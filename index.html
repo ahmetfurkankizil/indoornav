@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IndoorNav AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1>IndoorNav AI</h1>
+      <p class="tagline">Accessible indoor navigation for everyone.</p>
+      <a href="#about" class="btn">Learn More</a>
+    </div>
+  </header>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <h2>About the Project</h2>
+    <p>
+      IndoorNav AI helps blind and low-vision individuals navigate complex buildings 
+      using AR glasses, audio feedback, and wearable technologies. 
+      From hospitals and airports to malls and offices, our solution ensures safe 
+      navigation, even during emergencies.
+    </p>
+  </section>
+
+  <!-- Stakeholders -->
+  <section id="stakeholders" class="section alt">
+    <h2>Key Stakeholders</h2>
+    <ul>
+      <li>Hospitals & Medical Centers</li>
+      <li>Airports & Train Stations</li>
+      <li>Municipal Buildings & Courthouses</li>
+      <li>Corporate Campuses</li>
+      <li>Shopping Malls</li>
+    </ul>
+  </section>
+
+  <!-- Team -->
+  <section id="team" class="section">
+    <h2>Meet the Team</h2>
+    <ul class="team-list">
+      <li>Ahmet Furkan Kızıl (22203112)</li>
+      <li>Buğra Çayır (22202461)</li>
+      <li>Emirhan Kılıç (22203360)</li>
+      <li>Ahmet Zor (22203340)</li>
+      <li>Muhammet Ümit Tavus (22203317)</li>
+    </ul>
+  </section>
+
+  <!-- Resources -->
+  <section id="resources" class="section alt">
+    <h2>Resources</h2>
+    <ul>
+      <li><a href="#">GitHub Repositories</a></li>
+      <li><a href="#">Project Information Form</a></li>
+    </ul>
+  </section>
+
+  <!-- Pronunciation -->
+  <section id="pronunciation" class="section">
+    <h2>Pronunciation</h2>
+    <button onclick="playPronunciation()">🔊 Say "Indoor-Nav"</button>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 IndoorNav AI – Accessibility for Everyone</p>
+  </footer>
+
+  <script>
+    function playPronunciation() {
+      const msg = new SpeechSynthesisUtterance("Indoor Nav");
+      speechSynthesis.speak(msg);
+    }
+  </script>
+</body>
+</html>
