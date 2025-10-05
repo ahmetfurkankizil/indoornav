@@ -1,1 +1,1 @@
-# indoornav
+# Vectura AI
