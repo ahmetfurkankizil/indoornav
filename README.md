@@ -19,7 +19,7 @@ It serves as the **public-facing static site** for this repository.
 ## 🚀 Viewing the Site
 
 You can view the live page here:  
-👉 https://ahmetfurkankizil.github.io/indoornav/
+👉 https://ahmetfurkankizil.github.io/vecturai/
 
 
 ---
