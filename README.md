@@ -19,15 +19,8 @@ It serves as the **public-facing static site** for this repository.
 ## 🚀 Viewing the Site
 
 You can view the live page here:  
-👉 [https://<your-username>.github.io/<your-repo-name>/](https://<your-username>.github.io/<your-repo-name>/)
+👉 https://ahmetfurkankizil.github.io/indoornav/
 
----
-
-## 🛠️ Deployment Notes
-
-- This branch is automatically updated via your CI/CD workflow (e.g., GitHub Actions).  
-- Manual commits should be avoided unless adjusting static assets or configuration files.  
-- The root directory contains the compiled/static version of the project.
 
 ---
 
