@@ -1,0 +1,74 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters (Phone Camera - Template)
+# 
+# NOTE: This is a TEMPLATE file with approximate values.
+# For accurate SLAM results, run calibrate_camera.py to generate
+# proper calibration values for YOUR specific phone camera.
+#--------------------------------------------------------------------------------------------
+
+# Camera type: Pinhole
+Camera.type: "PinHole"
+
+# Camera calibration parameters (approximate values for 480p phone camera)
+# These MUST be calibrated for your specific phone for best accuracy!
+Camera.fx: 500.0
+Camera.fy: 500.0
+Camera.cx: 320.0
+Camera.cy: 240.0
+
+# Distortion parameters (OpenCV model)
+# Run calibration to get accurate values
+Camera.k1: 0.0
+Camera.k2: 0.0
+Camera.p1: 0.0
+Camera.p2: 0.0
+Camera.k3: 0.0
+
+# Camera resolution (matches your IP Webcam settings)
+# Using 640x480 for better performance
+Camera.width: 640
+Camera.height: 480
+
+# Camera frames per second
+Camera.fps: 30
+
+# Color order: RGB or BGR (IP Webcam sends BGR by default)
+Camera.RGB: 0
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# Number of features per image
+# Balance between accuracy and speed
+ORBextractor.nFeatures: 1000
+
+# Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# Number of levels in the scale pyramid
+ORBextractor.nLevels: 8
+
+# Fast threshold
+# LOWERED for more stable features (less flickering)
+ORBextractor.iniThFAST: 15
+# Minimum threshold (used if too few features found)
+ORBextractor.minThFAST: 5
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500
+
