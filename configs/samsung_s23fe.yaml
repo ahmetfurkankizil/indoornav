@@ -1,0 +1,141 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Samsung Galaxy S23 FE Camera-IMU Configuration for ORB-SLAM3
+# 
+# IMPORTANT: These are approximate values. For best results, calibrate your specific device:
+# 1. Camera intrinsics: Use OpenCV checkerboard calibration
+# 2. IMU noise: Collect static IMU data and compute Allan variance
+# 3. Camera-IMU extrinsics: Use Kalibr or similar tool
+#
+# Samsung S23 FE Main Camera Specs:
+# - 50MP, f/1.8, 24mm equivalent
+# - Sensor: ~1/1.56"
+#--------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters
+#--------------------------------------------------------------------------------------------
+
+# Camera type: "PinHole" or "Fisheye"
+Camera.type: "PinHole"
+
+# Camera resolution (streaming resolution, not native sensor)
+# IP Webcam sends 480x720 (portrait mode)
+Camera.width: 480
+Camera.height: 720
+
+# Camera intrinsic parameters (approximate for 480x720)
+# These should be calibrated for your specific device!
+# fx, fy: focal length in pixels
+# cx, cy: principal point (center of image)
+Camera.fx: 500.0
+Camera.fy: 500.0
+Camera.cx: 240.0
+Camera.cy: 360.0
+
+# Distortion coefficients (k1, k2, p1, p2, k3)
+# Smartphone cameras typically have minimal distortion after ISP correction
+Camera.k1: 0.0
+Camera.k2: 0.0
+Camera.p1: 0.0
+Camera.p2: 0.0
+Camera.k3: 0.0
+
+# Camera FPS
+Camera.fps: 30
+
+# Color order (0: BGR, 1: RGB)
+Camera.RGB: 1
+
+#--------------------------------------------------------------------------------------------
+# ORB Feature Extraction Parameters
+#--------------------------------------------------------------------------------------------
+
+# Number of features per image
+ORBextractor.nFeatures: 1000
+
+# Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# Number of levels in the scale pyramid
+ORBextractor.nLevels: 8
+
+# Fast threshold
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
+Viewer.imageViewScale: 1.0
+
+#--------------------------------------------------------------------------------------------
+# IMU Parameters
+#--------------------------------------------------------------------------------------------
+
+# IMU noise parameters (typical smartphone IMU values)
+# These should be calibrated using Allan variance for best results
+
+# Gyroscope noise density (rad/s/sqrt(Hz))
+IMU.NoiseGyro: 1.7e-4
+
+# Accelerometer noise density (m/s^2/sqrt(Hz))
+IMU.NoiseAcc: 2.0e-3
+
+# Gyroscope random walk (rad/s^2/sqrt(Hz))
+IMU.GyroWalk: 1.9e-5
+
+# Accelerometer random walk (m/s^3/sqrt(Hz))
+IMU.AccWalk: 3.0e-3
+
+# IMU frequency (Hz) - SensorServer default rate is ~30Hz
+IMU.Frequency: 30
+
+#--------------------------------------------------------------------------------------------
+# Camera-IMU Extrinsic Calibration
+#--------------------------------------------------------------------------------------------
+
+# Transformation from camera to IMU body frame (Tbc)
+# For smartphones, camera and IMU are nearly co-located
+# This is an identity transformation with slight offset for typical phone layout
+
+# Rotation (identity - camera and IMU roughly aligned)
+# Format: 4x4 transformation matrix [R|t; 0 0 0 1]
+Tbc: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [ 1.0,  0.0,  0.0,  0.00,
+           0.0,  1.0,  0.0,  0.00,
+           0.0,  0.0,  1.0,  0.00,
+           0.0,  0.0,  0.0,  1.0]
+
+# Time offset between camera and IMU (seconds)
+# Positive if IMU timestamp is ahead of camera timestamp
+IMU.T_offset: 0.0
+
+# Insert KFs when tracking is lost (for monocular-inertial)
+IMU.InsertKFsLost: 1
+
+#--------------------------------------------------------------------------------------------
+# System Parameters
+#--------------------------------------------------------------------------------------------
+
+# Use Loop Closing (1: yes, 0: no)
+System.LoopClosing: 1
+
+# Save trajectory automatically on shutdown
+System.SaveTrajectory: 1
+
