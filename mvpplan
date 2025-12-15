@@ -1,0 +1,936 @@
+
+## Phase 1 – New ARCore Project Skeleton
+
+**Goal:** Create a project in Android Studio, wire ARCore dependency, permissions, runtime camera permission, and verify a basic AR view.
+
+### 1.1 Create the project
+
+1. Open Android Studio → **New Project**.
+2. Template: **Empty Activity**.
+3. Name: `IndoorNavMvp`.
+4. Package name: `com.example.indoornavmvp` (or similar).
+5. Language: **Kotlin**.
+6. Minimum SDK: **24** (Android 7.0).
+7. Finish.
+
+### 1.2 Configure Gradle with ARCore
+
+Open `app/build.gradle.kts` (module-level Gradle):
+
+1. In the `android {}` block, set compileSdk using your style:
+
+```kotlin
+android {
+    namespace = "com.example.indoornavmvp"
+    compileSdk {
+        // If this syntax doesn’t compile, use: compileSdk = 36
+        version = release(36)
+    }
+
+    defaultConfig {
+        applicationId = "com.example.indoornavmvp"
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    // keep other defaults...
+}
+```
+
+If Android Studio complains about `compileSdk {}`, change to:
+
+```kotlin
+compileSdk = 36
+```
+
+2. In `dependencies {}`:
+
+```kotlin
+dependencies {
+    implementation("com.google.ar:core:1.51.0")
+    // other default dependencies stay
+}
+```
+
+3. Click **Sync Now**.
+
+### 1.3 Add AR permissions and feature to manifest
+
+Open `app/src/main/AndroidManifest.xml`:
+
+Inside `<manifest>` (top level), add:
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+
+<uses-feature
+    android:name="android.hardware.camera.ar"
+    android:required="true" />
+```
+
+Leave `<application>` and `<activity>` as created.
+
+### 1.4 Add runtime CAMERA permission
+
+We’ll handle permission in any AR activity (both Admin and User later).
+
+For now, we’ll assume our AR activity is `AdminActivity`.
+
+Create `AdminActivity.kt` in `app/src/main/java/com/example/indoornavmvp/`:
+
+```kotlin
+class AdminActivity : AppCompatActivity() {
+
+    companion object {
+        private const val CAMERA_PERMISSION_CODE = 1001
+        private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
+    }
+
+    private var session: Session? = null
+    private lateinit var surfaceView: SurfaceView
+    // you will add renderer later
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_admin)
+
+        surfaceView = findViewById(R.id.surfaceView)
+        // renderer setup will come later
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!hasCameraPermission()) {
+            requestCameraPermission()
+            return
+        }
+        startArSessionSafely()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        session?.pause()
+    }
+
+    private fun hasCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            CAMERA_PERMISSION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(CAMERA_PERMISSION),
+            CAMERA_PERMISSION_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            val granted = grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+
+            if (granted) {
+                startArSessionSafely()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Camera permission is required for AR",
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+        }
+    }
+
+    private fun startArSessionSafely() {
+        try {
+            if (session == null) {
+                session = Session(this)
+                val config = Config(session)
+                // later: enable depth, etc.
+                session!!.configure(config)
+            }
+            session?.resume()
+            // later: tell renderer to use this session
+        } catch (e: Exception) {
+            // ARCore not available or similar
+            Toast.makeText(this, "ARCore session failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+}
+```
+
+### 1.5 Create a basic AR layout
+
+Create `res/layout/activity_admin.xml`:
+
+```xml
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>
+```
+
+### 1.6 Set AdminActivity as launcher temporarily
+
+In `AndroidManifest.xml`, inside `<application>` replace the default activity with:
+
+```xml
+<activity
+    android:name=".AdminActivity"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+```
+
+(We’ll add StartActivity later.)
+
+### 1.7 Add a minimal renderer stub
+
+You need a renderer that:
+
+* Renders the camera background.
+* Renders a simple test object (cube).
+
+You can either:
+
+* Take the **ARCore “Hello AR”** sample code and adapt it (recommended).
+* Or ask Cursor to scaffold a “SimpleArRenderer” that:
+
+  * Uses the ARCore `Session`.
+  * In a loop: `session.update()` → draws `frame`’s camera image and a cube.
+
+Actions:
+
+1. Create `SimpleRenderer.kt` (Kotlin class).
+2. Give it:
+
+   * Reference to `Session`.
+   * Reference to `SurfaceView` or its `SurfaceHolder`.
+3. In renderer:
+
+   * Set up OpenGL context on the Surface.
+   * In a loop:
+
+     * Get `frame = session.update()`.
+     * Draw camera background.
+     * Use `frame.camera.displayOrientedPose` and projection matrix to draw a cube.
+
+**At this point:** build and run.
+Expected: camera background with a cube that stays in place when you move.
+
+If that works, Phase 1 is done.
+
+---
+
+## Phase 2 – Entry Screen and Mode Split
+
+**Goal:** Have a clear **Start screen** where you choose Admin or User mode. Admin mode shows AR; User mode will be filled later.
+
+### 2.1 Create StartActivity with two buttons
+
+Create `StartActivity.kt`:
+
+```kotlin
+class StartActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_start)
+
+        findViewById<Button>(R.id.btnAdmin).setOnClickListener {
+            startActivity(Intent(this, AdminActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnUser).setOnClickListener {
+            startActivity(Intent(this, UserActivity::class.java))
+        }
+    }
+}
+```
+
+Create `res/layout/activity_start.xml`:
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <Button
+        android:id="@+id/btnAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Admin Mode" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="16dp" />
+
+    <Button
+        android:id="@+id/btnUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Mode" />
+</LinearLayout>
+```
+
+### 2.2 Update launcher activity
+
+In `AndroidManifest.xml` replace the launcher activity:
+
+```xml
+<activity
+    android:name=".StartActivity"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+
+<activity
+    android:name=".AdminActivity"
+    android:exported="false" />
+
+<activity
+    android:name=".UserActivity"
+    android:exported="false" />
+```
+
+Create an empty `UserActivity` for now.
+
+Run the app: you should see Start screen → Admin → AR view.
+
+---
+
+## Phase 3 – Admin Mode: Place Nodes and Save Map
+
+**Goal:** In Admin mode you can:
+
+* Tap a button → capture current camera pose → store as “node”.
+* See a marker at each node.
+* Save all nodes to a local JSON file `map.json`.
+
+### 3.1 Data models for nodes
+
+Create `LocalNode.kt`:
+
+```kotlin
+data class LocalNode(
+    val id: Int,
+    val label: String,
+    val poseMatrix: FloatArray // 16 floats
+)
+
+// DTO for JSON
+data class NodeDto(
+    val id: Int,
+    val label: String,
+    val pose: List<Float>
+)
+```
+
+### 3.2 Extend admin layout with buttons
+
+Update `activity_admin.xml` to include two buttons:
+
+```xml
+<FrameLayout ...>
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/btnPlaceNode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Place Node"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/btnSaveMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save Map"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp" />
+
+</FrameLayout>
+```
+
+### 3.3 Track latest camera pose
+
+In the renderer, keep the latest camera pose:
+
+```kotlin
+class SimpleRenderer(
+    private val session: Session
+) {
+    @Volatile
+    var latestCameraPose: Pose? = null
+
+    fun drawFrame() {
+        val frame = session.update()
+        val camera = frame.camera
+
+        latestCameraPose = camera.displayOrientedPose
+
+        // draw camera background
+        // draw objects...
+    }
+}
+```
+
+In `AdminActivity`, hold a reference to renderer:
+
+```kotlin
+private lateinit var renderer: SimpleRenderer
+private val placedNodes = mutableListOf<LocalNode>()
+private var nextNodeId = 0
+```
+
+### 3.4 Implement “Place Node” button
+
+In `AdminActivity.onCreate`:
+
+```kotlin
+findViewById<Button>(R.id.btnPlaceNode).setOnClickListener {
+    val pose = renderer.latestCameraPose
+    if (pose != null) {
+        val matrix = FloatArray(16)
+        pose.toMatrix(matrix, 0)
+
+        val label = "NODE_$nextNodeId" // later: let admin choose
+        val node = LocalNode(
+            id = nextNodeId,
+            label = label,
+            poseMatrix = matrix
+        )
+        placedNodes.add(node)
+        nextNodeId++
+    } else {
+        Toast.makeText(this, "No pose yet", Toast.LENGTH_SHORT).show()
+    }
+}
+```
+
+### 3.5 Render markers at node positions
+
+In `SimpleRenderer`, allow injecting node poses:
+
+```kotlin
+@Volatile
+var nodePoses: List<FloatArray> = emptyList()
+```
+
+In `drawFrame()`:
+
+* After drawing background, loop through `nodePoses`:
+
+  * For each `poseMatrix`, set model matrix accordingly, draw a small sphere.
+
+In `AdminActivity`, after placing nodes:
+
+```kotlin
+renderer.nodePoses = placedNodes.map { it.poseMatrix }
+```
+
+Now, when you tap “Place Node”, a marker should appear in AR.
+
+### 3.6 Save map to JSON
+
+Add Gson dependency in `build.gradle.kts`:
+
+```kotlin
+implementation("com.google.code.gson:gson:2.11.0")
+```
+
+In `AdminActivity.onCreate`:
+
+```kotlin
+findViewById<Button>(R.id.btnSaveMap).setOnClickListener {
+    saveMapToFile()
+}
+```
+
+Implement `saveMapToFile()`:
+
+```kotlin
+private fun saveMapToFile() {
+    if (placedNodes.isEmpty()) {
+        Toast.makeText(this, "No nodes to save", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val dtos = placedNodes.map {
+        NodeDto(
+            id = it.id,
+            label = it.label,
+            pose = it.poseMatrix.toList()
+        )
+    }
+
+    val json = Gson().toJson(dtos)
+    val file = File(filesDir, "map.json")
+    file.writeText(json)
+
+    Toast.makeText(this, "Saved ${dtos.size} nodes to ${file.absolutePath}", Toast.LENGTH_LONG).show()
+}
+```
+
+**Checkpoint:** Run app → Admin Mode → place 3–4 nodes in a corridor → Save → verify `map.json` exists via Device File Explorer.
+
+---
+
+## Phase 4 – Nav Graph and Pathfinding (non-AR User)
+
+**Goal:** Build a tiny navigation graph and pathfinding over nodes, tested first in a simple text User screen.
+
+### 4.1 Navigation model classes
+
+Create `NavModels.kt`:
+
+```kotlin
+@JvmInline
+value class NodeId(val value: String)
+
+data class NavNode(
+    val id: NodeId,
+    val label: String
+)
+
+data class Edge(
+    val from: NodeId,
+    val to: NodeId,
+    val cost: Float
+)
+
+data class Room(
+    val id: String,
+    val name: String,
+    val doorNode: NodeId
+)
+
+data class NavGraph(
+    val nodes: List<NavNode>,
+    val edges: List<Edge>,
+    val rooms: List<Room>
+)
+```
+
+### 4.2 Build NavGraph from NodeDto (MVP simple)
+
+Create `MapRepository.kt`:
+
+```kotlin
+object MapRepository {
+
+    fun loadNodeDtos(context: Context): List<NodeDto> {
+        val file = File(context.filesDir, "map.json")
+        if (!file.exists()) return emptyList()
+        val json = file.readText()
+        return Gson().fromJson(json, Array<NodeDto>::class.java).toList()
+    }
+
+    fun buildNavGraphFromDtos(nodeDtos: List<NodeDto>): NavGraph {
+        if (nodeDtos.isEmpty()) {
+            return NavGraph(emptyList(), emptyList(), emptyList())
+        }
+
+        val navNodes = nodeDtos.map {
+            NavNode(
+                id = NodeId("NODE_${it.id}"),
+                label = it.label
+            )
+        }
+
+        // MVP: connect nodes sequentially: NODE_0 -> NODE_1 -> NODE_2...
+        val edges = nodeDtos.zipWithNext().map { (a, b) ->
+            Edge(NodeId("NODE_${a.id}"), NodeId("NODE_${b.id}"), 1f)
+        }
+
+        // MVP: assume last node is the door to Room 201
+        val rooms = listOf(
+            Room(
+                id = "room_201",
+                name = "Room 201",
+                doorNode = NodeId("NODE_${nodeDtos.last().id}")
+            )
+        )
+
+        return NavGraph(navNodes, edges, rooms)
+    }
+}
+```
+
+### 4.3 Implement simple shortest path (Dijkstra)
+
+Create `PathFinder.kt`:
+
+```kotlin
+object PathFinder {
+
+    fun shortestPath(graph: NavGraph, start: NodeId, goal: NodeId): List<NodeId> {
+        val neighbors = graph.edges.groupBy { it.from }
+
+        val dist = mutableMapOf<NodeId, Float>().withDefault { Float.POSITIVE_INFINITY }
+        val prev = mutableMapOf<NodeId, NodeId?>()
+
+        val queue = PriorityQueue<Pair<NodeId, Float>>(compareBy { it.second })
+
+        dist[start] = 0f
+        queue.add(start to 0f)
+
+        val allNodes = graph.nodes.map { it.id }.toSet()
+
+        while (queue.isNotEmpty()) {
+            val (u, d) = queue.poll()
+            if (u == goal) break
+            if (d > dist.getValue(u)) continue
+
+            val edges = neighbors[u] ?: emptyList()
+            for (e in edges) {
+                val v = e.to
+                if (v !in allNodes) continue
+                val alt = d + e.cost
+                if (alt < dist.getValue(v)) {
+                    dist[v] = alt
+                    prev[v] = u
+                    queue.add(v to alt)
+                }
+            }
+        }
+
+        if (!prev.containsKey(goal) && start != goal) {
+            return emptyList()
+        }
+
+        // reconstruct path
+        val path = mutableListOf<NodeId>()
+        var cur: NodeId? = goal
+        while (cur != null) {
+            path.add(cur)
+            cur = prev[cur]
+        }
+        if (path.last() != start) return emptyList()
+        path.reverse()
+        return path
+    }
+}
+```
+
+### 4.4 Temporary non-AR UserActivity
+
+Create `UserActivity.kt` with a simple text UI to test nav logic:
+
+```kotlin
+class UserActivity : AppCompatActivity() {
+
+    private lateinit var rooms: List<Room>
+    private lateinit var graph: NavGraph
+    private lateinit var roomsSpinner: Spinner
+    private lateinit var txtRoute: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_user_non_ar)
+
+        roomsSpinner = findViewById(R.id.spinnerRooms)
+        txtRoute = findViewById(R.id.txtRoute)
+
+        val dtos = MapRepository.loadNodeDtos(this)
+        graph = MapRepository.buildNavGraphFromDtos(dtos)
+        rooms = graph.rooms
+
+        val roomNames = rooms.map { it.name }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, roomNames)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        roomsSpinner.adapter = adapter
+
+        findViewById<Button>(R.id.btnComputeRoute).setOnClickListener {
+            computeRoute()
+        }
+    }
+
+    private fun computeRoute() {
+        if (rooms.isEmpty()) {
+            txtRoute.text = "No rooms defined"
+            return
+        }
+        val selectedIndex = roomsSpinner.selectedItemPosition
+        val room = rooms[selectedIndex]
+
+        val startNode = graph.nodes.firstOrNull()?.id
+        if (startNode == null) {
+            txtRoute.text = "No nodes in graph"
+            return
+        }
+
+        val path = PathFinder.shortestPath(graph, startNode, room.doorNode)
+        if (path.isEmpty()) {
+            txtRoute.text = "No path found"
+        } else {
+            txtRoute.text = path.joinToString(" -> ") { it.value }
+        }
+    }
+}
+```
+
+Layout `activity_user_non_ar.xml`:
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Spinner
+        android:id="@+id/spinnerRooms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnComputeRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compute Route" />
+
+    <TextView
+        android:id="@+id/txtRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Route will appear here"
+        android:paddingTop="16dp" />
+
+</LinearLayout>
+```
+
+**Checkpoint:**
+Admin: place nodes + save.
+User: open user mode → select Room 201 → see route like `NODE_0 -> NODE_1 -> NODE_2`.
+
+---
+
+## Phase 5 – AR User Navigation with Arrows (same session, MVP)
+
+**Goal:** In UserActivity (AR), display:
+
+* Visible node markers at saved positions.
+* A big arrow pointing to the next node along computed path.
+* When close to node, advance to next.
+
+### 5.1 Make UserActivity AR-based
+
+Create `UserArActivity.kt` by copying the AR structure from `AdminActivity`:
+
+* Same permission logic.
+* Same `Session`, `SurfaceView`, and `SimpleRenderer`.
+
+Layout `activity_user_ar.xml`:
+
+```xml
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#66000000"
+        android:padding="8dp"
+        android:layout_gravity="top">
+
+        <Spinner
+            android:id="@+id/spinnerRooms"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnStartNav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start" />
+    </LinearLayout>
+</FrameLayout>
+```
+
+Adjust `StartActivity` to open `UserArActivity` instead of old `UserActivity` if you want.
+
+### 5.2 Load nodes & build graph in UserArActivity
+
+In `UserArActivity`:
+
+* On `onCreate`:
+
+```kotlin
+private lateinit var renderer: SimpleRenderer
+private lateinit var graph: NavGraph
+private lateinit var nodeDtos: List<NodeDto>
+private lateinit var rooms: List<Room>
+private var currentPath: List<NodeId> = emptyList()
+private var currentStepIndex = 0
+
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_user_ar)
+
+    val surfaceView: SurfaceView = findViewById(R.id.surfaceView)
+    // setup renderer with session later
+
+    val dtos = MapRepository.loadNodeDtos(this)
+    nodeDtos = dtos
+    graph = MapRepository.buildNavGraphFromDtos(dtos)
+    rooms = graph.rooms
+
+    val spinnerRooms: Spinner = findViewById(R.id.spinnerRooms)
+    val roomNames = rooms.map { it.name }
+    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, roomNames)
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    spinnerRooms.adapter = adapter
+
+    findViewById<Button>(R.id.btnStartNav).setOnClickListener {
+        if (rooms.isEmpty()) return@setOnClickListener
+        val selectedIndex = spinnerRooms.selectedItemPosition
+        val room = rooms[selectedIndex]
+        val startNode = graph.nodes.firstOrNull()?.id ?: return@setOnClickListener
+
+        currentPath = PathFinder.shortestPath(graph, startNode, room.doorNode)
+        currentStepIndex = 0
+        updateRendererNodeData()
+    }
+}
+```
+
+### 5.3 Provide node poses and path to renderer
+
+Extend `SimpleRenderer` with:
+
+```kotlin
+@Volatile
+var nodePoseById: Map<NodeId, FloatArray> = emptyMap()
+
+@Volatile
+var pathNodeIds: List<NodeId> = emptyList()
+
+@Volatile
+var currentStepIndex: Int = 0
+```
+
+In `UserArActivity`, after computing `currentPath`:
+
+```kotlin
+private fun updateRendererNodeData() {
+    val poseMap = nodeDtos.associate { dto ->
+        val matrix = FloatArray(16)
+        dto.pose.forEachIndexed { index, v -> matrix[index] = v }
+        NodeId("NODE_${dto.id}") to matrix
+    }
+    renderer.nodePoseById = poseMap
+    renderer.pathNodeIds = currentPath
+    renderer.currentStepIndex = currentStepIndex
+}
+```
+
+### 5.4 In renderer: draw nodes and arrow and update step index
+
+Inside `SimpleRenderer.drawFrame()`:
+
+1. After `frame = session.update()`:
+
+   * Get camera pose: `val camPose = frame.camera.displayOrientedPose`.
+
+2. Draw camera background.
+
+3. Draw all node markers:
+
+   * For each `nodePoseById.values`:
+
+     * Set model matrix to that pose, draw small sphere.
+
+4. If `pathNodeIds` not empty:
+
+   ```kotlin
+   if (pathNodeIds.isNotEmpty()) {
+       val clampedIndex = currentStepIndex.coerceIn(0, pathNodeIds.size - 1)
+       val nextNodeId = pathNodeIds[clampedIndex]
+       val nodeMatrix = nodePoseById[nextNodeId]
+       if (nodeMatrix != null) {
+           val nodePose = Pose.makePose(nodeMatrix)
+
+           // distance to camera
+           val dx = nodePose.tx() - camPose.tx()
+           val dy = nodePose.ty() - camPose.ty()
+           val dz = nodePose.tz() - camPose.tz()
+           val dist = sqrt(dx*dx + dy*dy + dz*dz)
+
+           // if close enough, advance to next node
+           if (dist < 0.7f && currentStepIndex < pathNodeIds.size - 1) {
+               currentStepIndex++
+           }
+
+           // draw a big arrow at nodePose
+           drawArrowAtPose(nodePose)
+       }
+   }
+   ```
+
+Where `drawArrowAtPose(pose: Pose)` uses model matrix from pose and draws an arrow mesh.
+
+You’ll need to synchronize `currentStepIndex` back to `UserArActivity` only if you want UI updates; for MVP you can keep it purely inside renderer.
+
+**Now your MVP behavior:**
+
+1. Admin:
+
+   * Open Admin mode.
+   * Walk corridor.
+   * Tap “Place Node” a few times along the corridor and at door.
+   * Tap “Save Map”.
+2. User:
+
+   * Open User AR mode.
+   * Select Room 201 (assumed door node = last node).
+   * Tap Start.
+   * AR view:
+
+     * Shows nodes as small balls.
+     * Arrow appears at the first node in path.
+   * As you walk close to first node, arrow jumps to next node, until door.
+
+That’s your **full, minimum MVP**:
+ARCore used for tracking and rendering, minimal navigation from node to node, using data captured in the same device/app.
+
