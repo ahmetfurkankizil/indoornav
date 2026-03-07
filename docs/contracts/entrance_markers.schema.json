@@ -1,0 +1,72 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Entrance Markers",
+    "description": "Entrance marker definitions for AR world alignment and localization.",
+    "type": "object",
+    "required": [
+        "buildingId",
+        "markers"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string"
+        },
+        "markers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "qrPayload",
+                    "positionX",
+                    "positionY",
+                    "nearestNodeId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique marker identifier"
+                    },
+                    "qrPayload": {
+                        "type": "string",
+                        "description": "QR code content (JSON or URI with building/marker IDs)"
+                    },
+                    "positionX": {
+                        "type": "number",
+                        "description": "Marker X position in nav-graph coordinate system (meters)"
+                    },
+                    "positionY": {
+                        "type": "number",
+                        "description": "Marker Y position in nav-graph coordinate system (meters)"
+                    },
+                    "positionZ": {
+                        "type": "number",
+                        "description": "Marker Z position (elevation)",
+                        "default": 0
+                    },
+                    "rotationYDegrees": {
+                        "type": "number",
+                        "description": "Marker rotation around Y-axis in degrees",
+                        "default": 0
+                    },
+                    "nearestNodeId": {
+                        "type": "string",
+                        "description": "Closest nav-graph node to this marker"
+                    },
+                    "physicalWidthMeters": {
+                        "type": "number",
+                        "description": "Physical width of the printed marker for AR scale",
+                        "default": 0.2
+                    },
+                    "referenceImageName": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Name of the AR reference image asset"
+                    }
+                }
+            }
+        }
+    }
+}

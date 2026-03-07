@@ -1,0 +1,76 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Rooms",
+    "description": "Room/POI definitions for a building, used for search and navigation targets.",
+    "type": "object",
+    "required": [
+        "buildingId",
+        "rooms"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string"
+        },
+        "rooms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "entryNodeIds"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique room identifier"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Human-readable room name"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Optional room description"
+                    },
+                    "category": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Room category (e.g., 'office', 'restroom', 'meeting', 'kitchen')"
+                    },
+                    "entryNodeIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Nav graph node IDs that serve as entry points"
+                    },
+                    "centerX": {
+                        "type": "number",
+                        "description": "Room center X for map display"
+                    },
+                    "centerY": {
+                        "type": "number",
+                        "description": "Room center Y for map display"
+                    },
+                    "floor": {
+                        "type": "string",
+                        "default": "ground"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "Arbitrary key-value metadata"
+                    }
+                }
+            }
+        }
+    }
+}

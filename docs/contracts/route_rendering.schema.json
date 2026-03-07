@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Route Rendering Configuration",
+    "description": "Configuration for how navigation routes are rendered in AR and on the 2D map.",
+    "type": "object",
+    "required": [
+        "buildingId"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string"
+        },
+        "arArrows": {
+            "type": "object",
+            "description": "AR 3D arrow rendering configuration",
+            "properties": {
+                "modelAsset": {
+                    "type": "string",
+                    "description": "3D model filename for the navigation arrow",
+                    "default": "arrow.glb"
+                },
+                "colorHex": {
+                    "type": "string",
+                    "description": "Arrow color as hex string",
+                    "default": "#2563EB"
+                },
+                "spacingMeters": {
+                    "type": "number",
+                    "description": "Distance between consecutive arrows along the path",
+                    "default": 1.5
+                },
+                "heightAboveFloorMeters": {
+                    "type": "number",
+                    "description": "Height of arrows above the floor surface",
+                    "default": 0.1
+                },
+                "scale": {
+                    "type": "number",
+                    "description": "Scale factor for the arrow model",
+                    "default": 1.0
+                },
+                "animationType": {
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "pulse",
+                        "bounce",
+                        "glow"
+                    ],
+                    "description": "Animation applied to arrows",
+                    "default": "pulse"
+                }
+            }
+        },
+        "destinationMarker": {
+            "type": "object",
+            "description": "Configuration for the destination indicator",
+            "properties": {
+                "modelAsset": {
+                    "type": "string",
+                    "default": "destination_pin.glb"
+                },
+                "colorHex": {
+                    "type": "string",
+                    "default": "#F59E0B"
+                },
+                "heightAboveFloorMeters": {
+                    "type": "number",
+                    "default": 1.0
+                }
+            }
+        },
+        "pathLine": {
+            "type": "object",
+            "description": "2D path line rendering for map preview",
+            "properties": {
+                "colorHex": {
+                    "type": "string",
+                    "default": "#60A5FA"
+                },
+                "widthDp": {
+                    "type": "number",
+                    "default": 4
+                },
+                "dashPattern": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "number"
+                    },
+                    "description": "Dash pattern [on, off] in dp. null for solid line."
+                }
+            }
+        }
+    }
+}

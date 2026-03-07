@@ -1,0 +1,101 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Navigation Graph",
+    "description": "Indoor navigation graph with nodes (waypoints) and edges (connections) for pathfinding.",
+    "type": "object",
+    "required": [
+        "buildingId",
+        "floorId",
+        "nodes",
+        "edges",
+        "version"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string"
+        },
+        "floorId": {
+            "type": "string",
+            "default": "ground"
+        },
+        "version": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "nodes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "x",
+                    "y"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique node identifier"
+                    },
+                    "x": {
+                        "type": "number",
+                        "description": "X coordinate in meters (building-local)"
+                    },
+                    "y": {
+                        "type": "number",
+                        "description": "Y coordinate in meters (building-local)"
+                    },
+                    "z": {
+                        "type": "number",
+                        "description": "Z coordinate (elevation), always 0 for single floor",
+                        "default": 0
+                    },
+                    "label": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Optional human-readable label"
+                    },
+                    "roomId": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Associated room ID if this node is inside a room"
+                    }
+                }
+            }
+        },
+        "edges": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "from",
+                    "to",
+                    "weight"
+                ],
+                "properties": {
+                    "from": {
+                        "type": "string",
+                        "description": "Source node ID"
+                    },
+                    "to": {
+                        "type": "string",
+                        "description": "Destination node ID"
+                    },
+                    "weight": {
+                        "type": "number",
+                        "description": "Edge weight (typically Euclidean distance in meters)",
+                        "minimum": 0
+                    },
+                    "isAccessible": {
+                        "type": "boolean",
+                        "description": "Whether this edge is currently traversable",
+                        "default": true
+                    }
+                }
+            }
+        }
+    }
+}
