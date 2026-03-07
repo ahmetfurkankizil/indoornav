@@ -1,0 +1,289 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Authoring Config",
+    "description": "Human-authored building annotation file. Input to the nav-preprocessor CLI.",
+    "type": "object",
+    "required": [
+        "buildingId",
+        "buildingName",
+        "floorId",
+        "asset",
+        "entranceMarkers",
+        "nodes",
+        "edges",
+        "rooms"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string",
+            "minLength": 1
+        },
+        "buildingName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "floorId": {
+            "type": "string",
+            "default": "ground"
+        },
+        "asset": {
+            "type": "object",
+            "required": [
+                "glbFile"
+            ],
+            "properties": {
+                "glbFile": {
+                    "type": "string",
+                    "description": "Relative path to Polycam .glb file"
+                },
+                "sourceApp": {
+                    "type": "string",
+                    "default": "polycam"
+                },
+                "scanDate": {
+                    "type": "string",
+                    "format": "date"
+                }
+            }
+        },
+        "tags": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "entranceMarkers": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "startNodeId",
+                    "physicalWidthMeters",
+                    "physicalHeightMeters",
+                    "position"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "startNodeId": {
+                        "type": "string",
+                        "description": "Graph node nearest to this marker"
+                    },
+                    "physicalWidthMeters": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "physicalHeightMeters": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "position": {
+                        "type": "object",
+                        "required": [
+                            "x",
+                            "y",
+                            "z"
+                        ],
+                        "properties": {
+                            "x": {
+                                "type": "number"
+                            },
+                            "y": {
+                                "type": "number"
+                            },
+                            "z": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "forwardBasis": {
+                        "type": "string",
+                        "enum": [
+                            "+x",
+                            "-x",
+                            "+z",
+                            "-z"
+                        ],
+                        "default": "-z",
+                        "description": "Direction the marker faces in building-local coords (Y-up, default -Z is forward)"
+                    },
+                    "rotationYDegrees": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "referenceImageName": {
+                        "type": "string"
+                    },
+                    "notes": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "nodes": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "x",
+                    "y"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    },
+                    "z": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "waypoint",
+                            "entrance",
+                            "room_entry",
+                            "junction",
+                            "poi"
+                        ],
+                        "default": "waypoint"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "edges": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "from",
+                    "to",
+                    "cost"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "from": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "bidirectional": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "rooms": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "displayName",
+                    "destinationNodeId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "destinationNodeId": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "keywords": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "aliases": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "routeRendering": {
+            "type": "object",
+            "properties": {
+                "arrowSpacingMeters": {
+                    "type": "number",
+                    "default": 1.5,
+                    "minimum": 0.3
+                },
+                "lookaheadDistanceMeters": {
+                    "type": "number",
+                    "default": 8.0,
+                    "minimum": 1.0
+                },
+                "destinationThresholdMeters": {
+                    "type": "number",
+                    "default": 1.5,
+                    "minimum": 0.3
+                },
+                "turnMarkerThresholdDegrees": {
+                    "type": "number",
+                    "default": 30.0,
+                    "minimum": 5.0
+                },
+                "arrowHeightOffsetMeters": {
+                    "type": "number",
+                    "default": 0.05,
+                    "minimum": 0.0
+                }
+            }
+        },
+        "graphMetadata": {
+            "type": "object",
+            "properties": {
+                "authorName": {
+                    "type": "string"
+                },
+                "authoredDate": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "notes": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,313 @@
+{
+    "buildingId": "demo-office-01",
+    "buildingName": "VecturAI Demo Office",
+    "floorId": "ground",
+    "asset": {
+        "glbFile": "scan.glb",
+        "sourceApp": "polycam",
+        "scanDate": "2026-03-08"
+    },
+    "tags": [
+        "demo",
+        "office",
+        "single-floor"
+    ],
+    "graphMetadata": {
+        "authorName": "VecturAI Team",
+        "authoredDate": "2026-03-08",
+        "notes": "Synthetic demo building for development and testing. Represents a small office with a corridor, rooms on both sides, and a lobby."
+    },
+    "entranceMarkers": [
+        {
+            "id": "marker-main",
+            "startNodeId": "n01",
+            "physicalWidthMeters": 0.21,
+            "physicalHeightMeters": 0.21,
+            "position": {
+                "x": 0.0,
+                "y": 1.2,
+                "z": 0.0
+            },
+            "forwardBasis": "-z",
+            "rotationYDegrees": 0,
+            "referenceImageName": "entrance_marker_main",
+            "notes": "Main entrance door, marker mounted on wall at 1.2m height"
+        }
+    ],
+    "nodes": [
+        {
+            "id": "n01",
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "entrance",
+            "label": "Main Entrance"
+        },
+        {
+            "id": "n02",
+            "x": 3.0,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "junction",
+            "label": "Lobby Center"
+        },
+        {
+            "id": "n03",
+            "x": 6.0,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "junction",
+            "label": "Corridor Start"
+        },
+        {
+            "id": "n04",
+            "x": 6.0,
+            "y": 0.0,
+            "z": 4.0,
+            "type": "junction",
+            "label": "Corridor Mid-Left"
+        },
+        {
+            "id": "n05",
+            "x": 6.0,
+            "y": 0.0,
+            "z": 8.0,
+            "type": "junction",
+            "label": "Corridor Mid-Right"
+        },
+        {
+            "id": "n06",
+            "x": 6.0,
+            "y": 0.0,
+            "z": 12.0,
+            "type": "junction",
+            "label": "Corridor End"
+        },
+        {
+            "id": "n07",
+            "x": 3.0,
+            "y": 0.0,
+            "z": 4.0,
+            "type": "room_entry",
+            "label": "Conference Room Entry"
+        },
+        {
+            "id": "n08",
+            "x": 9.0,
+            "y": 0.0,
+            "z": 4.0,
+            "type": "room_entry",
+            "label": "Office A Entry"
+        },
+        {
+            "id": "n09",
+            "x": 3.0,
+            "y": 0.0,
+            "z": 8.0,
+            "type": "room_entry",
+            "label": "Kitchen Entry"
+        },
+        {
+            "id": "n10",
+            "x": 9.0,
+            "y": 0.0,
+            "z": 8.0,
+            "type": "room_entry",
+            "label": "Office B Entry"
+        },
+        {
+            "id": "n11",
+            "x": 3.0,
+            "y": 0.0,
+            "z": 12.0,
+            "type": "room_entry",
+            "label": "Restroom Entry"
+        },
+        {
+            "id": "n12",
+            "x": 9.0,
+            "y": 0.0,
+            "z": 12.0,
+            "type": "room_entry",
+            "label": "Server Room Entry"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e01",
+            "from": "n01",
+            "to": "n02",
+            "cost": 3.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e02",
+            "from": "n02",
+            "to": "n03",
+            "cost": 3.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e03",
+            "from": "n03",
+            "to": "n04",
+            "cost": 4.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e04",
+            "from": "n04",
+            "to": "n05",
+            "cost": 4.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e05",
+            "from": "n05",
+            "to": "n06",
+            "cost": 4.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e06",
+            "from": "n04",
+            "to": "n07",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Conference Room"
+        },
+        {
+            "id": "e07",
+            "from": "n04",
+            "to": "n08",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Office A"
+        },
+        {
+            "id": "e08",
+            "from": "n05",
+            "to": "n09",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Kitchen"
+        },
+        {
+            "id": "e09",
+            "from": "n05",
+            "to": "n10",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Office B"
+        },
+        {
+            "id": "e10",
+            "from": "n06",
+            "to": "n11",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Restroom"
+        },
+        {
+            "id": "e11",
+            "from": "n06",
+            "to": "n12",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": "To Server Room"
+        }
+    ],
+    "rooms": [
+        {
+            "id": "room-conf",
+            "displayName": "Conference Room",
+            "destinationNodeId": "n07",
+            "category": "meeting",
+            "keywords": [
+                "meeting",
+                "presentation",
+                "projector"
+            ],
+            "aliases": [
+                "Meeting Room",
+                "Board Room"
+            ]
+        },
+        {
+            "id": "room-office-a",
+            "displayName": "Office A",
+            "destinationNodeId": "n08",
+            "category": "office",
+            "keywords": [
+                "desk",
+                "workspace"
+            ],
+            "aliases": [
+                "Room 101"
+            ]
+        },
+        {
+            "id": "room-kitchen",
+            "displayName": "Kitchen",
+            "destinationNodeId": "n09",
+            "category": "facility",
+            "keywords": [
+                "coffee",
+                "lunch",
+                "microwave",
+                "fridge"
+            ],
+            "aliases": [
+                "Break Room",
+                "Pantry"
+            ]
+        },
+        {
+            "id": "room-office-b",
+            "displayName": "Office B",
+            "destinationNodeId": "n10",
+            "category": "office",
+            "keywords": [
+                "desk",
+                "workspace"
+            ],
+            "aliases": [
+                "Room 102"
+            ]
+        },
+        {
+            "id": "room-restroom",
+            "displayName": "Restroom",
+            "destinationNodeId": "n11",
+            "category": "facility",
+            "keywords": [
+                "bathroom",
+                "toilet",
+                "WC"
+            ],
+            "aliases": [
+                "Bathroom",
+                "WC"
+            ]
+        },
+        {
+            "id": "room-server",
+            "displayName": "Server Room",
+            "destinationNodeId": "n12",
+            "category": "utility",
+            "keywords": [
+                "IT",
+                "network",
+                "rack"
+            ],
+            "description": "Restricted access — IT staff only"
+        }
+    ],
+    "routeRendering": {
+        "arrowSpacingMeters": 1.5,
+        "lookaheadDistanceMeters": 8.0,
+        "destinationThresholdMeters": 1.5,
+        "turnMarkerThresholdDegrees": 30.0,
+        "arrowHeightOffsetMeters": 0.05
+    }
+}

@@ -5,23 +5,24 @@ import kotlinx.serialization.Serializable
 /**
  * An entrance marker used for AR world alignment.
  *
- * Each entrance marker is a physical marker placed at a known location
- * in the building. It contains both a QR code (for payload decoding) and
- * a visual reference image (for ARKit/ARCore image detection).
+ * Coordinates use the building-local coordinate system (meters, Y-up).
  *
- * When a user scans this marker, the AR system establishes the relationship
- * between the physical world coordinate system and the navigation graph
- * coordinate system.
+ * When a user scans this marker, the AR system:
+ * 1. Decodes the QR payload to identify the building + marker
+ * 2. Detects the marker image to get 6-DoF pose in device coords
+ * 3. Uses the known marker pose in building coords to compute the transform
  *
  * @property id Unique marker identifier
- * @property qrPayload The data encoded in the QR code (e.g., building ID, marker ID)
- * @property positionX Marker position X in the nav-graph coordinate system
- * @property positionY Marker position Y in the nav-graph coordinate system
- * @property positionZ Marker position Z in the nav-graph coordinate system
+ * @property qrPayload QR code content (typically "vecturai://building/{buildingId}/marker/{id}")
+ * @property positionX Marker X in building-local coords (meters)
+ * @property positionY Marker Y in building-local coords (meters)
+ * @property positionZ Marker Z in building-local coords (meters)
  * @property rotationYDegrees Marker rotation around Y-axis in degrees
- * @property nearestNodeId The closest NavNode to this marker's position
- * @property physicalWidthMeters Physical width of the marker for AR scale detection
- * @property referenceImageName Name of the reference image asset for AR detection
+ * @property forwardBasis Semantic facing direction of the marker ("+x", "-x", "+z", "-z")
+ * @property nearestNodeId Graph node closest to this marker (start of navigation)
+ * @property physicalWidthMeters Physical printed width for AR scale detection
+ * @property physicalHeightMeters Physical printed height
+ * @property referenceImageName Name of the AR reference image asset
  */
 @Serializable
 data class EntranceMarker(
@@ -31,7 +32,9 @@ data class EntranceMarker(
     val positionY: Double,
     val positionZ: Double = 0.0,
     val rotationYDegrees: Double = 0.0,
+    val forwardBasis: String = "-z",
     val nearestNodeId: String,
     val physicalWidthMeters: Double = 0.2,
+    val physicalHeightMeters: Double = 0.2,
     val referenceImageName: String? = null,
 )

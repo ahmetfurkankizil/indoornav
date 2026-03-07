@@ -1,10 +1,10 @@
 # VecturAI — Indoor AR Navigation
 
-> Kotlin Multiplatform indoor navigation app with AR guidance for Android and iOS.
+> Kotlin Multiplatform indoor navigation with AR guidance for Android and iOS.
 
 VecturAI guides users through buildings using augmented reality. Users scan an entrance marker, select a destination, and follow 3D arrows overlaid on the camera view — supplemented by textual step-by-step directions and a strong non-AR UI.
 
-**Status:** v0.1.0 — Architecture skeleton & code scaffold (MVP in development)
+**Status:** v1.0.0 — Working authoring → preprocessing → loading → routing pipeline
 
 ---
 
@@ -15,15 +15,7 @@ VecturAI guides users through buildings using augmented reality. Users scan an e
 │                    Mobile Apps                          │
 │  ┌──────────────────┐     ┌──────────────────────┐     │
 │  │   Android App    │     │      iOS App          │     │
-│  │  ┌────────────┐  │     │  ┌────────────────┐  │     │
-│  │  │  Compose   │  │     │  │   Compose MP   │  │     │
-│  │  │  MP Shell  │  │     │  │   Shell (UIKit │  │     │
-│  │  │            │  │     │  │   hosted)      │  │     │
-│  │  └────────────┘  │     │  └────────────────┘  │     │
-│  │  ┌────────────┐  │     │  ┌────────────────┐  │     │
-│  │  │  ARCore    │  │     │  │  ARKit /       │  │     │
-│  │  │  Native AR │  │     │  │  RealityKit    │  │     │
-│  │  └────────────┘  │     │  └────────────────┘  │     │
+│  │  Compose MP + AR │     │  Compose MP + AR      │     │
 │  └──────────────────┘     └──────────────────────┘     │
 ├─────────────────────────────────────────────────────────┤
 │                   Shared (KMP)                          │
@@ -31,17 +23,14 @@ VecturAI guides users through buildings using augmented reality. Users scan an e
 │  │   core   │ │ feature- │ │ feature- │ │ feature- │  │
 │  │ (domain, │ │  search  │ │ routing  │ │ history  │  │
 │  │ routing, │ │          │ │          │ │          │  │
-│  │ store)   │ │          │ │          │ │          │  │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
-│  │ feature- │ │  data-   │ │  data-   │ │ design-  │  │
-│  │ preview  │ │  local   │ │  remote  │ │ system   │  │
+│  │ loading) │ │          │ │          │ │          │  │
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
 ├─────────────────────────────────────────────────────────┤
 │                    Tools                                │
 │  ┌──────────────────────────────────────┐              │
 │  │  nav-preprocessor (JVM CLI)          │              │
-│  │  Polycam .glb → JSON contracts       │              │
+│  │  authoring_config.json + .glb        │              │
+│  │  → building package + debug SVG      │              │
 │  └──────────────────────────────────────┘              │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -55,111 +44,159 @@ VecturAI guides users through buildings using augmented reality. Users scan an e
 | 3 | Offline preprocessing from Polycam | [ADR-003](docs/adr/ADR-003-offline-preprocessing.md) |
 | 4 | Entrance marker-based initialization | [ADR-004](docs/adr/ADR-004-entrance-marker-init.md) |
 | 5 | Single-floor static-map MVP | [ADR-005](docs/adr/ADR-005-single-floor-mvp.md) |
+| 6 | Assisted graph authoring for v1 | [ADR-006](docs/adr/ADR-006-assisted-authoring.md) |
+
+---
+
+## Authoring Workflow (V1)
+
+V1 uses a **semi-automatic assisted workflow** (see [ADR-006](docs/adr/ADR-006-assisted-authoring.md)):
+
+```
+1. Scan building with Polycam → export .glb
+2. Author authoring_config.json (nodes, edges, rooms, markers)
+3. Run nav-preprocessor CLI
+4. Inspect plan_view_debug.svg in browser
+5. Iterate until graph matches the building
+6. Deploy package/ to backend
+```
+
+### Creating an Authoring Config
+
+The `authoring_config.json` defines the building's navigation data. See [docs/contracts/README.md](docs/contracts/README.md) for full format details.
+
+Key sections:
+- **nodes** — waypoints in the building (x, y, z in meters, Y-up)
+- **edges** — connections between nodes with traversal cost
+- **rooms** — searchable destinations linked to entry nodes
+- **entranceMarkers** — AR alignment markers with physical dimensions
+- **routeRendering** — arrow spacing, lookahead, thresholds
+
+Example: see [`sample/demo-building/authoring_config.json`](sample/demo-building/authoring_config.json)
+
+### Coordinate Conventions
+
+| Property | Convention |
+|----------|-----------|
+| Unit | Meters |
+| Handedness | Right-handed |
+| Up axis | Y-up |
+| Floor plane | Y = 0 |
+| Rotation | Degrees (CW from above) |
+
+See [docs/contracts/README.md](docs/contracts/README.md) for full details.
+
+---
+
+## Running the Preprocessor
+
+```bash
+# Process sample building
+./gradlew :tools:nav-preprocessor:run \
+  --args="--input sample/demo-building/scan.glb \
+          --config sample/demo-building/authoring_config.json \
+          --output sample/demo-building/package/ \
+          --overwrite"
+```
+
+Output:
+```
+╔══════════════════════════════════════════════╗
+║   VecturAI Navigation Preprocessor v1.0      ║
+╚══════════════════════════════════════════════╝
+
+[1/5] Inspecting asset... ✓ (12 B, GLB v2)
+[2/5] Loading authoring config... ✓ (12 nodes, 11 edges, 6 rooms)
+[3/5] Validating graph... ✓
+[4/5] Exporting package... ✓ (6 files)
+[5/5] Exporting debug artifacts... ✓
+
+Package exported successfully to: sample/demo-building/package/
+```
+
+### Package Output
+
+```
+package/
+├── manifest.json           # Metadata, version, file list
+├── nav_graph.json          # Nodes and edges for pathfinding
+├── rooms.json              # Searchable room definitions
+├── entrance_markers.json   # AR alignment markers
+├── route_rendering.json    # Arrow/path rendering config
+├── preview.glb             # Copy of Polycam scan
+├── graph_debug.json        # Debug: computed graph metadata
+└── plan_view_debug.svg     # Debug: visual plan-view
+```
+
+---
+
+## How the App Consumes a Package
+
+```
+JSON files → BuildingPackageLoader → BuildingPackage
+                                          ↓
+                                    InMemoryPackageStore
+                                          ↓
+                                  DefaultBuildingRepository
+                                    ↓           ↓
+                             SearchUseCase  RoutePreviewUseCase
+                                                ↓
+                                         DijkstraRouteEngine
+```
+
+1. Package JSON files are loaded (from bundled assets or remote download)
+2. `BuildingPackageLoader` deserializes into typed Kotlin models
+3. `InMemoryPackageStore` holds the loaded package in memory
+4. `DefaultBuildingRepository` exposes rooms, nav graph, markers
+5. Feature use cases query the repository for real data
+6. `DijkstraRouteEngine` computes shortest paths on the nav graph
+
+---
+
+## Running Tests
+
+```bash
+./gradlew :tools:nav-preprocessor:test
+```
+
+43 tests covering:
+- Graph validation (duplicates, connectivity, invalid refs)
+- Authoring config structural validation
+- Contract serialization roundtrips
+- Dijkstra shortest-path correctness
+- Package export file generation
+- Full pipeline integration
 
 ---
 
 ## Module Responsibilities
 
-| Module | Type | Responsibility |
-|--------|------|---------------|
-| `apps/androidApp` | Android | Android entry point, Compose host, ARCore native AR |
-| `apps/iosApp` | iOS | SwiftUI entry point, Compose host, ARKit native AR |
-| `shared/core` | KMP | Domain models, routing engine, repositories, app store |
-| `shared/feature-search` | KMP | Room search use case |
-| `shared/feature-routing` | KMP | Route computation orchestration |
-| `shared/feature-history` | KMP | Visit history persistence |
-| `shared/feature-preview` | KMP | 2D route preview data |
-| `shared/data-local` | KMP | SQLite cache via SqlDelight |
-| `shared/data-remote` | KMP | HTTP client via Ktor |
-| `shared/designsystem` | KMP + Compose | Theme, components, screens, navigation |
-| `tools/nav-preprocessor` | JVM CLI | .glb scan → JSON contract conversion |
+| Module | Responsibility |
+|--------|---------------|
+| `shared/core` | Domain models, routing engine, repositories, loading, store |
+| `shared/feature-search` | Room search with keyword/alias scoring |
+| `shared/feature-routing` | Route computation orchestration |
+| `shared/feature-preview` | 2D route preview data |
+| `shared/designsystem` | Theme, components, 5 Compose screens |
+| `apps/androidApp` | Android entry + ARCore placeholder |
+| `apps/iosApp` | iOS entry + ARKit placeholder |
+| `tools/nav-preprocessor` | CLI: authoring config + .glb → building package |
+| `sample/demo-building` | Sample building for development |
 
 ---
 
-## Shared / Native Boundaries
+## What Remains Deferred
 
-The app has a clear boundary between shared KMP code and platform-native code:
-
-**Shared (Kotlin Multiplatform):**
-- All domain models and business logic
-- Route computation (Dijkstra)
-- State management (`AppStore` with `StateFlow`)
-- All non-AR UI (via Compose Multiplatform)
-- Networking (Ktor) and caching (SqlDelight)
-
-**Native (per platform):**
-- AR camera session management (ARCore / ARKit)
-- 3D arrow rendering on camera view
-- Entrance marker detection (QR + image reference)
-- Coordinate transformation (nav-graph ↔ AR world space)
-
-**Bridge pattern:** Native AR code observes `AppStore.navigationState` (a `StateFlow<NavigationState>`) and reports events (marker detected, destination reached) back to the shared layer via bridge classes (`ArBridge` on Android, `ARBridge` on iOS).
-
----
-
-## Build & Run
-
-### Prerequisites
-
-- **JDK 17+**
-- **Android Studio Arctic Fox+** with Android SDK 35
-- **Xcode 15+** (for iOS)
-- **Kotlin 2.1.10**
-
-### Build Shared Modules
-
-```bash
-./gradlew :shared:core:build
-```
-
-### Run Android App
-
-```bash
-./gradlew :apps:androidApp:installDebug
-```
-
-### Run iOS App
-
-Open `apps/iosApp/iosApp.xcodeproj` in Xcode and run on a simulator or device.
-
-### Run Nav Preprocessor
-
-```bash
-./gradlew :tools:nav-preprocessor:run --args="--input scan.glb --output ./output/"
-```
-
----
-
-## Data Contracts
-
-All contract schemas are in [`docs/contracts/`](docs/contracts/):
-
-| Contract | Description |
-|----------|-------------|
-| [`manifest.schema.json`](docs/contracts/manifest.schema.json) | Building package metadata and version |
-| [`nav_graph.schema.json`](docs/contracts/nav_graph.schema.json) | Navigation nodes and edges |
-| [`rooms.schema.json`](docs/contracts/rooms.schema.json) | Room/POI definitions |
-| [`entrance_markers.schema.json`](docs/contracts/entrance_markers.schema.json) | AR alignment markers |
-| [`route_rendering.schema.json`](docs/contracts/route_rendering.schema.json) | Arrow and path rendering configuration |
-
----
-
-## What Is Intentionally Deferred from v1
-
-The following features are **explicitly out of scope** for the MVP (see [ADR-005](docs/adr/ADR-005-single-floor-mvp.md)):
-
-- ❌ Multi-floor navigation (stairs, elevators)
+- ❌ Multi-floor navigation
 - ❌ Admin tools / building management dashboard
-- ❌ Dynamic obstacles / real-time blockage reporting
-- ❌ Cloud anchors (Google/Apple cloud localization)
-- ❌ Advanced AR occlusion (arrows hiding behind walls)
-- ❌ Complex failure recovery
-- ❌ Accessibility-weighted routing
-- ❌ Voice / TTS guidance
-- ❌ Multi-building search and cross-building routing
-- ❌ Live user position sharing
+- ❌ Dynamic obstacles / real-time blockage
+- ❌ Cloud anchors
+- ❌ Advanced AR occlusion
+- ❌ Automatic graph extraction from .glb geometry
+- ❌ Voice guidance
+- ❌ Multi-building search
 
-All deferred items are designed to be addable incrementally thanks to the modular architecture. Search for `TODO` across the codebase to find all documented extension points.
+All deferred items can be added incrementally. Future automatic extraction plugs into the same pipeline by generating `authoring_config.json` format.
 
 ---
 
@@ -169,16 +206,10 @@ All deferred items are designed to be addable incrementally thanks to the modula
 |-------|-----------|
 | Shared logic | Kotlin Multiplatform 2.1.10 |
 | Shared UI | Compose Multiplatform 1.7.3 |
-| Android AR | ARCore 1.46 |
-| iOS AR | ARKit + RealityKit |
+| Routing | Dijkstra shortest-path |
+| Android AR | ARCore 1.46 (placeholder) |
+| iOS AR | ARKit + RealityKit (placeholder) |
 | Networking | Ktor 3.0.3 |
-| Local storage | SqlDelight 2.0.2 |
 | DI | Koin 4.0.0 |
 | Serialization | kotlinx.serialization 1.7.3 |
 | CLI | Clikt 5.0.2 |
-
----
-
-## License
-
-See [LICENSE](LICENSE).

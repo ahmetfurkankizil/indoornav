@@ -12,4 +12,11 @@ dependencies {
     implementation(libs.clikt)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.core)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

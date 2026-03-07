@@ -6,13 +6,8 @@ import com.vecturai.core.repository.BuildingRepository
 /**
  * Use case for searching rooms within a building.
  *
- * Provides room lookup by name, category, or keyword.
- * Results are filtered and ranked for display in the search screen.
- *
- * TODO: Implement fuzzy search / substring matching
- * TODO: Add search result ranking by relevance
- * TODO: Support search by category filter
- * TODO: Add recent search suggestions
+ * Searches by name, description, category, keywords, and aliases.
+ * Results ranked by match quality (name match > keyword > alias).
  */
 class SearchUseCase(
     private val buildingRepository: BuildingRepository,
@@ -22,30 +17,61 @@ class SearchUseCase(
      * Search for rooms matching the given query.
      *
      * @param buildingId Building to search within
-     * @param query Search text (matched against room name and description)
+     * @param query Search text
      * @return List of matching rooms, ordered by relevance
      */
     suspend fun searchRooms(buildingId: String, query: String): List<Room> {
         if (query.isBlank()) return emptyList()
 
         val allRooms = buildingRepository.getRooms(buildingId)
+        val q = query.trim().lowercase()
 
-        // TODO: Replace with proper fuzzy matching / text search
-        return allRooms.filter { room ->
-            room.name.contains(query, ignoreCase = true) ||
-                room.description?.contains(query, ignoreCase = true) == true ||
-                room.category?.contains(query, ignoreCase = true) == true
-        }
+        return allRooms
+            .map { room -> room to scoreMatch(room, q) }
+            .filter { it.second > 0 }
+            .sortedByDescending { it.second }
+            .map { it.first }
     }
 
     /**
      * Get all rooms grouped by category.
-     *
-     * @param buildingId Building to list rooms for
-     * @return Map of category name to rooms in that category
      */
     suspend fun getRoomsByCategory(buildingId: String): Map<String, List<Room>> {
         val rooms = buildingRepository.getRooms(buildingId)
         return rooms.groupBy { it.category ?: "Other" }
+    }
+
+    /**
+     * Get all rooms (flat list).
+     */
+    suspend fun getAllRooms(buildingId: String): List<Room> {
+        return buildingRepository.getRooms(buildingId)
+    }
+
+    /**
+     * Score a room against a search query. Higher = better match.
+     */
+    private fun scoreMatch(room: Room, query: String): Int {
+        var score = 0
+
+        // Exact name match (highest priority)
+        if (room.name.lowercase() == query) score += 100
+
+        // Name contains query
+        if (room.name.lowercase().contains(query)) score += 50
+
+        // Alias match
+        if (room.aliases.any { it.lowercase().contains(query) }) score += 30
+
+        // Keyword match
+        if (room.keywords.any { it.lowercase().contains(query) }) score += 20
+
+        // Category match
+        if (room.category?.lowercase()?.contains(query) == true) score += 10
+
+        // Description match
+        if (room.description?.lowercase()?.contains(query) == true) score += 5
+
+        return score
     }
 }

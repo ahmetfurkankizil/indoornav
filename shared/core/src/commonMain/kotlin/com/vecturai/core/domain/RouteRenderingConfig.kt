@@ -1,0 +1,18 @@
+package com.vecturai.core.domain
+
+import kotlinx.serialization.Serializable
+
+/**
+ * Configuration for how navigation routes are rendered in AR and 2D preview.
+ *
+ * Loaded from the building package `route_rendering.json`.
+ */
+@Serializable
+data class RouteRenderingConfig(
+    val arrowSpacingMeters: Double = 1.5,
+    val lookaheadDistanceMeters: Double = 8.0,
+    val destinationThresholdMeters: Double = 1.5,
+    val turnMarkerThresholdDegrees: Double = 30.0,
+    val arrowHeightOffsetMeters: Double = 0.05,
+    val schemaVersion: Int = 1,
+)
