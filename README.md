@@ -1,118 +1,102 @@
 # VecturAI — Indoor AR Navigation
 
-> Kotlin Multiplatform indoor navigation with AR guidance for Android and iOS.
+> Kotlin Multiplatform indoor navigation with AR guidance for Android & iOS.
 
-VecturAI guides users through buildings using augmented reality. Users scan an entrance marker, select a destination, and follow 3D arrows overlaid on the camera view — supplemented by textual directions and a strong non-AR UI.
+**v1.2.0 — Demo Ready** | [Demo Script](docs/demo/demo-script.md) | [Demo Setup](docs/demo/demo-setup.md)
 
-**Status:** v1.2.0 — End-to-end MVP demo flow
+---
+
+## Quick Start
+
+```bash
+git clone <repo-url> && cd vecturai
+make help                  # show all build targets
+make test-preprocessor     # run ~107 tests
+make android-debug         # build Android APK
+make ios-open              # open Xcode for iOS
+```
+
+## Build Targets
+
+| Command | What it does |
+|---------|-------------|
+| `make test-all` | Run all tests |
+| `make test-preprocessor` | Run nav-preprocessor tests (~107) |
+| `make android-debug` | Build Android debug APK |
+| `make android-release` | Build Android release APK |
+| `make android-install` | Install debug APK to device |
+| `make ios-open` | Open Xcode project |
+| `make ios-framework` | Build shared framework for iOS |
+| `make preprocess` | Run preprocessor on sample building |
+| `make clean` | Clean all build outputs |
 
 ---
 
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                  Mobile Apps                         │
-│  ┌───────────────┐       ┌─────────────────────┐    │
-│  │  Android App  │       │     iOS App          │    │
-│  │  ARCore       │       │  ARKit + RealityKit  │    │
-│  └──────┬────────┘       └──────┬──────────────┘    │
-├─────────┼───────────────────────┼────────────────────┤
-│         ▼   Shared (KMP)        ▼                    │
-│  ┌────────────────────────────────────────────┐     │
-│  │  NavigationSessionCoordinator              │     │
-│  │  ├─ ArNavigationCoordinator (AR state)     │     │
-│  │  ├─ ArrivalDetector (progress-based)       │     │
-│  │  ├─ RouteToArrowMapper (path → arrows)     │     │
-│  │  ├─ DijkstraRouteEngine                    │     │
-│  │  ├─ HistoryRepository + VisitRecord        │     │
-│  │  └─ DemoMode (one-tap demo flow)           │     │
-│  └────────────────────────────────────────────┘     │
-├──────────────────────────────────────────────────────┤
-│  nav-preprocessor (JVM CLI)                          │
-│  authoring_config → building package                 │
-└──────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────┐
+│              Mobile Apps                   │
+│  Android (ARCore)    iOS (ARKit/RealityKit)│
+├────────────────────────────────────────────┤
+│          Shared KMP                        │
+│  NavigationSessionCoordinator              │
+│  ├─ ArNavigationCoordinator               │
+│  ├─ ArrivalDetector                       │
+│  ├─ RouteToArrowMapper                    │
+│  ├─ DijkstraRouteEngine                   │
+│  ├─ HistoryRepository                     │
+│  └─ DemoMode + DemoPackageProvider        │
+├────────────────────────────────────────────┤
+│  nav-preprocessor (JVM CLI)               │
+└────────────────────────────────────────────┘
 ```
-
-### ADRs
-
-| # | Decision |
-|---|----------|
-| 1–6 | KMP, graph routing, preprocessing, marker init, single-floor MVP, assisted authoring |
-| 7 | Marker-based AR world alignment |
-| 8 | Shared route, native AR rendering boundary |
-| 9 | Marker-init, not global localization |
-| 10 | Arrow-progress arrival detection |
-| 11 | Local-first visit history |
-| 12 | Demo-first UX prioritization |
-
----
 
 ## End-to-End Flow
 
 ```
-Home → Search → Route Preview → Start AR
-                                    │
-                         Simulate / Real Scan
-                                    │
-                              Navigating
-                           (arrows + progress)
-                                    │
-                          Approaching → Arrived
-                                    │
-                           Session Summary
-                                    │
-                          History (persisted)
+Home → Search → Route Preview → AR Navigation → Arrived → Summary → History
 ```
 
-### Session Lifecycle
+## Config Profiles
 
-| State | Trigger |
-|-------|---------|
-| Created | User taps "Start AR" from route preview |
-| WaitingForMarker | AR session running, scanning |
-| Aligned | Marker detected (or simulated) |
-| Navigating | Route rendered, progress updating |
-| Approaching | ≥80% progress |
-| Arrived | ≥95% progress or distance < 1.5m |
-| Ended | User manually ends or arrives |
+| Profile | Debug Overlays | Simulate Scan | Preload Package | Demo Label |
+|---------|---------------|--------------|-----------------|------------|
+| **Dev** | ✓ | ✓ | ✓ | ✓ |
+| **Demo** | ✗ | ✓ | ✓ | ✓ |
+| **Release** | ✗ | ✗ | ✗ | ✗ |
 
-### Completion Statuses
+Set via `AppConfig.current = AppConfig.Demo` at startup.
 
-`CompletedAtDestination`, `EndedManually`, `CancelledBeforeAlignment`, `CancelledAfterAlignment`, `LostTrackingEnded`, `DemoCompleted`
+## History Persistence
 
----
+JSON-file-backed (`JsonFileHistoryRepository`) — survives app restarts. Platform provides read/write functions for local storage path. Graceful recovery from malformed data.
 
-## AR Alignment
+## ADRs
 
-`T_ar_bldg = T_ar_marker × T_bldg_marker⁻¹` — see [ar-alignment.md](docs/contracts/ar-alignment.md).
+| # | Decision |
+|---|----------|
+| 1–6 | KMP, graph routing, preprocessing, marker init, single-floor, assisted authoring |
+| 7–9 | Marker alignment, shared/native boundary, marker-init over global localization |
+| 10 | Arrow-progress arrival detection |
+| 11 | Local-first visit history |
+| 12 | Demo-first UX prioritization |
+| 13 | Demo-build and release strategy |
+| 14 | Visual polish priorities |
+| 15 | QA and deterministic demo testing |
 
-### V1 Arrival Detection (Honest)
+## QA
 
-Progress-based, not position-based. V1 cannot rely on camera position due to VIO drift. Arrow-index progress serves as a deterministic proxy. Architecture allows later upgrade to true proximity detection.
+- [Demo Smoke Checklist](docs/qa/demo-smoke-checklist.md)
+- [Release Checklist](docs/qa/release-checklist.md)
+- [Demo Script (2–3 min)](docs/demo/demo-script.md)
+- [Demo Setup](docs/demo/demo-setup.md)
 
----
+## Known Limitations (v1)
 
-## Running
-
-```bash
-# Preprocessor
-./gradlew :tools:nav-preprocessor:run \
-  --args="--input scan.glb --config authoring_config.json --output ./package/ --overwrite"
-
-# Tests (~92 tests)
-./gradlew :tools:nav-preprocessor:test
-```
-
----
-
-## What Remains Deferred
-
-- ❌ Production 3D arrow models (placeholder boxes/spheres)
-- ❌ Position-based arrival (using progress proxy)
-- ❌ Drift correction / relocalization
-- ❌ Backend history sync
-- ❌ Multi-floor, dynamic obstacles, voice, cloud anchors
-- ❌ Persistent (SqlDelight) history storage
-
-All items can be added incrementally on the current architecture.
+- Arrival: progress-based proxy, not camera-position-based
+- 3D arrows: placeholder geometry (boxes/spheres)
+- History: local JSON file, no cloud sync
+- Marker: requires physical 21cm printed marker (or Simulate Scan)
+- Drift: no relocalization or multi-marker correction
+- Single floor, single building
