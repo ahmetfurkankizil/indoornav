@@ -1,8 +1,8 @@
 # VecturAI — Indoor AR Navigation
 
-> Kotlin Multiplatform indoor navigation with AR guidance for Android & iOS.
+> Kotlin Multiplatform indoor AR navigation for Android & iOS.
 
-**v1.2.0 — Demo Ready** | [Demo Script](docs/demo/demo-script.md) | [Demo Setup](docs/demo/demo-setup.md)
+**v1.5.0 — Live Progress** | [Demo Script](docs/demo/demo-script.md) | [Marker Guide](docs/demo/marker-guide.md)
 
 ---
 
@@ -10,93 +10,68 @@
 
 ```bash
 git clone <repo-url> && cd vecturai
-make help                  # show all build targets
-make test-preprocessor     # run ~107 tests
+make help                  # show all targets
+make test-preprocessor     # run ~123 tests
 make android-debug         # build Android APK
-make ios-open              # open Xcode for iOS
+make ios-open              # open Xcode
 ```
-
-## Build Targets
-
-| Command | What it does |
-|---------|-------------|
-| `make test-all` | Run all tests |
-| `make test-preprocessor` | Run nav-preprocessor tests (~107) |
-| `make android-debug` | Build Android debug APK |
-| `make android-release` | Build Android release APK |
-| `make android-install` | Install debug APK to device |
-| `make ios-open` | Open Xcode project |
-| `make ios-framework` | Build shared framework for iOS |
-| `make preprocess` | Run preprocessor on sample building |
-| `make clean` | Clean all build outputs |
-
----
 
 ## Architecture
 
 ```
-┌────────────────────────────────────────────┐
-│              Mobile Apps                   │
-│  Android (ARCore)    iOS (ARKit/RealityKit)│
-├────────────────────────────────────────────┤
-│          Shared KMP                        │
-│  NavigationSessionCoordinator              │
-│  ├─ ArNavigationCoordinator               │
-│  ├─ ArrivalDetector                       │
-│  ├─ RouteToArrowMapper                    │
-│  ├─ DijkstraRouteEngine                   │
-│  ├─ HistoryRepository                     │
-│  └─ DemoMode + DemoPackageProvider        │
-├────────────────────────────────────────────┤
-│  nav-preprocessor (JVM CLI)               │
-└────────────────────────────────────────────┘
+Native AR (ARKit / ARCore)
+  │ CameraPose @ 2Hz
+  ▼
+AlignmentTransform.inverseTransformPoint()
+  │ Building-local position
+  ▼
+ProgressEstimator (polyline projection)
+  │ Progress fraction + remaining distance
+  ▼
+ArrivalDetector → Session → History
 ```
 
-## End-to-End Flow
+## What Works
 
-```
-Home → Search → Route Preview → AR Navigation → Arrived → Summary → History
-```
+| Feature | Scripted | Live |
+|---------|----------|------|
+| Search + preview | ✓ | ✓ |
+| AR route arrows | ✓ | ✓ |
+| Progress tracking | Manual buttons | Camera movement |
+| Remaining distance | ✓ | ✓ |
+| Arrival detection | ≥95% progress | Position + progress |
+| Rescan/recenter | — | ✓ |
+| History persistence | ✓ | ✓ |
 
 ## Config Profiles
 
-| Profile | Debug Overlays | Simulate Scan | Preload Package | Demo Label |
-|---------|---------------|--------------|-----------------|------------|
-| **Dev** | ✓ | ✓ | ✓ | ✓ |
-| **Demo** | ✗ | ✓ | ✓ | ✓ |
-| **Release** | ✗ | ✗ | ✗ | ✗ |
+| Profile | Debug | Simulate | Preload | 
+|---------|-------|----------|---------|
+| Dev | ✓ | ✓ | ✓ |
+| Demo | ✗ | ✓ | ✓ |
+| Release | ✗ | ✗ | ✗ |
 
-Set via `AppConfig.current = AppConfig.Demo` at startup.
+## ADRs (1–18)
 
-## History Persistence
+| 1–9 | KMP, routing, preprocessing, marker alignment, single-floor, assisted authoring |
+|-----|---|
+| 10–12 | Arrow-progress arrival, local history, demo-first UX |
+| 13–15 | Build strategy, visual polish, QA testing |
+| 16–18 | Controlled-route hardening, route-relative progress, recenter/rescan |
 
-JSON-file-backed (`JsonFileHistoryRepository`) — survives app restarts. Platform provides read/write functions for local storage path. Graceful recovery from malformed data.
+## QA Docs
 
-## ADRs
-
-| # | Decision |
-|---|----------|
-| 1–6 | KMP, graph routing, preprocessing, marker init, single-floor, assisted authoring |
-| 7–9 | Marker alignment, shared/native boundary, marker-init over global localization |
-| 10 | Arrow-progress arrival detection |
-| 11 | Local-first visit history |
-| 12 | Demo-first UX prioritization |
-| 13 | Demo-build and release strategy |
-| 14 | Visual polish priorities |
-| 15 | QA and deterministic demo testing |
-
-## QA
-
-- [Demo Smoke Checklist](docs/qa/demo-smoke-checklist.md)
+- [Demo Smoke Checklist](docs/qa/demo-smoke-checklist.md) — scripted path
+- [Live AR Checklist](docs/qa/live-ar-smoke-checklist.md) — real device
 - [Release Checklist](docs/qa/release-checklist.md)
-- [Demo Script (2–3 min)](docs/demo/demo-script.md)
-- [Demo Setup](docs/demo/demo-setup.md)
+- [Demo Script](docs/demo/demo-script.md) — 2–3 min presentation
+- [Marker Guide](docs/demo/marker-guide.md) — print + placement
 
-## Known Limitations (v1)
+## Known Limitations (v1.5)
 
-- Arrival: progress-based proxy, not camera-position-based
-- 3D arrows: placeholder geometry (boxes/spheres)
+- VIO drift: ~1–2% on routes < 50m (acceptable for demo)
+- Single marker, single floor
+- Progress is route-relative projection, not absolute indoor localization
+- 3D arrows: placeholder geometry
 - History: local JSON file, no cloud sync
-- Marker: requires physical 21cm printed marker (or Simulate Scan)
-- Drift: no relocalization or multi-marker correction
-- Single floor, single building
+- No relocalization, multi-marker correction, or SLAM

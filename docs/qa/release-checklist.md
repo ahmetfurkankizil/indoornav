@@ -1,27 +1,29 @@
 # Release Checklist
 
-## Before Tagging
+## Tests
 - [ ] All tests pass (`make test-all`)
-- [ ] Demo smoke checklist passed on both platforms
-- [ ] README version updated
-- [ ] AppVersion constants updated
-- [ ] No TODO/FIXME in critical path code
-- [ ] Demo script rehearsed end-to-end
+- [ ] ~123+ tests across all suites
+
+## QA
+- [ ] [Demo smoke checklist](demo-smoke-checklist.md) passed (scripted path)
+- [ ] [Live AR smoke checklist](live-ar-smoke-checklist.md) passed (real device)
+- [ ] Demo script rehearsed with both live and scripted paths
 
 ## Android
 - [ ] Debug APK builds (`make android-debug`)
 - [ ] Release APK builds (`make android-release`)
-- [ ] Demo flow works on physical device
-- [ ] ProGuard / R8 rules correct (if applicable)
+- [ ] Live AR works on physical device with marker
+- [ ] Simulate Scan works on emulator/device
 
 ## iOS
-- [ ] Xcode project builds for simulator
-- [ ] Xcode project builds for device
-- [ ] Signing configured for TestFlight (if distributing)
-- [ ] Demo flow works on physical device
+- [ ] Xcode build for simulator succeeds
+- [ ] Xcode build for device succeeds
+- [ ] Live AR works on physical device with marker
+- [ ] Simulate Scan works on simulator
 
-## Documentation
-- [ ] README accurate
-- [ ] ADRs numbered sequentially
-- [ ] Demo script current
+## Docs
+- [ ] README accurate (version, test count, features)
+- [ ] ADRs numbered 1–18, no gaps
+- [ ] Demo script current (live + scripted paths)
 - [ ] Known limitations documented
+- [ ] Marker guide printed and verified

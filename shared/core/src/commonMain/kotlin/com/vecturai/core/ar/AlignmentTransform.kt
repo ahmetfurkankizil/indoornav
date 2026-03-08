@@ -48,6 +48,33 @@ data class AlignmentTransform(
     }
 
     /**
+     * Inverse transform: AR world point → building-local coordinates.
+     *
+     * Used for converting live camera position back to building coords
+     * for route-relative progress estimation.
+     *
+     * Inverse of: P_ar = rotate(P_bldg, θ) + offset
+     * Is:         P_bldg = rotate(P_ar - offset, -θ)
+     *
+     * @return Triple(buildingX, buildingY, buildingZ)
+     */
+    fun inverseTransformPoint(arX: Double, arY: Double, arZ: Double): Triple<Double, Double, Double> {
+        val radians = Math.toRadians(-rotationYDeg)
+        val cosR = cos(radians)
+        val sinR = sin(radians)
+
+        // Subtract offset, then rotate by -θ
+        val tx = arX - offsetX
+        val tz = arZ - offsetZ
+
+        return Triple(
+            tx * cosR + tz * sinR,
+            arY - offsetY,
+            -tx * sinR + tz * cosR,
+        )
+    }
+
+    /**
      * Transform a building-local direction vector to AR world.
      * (Translation not applied — direction only.)
      */

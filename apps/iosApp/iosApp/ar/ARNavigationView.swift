@@ -2,13 +2,7 @@ import SwiftUI
 import ARKit
 import RealityKit
 
-/// Native ARKit/RealityKit navigation view for iOS.
-///
-/// Full navigation experience:
-/// - Marker detection → alignment → route rendering
-/// - Active navigation overlay (instruction, progress, tracking)
-/// - Arrival detection → session summary
-/// - Debug controls (simulate scan, advance progress, simulate arrival)
+/// Native AR navigation view with live progress, recenter, and arrival flow.
 struct ARNavigationView: View {
     @Binding var isPresented: Bool
     @StateObject private var viewModel = ARNavigationViewModel()
@@ -18,11 +12,9 @@ struct ARNavigationView: View {
     
     var body: some View {
         ZStack {
-            // Real AR camera view
             ARViewContainer(viewModel: viewModel)
                 .ignoresSafeArea()
             
-            // State-dependent overlay
             VStack(spacing: 0) {
                 topBar
                 Spacer()
@@ -35,6 +27,7 @@ struct ARNavigationView: View {
             }
         }
         .onAppear {
+            viewModel.destinationLabel = destinationName.isEmpty ? "Conference Room" : destinationName
             viewModel.startSession()
         }
     }
@@ -64,10 +57,10 @@ struct ARNavigationView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
                 
-                if !viewModel.trackingState.isEmpty {
-                    Text("Tracking: \(viewModel.trackingState)")
+                if viewModel.trackingQuality != "Normal" {
+                    Text("⚠ \(viewModel.trackingQuality)")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.yellow)
                 }
             }
             
@@ -89,15 +82,28 @@ struct ARNavigationView: View {
     // MARK: - Active Navigation Overlay
     
     private var activeNavigationOverlay: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             // Progress bar
             if viewModel.isAligned {
-                ProgressView(value: viewModel.progress, total: 1.0)
-                    .tint(viewModel.progress > 0.8 ? .green : .blue)
-                    .padding(.horizontal, 32)
+                VStack(spacing: 4) {
+                    ProgressView(value: viewModel.progress, total: 1.0)
+                        .tint(viewModel.progress > 0.8 ? .green : .blue)
+                    
+                    HStack {
+                        Text("\(Int(viewModel.progress * 100))%")
+                            .font(.caption2)
+                        Spacer()
+                        if viewModel.remainingDistance > 0 {
+                            Text("\(String(format: "%.1f", viewModel.remainingDistance))m remaining")
+                                .font(.caption2)
+                        }
+                    }
+                    .foregroundStyle(.white.opacity(0.7))
+                }
+                .padding(.horizontal, 32)
             }
             
-            // Current instruction
+            // Instruction
             if !viewModel.currentInstruction.isEmpty {
                 Text(viewModel.currentInstruction)
                     .font(.title3)
@@ -110,25 +116,24 @@ struct ARNavigationView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
             
-            // Destination + distance
+            // Destination + low confidence warning
             HStack {
                 Image(systemName: "location.fill")
                     .foregroundStyle(.blue)
                 Text(viewModel.destinationLabel)
                     .font(.callout)
                     .foregroundStyle(.white.opacity(0.9))
-                
-                if viewModel.isAligned {
-                    Spacer()
-                    Text("\(viewModel.arrowCount) arrows")
+                Spacer()
+                if viewModel.isLowConfidence {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.yellow)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.5))
                 }
             }
             .padding(.horizontal, 24)
             
             // Action buttons
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 // Debug toggle
                 Button(action: { viewModel.showDebugPanel.toggle() }) {
                     Image(systemName: "ladybug")
@@ -140,48 +145,52 @@ struct ARNavigationView: View {
                 }
                 
                 if !viewModel.isAligned {
-                    // Simulate scan
                     Button(action: { viewModel.simulateAlignment() }) {
                         Label("Simulate Scan", systemImage: "qrcode.viewfinder")
-                            .font(.callout)
-                            .fontWeight(.medium)
+                            .font(.callout).fontWeight(.medium)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
+                            .padding(.horizontal, 14).padding(.vertical, 10)
                             .background(.blue.opacity(0.85))
                             .clipShape(Capsule())
                     }
                 } else {
-                    // Advance progress (demo)
-                    Button(action: { viewModel.advanceProgress() }) {
-                        Label("Advance", systemImage: "forward.fill")
-                            .font(.callout)
-                            .fontWeight(.medium)
+                    // Recenter / Rescan
+                    Button(action: { viewModel.rescanMarker() }) {
+                        Label("Rescan", systemImage: "arrow.counterclockwise")
+                            .font(.callout).fontWeight(.medium)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
+                            .padding(.horizontal, 12).padding(.vertical, 10)
                             .background(.indigo.opacity(0.8))
                             .clipShape(Capsule())
                     }
                     
-                    // End navigation
+                    // Advance (demo only)
+                    if viewModel.isSimulated {
+                        Button(action: { viewModel.advanceProgress() }) {
+                            Label("Advance", systemImage: "forward.fill")
+                                .font(.callout).fontWeight(.medium)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 12).padding(.vertical, 10)
+                                .background(.indigo.opacity(0.7))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    
                     Button(action: {
                         viewModel.endNavigation()
                         isPresented = false
                     }) {
                         Label("End", systemImage: "stop.fill")
-                            .font(.callout)
-                            .fontWeight(.medium)
+                            .font(.callout).fontWeight(.medium)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
+                            .padding(.horizontal, 12).padding(.vertical, 10)
                             .background(.red.opacity(0.7))
                             .clipShape(Capsule())
                     }
                 }
             }
             
-            // Debug panel
+            // Debug panel (collapsible)
             if viewModel.showDebugPanel {
                 debugPanel
             }
@@ -200,8 +209,7 @@ struct ARNavigationView: View {
                 .foregroundStyle(.green)
             
             Text("You've arrived!")
-                .font(.title)
-                .fontWeight(.bold)
+                .font(.title).fontWeight(.bold)
                 .foregroundStyle(.white)
             
             Text(viewModel.destinationLabel)
@@ -212,8 +220,7 @@ struct ARNavigationView: View {
                 Text("Demo session")
                     .font(.caption)
                     .foregroundStyle(.orange)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 12).padding(.vertical, 4)
                     .background(Color.orange.opacity(0.2))
                     .clipShape(Capsule())
             }
@@ -231,16 +238,6 @@ struct ARNavigationView: View {
                         .background(.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
-                
-                Button(action: {
-                    // TODO: Navigate to history
-                    viewModel.endNavigation()
-                    isPresented = false
-                }) {
-                    Text("View History")
-                        .font(.subheadline)
-                        .foregroundStyle(.blue)
-                }
             }
             .padding(.horizontal, 32)
             .padding(.bottom, 50)
@@ -257,19 +254,17 @@ struct ARNavigationView: View {
     // MARK: - Debug Panel
     
     private var debugPanel: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Debug Info")
-                .font(.caption).fontWeight(.bold)
-            Text("State: \(viewModel.sessionStateLabel)")
-                .font(.caption2)
-            Text("Marker: \(viewModel.isAligned ? "✓" : "✗")")
-                .font(.caption2)
-            Text("Arrows: \(viewModel.arrowCount)")
-                .font(.caption2)
-            Text("Progress: \(Int(viewModel.progress * 100))%")
-                .font(.caption2)
-            Text("Mode: \(viewModel.isSimulated ? "Simulated" : "Live")")
-                .font(.caption2)
+        VStack(alignment: .leading, spacing: 3) {
+            Text("Debug").font(.caption).fontWeight(.bold)
+            Text("State: \(viewModel.sessionStateLabel)").font(.caption2)
+            Text("Marker: \(viewModel.isAligned ? "✓" : "✗")").font(.caption2)
+            Text("Arrows: \(viewModel.arrowCount)").font(.caption2)
+            Text("Progress: \(Int(viewModel.progress * 100))%").font(.caption2)
+            Text("Remaining: \(String(format: "%.1f", viewModel.remainingDistance))m").font(.caption2)
+            Text("Tracking: \(viewModel.trackingQuality)").font(.caption2)
+            Text("Confidence: \(viewModel.isLowConfidence ? "Low" : "OK")").font(.caption2)
+            Text("Mode: \(viewModel.isSimulated ? "Simulated" : "Live")").font(.caption2)
+            Text("Segment: \(viewModel.nearestSegment)").font(.caption2)
         }
         .foregroundStyle(.white)
         .padding(10)
@@ -299,7 +294,7 @@ struct ARViewContainer: UIViewRepresentable {
 class ARNavigationViewModel: ObservableObject {
     
     @Published var sessionStateLabel: String = "Initializing"
-    @Published var trackingState: String = ""
+    @Published var trackingQuality: String = "Normal"
     @Published var currentInstruction: String = "Point camera at entrance marker"
     @Published var destinationLabel: String = ""
     @Published var arrowCount: Int = 0
@@ -307,6 +302,9 @@ class ARNavigationViewModel: ObservableObject {
     @Published var hasArrived: Bool = false
     @Published var isSimulated: Bool = false
     @Published var progress: Double = 0.0
+    @Published var remainingDistance: Double = 0.0
+    @Published var isLowConfidence: Bool = false
+    @Published var nearestSegment: Int = 0
     @Published var showDebugPanel: Bool = false
     @Published var stateColor: Color = .orange
     
@@ -315,12 +313,23 @@ class ARNavigationViewModel: ObservableObject {
     private let routeRenderer = ARRouteRenderer()
     private weak var arView: ARView?
     
+    // Alignment state
+    private var alignmentOffsetX: Double = 0
+    private var alignmentOffsetY: Double = 0
+    private var alignmentOffsetZ: Double = 0
+    private var alignmentRotYDeg: Double = 0
+    
+    private var poseTimer: Timer?
+    
     func setupARView(_ arView: ARView) {
         self.arView = arView
         
         sessionManager.onTrackingStateChanged = { [weak self] isLimited, reason in
             DispatchQueue.main.async {
-                self?.trackingState = isLimited ? reason : "Normal"
+                self?.trackingQuality = isLimited ? reason : "Normal"
+                if isLimited {
+                    self?.isLowConfidence = true
+                }
             }
         }
         
@@ -357,8 +366,7 @@ class ARNavigationViewModel: ObservableObject {
     func simulateAlignment() {
         isSimulated = true
         let event = MarkerDetectionEvent(
-            markerId: "marker-main",
-            entranceNodeId: "n01",
+            markerId: "marker-main", entranceNodeId: "n01",
             markerBuildingX: 0.0, markerBuildingY: 1.2, markerBuildingZ: 0.0,
             markerArX: 0.0, markerArY: 0.0, markerArZ: -1.0,
             markerArRotationYDeg: 0.0, markerBuildingRotationYDeg: 0.0,
@@ -367,18 +375,22 @@ class ARNavigationViewModel: ObservableObject {
         handleMarkerDetected(event)
     }
     
+    func rescanMarker() {
+        sessionStateLabel = "Rescanning..."
+        stateColor = .orange
+        currentInstruction = "Point camera at entrance marker to recenter"
+        // Marker detector is already active; next detection will re-align
+    }
+    
     func advanceProgress() {
         progress = min(progress + 0.15, 1.0)
-        
-        if progress >= 0.95 {
-            arriveAtDestination()
-        } else if progress >= 0.8 {
-            currentInstruction = "Approaching destination..."
-            stateColor = .green
-        }
+        remainingDistance = max(0, remainingDistance - 2.0)
+        checkArrival()
     }
     
     func endNavigation() {
+        poseTimer?.invalidate()
+        poseTimer = nil
         sessionManager.stopSession()
         if let arView = arView {
             routeRenderer.clearRoute(from: arView)
@@ -392,7 +404,9 @@ class ARNavigationViewModel: ObservableObject {
         sessionStateLabel = "Navigating"
         stateColor = .blue
         currentInstruction = "Follow the arrows"
-        progress = 0.0
+        isLowConfidence = false
+        
+        if !isSimulated { progress = 0.0 }
         
         let rotDeg = event.markerArRotationYDeg - event.markerBuildingRotationYDeg
         let cosR = cos(rotDeg * .pi / 180.0)
@@ -400,21 +414,101 @@ class ARNavigationViewModel: ObservableObject {
         let rotBldgX = event.markerBuildingX * cosR + event.markerBuildingZ * sinR
         let rotBldgZ = -event.markerBuildingX * sinR + event.markerBuildingZ * cosR
         
+        alignmentOffsetX = event.markerArX - rotBldgX
+        alignmentOffsetY = event.markerArY - event.markerBuildingY
+        alignmentOffsetZ = event.markerArZ - rotBldgZ
+        alignmentRotYDeg = rotDeg
+        
         routeRenderer.setAlignmentTransform(
-            offsetX: event.markerArX - rotBldgX,
-            offsetY: event.markerArY - event.markerBuildingY,
-            offsetZ: event.markerArZ - rotBldgZ,
-            rotationYDeg: rotDeg
+            offsetX: alignmentOffsetX, offsetY: alignmentOffsetY,
+            offsetZ: alignmentOffsetZ, rotationYDeg: alignmentRotYDeg
         )
         
         let demoArrows = generateDemoArrows()
+        remainingDistance = 13.0 // total route distance
+        
         if let arView = arView {
             routeRenderer.renderRoute(in: arView, arrows: demoArrows)
             arrowCount = routeRenderer.renderedArrowCount
         }
+        
+        // Start live pose updates for non-simulated mode
+        if !isSimulated {
+            startPoseUpdates()
+        }
+    }
+    
+    private func startPoseUpdates() {
+        poseTimer?.invalidate()
+        poseTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            self?.sampleCameraPose()
+        }
+    }
+    
+    private func sampleCameraPose() {
+        guard let arView = arView, isAligned, !isSimulated else { return }
+        let transform = arView.cameraTransform
+        let pos = transform.translation
+        
+        // Convert AR-world → building-local via inverse alignment
+        let radians = -alignmentRotYDeg * .pi / 180.0
+        let cosR = cos(radians)
+        let sinR = sin(radians)
+        let tx = Double(pos.x) - alignmentOffsetX
+        let tz = Double(pos.z) - alignmentOffsetZ
+        let bx = tx * cosR + tz * sinR
+        let bz = -tx * sinR + tz * cosR
+        
+        // Simple nearest-segment progress on demo route
+        let routePoints: [(Double, Double)] = [
+            (0,0), (3,0), (6,0), (6,4), (3,4)
+        ]
+        let segLengths = [3.0, 3.0, 4.0, 3.0] // total = 13.0
+        let totalDist = 13.0
+        
+        var bestDist = Double.greatestFiniteMagnitude
+        var bestCum = 0.0
+        var cumDist = 0.0
+        
+        for i in 0..<(routePoints.count - 1) {
+            let (ax, az) = routePoints[i]
+            let (bpx, bpz) = routePoints[i+1]
+            let segLen = segLengths[i]
+            let dx = bpx - ax; let dz = bpz - az
+            var t = ((bx - ax) * dx + (bz - az) * dz) / (dx*dx + dz*dz)
+            t = max(0, min(1, t))
+            let px = ax + t * dx; let pz = az + t * dz
+            let d = sqrt((bx-px)*(bx-px) + (bz-pz)*(bz-pz))
+            if d < bestDist {
+                bestDist = d
+                bestCum = cumDist + t * segLen
+            }
+            cumDist += segLen
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let newProgress = bestCum / totalDist
+            if newProgress > self.progress {
+                self.progress = min(newProgress, 1.0)
+            }
+            self.remainingDistance = max(0, totalDist - bestCum)
+            self.isLowConfidence = bestDist > 3.0
+            self.checkArrival()
+        }
+    }
+    
+    private func checkArrival() {
+        if progress >= 0.95 || remainingDistance < 1.5 {
+            arriveAtDestination()
+        } else if progress >= 0.8 {
+            currentInstruction = "Approaching destination..."
+            stateColor = .green
+        }
     }
     
     private func arriveAtDestination() {
+        poseTimer?.invalidate()
         hasArrived = true
         sessionStateLabel = "Arrived"
         stateColor = .green
@@ -423,31 +517,21 @@ class ARNavigationViewModel: ObservableObject {
     
     private func generateDemoArrows() -> [ArrowPlacementData] {
         return [
-            ArrowPlacementData(id: "a0", positionX: 0.0, positionY: 0.05, positionZ: 0.0,
-                             forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a1", positionX: 1.5, positionY: 0.05, positionZ: 0.0,
-                             forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a2", positionX: 3.0, positionY: 0.05, positionZ: 0.0,
-                             forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a3", positionX: 4.5, positionY: 0.05, positionZ: 0.0,
-                             forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a4", positionX: 6.0, positionY: 0.05, positionZ: 0.0,
-                             forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .turnRight, label: "Turn right"),
-            ArrowPlacementData(id: "a5", positionX: 6.0, positionY: 0.05, positionZ: 1.5,
-                             forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a6", positionX: 6.0, positionY: 0.05, positionZ: 3.0,
-                             forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a7", positionX: 6.0, positionY: 0.05, positionZ: 4.0,
-                             forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .turnLeft, label: "Turn left"),
-            ArrowPlacementData(id: "a8", positionX: 4.5, positionY: 0.05, positionZ: 4.0,
-                             forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
-            ArrowPlacementData(id: "a9", positionX: 3.0, positionY: 0.05, positionZ: 4.0,
-                             forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .destination, label: "Conference Room"),
+            ArrowPlacementData(id: "a0", positionX: 0.0, positionY: 0.05, positionZ: 0.0, forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a1", positionX: 1.5, positionY: 0.05, positionZ: 0.0, forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a2", positionX: 3.0, positionY: 0.05, positionZ: 0.0, forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a3", positionX: 4.5, positionY: 0.05, positionZ: 0.0, forwardDx: 1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a4", positionX: 6.0, positionY: 0.05, positionZ: 0.0, forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .turnRight, label: "Turn right"),
+            ArrowPlacementData(id: "a5", positionX: 6.0, positionY: 0.05, positionZ: 1.5, forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a6", positionX: 6.0, positionY: 0.05, positionZ: 3.0, forwardDx: 0.0, forwardDy: 0.0, forwardDz: 1.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a7", positionX: 6.0, positionY: 0.05, positionZ: 4.0, forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .turnLeft, label: "Turn left"),
+            ArrowPlacementData(id: "a8", positionX: 4.5, positionY: 0.05, positionZ: 4.0, forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .follow, label: nil),
+            ArrowPlacementData(id: "a9", positionX: 3.0, positionY: 0.05, positionZ: 4.0, forwardDx: -1.0, forwardDy: 0.0, forwardDz: 0.0, type: .destination, label: "Conference Room"),
         ]
     }
 }
 
-// MARK: - Session Delegate Bridge
+// MARK: - Session Delegate
 
 class AnchorDetectionDelegate: NSObject, ARSessionDelegate {
     let markerDetector: ARMarkerDetector
