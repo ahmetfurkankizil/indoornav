@@ -3,83 +3,64 @@ import Combine
 
 /// Bridge between KMP shared navigation state and native iOS AR layer.
 ///
-/// This class observes the shared NavigationState (via KMP interop) and
-/// translates it into data that ARKit/RealityKit can consume.
+/// Connects the shared ArNavigationCoordinator to the native iOS AR
+/// components (session manager, marker detector, route renderer).
 ///
-/// TODO: Import shared KMP framework and observe NavigationState
-/// TODO: Convert route segments from nav-graph coordinates to ARKit world coordinates
-/// TODO: Provide entrance marker detection results back to shared state
-/// TODO: Handle coordinate system alignment (entrance marker pose → ARKit world origin)
+/// TODO: Import shared KMP framework once iOS build is configured.
+/// For now, this follows the ArNavigationBridge interface contract.
 class ARBridge: ObservableObject {
-
-    /// Human-readable label for the current navigation state.
+    
+    /// Human-readable label for the current session state.
     @Published var currentStateLabel: String = "Idle"
-
-    /// Whether the entrance marker has been detected and world is aligned.
+    
+    /// Whether the entrance marker has been detected.
     @Published var isWorldAligned: Bool = false
-
-    /// Current route segments transformed to AR world coordinates.
-    /// TODO: Replace with actual 3D position data
-    @Published var arRouteSegments: [ARRouteSegment] = []
-
+    
     /// Current navigation instruction text.
     @Published var currentInstruction: String = ""
-
-    // MARK: - Shared State Observation
-
-    /// Starts observing the shared KMP NavigationState.
-    ///
-    /// TODO: Use shared framework's AppStore to collect NavigationState flow:
-    /// ```swift
-    /// func startObserving(appStore: AppStore) {
-    ///     // Use Kotlin/Native flow collection
-    ///     appStore.navigationState.collect { state in
-    ///         DispatchQueue.main.async {
-    ///             self.updateFromSharedState(state)
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    func startObserving() {
-        // TODO: Connect to shared KMP state
+    
+    /// Number of arrows currently renderable.
+    @Published var arrowCount: Int = 0
+    
+    /// Current destination name.
+    @Published var destinationName: String = ""
+    
+    // MARK: - ArNavigationBridge Implementation
+    
+    /// Start an AR session. Called by shared coordinator.
+    /// TODO: Accept BuildingPackage and Room from KMP shared code.
+    func startSession(buildingId: String, destinationName: String) {
+        currentStateLabel = "Waiting for Marker"
+        self.destinationName = destinationName
+        currentInstruction = "Point camera at the entrance marker"
     }
-
-    // MARK: - Marker Detection Callbacks
-
-    /// Called when the entrance marker is successfully detected by ARKit.
-    ///
-    /// TODO: Extract pose from ARKit anchor
-    /// TODO: Notify shared state that alignment is complete
-    /// TODO: Calculate world-to-navgraph coordinate transform
-    ///
-    /// - Parameter anchorName: The reference image name that was detected
-    func onEntranceMarkerDetected(anchorName: String) {
+    
+    /// Stop the AR session.
+    func stopSession() {
+        currentStateLabel = "Idle"
+        isWorldAligned = false
+        currentInstruction = ""
+        arrowCount = 0
+    }
+    
+    /// Called when alignment is established.
+    func onAlignmentEstablished(
+        offsetX: Double, offsetY: Double, offsetZ: Double,
+        rotationYDeg: Double
+    ) {
         isWorldAligned = true
-        currentStateLabel = "Navigating"
-        // TODO: Parse QR payload, update shared NavigationState
+        currentStateLabel = "Aligned"
     }
-
-    /// Called when the user reaches close proximity to the destination.
-    ///
-    /// TODO: Update shared state to Arrived
-    /// TODO: Record visit in history via shared layer
-    func onDestinationReached() {
-        currentStateLabel = "Arrived"
-        // TODO: Transition shared NavigationState to Arrived
+    
+    /// Called when renderable route is updated.
+    func onRenderableRouteUpdated(arrowCount: Int, instruction: String) {
+        self.arrowCount = arrowCount
+        currentInstruction = instruction
+        currentStateLabel = "Rendering Route"
     }
-}
-
-// MARK: - AR Data Models
-
-/// A route segment transformed into AR world coordinates.
-///
-/// TODO: Replace with actual SIMD types once ARKit integration is implemented
-struct ARRouteSegment {
-    let startX: Float
-    let startY: Float
-    let startZ: Float
-    let endX: Float
-    let endY: Float
-    let endZ: Float
-    let instruction: String
+    
+    /// Called when session state changes.
+    func onSessionStateChanged(stateLabel: String) {
+        currentStateLabel = stateLabel
+    }
 }

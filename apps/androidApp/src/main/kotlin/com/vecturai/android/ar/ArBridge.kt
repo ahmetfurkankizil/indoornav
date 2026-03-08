@@ -3,52 +3,81 @@ package com.vecturai.android.ar
 import com.vecturai.core.domain.NavigationState
 import com.vecturai.core.store.AppStore
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 
 /**
- * Bridge between shared KMP navigation state and the native Android AR layer.
+ * Bridge between shared KMP AR coordinator and native Android AR layer.
  *
- * This class translates the platform-agnostic [NavigationState] into data
- * that the ARCore renderer can consume (e.g., world-space arrow positions,
- * current instruction text, progress percentage).
+ * Follows the shared ArNavigationBridge interface contract.
+ * Connects ArNavigationCoordinator events to the native AR components.
  *
- * TODO: Accept AppStore via DI (Koin) and expose derived AR-specific state
- * TODO: Convert route segments from nav-graph coordinates to ARCore world coordinates
- * TODO: Provide entrance marker detection callbacks back to shared state
+ * TODO: Wire to ArNavigationCoordinator via Koin DI once shared framework builds.
  */
 class ArBridge {
 
+    /** Current session state label (for debug display). */
+    var currentStateLabel: String = "Idle"
+        private set
+
+    /** Whether marker alignment is established. */
+    var isWorldAligned: Boolean = false
+        private set
+
+    /** Current instruction text. */
+    var currentInstruction: String = ""
+        private set
+
+    /** Arrow count currently renderable. */
+    var arrowCount: Int = 0
+        private set
+
+    // ── ArNavigationBridge contract ────────────────
+
+    fun startSession(buildingId: String, destinationName: String) {
+        currentStateLabel = "Waiting for Marker"
+        currentInstruction = "Point camera at the entrance marker"
+    }
+
+    fun stopSession() {
+        currentStateLabel = "Idle"
+        isWorldAligned = false
+        currentInstruction = ""
+        arrowCount = 0
+    }
+
+    fun onAlignmentEstablished(
+        offsetX: Double, offsetY: Double, offsetZ: Double,
+        rotationYDeg: Double,
+    ) {
+        isWorldAligned = true
+        currentStateLabel = "Aligned"
+    }
+
+    fun onRenderableRouteUpdated(arrowCount: Int, instruction: String) {
+        this.arrowCount = arrowCount
+        currentInstruction = instruction
+        currentStateLabel = "Rendering Route"
+    }
+
+    fun onSessionStateChanged(stateLabel: String) {
+        currentStateLabel = stateLabel
+    }
+
     /**
-     * Observes the shared navigation state and maps it to AR-renderable data.
-     *
-     * TODO: Implement coordinate transformation:
-     *   - navGraphPosition (from shared RouteSegment) → ARCore world anchor pose
-     *   - Account for entrance marker alignment offset
+     * Observe shared navigation state.
      */
     fun observeNavigationState(appStore: AppStore): StateFlow<NavigationState> {
         return appStore.navigationState
     }
 
     /**
-     * Called when the entrance marker is successfully detected by ARCore.
-     *
-     * TODO: Extract pose from ARCore anchor
-     * TODO: Notify shared state that alignment is complete
-     * TODO: Trigger route rendering
-     *
-     * @param markerPayload The QR code content decoded from the entrance marker
+     * Called when entrance marker is detected by ARCore.
      */
     fun onEntranceMarkerDetected(markerPayload: String) {
-        // TODO: Parse marker payload, update shared NavigationState to Navigating
+        isWorldAligned = true
+        currentStateLabel = "Navigating"
     }
 
-    /**
-     * Called when the user reaches the destination in AR view.
-     *
-     * TODO: Update shared state to Arrived
-     * TODO: Record visit in history
-     */
     fun onDestinationReached() {
-        // TODO: Transition NavigationState to Arrived
+        currentStateLabel = "Arrived"
     }
 }

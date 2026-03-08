@@ -1,5 +1,7 @@
 package com.vecturai.core.di
 
+import com.vecturai.core.ar.ArNavigationCoordinator
+import com.vecturai.core.ar.RouteToArrowMapper
 import com.vecturai.core.loading.BuildingPackageLoader
 import com.vecturai.core.loading.DefaultBuildingRepository
 import com.vecturai.core.loading.InMemoryPackageStore
@@ -18,4 +20,7 @@ val coreModule = module {
     single { InMemoryPackageStore() }
     single { BuildingPackageLoader() }
     single<BuildingRepository> { DefaultBuildingRepository(get()) }
+    single { RouteToArrowMapper() }
+    single { ArNavigationCoordinator(get(), get(), get(), get()) }
 }
+
