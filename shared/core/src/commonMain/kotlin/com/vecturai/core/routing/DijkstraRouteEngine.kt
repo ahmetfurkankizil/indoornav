@@ -171,7 +171,7 @@ class DijkstraRouteEngine : RouteEngine {
             val dx = to.x - from.x
             val dz = to.z - from.z
             val radians = atan2(dz, dx)
-            return Math.toDegrees(radians)
+            return radians * 180.0 / kotlin.math.PI
         }
 
         /**

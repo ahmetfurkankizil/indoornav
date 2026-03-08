@@ -193,7 +193,7 @@ class RouteToArrowMapper {
         val inAngle = atan2(inDz, inDx)
         val outAngle = atan2(outDz, outDx)
 
-        var turn = Math.toDegrees(outAngle - inAngle)
+        var turn = (outAngle - inAngle) * 180.0 / kotlin.math.PI
         if (turn > 180.0) turn -= 360.0
         if (turn < -180.0) turn += 360.0
         return turn

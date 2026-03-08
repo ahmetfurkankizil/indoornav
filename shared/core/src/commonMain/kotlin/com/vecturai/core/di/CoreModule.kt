@@ -16,8 +16,6 @@ import com.vecturai.core.repository.InMemoryHistoryRepository
 import com.vecturai.core.routing.DijkstraRouteEngine
 import com.vecturai.core.routing.RouteEngine
 import com.vecturai.core.store.AppStore
-import com.vecturai.feature.history.HistoryUseCase
-import com.vecturai.feature.preview.RoutePreviewUseCase
 import org.koin.dsl.module
 
 /**
@@ -35,7 +33,6 @@ val coreModule = module {
 
     // Routing
     single<RouteEngine> { DijkstraRouteEngine() }
-    single { RoutePreviewUseCase(get(), get()) }
 
     // Package loading
     single { InMemoryPackageStore() }
@@ -56,5 +53,4 @@ val coreModule = module {
 
     // History (in-memory for now; swap to JsonFileHistoryRepository per-platform)
     single<HistoryRepository> { InMemoryHistoryRepository() }
-    single { HistoryUseCase(get()) }
 }

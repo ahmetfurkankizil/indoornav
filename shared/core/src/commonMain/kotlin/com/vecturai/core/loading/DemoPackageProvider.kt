@@ -18,34 +18,40 @@ object DemoPackageProvider {
     fun manifest(): BuildingManifest = BuildingManifest(
         buildingId = "demo-office-01",
         buildingName = "VecturAI Demo Office",
-        floorCount = 1,
-        version = "1.0.0",
+        version = 1,
     )
 
     /** Demo navigation graph. */
     fun navGraph(): NavGraph {
         val nodes = listOf(
-            NavNode("n01", 0.0, 0.0, 0.0, "Entrance"),
-            NavNode("n02", 3.0, 0.0, 0.0, "Hallway A"),
-            NavNode("n03", 6.0, 0.0, 0.0, "Junction B"),
-            NavNode("n04", 6.0, 0.0, 4.0, "Hallway C"),
-            NavNode("n05", 3.0, 0.0, 4.0, "Conference Room Entry"),
-            NavNode("n06", 0.0, 0.0, 4.0, "Kitchen Entry"),
-            NavNode("n07", 9.0, 0.0, 0.0, "Office A Entry"),
-            NavNode("n08", 9.0, 0.0, 4.0, "Office B Entry"),
+            NavNode("n01", 0.0, 0.0, 0.0, NodeType.ENTRANCE, "Entrance"),
+            NavNode("n02", 3.0, 0.0, 0.0, NodeType.WAYPOINT, "Hallway A"),
+            NavNode("n03", 6.0, 0.0, 0.0, NodeType.JUNCTION, "Junction B"),
+            NavNode("n04", 6.0, 0.0, 4.0, NodeType.WAYPOINT, "Hallway C"),
+            NavNode("n05", 3.0, 0.0, 4.0, NodeType.ROOM_ENTRY, "Conference Room Entry"),
+            NavNode("n06", 0.0, 0.0, 4.0, NodeType.ROOM_ENTRY, "Kitchen Entry"),
+            NavNode("n07", 9.0, 0.0, 0.0, NodeType.ROOM_ENTRY, "Office A Entry"),
+            NavNode("n08", 9.0, 0.0, 4.0, NodeType.ROOM_ENTRY, "Office B Entry"),
         )
 
         val edges = listOf(
-            NavEdge("n01", "n02", 3.0), NavEdge("n02", "n01", 3.0),
-            NavEdge("n02", "n03", 3.0), NavEdge("n03", "n02", 3.0),
-            NavEdge("n03", "n04", 4.0), NavEdge("n04", "n03", 4.0),
-            NavEdge("n04", "n05", 3.0), NavEdge("n05", "n04", 3.0),
-            NavEdge("n05", "n06", 3.0), NavEdge("n06", "n05", 3.0),
-            NavEdge("n03", "n07", 3.0), NavEdge("n07", "n03", 3.0),
-            NavEdge("n04", "n08", 3.0), NavEdge("n08", "n04", 3.0),
+            NavEdge(from = "n01", to = "n02", weight = 3.0),
+            NavEdge(from = "n02", to = "n01", weight = 3.0),
+            NavEdge(from = "n02", to = "n03", weight = 3.0),
+            NavEdge(from = "n03", to = "n02", weight = 3.0),
+            NavEdge(from = "n03", to = "n04", weight = 4.0),
+            NavEdge(from = "n04", to = "n03", weight = 4.0),
+            NavEdge(from = "n04", to = "n05", weight = 3.0),
+            NavEdge(from = "n05", to = "n04", weight = 3.0),
+            NavEdge(from = "n05", to = "n06", weight = 3.0),
+            NavEdge(from = "n06", to = "n05", weight = 3.0),
+            NavEdge(from = "n03", to = "n07", weight = 3.0),
+            NavEdge(from = "n07", to = "n03", weight = 3.0),
+            NavEdge(from = "n04", to = "n08", weight = 3.0),
+            NavEdge(from = "n08", to = "n04", weight = 3.0),
         )
 
-        return NavGraph(nodes = nodes, edges = edges)
+        return NavGraph(buildingId = "demo-office-01", nodes = nodes, edges = edges)
     }
 
     /** Demo rooms. */

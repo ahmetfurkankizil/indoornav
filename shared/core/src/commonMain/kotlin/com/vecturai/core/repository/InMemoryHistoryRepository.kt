@@ -1,6 +1,6 @@
 package com.vecturai.core.repository
 
-import com.vecturai.feature.history.VisitRecord
+import com.vecturai.core.domain.VisitRecord
 
 /**
  * In-memory implementation of [HistoryRepository].

@@ -3,6 +3,7 @@ package com.vecturai.core.ar
 import kotlinx.serialization.Serializable
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.PI
 
 /**
  * Platform-neutral alignment transform.
@@ -32,7 +33,7 @@ data class AlignmentTransform(
      * @return Triple(arX, arY, arZ)
      */
     fun transformPoint(buildingX: Double, buildingY: Double, buildingZ: Double): Triple<Double, Double, Double> {
-        val radians = Math.toRadians(rotationYDeg)
+        val radians = rotationYDeg * PI / 180.0
         val cosR = cos(radians)
         val sinR = sin(radians)
 
@@ -59,7 +60,7 @@ data class AlignmentTransform(
      * @return Triple(buildingX, buildingY, buildingZ)
      */
     fun inverseTransformPoint(arX: Double, arY: Double, arZ: Double): Triple<Double, Double, Double> {
-        val radians = Math.toRadians(-rotationYDeg)
+        val radians = -rotationYDeg * PI / 180.0
         val cosR = cos(radians)
         val sinR = sin(radians)
 
@@ -79,7 +80,7 @@ data class AlignmentTransform(
      * (Translation not applied — direction only.)
      */
     fun transformDirection(dx: Double, dy: Double, dz: Double): Triple<Double, Double, Double> {
-        val radians = Math.toRadians(rotationYDeg)
+        val radians = rotationYDeg * PI / 180.0
         val cosR = cos(radians)
         val sinR = sin(radians)
 
@@ -98,7 +99,7 @@ data class AlignmentTransform(
          */
         fun fromMarkerAlignment(result: MarkerAlignmentResult): AlignmentTransform {
             val rotDeg = result.markerArRotationYDeg - result.markerBuildingRotationYDeg
-            val radians = Math.toRadians(rotDeg)
+            val radians = rotDeg * PI / 180.0
             val cosR = cos(radians)
             val sinR = sin(radians)
 

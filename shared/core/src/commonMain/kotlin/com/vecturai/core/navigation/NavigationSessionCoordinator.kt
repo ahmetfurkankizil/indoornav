@@ -7,7 +7,7 @@ import com.vecturai.core.domain.Room
 import com.vecturai.core.domain.BuildingPackage
 import com.vecturai.core.repository.HistoryRepository
 import com.vecturai.core.store.AppStore
-import com.vecturai.feature.history.VisitRecord
+import com.vecturai.core.domain.VisitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,7 +51,7 @@ class NavigationSessionCoordinator(
         startNodeId: String,
         mode: SessionMode = SessionMode.REAL_SCAN,
     ): Boolean {
-        val sessionId = "session-${++sessionCounter}-${System.currentTimeMillis()}"
+        val sessionId = "session-${++sessionCounter}"
         val now = currentIsoTimestamp()
 
         val session = NavigationSession(
