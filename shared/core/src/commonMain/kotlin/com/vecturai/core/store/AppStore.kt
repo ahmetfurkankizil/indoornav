@@ -3,6 +3,8 @@ package com.vecturai.core.store
 import com.vecturai.core.ar.ArSessionState
 import com.vecturai.core.domain.NavigationState
 import com.vecturai.core.domain.Room
+import com.vecturai.core.navigation.ArrivalStatus
+import com.vecturai.core.navigation.NavigationSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,8 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * Central application state store.
  *
  * Holds the reactive state for the entire app using [StateFlow].
- * Both the Compose UI and native AR shells observe this store
- * to stay in sync with the current navigation state.
+ * Both the Compose UI and native AR shells observe this store.
  */
 class AppStore {
 
@@ -32,6 +33,24 @@ class AppStore {
 
     fun updateArSessionState(newState: ArSessionState) {
         _arSessionState.value = newState
+    }
+
+    // ── Current Session ──────────────────────────────────
+
+    private val _currentSession = MutableStateFlow<NavigationSession?>(null)
+    val currentSession: StateFlow<NavigationSession?> = _currentSession.asStateFlow()
+
+    fun updateCurrentSession(session: NavigationSession?) {
+        _currentSession.value = session
+    }
+
+    // ── Arrival Status ──────────────────────────────────
+
+    private val _arrivalStatus = MutableStateFlow<ArrivalStatus>(ArrivalStatus.NotArrived)
+    val arrivalStatus: StateFlow<ArrivalStatus> = _arrivalStatus.asStateFlow()
+
+    fun updateArrivalStatus(status: ArrivalStatus) {
+        _arrivalStatus.value = status
     }
 
     // ── Selected Building ──────────────────────────────────
@@ -66,9 +85,10 @@ class AppStore {
     fun reset() {
         _navigationState.value = NavigationState.Idle
         _arSessionState.value = ArSessionState.Idle
+        _currentSession.value = null
+        _arrivalStatus.value = ArrivalStatus.NotArrived
         _selectedBuildingId.value = null
         _selectedDestination.value = null
         _isLoading.value = false
     }
 }
-

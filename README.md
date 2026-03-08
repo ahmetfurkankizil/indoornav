@@ -2,163 +2,117 @@
 
 > Kotlin Multiplatform indoor navigation with AR guidance for Android and iOS.
 
-VecturAI guides users through buildings using augmented reality. Users scan an entrance marker, select a destination, and follow 3D arrows overlaid on the camera view — supplemented by textual step-by-step directions and a strong non-AR UI.
+VecturAI guides users through buildings using augmented reality. Users scan an entrance marker, select a destination, and follow 3D arrows overlaid on the camera view — supplemented by textual directions and a strong non-AR UI.
 
-**Status:** v1.1.0 — Working pipeline + real AR integration shell
+**Status:** v1.2.0 — End-to-end MVP demo flow
 
 ---
 
-## Architecture Overview
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Mobile Apps                          │
-│  ┌──────────────────┐     ┌──────────────────────┐     │
-│  │   Android App    │     │      iOS App          │     │
-│  │  ARCore + native │     │  ARKit + RealityKit   │     │
-│  └────────┬─────────┘     └────────┬─────────────┘     │
-│           │    ArNavigationBridge   │                   │
-├───────────┼─────────────────────────┼───────────────────┤
-│           ▼    Shared (KMP)         ▼                   │
-│  ┌──────────────────────────────────────────────┐      │
-│  │  ArNavigationCoordinator (state machine)     │      │
-│  │  RouteToArrowMapper (path → arrow placements)│      │
-│  │  AlignmentTransform (building → AR coords)   │      │
-│  │  DijkstraRouteEngine (shortest path)         │      │
-│  │  BuildingPackageLoader + Repository          │      │
-│  │  SearchUseCase + RoutePreviewUseCase          │      │
-│  └──────────────────────────────────────────────┘      │
-├─────────────────────────────────────────────────────────┤
-│  ┌──────────────────────────────────────┐              │
-│  │  nav-preprocessor (JVM CLI)          │              │
-│  │  authoring_config → building package │              │
-│  └──────────────────────────────────────┘              │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                  Mobile Apps                         │
+│  ┌───────────────┐       ┌─────────────────────┐    │
+│  │  Android App  │       │     iOS App          │    │
+│  │  ARCore       │       │  ARKit + RealityKit  │    │
+│  └──────┬────────┘       └──────┬──────────────┘    │
+├─────────┼───────────────────────┼────────────────────┤
+│         ▼   Shared (KMP)        ▼                    │
+│  ┌────────────────────────────────────────────┐     │
+│  │  NavigationSessionCoordinator              │     │
+│  │  ├─ ArNavigationCoordinator (AR state)     │     │
+│  │  ├─ ArrivalDetector (progress-based)       │     │
+│  │  ├─ RouteToArrowMapper (path → arrows)     │     │
+│  │  ├─ DijkstraRouteEngine                    │     │
+│  │  ├─ HistoryRepository + VisitRecord        │     │
+│  │  └─ DemoMode (one-tap demo flow)           │     │
+│  └────────────────────────────────────────────┘     │
+├──────────────────────────────────────────────────────┤
+│  nav-preprocessor (JVM CLI)                          │
+│  authoring_config → building package                 │
+└──────────────────────────────────────────────────────┘
 ```
 
 ### ADRs
 
-| # | Decision | Doc |
-|---|----------|-----|
-| 1 | KMP + Compose MP + native AR shells | [ADR-001](docs/adr/ADR-001-kmp-shared-ui-native-ar.md) |
-| 2 | Graph routing (not raw point cloud) | [ADR-002](docs/adr/ADR-002-graph-routing.md) |
-| 3 | Offline preprocessing | [ADR-003](docs/adr/ADR-003-offline-preprocessing.md) |
-| 4 | Entrance marker initialization | [ADR-004](docs/adr/ADR-004-entrance-marker-init.md) |
-| 5 | Single-floor static-map MVP | [ADR-005](docs/adr/ADR-005-single-floor-mvp.md) |
-| 6 | Assisted graph authoring | [ADR-006](docs/adr/ADR-006-assisted-authoring.md) |
-| 7 | Marker-based AR alignment | [ADR-007](docs/adr/ADR-007-marker-ar-alignment.md) |
-| 8 | Shared route, native AR rendering | [ADR-008](docs/adr/ADR-008-shared-route-native-ar-boundary.md) |
-| 9 | Marker-init, not global localization | [ADR-009](docs/adr/ADR-009-marker-init-not-global-localization.md) |
+| # | Decision |
+|---|----------|
+| 1–6 | KMP, graph routing, preprocessing, marker init, single-floor MVP, assisted authoring |
+| 7 | Marker-based AR world alignment |
+| 8 | Shared route, native AR rendering boundary |
+| 9 | Marker-init, not global localization |
+| 10 | Arrow-progress arrival detection |
+| 11 | Local-first visit history |
+| 12 | Demo-first UX prioritization |
 
 ---
 
-## How AR Navigation Works
-
-### Alignment Model
+## End-to-End Flow
 
 ```
-1. User scans entrance marker → ARKit/ARCore detects reference image
-2. Platform provides marker's 6-DoF pose in AR world coords
-3. We know marker's position in building coords (from package)
-4. Compute: T_ar_bldg = T_ar_marker × T_bldg_marker⁻¹
-5. All building-local arrow positions → apply transform → AR world
+Home → Search → Route Preview → Start AR
+                                    │
+                         Simulate / Real Scan
+                                    │
+                              Navigating
+                           (arrows + progress)
+                                    │
+                          Approaching → Arrived
+                                    │
+                           Session Summary
+                                    │
+                          History (persisted)
 ```
 
-See [docs/contracts/ar-alignment.md](docs/contracts/ar-alignment.md) for the full transform derivation.
+### Session Lifecycle
 
-### Shared vs Native Boundary
+| State | Trigger |
+|-------|---------|
+| Created | User taps "Start AR" from route preview |
+| WaitingForMarker | AR session running, scanning |
+| Aligned | Marker detected (or simulated) |
+| Navigating | Route rendered, progress updating |
+| Approaching | ≥80% progress |
+| Arrived | ≥95% progress or distance < 1.5m |
+| Ended | User manually ends or arrives |
 
-| Shared (KMP) | Native (Swift/Kotlin) |
-|--------------|----------------------|
-| Route computation | AR session lifecycle |
-| Arrow placement generation | Reference image detection |
-| State machine (coordinator) | Coordinate transform application |
-| Textual guidance | 3D entity creation/rendering |
-| Alignment transform math | Camera feed |
+### Completion Statuses
 
-### State Machine
-
-```
-Idle → WaitingForMarker → MarkerDetected → Aligned → RenderingRoute
-                                                    ↕
-                                              TrackingLimited
-```
-
-### Debug/Simulation Mode
-
-Both iOS and Android include a "Simulate Scan" button that bypasses live marker detection:
-- Uses the first entrance marker from the loaded package
-- Creates identity alignment (marker at building origin)
-- Immediately renders demo arrows
-- Essential for development without physical markers
+`CompletedAtDestination`, `EndedManually`, `CancelledBeforeAlignment`, `CancelledAfterAlignment`, `LostTrackingEnded`, `DemoCompleted`
 
 ---
 
-## Running the Preprocessor
+## AR Alignment
+
+`T_ar_bldg = T_ar_marker × T_bldg_marker⁻¹` — see [ar-alignment.md](docs/contracts/ar-alignment.md).
+
+### V1 Arrival Detection (Honest)
+
+Progress-based, not position-based. V1 cannot rely on camera position due to VIO drift. Arrow-index progress serves as a deterministic proxy. Architecture allows later upgrade to true proximity detection.
+
+---
+
+## Running
 
 ```bash
+# Preprocessor
 ./gradlew :tools:nav-preprocessor:run \
-  --args="--input sample/demo-building/scan.glb \
-          --config sample/demo-building/authoring_config.json \
-          --output sample/demo-building/package/ \
-          --overwrite"
-```
+  --args="--input scan.glb --config authoring_config.json --output ./package/ --overwrite"
 
----
-
-## Running Tests
-
-```bash
+# Tests (~92 tests)
 ./gradlew :tools:nav-preprocessor:test
 ```
-
-~64 tests covering:
-- Graph validation, config validation
-- Contract serialization roundtrips
-- Dijkstra shortest-path correctness
-- Package export + full pipeline integration
-- **Route-to-arrow mapper** (spacing, turns, destination, edge cases)
-- **Alignment transform** (identity, translation, rotation, marker invariants)
-- **AR contract models** (serialization roundtrips, defaults)
-
----
-
-## Marker Asset Workflow
-
-See [docs/contracts/marker-assets.md](docs/contracts/marker-assets.md):
-1. Print marker at 21×21 cm on matte paper
-2. Mount at measured position → record coords
-3. Add to `authoring_config.json`
-4. Save reference PNG in `markers/` directory
-5. Add to iOS AR Resources / Android `res/drawable/`
 
 ---
 
 ## What Remains Deferred
 
-- ❌ Multi-floor navigation
-- ❌ Production-grade 3D arrow models (using placeholder boxes/spheres)
+- ❌ Production 3D arrow models (placeholder boxes/spheres)
+- ❌ Position-based arrival (using progress proxy)
 - ❌ Drift correction / relocalization
-- ❌ Multi-marker alignment averaging
-- ❌ Dynamic obstacles
-- ❌ Voice guidance
-- ❌ Cloud anchors
-- ❌ Advanced AR occlusion
-- ❌ Automatic graph extraction from .glb
+- ❌ Backend history sync
+- ❌ Multi-floor, dynamic obstacles, voice, cloud anchors
+- ❌ Persistent (SqlDelight) history storage
 
 All items can be added incrementally on the current architecture.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Shared logic | Kotlin Multiplatform 2.1.10 |
-| Shared UI | Compose Multiplatform 1.7.3 |
-| Routing | Dijkstra shortest-path |
-| Android AR | ARCore 1.46 |
-| iOS AR | ARKit + RealityKit |
-| DI | Koin 4.0.0 |
-| Serialization | kotlinx.serialization 1.7.3 |
-| CLI | Clikt 5.0.2 |
