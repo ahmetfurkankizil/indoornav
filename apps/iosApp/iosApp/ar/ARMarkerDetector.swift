@@ -1,16 +1,34 @@
 import Foundation
 import ARKit
 
-/// Detects entrance marker reference images and reports alignment events.
+/// Detects entrance and checkpoint marker reference images and reports alignment events.
 ///
 /// Works as an ARSession delegate extension, watching for ARImageAnchor
-/// additions and reporting the first stable detection.
+/// additions. Entrance markers trigger session alignment; checkpoint markers
+/// emit correction events without restarting the session.
 class ARMarkerDetector: NSObject {
     
-    /// Expected marker reference image name (from entrance_markers.json)
-    var expectedMarkerName: String?
+    /// Known markers: key is referenceImageName, value is metadata + role
+    struct KnownMarker {
+        let markerId: String
+        let role: MarkerDetectionRole
+        let buildingX: Double
+        let buildingY: Double
+        let buildingZ: Double
+        let buildingRotationYDeg: Double
+        let nearestNodeId: String
+    }
     
-    /// Marker metadata from the building package
+    enum MarkerDetectionRole {
+        case entrance
+        case checkpoint
+    }
+    
+    /// Registered markers by reference image name
+    private var knownMarkers: [String: KnownMarker] = [:]
+    
+    /// Fallback entrance marker metadata (for single-marker backward compat)
+    var expectedMarkerName: String?
     var markerBuildingX: Double = 0.0
     var markerBuildingY: Double = 0.0
     var markerBuildingZ: Double = 0.0
@@ -18,13 +36,16 @@ class ARMarkerDetector: NSObject {
     var markerNearestNodeId: String = ""
     var markerId: String = ""
     
-    /// Callback when marker is detected with alignment data
+    /// Callback when entrance marker is detected with alignment data
     var onMarkerDetected: ((MarkerDetectionEvent) -> Void)?
     
-    /// Whether a marker has already been detected (to avoid re-triggering)
+    /// Callback when checkpoint marker is detected (does NOT restart session)
+    var onCheckpointDetected: ((MarkerDetectionEvent) -> Void)?
+    
+    /// Whether an entrance marker has already been detected (to avoid re-triggering)
     private(set) var hasDetectedMarker: Bool = false
     
-    /// Configure the detector with entrance marker data.
+    /// Configure the detector with entrance marker data (backward-compatible single-marker).
     func configure(
         markerId: String,
         markerName: String?,
@@ -42,20 +63,40 @@ class ARMarkerDetector: NSObject {
         self.markerBuildingRotationYDeg = buildingRotationYDeg
         self.markerNearestNodeId = nearestNodeId
         self.hasDetectedMarker = false
+        
+        // Register as known marker
+        if let name = markerName {
+            knownMarkers[name] = KnownMarker(
+                markerId: markerId,
+                role: .entrance,
+                buildingX: buildingX,
+                buildingY: buildingY,
+                buildingZ: buildingZ,
+                buildingRotationYDeg: buildingRotationYDeg,
+                nearestNodeId: nearestNodeId
+            )
+        }
+    }
+    
+    /// Configure additional checkpoint markers.
+    func configureCheckpoints(_ checkpoints: [(id: String, refImageName: String, buildingX: Double, buildingY: Double, buildingZ: Double, rotationYDeg: Double, nearestNodeId: String)]) {
+        for cp in checkpoints {
+            knownMarkers[cp.refImageName] = KnownMarker(
+                markerId: cp.id,
+                role: .checkpoint,
+                buildingX: cp.buildingX,
+                buildingY: cp.buildingY,
+                buildingZ: cp.buildingZ,
+                buildingRotationYDeg: cp.rotationYDeg,
+                nearestNodeId: cp.nearestNodeId
+            )
+        }
     }
     
     /// Process an ARImageAnchor when added to the session.
     /// Call this from ARSessionDelegate.session(_:didAdd:)
     func processAnchor(_ anchor: ARAnchor) {
-        guard !hasDetectedMarker,
-              let imageAnchor = anchor as? ARImageAnchor else { return }
-        
-        // Check if this is our expected marker
-        let detectedName = imageAnchor.referenceImage.name ?? ""
-        print("[MarkerDetector] Detected image: '\(detectedName)'")
-        
-        // Accept any detected image for now (single-building MVP)
-        // Future: match against expectedMarkerName
+        guard let imageAnchor = anchor as? ARImageAnchor else { return }
         
         // Extract pose from anchor transform
         let transform = imageAnchor.transform
@@ -64,9 +105,47 @@ class ARMarkerDetector: NSObject {
         let arZ = Double(transform.columns.3.z)
         
         // Extract Y-rotation from the transform matrix
-        // For Y-up, rotation around Y: atan2(m[0][2], m[0][0])
         let arRotationYRad = atan2(Double(transform.columns.0.z), Double(transform.columns.0.x))
         let arRotationYDeg = arRotationYRad * 180.0 / .pi
+        
+        let detectedName = imageAnchor.referenceImage.name ?? ""
+        let confidence = Double(imageAnchor.isTracked ? 1.0 : 0.5)
+        
+        print("[MarkerDetector] Detected image: '\(detectedName)'")
+        
+        // Try to match against known markers
+        if let known = knownMarkers[detectedName] {
+            let event = MarkerDetectionEvent(
+                markerId: known.markerId,
+                entranceNodeId: known.nearestNodeId,
+                markerBuildingX: known.buildingX,
+                markerBuildingY: known.buildingY,
+                markerBuildingZ: known.buildingZ,
+                markerArX: arX,
+                markerArY: arY,
+                markerArZ: arZ,
+                markerArRotationYDeg: arRotationYDeg,
+                markerBuildingRotationYDeg: known.buildingRotationYDeg,
+                confidence: confidence,
+                role: known.role
+            )
+            
+            switch known.role {
+            case .entrance:
+                guard !hasDetectedMarker else { return }
+                hasDetectedMarker = true
+                print("[MarkerDetector] Entrance marker aligned — AR pos: (\(arX), \(arY), \(arZ))")
+                onMarkerDetected?(event)
+                
+            case .checkpoint:
+                print("[MarkerDetector] Checkpoint marker observed: \(known.markerId) — AR pos: (\(arX), \(arY), \(arZ))")
+                onCheckpointDetected?(event)
+            }
+            return
+        }
+        
+        // Fallback: accept any detected image for entrance (single-building MVP backward compat)
+        guard !hasDetectedMarker else { return }
         
         hasDetectedMarker = true
         
@@ -81,7 +160,8 @@ class ARMarkerDetector: NSObject {
             markerArZ: arZ,
             markerArRotationYDeg: arRotationYDeg,
             markerBuildingRotationYDeg: markerBuildingRotationYDeg,
-            confidence: Double(imageAnchor.isTracked ? 1.0 : 0.5)
+            confidence: confidence,
+            role: .entrance
         )
         
         print("[MarkerDetector] Marker aligned — AR pos: (\(arX), \(arY), \(arZ))")
@@ -91,6 +171,12 @@ class ARMarkerDetector: NSObject {
     /// Reset to allow re-detection.
     func reset() {
         hasDetectedMarker = false
+    }
+    
+    /// Full reset including all marker registrations.
+    func fullReset() {
+        hasDetectedMarker = false
+        knownMarkers.removeAll()
     }
 }
 
@@ -107,4 +193,5 @@ struct MarkerDetectionEvent {
     let markerArRotationYDeg: Double
     let markerBuildingRotationYDeg: Double
     let confidence: Double
+    let role: ARMarkerDetector.MarkerDetectionRole
 }

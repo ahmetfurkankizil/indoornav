@@ -1,0 +1,102 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VecturAI Markers",
+    "description": "Unified marker definitions for AR alignment. Supports entrance (session init) and checkpoint (mid-route correction) roles.",
+    "type": "object",
+    "required": [
+        "buildingId",
+        "entranceMarkers"
+    ],
+    "properties": {
+        "buildingId": {
+            "type": "string"
+        },
+        "entranceMarkers": {
+            "type": "array",
+            "minItems": 1,
+            "description": "At least one entrance marker is required for session initialization.",
+            "items": {
+                "$ref": "#/definitions/marker"
+            }
+        },
+        "checkpointMarkers": {
+            "type": "array",
+            "description": "Optional checkpoint markers for mid-route alignment correction.",
+            "items": {
+                "$ref": "#/definitions/marker"
+            }
+        }
+    },
+    "definitions": {
+        "marker": {
+            "type": "object",
+            "required": [
+                "id",
+                "positionX",
+                "positionY",
+                "nearestNodeId"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique marker identifier (must be unique across all markers)"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "entrance",
+                        "checkpoint"
+                    ],
+                    "description": "Marker role. Entrance markers initialize the AR session; checkpoint markers apply mid-route corrections."
+                },
+                "qrPayload": {
+                    "type": "string",
+                    "description": "QR code content (JSON or URI with building/marker IDs)"
+                },
+                "positionX": {
+                    "type": "number",
+                    "description": "Marker X position in building-local coords (meters)"
+                },
+                "positionY": {
+                    "type": "number",
+                    "description": "Marker Y position in building-local coords (meters)"
+                },
+                "positionZ": {
+                    "type": "number",
+                    "description": "Marker Z position (elevation)",
+                    "default": 0
+                },
+                "rotationYDegrees": {
+                    "type": "number",
+                    "description": "Marker rotation around Y-axis in degrees",
+                    "default": 0
+                },
+                "nearestNodeId": {
+                    "type": "string",
+                    "description": "Closest nav-graph node to this marker"
+                },
+                "physicalWidthMeters": {
+                    "type": "number",
+                    "description": "Physical width of the printed marker for AR scale",
+                    "default": 0.2
+                },
+                "physicalHeightMeters": {
+                    "type": "number",
+                    "description": "Physical height of the printed marker",
+                    "default": 0.2
+                },
+                "referenceImageName": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Name of the AR reference image asset"
+                },
+                "notes": {
+                    "type": "string",
+                    "description": "Optional placement or operational notes"
+                }
+            }
+        }
+    }
+}

@@ -97,6 +97,7 @@ class DebugExporter {
         sb.appendLine("""  .node-circle { fill: #3b82f6; stroke: #1e40af; stroke-width: 1.5; }""")
         sb.appendLine("""  .room-circle { fill: #10b981; stroke: #065f46; stroke-width: 2; }""")
         sb.appendLine("""  .marker-circle { fill: #f59e0b; stroke: #92400e; stroke-width: 2; }""")
+        sb.appendLine("""  .checkpoint-marker { fill: #8b5cf6; stroke: #5b21b6; stroke-width: 2; }""")
         sb.appendLine("""  .node-label { font-size: 10px; fill: #334155; }""")
         sb.appendLine("""  .room-label { font-size: 11px; fill: #065f46; font-weight: bold; }""")
         sb.appendLine("""  .title { font-size: 16px; fill: #1e293b; font-weight: bold; }""")
@@ -108,7 +109,7 @@ class DebugExporter {
 
         // Title
         sb.appendLine("""<text x="20" y="30" class="title">${escapeXml(config.buildingName)} — Plan View Debug</text>""")
-        sb.appendLine("""<text x="20" y="48" class="legend-text">${config.nodes.size} nodes, ${config.edges.size} edges, ${config.rooms.size} rooms</text>""")
+        sb.appendLine("""<text x="20" y="48" class="legend-text">${config.nodes.size} nodes, ${config.edges.size} edges, ${config.rooms.size} rooms, ${config.checkpointMarkers.size} checkpoints</text>""")
 
         // Translate content down for title
         sb.appendLine("""<g transform="translate(0, 30)">""")
@@ -154,6 +155,18 @@ class DebugExporter {
             sb.appendLine("""<text x="$cx" y="$cy" text-anchor="middle" style="font-size:10px;fill:#92400e;">⬟ ${escapeXml(marker.id)}</text>""")
         }
 
+        // Checkpoint markers (purple diamonds)
+        for (cp in config.checkpointMarkers) {
+            val cpX = tx(cp.position.x).f()
+            val cpZ = tz(cp.position.z).f()
+            val cpXd = tx(cp.position.x)
+            val cpZd = tz(cp.position.z)
+            val s = 8.0  // diamond half-size
+            val diamondPoints = "${cpXd},${cpZd - s} ${cpXd + s},${cpZd} ${cpXd},${cpZd + s} ${cpXd - s},${cpZd}"
+            sb.appendLine("""<polygon points="$diamondPoints" class="checkpoint-marker"/>""")
+            sb.appendLine("""<text x="$cpX" y="${(cpZd + 18).f()}" text-anchor="middle" style="font-size:10px;fill:#5b21b6;">◆ ${escapeXml(cp.id)}</text>""")
+        }
+
         sb.appendLine("""</g>""")
 
         // Legend
@@ -165,8 +178,10 @@ class DebugExporter {
         sb.appendLine("""<text x="120" y="12" class="legend-text">Room Entry</text>""")
         sb.appendLine("""<circle cx="218" cy="8" r="7" class="marker-circle"/>""")
         sb.appendLine("""<text x="230" y="12" class="legend-text">Entrance Marker</text>""")
-        sb.appendLine("""<line x1="348" y1="8" x2="378" y2="8" class="edge"/>""")
-        sb.appendLine("""<text x="385" y="12" class="legend-text">Edge</text>""")
+        sb.appendLine("""<polygon points="318,1 325,8 318,15 311,8" class="checkpoint-marker"/>""")
+        sb.appendLine("""<text x="332" y="12" class="legend-text">Checkpoint</text>""")
+        sb.appendLine("""<line x1="428" y1="8" x2="458" y2="8" class="edge"/>""")
+        sb.appendLine("""<text x="465" y="12" class="legend-text">Edge</text>""")
         sb.appendLine("""</g>""")
 
         sb.appendLine("""</svg>""")

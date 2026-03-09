@@ -134,6 +134,16 @@ class ProgressEstimator(
         )
     }
 
+    /**
+     * Update the alignment transform after a checkpoint correction.
+     *
+     * This replaces the current alignment without resetting peak progress,
+     * enabling corrected re-projection while preserving monotonic progress.
+     */
+    fun updateAlignment(newAlignment: AlignmentTransform) {
+        alignmentTransform = newAlignment
+    }
+
     /** Reset estimator state (e.g., on recenter/rescan). */
     fun resetProgress() {
         // Don't regress — keep peak on rescan per ADR-018

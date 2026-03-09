@@ -74,6 +74,37 @@ class GraphValidator {
             }
         }
 
+        // ── Entrance marker ID uniqueness ────────────────────
+        val entranceMarkerIds = config.entranceMarkers.map { it.id }
+        val duplicateEntranceMarkers = entranceMarkerIds.groupBy { it }.filter { it.value.size > 1 }.keys
+        if (duplicateEntranceMarkers.isNotEmpty()) {
+            errors.add("Duplicate entrance marker IDs: $duplicateEntranceMarkers")
+        }
+
+        // ── Checkpoint marker validation ─────────────────────
+        if (config.checkpointMarkers.isNotEmpty()) {
+            val checkpointIds = config.checkpointMarkers.map { it.id }
+
+            // Unique checkpoint marker IDs
+            val duplicateCheckpoints = checkpointIds.groupBy { it }.filter { it.value.size > 1 }.keys
+            if (duplicateCheckpoints.isNotEmpty()) {
+                errors.add("Duplicate checkpoint marker IDs: $duplicateCheckpoints")
+            }
+
+            // No overlap between entrance and checkpoint marker IDs
+            val overlappingIds = entranceMarkerIds.toSet().intersect(checkpointIds.toSet())
+            if (overlappingIds.isNotEmpty()) {
+                errors.add("Marker IDs overlap between entrance and checkpoint: $overlappingIds")
+            }
+
+            // Checkpoint marker nearestNodeId references
+            for (cp in config.checkpointMarkers) {
+                if (cp.nearestNodeId !in nodeIds) {
+                    errors.add("Checkpoint marker '${cp.id}': nearestNodeId '${cp.nearestNodeId}' does not exist")
+                }
+            }
+        }
+
         // ── Connectivity check ──────────────────────────────
         if (errors.isEmpty()) {
             val adjacency = buildAdjacency(config)

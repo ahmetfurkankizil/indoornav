@@ -105,6 +105,30 @@ class PackageExporter {
         writeJson(outDir, "entrance_markers.json", json.encodeToString(markers))
         files.add("entrance_markers.json")
 
+        // ── checkpoint_markers.json (optional) ──
+        if (config.checkpointMarkers.isNotEmpty()) {
+            val checkpointMarkers = PackageCheckpointMarkers(
+                buildingId = config.buildingId,
+                schemaVersion = 1,
+                markers = config.checkpointMarkers.map { cp ->
+                    PackageCheckpointMarker(
+                        id = cp.id,
+                        positionX = cp.position.x,
+                        positionY = cp.position.y,
+                        positionZ = cp.position.z,
+                        rotationYDegrees = cp.rotationYDegrees,
+                        nearestNodeId = cp.nearestNodeId,
+                        physicalWidthMeters = cp.physicalWidthMeters,
+                        physicalHeightMeters = cp.physicalHeightMeters,
+                        referenceImageName = cp.referenceImageName,
+                        notes = cp.notes,
+                    )
+                },
+            )
+            writeJson(outDir, "checkpoint_markers.json", json.encodeToString(checkpointMarkers))
+            files.add("checkpoint_markers.json")
+        }
+
         // ── route_rendering.json ──
         val rendering = PackageRouteRendering(
             arrowSpacingMeters = config.routeRendering.arrowSpacingMeters,
@@ -231,6 +255,27 @@ data class PackageMarker(
     val physicalWidthMeters: Double,
     val physicalHeightMeters: Double,
     val referenceImageName: String?,
+)
+
+@Serializable
+data class PackageCheckpointMarkers(
+    val buildingId: String,
+    val schemaVersion: Int,
+    val markers: List<PackageCheckpointMarker>,
+)
+
+@Serializable
+data class PackageCheckpointMarker(
+    val id: String,
+    val positionX: Double,
+    val positionY: Double,
+    val positionZ: Double,
+    val rotationYDegrees: Double,
+    val nearestNodeId: String,
+    val physicalWidthMeters: Double,
+    val physicalHeightMeters: Double,
+    val referenceImageName: String?,
+    val notes: String?,
 )
 
 @Serializable

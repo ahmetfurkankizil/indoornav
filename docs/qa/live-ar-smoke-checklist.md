@@ -22,6 +22,19 @@ Manual QA on a real device with physical printed marker.
 - [ ] Progress percent matches approximate walking distance
 - [ ] No backwards progress during forward walking
 
+## Checkpoint Correction (v1.6)
+- [ ] If package has checkpoint markers, walk toward one
+- [ ] Checkpoint detection logged (does NOT restart session)
+- [ ] Alignment correction applied (arrows adjust subtly)
+- [ ] Progress continues forward after correction
+- [ ] If no checkpoint markers in package, skip this section
+
+## Confidence & Off-Route (v1.6)
+- [ ] Debug panel shows alignment/progress/off-route confidence
+- [ ] Walking off-route shows MINOR_DRIFT → LOW_CONFIDENCE
+- [ ] Walking back to route recovers to ON_ROUTE
+- [ ] Recovery recommendation shown when appropriate
+
 ## Tracking Quality
 - [ ] "Normal" tracking in good conditions
 - [ ] "Limited" warning appears if camera obstructed
@@ -46,7 +59,7 @@ Manual QA on a real device with physical printed marker.
 - [ ] Advance button available in demo mode only
 
 ## Known Issues
-- Drift may accumulate on routes > 15m
-- Single-marker-only; no multi-marker correction
+- Drift may accumulate on routes > 15m (mitigated by checkpoint markers)
+- Checkpoint correction bounded to max 2m / 15° per observation
 - Progress is route-relative, not absolute position
-- Off-route walking shows low-confidence but doesn't auto-cancel
+- Off-route walking shows guidance but doesn't auto-cancel

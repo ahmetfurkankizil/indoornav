@@ -123,6 +123,67 @@
                 }
             }
         },
+        "checkpointMarkers": {
+            "type": "array",
+            "description": "Optional checkpoint markers for mid-route alignment correction. Not required — packages work without them.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "nearestNodeId",
+                    "physicalWidthMeters",
+                    "physicalHeightMeters",
+                    "position"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique marker identifier (must not overlap with entrance marker IDs)"
+                    },
+                    "nearestNodeId": {
+                        "type": "string",
+                        "description": "Graph node nearest to this checkpoint marker"
+                    },
+                    "physicalWidthMeters": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "physicalHeightMeters": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "position": {
+                        "type": "object",
+                        "required": [
+                            "x",
+                            "y",
+                            "z"
+                        ],
+                        "properties": {
+                            "x": {
+                                "type": "number"
+                            },
+                            "y": {
+                                "type": "number"
+                            },
+                            "z": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "rotationYDegrees": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "referenceImageName": {
+                        "type": "string"
+                    },
+                    "notes": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "nodes": {
             "type": "array",
             "minItems": 2,

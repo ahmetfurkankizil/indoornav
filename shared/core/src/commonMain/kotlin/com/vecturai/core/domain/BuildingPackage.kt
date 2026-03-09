@@ -15,6 +15,7 @@ data class BuildingPackage(
     val rooms: List<Room>,
     val entranceMarkers: List<EntranceMarker>,
     val renderingConfig: RouteRenderingConfig,
+    val checkpointMarkers: List<CheckpointMarker> = emptyList(),
 )
 
 /**

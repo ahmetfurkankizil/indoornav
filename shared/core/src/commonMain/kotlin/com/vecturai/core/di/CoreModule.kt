@@ -1,6 +1,8 @@
 package com.vecturai.core.di
 
 import com.vecturai.core.ar.ArNavigationCoordinator
+import com.vecturai.core.ar.CorrectionCoordinator
+import com.vecturai.core.ar.OffRouteDetector
 import com.vecturai.core.ar.RouteToArrowMapper
 import com.vecturai.core.config.AppConfig
 import com.vecturai.core.loading.BuildingPackageLoader
@@ -43,9 +45,13 @@ val coreModule = module {
     single { DemoPackageProvider }
     single { DemoMode() }
 
+    // AR — correction & confidence
+    single { CorrectionCoordinator() }
+    single { OffRouteDetector() }
+
     // AR
     single { RouteToArrowMapper() }
-    single { ArNavigationCoordinator(get(), get(), get(), get()) }
+    single { ArNavigationCoordinator(get(), get(), get(), get(), get(), get()) }
 
     // Navigation session
     single { ArrivalDetector() }
@@ -54,3 +60,4 @@ val coreModule = module {
     // History (in-memory for now; swap to JsonFileHistoryRepository per-platform)
     single<HistoryRepository> { InMemoryHistoryRepository() }
 }
+

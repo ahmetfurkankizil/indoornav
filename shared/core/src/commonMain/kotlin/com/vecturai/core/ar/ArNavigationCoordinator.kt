@@ -29,6 +29,8 @@ class ArNavigationCoordinator(
     private val routeEngine: RouteEngine,
     private val arrowMapper: RouteToArrowMapper,
     private val appStore: AppStore,
+    private val correctionCoordinator: CorrectionCoordinator = CorrectionCoordinator(),
+    private val offRouteDetector: OffRouteDetector = OffRouteDetector(),
 ) {
 
     // ── State ────────────────────────────────────────────
@@ -44,6 +46,9 @@ class ArNavigationCoordinator(
 
     private val _currentInstruction = MutableStateFlow("")
     val currentInstruction: StateFlow<String> = _currentInstruction.asStateFlow()
+
+    /** Confidence state including correction info, off-route status, recommendations. */
+    val confidenceState: StateFlow<NavigationConfidenceState> = correctionCoordinator.confidenceState
 
     private var bridge: ArNavigationBridge? = null
     private var currentRoute: Route? = null
@@ -149,6 +154,12 @@ class ArNavigationCoordinator(
 
         bridge?.onRenderableRouteUpdated(renderable)
         bridge?.onSessionStateChanged(_sessionState.value)
+
+        // Configure correction coordinator with checkpoint markers
+        val pkg = currentPackage
+        if (pkg != null && pkg.checkpointMarkers.isNotEmpty()) {
+            correctionCoordinator.configure(pkg.checkpointMarkers, transform)
+        }
     }
 
     /**
@@ -174,6 +185,31 @@ class ArNavigationCoordinator(
     /**
      * Stop the AR session and reset state.
      */
+    /**
+     * Called by native layer when a checkpoint marker is observed during navigation.
+     *
+     * Computes and applies bounded alignment correction.
+     * Does NOT restart the session or reset progress.
+     */
+    fun onCheckpointMarkerObserved(event: MarkerObservationEvent) {
+        val result = correctionCoordinator.onCheckpointObserved(event)
+        if (result.applied && result.newAlignment != null) {
+            _alignmentTransform.value = result.newAlignment
+            bridge?.onAlignmentEstablished(result.newAlignment)
+
+            // Update renderable route state with correction info
+            val renderable = _renderableRoute.value
+            if (renderable != null) {
+                _sessionState.value = ArSessionState.RenderingRoute(
+                    arrowCount = renderable.arrows.size,
+                    currentInstruction = renderable.currentInstruction,
+                    distanceRemainingMeters = renderable.totalDistanceMeters,
+                )
+                bridge?.onSessionStateChanged(_sessionState.value)
+            }
+        }
+    }
+
     fun stopSession() {
         bridge?.stopSession()
         _sessionState.value = ArSessionState.Idle
@@ -183,6 +219,8 @@ class ArNavigationCoordinator(
         currentRoute = null
         currentPackage = null
         currentDestination = null
+        correctionCoordinator.reset()
+        offRouteDetector.reset()
     }
 
     // ── Debug / Simulation ───────────────────────────────

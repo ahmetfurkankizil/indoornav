@@ -6,13 +6,35 @@ import com.google.ar.core.TrackingState
 import kotlin.math.atan2
 
 /**
- * Detects entrance marker augmented images and reports alignment events.
+ * Detects entrance and checkpoint marker augmented images and reports events.
  *
- * Watches ARCore frames for AugmentedImage tracking updates
- * and reports the first stable detection.
+ * Entrance markers trigger session alignment (once).
+ * Checkpoint markers emit correction events without restarting the session.
  */
 class ArMarkerDetector {
 
+    /**
+     * Known marker with registration metadata and role.
+     */
+    data class KnownMarker(
+        val markerId: String,
+        val role: MarkerDetectionRole,
+        val nearestNodeId: String,
+        val buildingX: Double,
+        val buildingY: Double,
+        val buildingZ: Double,
+        val buildingRotationYDeg: Double,
+    )
+
+    enum class MarkerDetectionRole {
+        ENTRANCE,
+        CHECKPOINT,
+    }
+
+    /** Registered markers by augmented image index. */
+    private val knownMarkersByIndex = mutableMapOf<Int, KnownMarker>()
+
+    /** Fallback entrance marker metadata for single-marker backward compat. */
     var markerId: String = ""
     var markerNearestNodeId: String = ""
     var markerBuildingX: Double = 0.0
@@ -24,9 +46,10 @@ class ArMarkerDetector {
         private set
 
     var onMarkerDetected: ((MarkerDetectionEvent) -> Unit)? = null
+    var onCheckpointDetected: ((MarkerDetectionEvent) -> Unit)? = null
 
     /**
-     * Configure the detector with entrance marker metadata.
+     * Configure the detector with entrance marker metadata (backward-compatible).
      */
     fun configure(
         markerId: String,
@@ -46,12 +69,20 @@ class ArMarkerDetector {
     }
 
     /**
+     * Register a known marker by augmented image index.
+     * Call after adding images to the augmented image database.
+     */
+    fun registerMarker(index: Int, marker: KnownMarker) {
+        knownMarkersByIndex[index] = marker
+    }
+
+    /**
      * Process an ARCore frame, checking for augmented image detections.
      * Call this each frame from the render loop.
+     *
+     * Unlike v1.5, continues processing checkpoint markers after entrance detection.
      */
     fun processFrame(frame: Frame) {
-        if (hasDetectedMarker) return
-
         val augmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
         for (image in augmentedImages) {
             if (image.trackingState != TrackingState.TRACKING) continue
@@ -72,30 +103,72 @@ class ArMarkerDetector {
                 atan2(2.0 * (qw * qy + qx * qz), 1.0 - 2.0 * (qy * qy + qz * qz))
             )
 
-            hasDetectedMarker = true
+            // Try to match by index
+            val known = knownMarkersByIndex[image.index]
+            if (known != null) {
+                val event = MarkerDetectionEvent(
+                    markerId = known.markerId,
+                    entranceNodeId = known.nearestNodeId,
+                    markerBuildingX = known.buildingX,
+                    markerBuildingY = known.buildingY,
+                    markerBuildingZ = known.buildingZ,
+                    markerArX = arX,
+                    markerArY = arY,
+                    markerArZ = arZ,
+                    markerArRotationYDeg = arRotationYDeg,
+                    markerBuildingRotationYDeg = known.buildingRotationYDeg,
+                    confidence = 1.0,
+                    role = known.role,
+                )
 
-            val event = MarkerDetectionEvent(
-                markerId = markerId,
-                entranceNodeId = markerNearestNodeId,
-                markerBuildingX = markerBuildingX,
-                markerBuildingY = markerBuildingY,
-                markerBuildingZ = markerBuildingZ,
-                markerArX = arX,
-                markerArY = arY,
-                markerArZ = arZ,
-                markerArRotationYDeg = arRotationYDeg,
-                markerBuildingRotationYDeg = markerBuildingRotationYDeg,
-                confidence = 1.0,
-            )
+                when (known.role) {
+                    MarkerDetectionRole.ENTRANCE -> {
+                        if (!hasDetectedMarker) {
+                            hasDetectedMarker = true
+                            println("[MarkerDetector] Entrance marker detected at AR ($arX, $arY, $arZ)")
+                            onMarkerDetected?.invoke(event)
+                        }
+                    }
+                    MarkerDetectionRole.CHECKPOINT -> {
+                        println("[MarkerDetector] Checkpoint marker '${known.markerId}' at AR ($arX, $arY, $arZ)")
+                        onCheckpointDetected?.invoke(event)
+                    }
+                }
+                continue
+            }
 
-            println("[MarkerDetector] Marker detected at AR ($arX, $arY, $arZ)")
-            onMarkerDetected?.invoke(event)
-            break
+            // Fallback: first unregistered image treated as entrance (backward compat)
+            if (!hasDetectedMarker) {
+                hasDetectedMarker = true
+
+                val event = MarkerDetectionEvent(
+                    markerId = markerId,
+                    entranceNodeId = markerNearestNodeId,
+                    markerBuildingX = markerBuildingX,
+                    markerBuildingY = markerBuildingY,
+                    markerBuildingZ = markerBuildingZ,
+                    markerArX = arX,
+                    markerArY = arY,
+                    markerArZ = arZ,
+                    markerArRotationYDeg = arRotationYDeg,
+                    markerBuildingRotationYDeg = markerBuildingRotationYDeg,
+                    confidence = 1.0,
+                    role = MarkerDetectionRole.ENTRANCE,
+                )
+
+                println("[MarkerDetector] Marker detected at AR ($arX, $arY, $arZ)")
+                onMarkerDetected?.invoke(event)
+            }
         }
     }
 
     fun reset() {
         hasDetectedMarker = false
+    }
+
+    fun fullReset() {
+        hasDetectedMarker = false
+        knownMarkersByIndex.clear()
     }
 }
 
@@ -114,4 +187,5 @@ data class MarkerDetectionEvent(
     val markerArRotationYDeg: Double,
     val markerBuildingRotationYDeg: Double,
     val confidence: Double,
+    val role: ArMarkerDetector.MarkerDetectionRole,
 )

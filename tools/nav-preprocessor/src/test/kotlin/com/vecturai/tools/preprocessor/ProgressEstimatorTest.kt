@@ -123,7 +123,7 @@ class ProgressEstimatorTest {
     @Test
     fun `large off-route triggers low confidence`() {
         val est = TestEstimator(route)
-        val r = est.update(3.0, 5.0) // 5m off route
+        val r = est.update(3.0, 10.0) // 6m off closest segment (6,4→3,4)
         assertTrue(r.lowConfidence)
     }
 

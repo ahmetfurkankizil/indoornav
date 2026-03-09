@@ -17,6 +17,7 @@ data class AuthoringConfig(
     val asset: AssetReference,
     val tags: List<String> = emptyList(),
     val entranceMarkers: List<AuthoringMarker>,
+    val checkpointMarkers: List<AuthoringCheckpointMarker> = emptyList(),
     val nodes: List<AuthoringNode>,
     val edges: List<AuthoringEdge>,
     val rooms: List<AuthoringRoom>,
@@ -39,6 +40,24 @@ data class AuthoringMarker(
     val physicalHeightMeters: Double,
     val position: Position3D,
     val forwardBasis: String = "-z",
+    val rotationYDegrees: Double = 0.0,
+    val referenceImageName: String? = null,
+    val notes: String? = null,
+)
+
+/**
+ * Checkpoint marker for mid-route alignment correction.
+ *
+ * Similar to entrance markers but with a correction role.
+ * Not required — packages work without them.
+ */
+@Serializable
+data class AuthoringCheckpointMarker(
+    val id: String,
+    val nearestNodeId: String,
+    val physicalWidthMeters: Double,
+    val physicalHeightMeters: Double,
+    val position: Position3D,
     val rotationYDegrees: Double = 0.0,
     val referenceImageName: String? = null,
     val notes: String? = null,
@@ -97,3 +116,4 @@ data class GraphMetadata(
     val authoredDate: String? = null,
     val notes: String? = null,
 )
+
