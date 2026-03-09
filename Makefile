@@ -1,6 +1,7 @@
 .PHONY: help test-all test-preprocessor test-shared \
        android-debug android-release \
-       ios-open preprocess clean
+       ios-open preprocess clean \
+       verify-all verify-package verify-ios
 
 # ═══════════════════════════════════════════════
 # VecturAI — Build Targets
@@ -15,7 +16,7 @@ help: ## Show available targets
 test-all: test-preprocessor ## Run all tests
 	@echo "✅ All tests passed"
 
-test-preprocessor: ## Run nav-preprocessor tests (~92 tests)
+test-preprocessor: ## Run nav-preprocessor tests (~160 tests)
 	./gradlew :tools:nav-preprocessor:test
 
 test-shared: ## Run shared KMP module tests (when configured)
@@ -48,6 +49,17 @@ preprocess: ## Run nav-preprocessor on sample building
 		        --config sample/demo-building/authoring_config.json \
 		        --output sample/demo-building/package/ \
 		        --overwrite"
+
+# ── Verification ─────────────────────────────
+
+verify-all: ## Run all verification checks (tests, build, package)
+	bash scripts/verify-all.sh
+
+verify-package: ## Validate demo package integrity
+	bash scripts/verify-demo-package.sh
+
+verify-ios: ## Run local iOS build verification
+	bash scripts/verify-ios-local.sh
 
 # ── Utilities ─────────────────────────────────
 
