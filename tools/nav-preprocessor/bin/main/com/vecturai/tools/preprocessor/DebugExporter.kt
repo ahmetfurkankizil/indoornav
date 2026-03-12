@@ -196,6 +196,227 @@ class DebugExporter {
         .replace("<", "&lt;")
         .replace(">", "&gt;")
         .replace("\"", "&quot;")
+
+
+
+    fun exportDraftDebug(
+        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        floorEstimate: com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
+        geometry: com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
+        outputDir: String,
+    ) {
+        val outDir = File(outputDir)
+        outDir.mkdirs()
+        exportOccupancySvg(grid, zones, outDir)
+        exportDraftGraphSvg(grid, zones, draftGraph, outDir)
+        exportGeometryStats(grid, zones, draftGraph, floorEstimate, geometry, outDir)
+    }
+
+    private fun exportOccupancySvg(
+        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        outDir: File,
+    ) {
+        val cellPx = 6
+        val padding = 40
+        val svgW = grid.width * cellPx + 2 * padding
+        val svgH = grid.height * cellPx + 2 * padding + 60
+
+        // Assign colors to zones
+        val zoneColors = listOf("#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16")
+        val cellZoneMap = mutableMapOf<Pair<Int, Int>, Int>()
+        zones.forEachIndexed { idx, zone ->
+            for (cell in zone.cells) cellZoneMap[cell] = idx
+        }
+
+        val sb = StringBuilder()
+        sb.appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
+        sb.appendLine("""<svg xmlns="http://www.w3.org/2000/svg" width="$svgW" height="$svgH">""")
+        sb.appendLine("""<rect width="100%" height="100%" fill="#1e1e2e" rx="8"/>""")
+        sb.appendLine("""<text x="20" y="28" fill="#cdd6f4" font-family="Inter,sans-serif" font-size="14" font-weight="bold">Occupancy Grid — ${grid.width}×${grid.height} cells (${grid.cellSize}m)</text>""")
+
+        sb.appendLine("""<g transform="translate($padding, 40)">""")
+        for (row in 0 until grid.height) {
+            for (col in 0 until grid.width) {
+                val x = col * cellPx
+                val y = row * cellPx
+                val fill = if (grid.cells[row][col] == com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OCCUPIED) {
+                    val zoneIdx = cellZoneMap[Pair(col, row)]
+                    if (zoneIdx != null) zoneColors[zoneIdx % zoneColors.size] else "#6c7086"
+                } else "#313244"
+                sb.appendLine("""<rect x="$x" y="$y" width="$cellPx" height="$cellPx" fill="$fill" stroke="#1e1e2e" stroke-width="0.5"/>""")
+            }
+        }
+        sb.appendLine("</g>")
+
+        // Legend
+        val ly = grid.height * cellPx + 50
+        sb.appendLine("""<g transform="translate(20, $ly)">""")
+        zones.forEachIndexed { idx, zone ->
+            val lx = idx * 120
+            val color = zoneColors[idx % zoneColors.size]
+            sb.appendLine("""<rect x="$lx" y="0" width="12" height="12" fill="$color" rx="2"/>""")
+            sb.appendLine("""<text x="${lx + 16}" y="10" fill="#cdd6f4" font-family="Inter,sans-serif" font-size="10">${escapeXml(zone.label)} (${zone.cellCount})</text>""")
+        }
+        sb.appendLine("</g>")
+        sb.appendLine("</svg>")
+
+        File(outDir, "occupancy_debug.svg").writeText(sb.toString())
+    }
+
+    private fun exportDraftGraphSvg(
+        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        outDir: File,
+    ) {
+        if (draftGraph.nodes.isEmpty()) return
+
+        val padding = 80.0
+        val svgWidth = 800.0
+        val svgHeight = 600.0
+        val drawW = svgWidth - 2 * padding
+        val drawH = svgHeight - 2 * padding
+
+        val xs = draftGraph.nodes.map { it.x }
+        val zs = draftGraph.nodes.map { it.z }
+        val minX = xs.min(); val maxX = xs.max()
+        val minZ = zs.min(); val maxZ = zs.max()
+        val rangeX = (maxX - minX).coerceAtLeast(1.0)
+        val rangeZ = (maxZ - minZ).coerceAtLeast(1.0)
+        val scale = minOf(drawW / rangeX, drawH / rangeZ)
+
+        fun tx(x: Double) = padding + (x - minX) * scale
+        fun tz(z: Double) = padding + (z - minZ) * scale
+
+        val nodeMap = draftGraph.nodes.associateBy { it.id }
+
+        val sb = StringBuilder()
+        sb.appendLine("""<?xml version="1.0" encoding="UTF-8"?>""")
+        sb.appendLine("""<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth.roundToInt()}" height="${(svgHeight + 80).roundToInt()}">""")
+        sb.appendLine("""<rect width="100%" height="100%" fill="#1e1e2e" rx="8"/>""")
+        sb.appendLine("""<text x="20" y="30" fill="#cdd6f4" font-family="Inter,sans-serif" font-size="16" font-weight="bold">Draft Navigation Graph — ${draftGraph.nodes.size} nodes, ${draftGraph.edges.size} edges</text>""")
+        sb.appendLine("""<text x="20" y="50" fill="#a6adc8" font-family="Inter,sans-serif" font-size="11">⚠ DRAFT — review and edit before use</text>""")
+
+        sb.appendLine("""<g transform="translate(0, 30)">""")
+
+        // Edges
+        for (edge in draftGraph.edges) {
+            val from = nodeMap[edge.from] ?: continue
+            val to = nodeMap[edge.to] ?: continue
+            sb.appendLine("""<line x1="${tx(from.x).f()}" y1="${tz(from.z).f()}" x2="${tx(to.x).f()}" y2="${tz(to.z).f()}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>""")
+            // Edge cost label
+            val mx = ((tx(from.x) + tx(to.x)) / 2).f()
+            val my = ((tz(from.z) + tz(to.z)) / 2).f()
+            sb.appendLine("""<text x="$mx" y="$my" text-anchor="middle" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9">${edge.cost}m</text>""")
+        }
+
+        // Nodes
+        for (node in draftGraph.nodes) {
+            val cx = tx(node.x).f()
+            val cy = tz(node.z).f()
+            val (fill, stroke, radius) = when (node.type) {
+                "room_entry" -> Triple("#10b981", "#065f46", 7)
+                "junction" -> Triple("#3b82f6", "#1e40af", 6)
+                else -> Triple("#f59e0b", "#92400e", 5)
+            }
+            sb.appendLine("""<circle cx="$cx" cy="$cy" r="$radius" fill="$fill" stroke="$stroke" stroke-width="2"/>""")
+
+            val label = node.label ?: node.id
+            sb.appendLine("""<text x="$cx" y="${(tz(node.z) - 12).f()}" text-anchor="middle" fill="#cdd6f4" font-family="Inter,sans-serif" font-size="10">${escapeXml(label)}</text>""")
+        }
+
+        sb.appendLine("</g>")
+        sb.appendLine("</svg>")
+
+        File(outDir, "draft_graph_debug.svg").writeText(sb.toString())
+    }
+
+    @Serializable
+    data class GeometryStats(
+        val totalVertices: Int,
+        val meshCount: Int,
+        val primitiveCount: Int,
+        val boundingBox: BoundsInfo?,
+        val floorEstimate: FloorInfo,
+        val occupancyGrid: GridInfo,
+        val zones: List<ZoneInfo>,
+        val draftGraph: GraphInfo,
+    )
+
+    @Serializable
+    data class BoundsInfo(
+        val minX: Float, val minY: Float, val minZ: Float,
+        val maxX: Float, val maxY: Float, val maxZ: Float,
+        val extentX: Float, val extentY: Float, val extentZ: Float,
+    )
+
+    @Serializable
+    data class FloorInfo(
+        val floorY: Double,
+        val confidence: Double,
+        val floorVertexCount: Int,
+    )
+
+    @Serializable
+    data class GridInfo(
+        val width: Int,
+        val height: Int,
+        val cellSize: Double,
+        val occupiedCells: Int,
+    )
+
+    @Serializable
+    data class ZoneInfo(
+        val id: String,
+        val label: String,
+        val cellCount: Int,
+        val centroidX: Double,
+        val centroidZ: Double,
+        val confidence: String,
+    )
+
+    @Serializable
+    data class GraphInfo(
+        val nodeCount: Int,
+        val edgeCount: Int,
+    )
+
+    private fun exportGeometryStats(
+        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        floorEstimate: com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
+        geometry: com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
+        outDir: File,
+    ) {
+        val stats = GeometryStats(
+            totalVertices = geometry.vertices.size,
+            meshCount = geometry.meshCount,
+            primitiveCount = geometry.primitiveCount,
+            boundingBox = geometry.boundingBox?.let { bb ->
+                BoundsInfo(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, bb.extentX, bb.extentY, bb.extentZ)
+            },
+            floorEstimate = FloorInfo(
+                floorY = floorEstimate.floorY,
+                confidence = floorEstimate.confidence,
+                floorVertexCount = floorEstimate.floorVertexCount,
+            ),
+            occupancyGrid = GridInfo(
+                width = grid.width,
+                height = grid.height,
+                cellSize = grid.cellSize,
+                occupiedCells = grid.occupiedCount,
+            ),
+            zones = zones.map { z ->
+                ZoneInfo(z.id, z.label, z.cellCount, z.centroidX, z.centroidZ, z.confidence)
+            },
+            draftGraph = GraphInfo(draftGraph.nodes.size, draftGraph.edges.size),
+        )
+        File(outDir, "geometry_stats.json").writeText(json.encodeToString(stats))
+    }
 }
 
 // ── Debug DTOs ──

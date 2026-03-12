@@ -3,77 +3,79 @@ package com.vecturai.tools.preprocessor
 import kotlin.math.sqrt
 import kotlin.test.*
 
+/** Test-only point type (file-private to avoid JUnit5 class discovery). */
+private data class Pt(val x: Double, val z: Double)
+
+/** Test-only result type (file-private to avoid JUnit5 class discovery). */
+private data class EstimatorResult(
+    val progress: Double,
+    val remaining: Double,
+    val segIndex: Int,
+    val distFromRoute: Double,
+    val lowConfidence: Boolean,
+)
+
+/** Simplified polyline projector matching shared ProgressEstimator logic. */
+private class TestEstimator(
+    private val waypoints: List<Pt>,
+    private val monotonicTolerance: Double = 0.5,
+    private val offRouteThreshold: Double = 3.0,
+) {
+    private val cumDist: List<Double>
+    val totalDist: Double
+    private var peakDist = 0.0
+
+    init {
+        val cd = mutableListOf(0.0)
+        for (i in 1 until waypoints.size) {
+            cd.add(cd.last() + dist(waypoints[i-1], waypoints[i]))
+        }
+        cumDist = cd
+        totalDist = cd.last()
+    }
+
+    fun update(px: Double, pz: Double): EstimatorResult {
+        var bestDist = Double.MAX_VALUE
+        var bestCum = 0.0
+        var bestSeg = 0
+
+        for (i in 0 until waypoints.size - 1) {
+            val a = waypoints[i]; val b = waypoints[i+1]
+            val dx = b.x - a.x; val dz = b.z - a.z
+            val segLen = dist(a, b)
+            if (segLen < 0.001) continue
+            var t = ((px - a.x) * dx + (pz - a.z) * dz) / (dx*dx + dz*dz)
+            t = t.coerceIn(0.0, 1.0)
+            val projX = a.x + t * dx; val projZ = a.z + t * dz
+            val d = sqrt((px-projX)*(px-projX) + (pz-projZ)*(pz-projZ))
+            if (d < bestDist) {
+                bestDist = d; bestSeg = i
+                bestCum = cumDist[i] + t * segLen
+            }
+        }
+
+        // Monotonic guard
+        val guarded = if (bestCum >= peakDist - monotonicTolerance) {
+            maxOf(bestCum, peakDist)
+        } else peakDist
+        peakDist = guarded
+
+        val frac = if (totalDist > 0) (guarded / totalDist).coerceIn(0.0, 1.0) else 0.0
+        val rem = (totalDist - guarded).coerceAtLeast(0.0)
+
+        return EstimatorResult(frac, rem, bestSeg, bestDist, bestDist > offRouteThreshold)
+    }
+
+    private fun dist(a: Pt, b: Pt): Double {
+        val dx = b.x - a.x; val dz = b.z - a.z
+        return sqrt(dx*dx + dz*dz)
+    }
+}
+
 /**
  * Tests for the ProgressEstimator (route-relative projection).
  */
 class ProgressEstimatorTest {
-
-    data class Pt(val x: Double, val z: Double)
-
-    /** Simplified polyline projector matching shared ProgressEstimator logic. */
-    class TestEstimator(
-        private val waypoints: List<Pt>,
-        private val monotonicTolerance: Double = 0.5,
-        private val offRouteThreshold: Double = 3.0,
-    ) {
-        private val cumDist: List<Double>
-        val totalDist: Double
-        private var peakDist = 0.0
-
-        init {
-            val cd = mutableListOf(0.0)
-            for (i in 1 until waypoints.size) {
-                cd.add(cd.last() + dist(waypoints[i-1], waypoints[i]))
-            }
-            cumDist = cd
-            totalDist = cd.last()
-        }
-
-        data class Result(
-            val progress: Double,
-            val remaining: Double,
-            val segIndex: Int,
-            val distFromRoute: Double,
-            val lowConfidence: Boolean,
-        )
-
-        fun update(px: Double, pz: Double): Result {
-            var bestDist = Double.MAX_VALUE
-            var bestCum = 0.0
-            var bestSeg = 0
-
-            for (i in 0 until waypoints.size - 1) {
-                val a = waypoints[i]; val b = waypoints[i+1]
-                val dx = b.x - a.x; val dz = b.z - a.z
-                val segLen = dist(a, b)
-                if (segLen < 0.001) continue
-                var t = ((px - a.x) * dx + (pz - a.z) * dz) / (dx*dx + dz*dz)
-                t = t.coerceIn(0.0, 1.0)
-                val projX = a.x + t * dx; val projZ = a.z + t * dz
-                val d = sqrt((px-projX)*(px-projX) + (pz-projZ)*(pz-projZ))
-                if (d < bestDist) {
-                    bestDist = d; bestSeg = i
-                    bestCum = cumDist[i] + t * segLen
-                }
-            }
-
-            // Monotonic guard
-            val guarded = if (bestCum >= peakDist - monotonicTolerance) {
-                maxOf(bestCum, peakDist)
-            } else peakDist
-            peakDist = guarded
-
-            val frac = if (totalDist > 0) (guarded / totalDist).coerceIn(0.0, 1.0) else 0.0
-            val rem = (totalDist - guarded).coerceAtLeast(0.0)
-
-            return Result(frac, rem, bestSeg, bestDist, bestDist > offRouteThreshold)
-        }
-
-        private fun dist(a: Pt, b: Pt): Double {
-            val dx = b.x - a.x; val dz = b.z - a.z
-            return sqrt(dx*dx + dz*dz)
-        }
-    }
 
     // Demo route: n01(0,0) → n02(3,0) → n03(6,0) → n04(6,4) → n05(3,4) = 13m
     private val route = listOf(Pt(0.0, 0.0), Pt(3.0, 0.0), Pt(6.0, 0.0), Pt(6.0, 4.0), Pt(3.0, 4.0))

@@ -43,9 +43,18 @@ ios-framework: ## Build shared framework for iOS
 
 # ── Preprocessor ─────────────────────────────
 
-preprocess: ## Run nav-preprocessor on sample building
+inspect: ## Inspect sample GLB file (geometry stats, floor estimate)
 	./gradlew :tools:nav-preprocessor:run \
-		--args="--input sample/demo-building/scan.glb \
+		--args="inspect --input sample/demo-building/scan.glb"
+
+generate-draft: ## Generate draft navigation config from sample GLB
+	./gradlew :tools:nav-preprocessor:run \
+		--args="generate-draft --input sample/demo-building/scan.glb \
+		        --output sample/demo-building/draft/"
+
+preprocess: ## Run nav-preprocessor on sample building (export-package)
+	./gradlew :tools:nav-preprocessor:run \
+		--args="export-package --input sample/demo-building/scan.glb \
 		        --config sample/demo-building/authoring_config.json \
 		        --output sample/demo-building/package/ \
 		        --overwrite"

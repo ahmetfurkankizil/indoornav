@@ -1,0 +1,145 @@
+{
+    "totalVertices": 22373,
+    "meshCount": 186,
+    "primitiveCount": 186,
+    "boundingBox": {
+        "minX": -5.142746,
+        "minY": -1.4237128,
+        "minZ": -4.467951,
+        "maxX": 5.1841455,
+        "maxY": 1.2480174,
+        "maxZ": 4.335522,
+        "extentX": 10.326891,
+        "extentY": 2.6717303,
+        "extentZ": 8.8034725
+    },
+    "floorEstimate": {
+        "floorY": -1.3237128496170043,
+        "confidence": 0.16305368077593527,
+        "floorVertexCount": 3648
+    },
+    "occupancyGrid": {
+        "width": 44,
+        "height": 38,
+        "cellSize": 0.25,
+        "occupiedCells": 301
+    },
+    "zones": [
+        {
+            "id": "zone-a",
+            "label": "Zone A",
+            "cellCount": 65,
+            "centroidX": -4.213899817833534,
+            "centroidZ": 0.5532030252309946,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-b",
+            "label": "Zone B",
+            "cellCount": 57,
+            "centroidX": -0.4168687786972314,
+            "centroidZ": 1.6833649685508327,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-c",
+            "label": "Zone C",
+            "cellCount": 45,
+            "centroidX": -0.5733015272352431,
+            "centroidZ": -3.4929508209228515,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-d",
+            "label": "Zone D",
+            "cellCount": 23,
+            "centroidX": -4.0177459716796875,
+            "centroidZ": -2.321211690488069,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-e",
+            "label": "Zone E",
+            "cellCount": 16,
+            "centroidX": 2.6697540283203125,
+            "centroidZ": -0.7648258209228516,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-f",
+            "label": "Zone F",
+            "cellCount": 15,
+            "centroidX": 4.415587361653646,
+            "centroidZ": 1.123715845743815,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-g",
+            "label": "Zone G",
+            "cellCount": 14,
+            "centroidX": 0.7858254568917411,
+            "centroidZ": -2.378665106637137,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-h",
+            "label": "Zone H",
+            "cellCount": 9,
+            "centroidX": 3.037809583875868,
+            "centroidZ": 2.323715845743815,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-i",
+            "label": "Zone I",
+            "cellCount": 8,
+            "centroidX": -1.2364959716796875,
+            "centroidZ": -2.0617008209228516,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-j",
+            "label": "Zone J",
+            "cellCount": 8,
+            "centroidX": 3.7010040283203125,
+            "centroidZ": 1.9382991790771484,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-k",
+            "label": "Zone K",
+            "cellCount": 7,
+            "centroidX": 1.4822540283203125,
+            "centroidZ": -1.5929508209228516,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-l",
+            "label": "Zone L",
+            "cellCount": 4,
+            "centroidX": 1.1072540283203125,
+            "centroidZ": -0.9679508209228516,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-m",
+            "label": "Zone M",
+            "cellCount": 4,
+            "centroidX": 1.6072540283203125,
+            "centroidZ": -0.46795082092285156,
+            "confidence": "low"
+        },
+        {
+            "id": "zone-n",
+            "label": "Zone N",
+            "cellCount": 4,
+            "centroidX": 1.6072540283203125,
+            "centroidZ": 2.5320491790771484,
+            "confidence": "low"
+        }
+    ],
+    "draftGraph": {
+        "nodeCount": 14,
+        "edgeCount": 86
+    }
+}
