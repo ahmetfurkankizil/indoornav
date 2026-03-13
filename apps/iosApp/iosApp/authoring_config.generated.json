@@ -1,0 +1,967 @@
+{
+    "buildingId": "draft-9950",
+    "buildingName": "Draft Building (edit me)",
+    "floorId": "ground",
+    "asset": {
+        "glbFile": "12_9_2025.glb",
+        "sourceApp": "polycam",
+        "scanDate": null
+    },
+    "tags": [
+        "draft",
+        "auto-generated"
+    ],
+    "entranceMarkers": [
+        {
+            "id": "marker-draft",
+            "startNodeId": "n01",
+            "physicalWidthMeters": 0.21,
+            "physicalHeightMeters": 0.21,
+            "position": {
+                "x": -4.213899817833534,
+                "y": -0.12371284961700435,
+                "z": 0.5532030252309946
+            },
+            "forwardBasis": "-z",
+            "rotationYDegrees": 0.0,
+            "referenceImageName": null,
+            "notes": "PLACEHOLDER — position and configure a real marker"
+        }
+    ],
+    "checkpointMarkers": [],
+    "nodes": [
+        {
+            "id": "n01",
+            "x": -4.213899817833534,
+            "y": -1.3237128496170043,
+            "z": 0.5532030252309946,
+            "type": "junction",
+            "label": "Zone A"
+        },
+        {
+            "id": "n02",
+            "x": -0.4168687786972314,
+            "y": -1.3237128496170043,
+            "z": 1.6833649685508327,
+            "type": "room_entry",
+            "label": "Zone B"
+        },
+        {
+            "id": "n03",
+            "x": -0.5733015272352431,
+            "y": -1.3237128496170043,
+            "z": -3.4929508209228515,
+            "type": "room_entry",
+            "label": "Zone C"
+        },
+        {
+            "id": "n04",
+            "x": -4.0177459716796875,
+            "y": -1.3237128496170043,
+            "z": -2.321211690488069,
+            "type": "room_entry",
+            "label": "Zone D"
+        },
+        {
+            "id": "n05",
+            "x": 2.6697540283203125,
+            "y": -1.3237128496170043,
+            "z": -0.7648258209228516,
+            "type": "room_entry",
+            "label": "Zone E"
+        },
+        {
+            "id": "n06",
+            "x": 4.415587361653646,
+            "y": -1.3237128496170043,
+            "z": 1.123715845743815,
+            "type": "room_entry",
+            "label": "Zone F"
+        },
+        {
+            "id": "n07",
+            "x": 0.7858254568917411,
+            "y": -1.3237128496170043,
+            "z": -2.378665106637137,
+            "type": "room_entry",
+            "label": "Zone G"
+        },
+        {
+            "id": "n08",
+            "x": 3.037809583875868,
+            "y": -1.3237128496170043,
+            "z": 2.323715845743815,
+            "type": "room_entry",
+            "label": "Zone H"
+        },
+        {
+            "id": "n09",
+            "x": -1.2364959716796875,
+            "y": -1.3237128496170043,
+            "z": -2.0617008209228516,
+            "type": "room_entry",
+            "label": "Zone I"
+        },
+        {
+            "id": "n10",
+            "x": 3.7010040283203125,
+            "y": -1.3237128496170043,
+            "z": 1.9382991790771484,
+            "type": "room_entry",
+            "label": "Zone J"
+        },
+        {
+            "id": "n11",
+            "x": 1.4822540283203125,
+            "y": -1.3237128496170043,
+            "z": -1.5929508209228516,
+            "type": "room_entry",
+            "label": "Zone K"
+        },
+        {
+            "id": "n12",
+            "x": 1.1072540283203125,
+            "y": -1.3237128496170043,
+            "z": -0.9679508209228516,
+            "type": "room_entry",
+            "label": "Zone L"
+        },
+        {
+            "id": "n13",
+            "x": 1.6072540283203125,
+            "y": -1.3237128496170043,
+            "z": -0.46795082092285156,
+            "type": "room_entry",
+            "label": "Zone M"
+        },
+        {
+            "id": "n14",
+            "x": 1.6072540283203125,
+            "y": -1.3237128496170043,
+            "z": 2.5320491790771484,
+            "type": "room_entry",
+            "label": "Zone N"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e01",
+            "from": "n01",
+            "to": "n02",
+            "cost": 3.96,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e02",
+            "from": "n01",
+            "to": "n03",
+            "cost": 5.44,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e03",
+            "from": "n01",
+            "to": "n04",
+            "cost": 2.88,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e04",
+            "from": "n01",
+            "to": "n05",
+            "cost": 7.01,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e05",
+            "from": "n01",
+            "to": "n07",
+            "cost": 5.8,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e06",
+            "from": "n01",
+            "to": "n08",
+            "cost": 7.46,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e07",
+            "from": "n01",
+            "to": "n09",
+            "cost": 3.96,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e08",
+            "from": "n01",
+            "to": "n11",
+            "cost": 6.09,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e09",
+            "from": "n01",
+            "to": "n12",
+            "cost": 5.53,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e10",
+            "from": "n01",
+            "to": "n13",
+            "cost": 5.91,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e11",
+            "from": "n01",
+            "to": "n14",
+            "cost": 6.15,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e12",
+            "from": "n02",
+            "to": "n03",
+            "cost": 5.18,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e13",
+            "from": "n02",
+            "to": "n04",
+            "cost": 5.39,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e14",
+            "from": "n02",
+            "to": "n05",
+            "cost": 3.94,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e15",
+            "from": "n02",
+            "to": "n06",
+            "cost": 4.86,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e16",
+            "from": "n02",
+            "to": "n07",
+            "cost": 4.24,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e17",
+            "from": "n02",
+            "to": "n08",
+            "cost": 3.51,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e18",
+            "from": "n02",
+            "to": "n09",
+            "cost": 3.83,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e19",
+            "from": "n02",
+            "to": "n10",
+            "cost": 4.13,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e20",
+            "from": "n02",
+            "to": "n11",
+            "cost": 3.79,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e21",
+            "from": "n02",
+            "to": "n12",
+            "cost": 3.06,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e22",
+            "from": "n02",
+            "to": "n13",
+            "cost": 2.95,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e23",
+            "from": "n02",
+            "to": "n14",
+            "cost": 2.19,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e24",
+            "from": "n03",
+            "to": "n04",
+            "cost": 3.64,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e25",
+            "from": "n03",
+            "to": "n05",
+            "cost": 4.24,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e26",
+            "from": "n03",
+            "to": "n06",
+            "cost": 6.8,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e27",
+            "from": "n03",
+            "to": "n07",
+            "cost": 1.76,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e28",
+            "from": "n03",
+            "to": "n08",
+            "cost": 6.85,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e29",
+            "from": "n03",
+            "to": "n09",
+            "cost": 1.58,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e30",
+            "from": "n03",
+            "to": "n10",
+            "cost": 6.91,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e31",
+            "from": "n03",
+            "to": "n11",
+            "cost": 2.8,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e32",
+            "from": "n03",
+            "to": "n12",
+            "cost": 3.03,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e33",
+            "from": "n03",
+            "to": "n13",
+            "cost": 3.73,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e34",
+            "from": "n03",
+            "to": "n14",
+            "cost": 6.41,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e35",
+            "from": "n04",
+            "to": "n05",
+            "cost": 6.87,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e36",
+            "from": "n04",
+            "to": "n07",
+            "cost": 4.8,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e37",
+            "from": "n04",
+            "to": "n09",
+            "cost": 2.79,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e38",
+            "from": "n04",
+            "to": "n11",
+            "cost": 5.55,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e39",
+            "from": "n04",
+            "to": "n12",
+            "cost": 5.3,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e40",
+            "from": "n04",
+            "to": "n13",
+            "cost": 5.92,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e41",
+            "from": "n04",
+            "to": "n14",
+            "cost": 7.43,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e42",
+            "from": "n05",
+            "to": "n06",
+            "cost": 2.57,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e43",
+            "from": "n05",
+            "to": "n07",
+            "cost": 2.48,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e44",
+            "from": "n05",
+            "to": "n08",
+            "cost": 3.11,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e45",
+            "from": "n05",
+            "to": "n09",
+            "cost": 4.12,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e46",
+            "from": "n05",
+            "to": "n10",
+            "cost": 2.89,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e47",
+            "from": "n05",
+            "to": "n11",
+            "cost": 1.45,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e48",
+            "from": "n05",
+            "to": "n12",
+            "cost": 1.58,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e49",
+            "from": "n05",
+            "to": "n13",
+            "cost": 1.1,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e50",
+            "from": "n05",
+            "to": "n14",
+            "cost": 3.46,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e51",
+            "from": "n06",
+            "to": "n07",
+            "cost": 5.04,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e52",
+            "from": "n06",
+            "to": "n08",
+            "cost": 1.83,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e53",
+            "from": "n06",
+            "to": "n09",
+            "cost": 6.49,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e54",
+            "from": "n06",
+            "to": "n10",
+            "cost": 1.08,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e55",
+            "from": "n06",
+            "to": "n11",
+            "cost": 4.0,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e56",
+            "from": "n06",
+            "to": "n12",
+            "cost": 3.91,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e57",
+            "from": "n06",
+            "to": "n13",
+            "cost": 3.23,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e58",
+            "from": "n06",
+            "to": "n14",
+            "cost": 3.14,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e59",
+            "from": "n07",
+            "to": "n08",
+            "cost": 5.21,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e60",
+            "from": "n07",
+            "to": "n09",
+            "cost": 2.05,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e61",
+            "from": "n07",
+            "to": "n10",
+            "cost": 5.21,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e62",
+            "from": "n07",
+            "to": "n11",
+            "cost": 1.05,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e63",
+            "from": "n07",
+            "to": "n12",
+            "cost": 1.45,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e64",
+            "from": "n07",
+            "to": "n13",
+            "cost": 2.08,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e65",
+            "from": "n07",
+            "to": "n14",
+            "cost": 4.98,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e66",
+            "from": "n08",
+            "to": "n09",
+            "cost": 6.12,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e67",
+            "from": "n08",
+            "to": "n10",
+            "cost": 0.77,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e68",
+            "from": "n08",
+            "to": "n11",
+            "cost": 4.21,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e69",
+            "from": "n08",
+            "to": "n12",
+            "cost": 3.82,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e70",
+            "from": "n08",
+            "to": "n13",
+            "cost": 3.14,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e71",
+            "from": "n08",
+            "to": "n14",
+            "cost": 1.45,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e72",
+            "from": "n09",
+            "to": "n10",
+            "cost": 6.35,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e73",
+            "from": "n09",
+            "to": "n11",
+            "cost": 2.76,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e74",
+            "from": "n09",
+            "to": "n12",
+            "cost": 2.59,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e75",
+            "from": "n09",
+            "to": "n13",
+            "cost": 3.26,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e76",
+            "from": "n09",
+            "to": "n14",
+            "cost": 5.4,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e77",
+            "from": "n10",
+            "to": "n11",
+            "cost": 4.17,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e78",
+            "from": "n10",
+            "to": "n12",
+            "cost": 3.9,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e79",
+            "from": "n10",
+            "to": "n13",
+            "cost": 3.19,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e80",
+            "from": "n10",
+            "to": "n14",
+            "cost": 2.18,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e81",
+            "from": "n11",
+            "to": "n12",
+            "cost": 0.73,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e82",
+            "from": "n11",
+            "to": "n13",
+            "cost": 1.13,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e83",
+            "from": "n11",
+            "to": "n14",
+            "cost": 4.13,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e84",
+            "from": "n12",
+            "to": "n13",
+            "cost": 0.71,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e85",
+            "from": "n12",
+            "to": "n14",
+            "cost": 3.54,
+            "bidirectional": true,
+            "label": null
+        },
+        {
+            "id": "e86",
+            "from": "n13",
+            "to": "n14",
+            "cost": 3.0,
+            "bidirectional": true,
+            "label": null
+        }
+    ],
+    "rooms": [
+        {
+            "id": "zone-b",
+            "displayName": "Zone B",
+            "destinationNodeId": "n02",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-c",
+            "displayName": "Zone C",
+            "destinationNodeId": "n03",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-d",
+            "displayName": "Zone D",
+            "destinationNodeId": "n04",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-e",
+            "displayName": "Zone E",
+            "destinationNodeId": "n05",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-f",
+            "displayName": "Zone F",
+            "destinationNodeId": "n06",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-g",
+            "displayName": "Zone G",
+            "destinationNodeId": "n07",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-h",
+            "displayName": "Zone H",
+            "destinationNodeId": "n08",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-i",
+            "displayName": "Zone I",
+            "destinationNodeId": "n09",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-j",
+            "displayName": "Zone J",
+            "destinationNodeId": "n10",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-k",
+            "displayName": "Zone K",
+            "destinationNodeId": "n11",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-l",
+            "displayName": "Zone L",
+            "destinationNodeId": "n12",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-m",
+            "displayName": "Zone M",
+            "destinationNodeId": "n13",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        },
+        {
+            "id": "zone-n",
+            "displayName": "Zone N",
+            "destinationNodeId": "n14",
+            "category": "unknown",
+            "keywords": [],
+            "aliases": [],
+            "description": "Auto-generated zone — rename and categorize manually"
+        }
+    ],
+    "routeRendering": {
+        "arrowSpacingMeters": 1.5,
+        "lookaheadDistanceMeters": 8.0,
+        "destinationThresholdMeters": 1.5,
+        "turnMarkerThresholdDegrees": 30.0,
+        "arrowHeightOffsetMeters": 0.05
+    },
+    "graphMetadata": {
+        "authorName": "nav-preprocessor (auto)",
+        "authoredDate": "2026-03-12",
+        "notes": "Auto-generated draft config. Zones are labeled neutrally. Review node positions, rename zones, add real entrance markers."
+    }
+}

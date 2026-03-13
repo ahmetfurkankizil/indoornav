@@ -313,6 +313,9 @@ class ARNavigationViewModel: ObservableObject {
     private let routeRenderer = ARRouteRenderer()
     private weak var arView: ARView?
     
+    /// Loaded building package (nil = fall back to hardcoded demo)
+    private var loadedPackage: BuildingPackageLoader.LoadedPackage?
+    
     // Alignment state
     private var alignmentOffsetX: Double = 0
     private var alignmentOffsetY: Double = 0
@@ -324,6 +327,13 @@ class ARNavigationViewModel: ObservableObject {
     func setupARView(_ arView: ARView) {
         self.arView = arView
         
+        // Try loading house package from bundle
+        loadedPackage = BuildingPackageLoader.loadFromBundle()
+        if let pkg = loadedPackage {
+            print("[ViewModel] Using house package: \(pkg.config.buildingName)")
+            destinationLabel = pkg.destinationName
+        }
+        
         sessionManager.onTrackingStateChanged = { [weak self] isLimited, reason in
             DispatchQueue.main.async {
                 self?.trackingQuality = isLimited ? reason : "Normal"
@@ -333,12 +343,16 @@ class ARNavigationViewModel: ObservableObject {
             }
         }
         
+        // Configure marker detector from package or defaults
+        let marker = loadedPackage?.entranceMarker
         markerDetector.configure(
-            markerId: "marker-main",
+            markerId: marker?.id ?? "marker-main",
             markerName: "entrance_marker_main",
-            buildingX: 0.0, buildingY: 1.2, buildingZ: 0.0,
+            buildingX: marker?.position.x ?? 0.0,
+            buildingY: marker?.position.y ?? 1.2,
+            buildingZ: marker?.position.z ?? 0.0,
             buildingRotationYDeg: 0.0,
-            nearestNodeId: "n01"
+            nearestNodeId: marker?.startNodeId ?? "n01"
         )
         
         markerDetector.onMarkerDetected = { [weak self] event in
@@ -370,7 +384,7 @@ class ARNavigationViewModel: ObservableObject {
             markerBuildingX: 0.0, markerBuildingY: 1.2, markerBuildingZ: 0.0,
             markerArX: 0.0, markerArY: 0.0, markerArZ: -1.0,
             markerArRotationYDeg: 0.0, markerBuildingRotationYDeg: 0.0,
-            confidence: 1.0
+            confidence: 1.0, role: .entrance
         )
         handleMarkerDetected(event)
     }
@@ -424,11 +438,17 @@ class ARNavigationViewModel: ObservableObject {
             offsetZ: alignmentOffsetZ, rotationYDeg: alignmentRotYDeg
         )
         
-        let demoArrows = generateDemoArrows()
-        remainingDistance = 13.0 // total route distance
+        let arrowsToRender: [ArrowPlacementData]
+        if let pkg = loadedPackage {
+            arrowsToRender = pkg.arrows
+            remainingDistance = pkg.totalDistance
+        } else {
+            arrowsToRender = generateDemoArrows()
+            remainingDistance = 13.0
+        }
         
         if let arView = arView {
-            routeRenderer.renderRoute(in: arView, arrows: demoArrows)
+            routeRenderer.renderRoute(in: arView, arrows: arrowsToRender)
             arrowCount = routeRenderer.renderedArrowCount
         }
         
@@ -459,12 +479,24 @@ class ARNavigationViewModel: ObservableObject {
         let bx = tx * cosR + tz * sinR
         let bz = -tx * sinR + tz * cosR
         
-        // Simple nearest-segment progress on demo route
-        let routePoints: [(Double, Double)] = [
-            (0,0), (3,0), (6,0), (6,4), (3,4)
-        ]
-        let segLengths = [3.0, 3.0, 4.0, 3.0] // total = 13.0
-        let totalDist = 13.0
+        // Route points for progress tracking — from package or demo
+        let routePoints: [(Double, Double)]
+        let totalDist: Double
+        if let pkg = loadedPackage {
+            routePoints = pkg.routePoints
+            totalDist = pkg.totalDistance
+        } else {
+            routePoints = [(0,0), (3,0), (6,0), (6,4), (3,4)]
+            totalDist = 13.0
+        }
+        
+        // Compute segment lengths
+        var segLengths: [Double] = []
+        for i in 0..<(routePoints.count - 1) {
+            let dx = routePoints[i+1].0 - routePoints[i].0
+            let dz = routePoints[i+1].1 - routePoints[i].1
+            segLengths.append(sqrt(dx*dx + dz*dz))
+        }
         
         var bestDist = Double.greatestFiniteMagnitude
         var bestCum = 0.0

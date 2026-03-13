@@ -45,7 +45,7 @@ data class AppDiagnostics(
         "Destination: ${activeDestination ?: "-"}",
         "Mode: ${sessionMode ?: "-"} | Live: $isLiveMode",
         "Marker: ${currentMarkerId ?: "-"} (${currentMarkerRole ?: "-"})",
-        "Corrections: $correctionCount (${String.format("%.2f", correctionMagnitudeMeters)}m total)",
+        "Corrections: $correctionCount (${((correctionMagnitudeMeters * 100).toInt() / 100.0)}m total)",
         "Alignment: $alignmentConfidence | Progress: $progressConfidence | Route: $offRouteStatus",
         "History: $historyCount entries",
         "Demo: $isDemoMode | Simulate: $simulateEnabled",
