@@ -11,5 +11,6 @@ sealed class Screen(val route: String, val title: String) {
     data object Search : Screen("search", "Search")
     data object RoutePreview : Screen("route_preview", "Route Preview")
     data object History : Screen("history", "History")
+    data object Import : Screen("import", "Import")
     data object Settings : Screen("settings", "Settings")
 }

@@ -148,6 +148,32 @@ class ExportPackageCommand : CliktCommand(
     }
 }
 
+// ── import-map ───────────────────────────────────────────
+
+class ImportMapCommand : CliktCommand(
+    name = "import-map",
+) {
+    override fun help(context: com.github.ajalt.clikt.core.Context) =
+        "Import a floor-plan scan (.ply, .xyz, .pts, .csv, .glb) and generate a draft authoring config."
+    private val input by option("--input", "-i", help = "Path to scan file (.ply, .xyz, .pts, .csv, .glb)")
+        .required()
+
+    private val output by option("--output", "-o", help = "Output directory for draft config and debug artifacts")
+        .required()
+
+    override fun run() {
+        val pipeline = com.vecturai.tools.preprocessor.importmap.MapImportPipeline()
+        val exitCode = pipeline.execute(
+            inputPath = input,
+            outputDir = output,
+        )
+
+        if (exitCode != 0) {
+            throw SystemExitException(exitCode)
+        }
+    }
+}
+
 // ── Utilities ────────────────────────────────────────────
 
 class SystemExitException(val code: Int) : RuntimeException()
@@ -161,7 +187,7 @@ private fun formatSize(bytes: Long): String = when {
 fun main(args: Array<String>) {
     try {
         NavPreprocessorCommand()
-            .subcommands(InspectCommand(), GenerateDraftCommand(), ExportPackageCommand())
+            .subcommands(InspectCommand(), GenerateDraftCommand(), ExportPackageCommand(), ImportMapCommand())
             .main(args)
     } catch (e: SystemExitException) {
         exitProcess(e.code)

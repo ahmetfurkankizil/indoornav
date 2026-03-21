@@ -99,9 +99,7 @@ class ArMarkerDetector {
             val qy = pose.qy().toDouble()
             val qz = pose.qz().toDouble()
             val qw = pose.qw().toDouble()
-            val arRotationYDeg = Math.toDegrees(
-                atan2(2.0 * (qw * qy + qx * qz), 1.0 - 2.0 * (qy * qy + qz * qz))
-            )
+            val arRotationYDeg = atan2(2.0 * (qw * qy + qx * qz), 1.0 - 2.0 * (qy * qy + qz * qz)) * (180.0 / 3.141592653589793)
 
             // Try to match by index
             val known = knownMarkersByIndex[image.index]

@@ -1,5 +1,8 @@
 package com.vecturai.android.ar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,48 +14,37 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
-import kotlin.math.sqrt
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.ar.core.ArCoreApk
+import com.google.ar.core.Session
+import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
+import kotlin.math.*
 
 /**
- * AR navigation activity with live progress, recenter, and arrival flow.
+ * AR navigation activity. 
+ * Allows users to navigate to a destination via AR markers or manual simulation.
  */
 class ArNavigationActivity : ComponentActivity() {
 
     private val sessionManager = ArSessionManager()
     private val markerDetector = ArMarkerDetector()
     private val routeRenderer = ArRouteRenderer()
+    private lateinit var cameraRenderer: ArCameraRenderer
+    private lateinit var glSurfaceView: GLSurfaceView
 
     private lateinit var stateLabel: TextView
-    private lateinit var trackingLabel: TextView
     private lateinit var instructionLabel: TextView
-    private lateinit var debugPanel: LinearLayout
-    private lateinit var arrowCountLabel: TextView
-    private lateinit var markerStatusLabel: TextView
-    private lateinit var progressLabel: TextView
-    private lateinit var remainingLabel: TextView
-    private lateinit var confidenceLabel: TextView
-    private lateinit var modeLabel: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var simulateButton: Button
-    private lateinit var advanceButton: Button
-    private lateinit var rescanButton: Button
-    private lateinit var endButton: Button
-    private lateinit var arrivalOverlay: LinearLayout
-
+    
     private var isAligned = false
     private var isSimulated = false
     private var progress = 0.0
     private var remainingDistance = 0.0
-    private var isLowConfidence = false
-
-    // Alignment state
-    private var alignOffX = 0.0; private var alignOffY = 0.0; private var alignOffZ = 0.0
-    private var alignRotYDeg = 0.0
+    private var installRequested = false
 
     private val handler = Handler(Looper.getMainLooper())
     private var poseRunnable: Runnable? = null
@@ -60,7 +52,7 @@ class ArNavigationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val destinationName = intent.getStringExtra("destinationName") ?: "Conference Room"
+        val destinationName = intent.getStringExtra("destinationName") ?: "Destination"
 
         markerDetector.configure(
             markerId = "marker-main", nearestNodeId = "n01",
@@ -71,306 +63,151 @@ class ArNavigationActivity : ComponentActivity() {
         }
 
         val container = FrameLayout(this)
-        val cameraView = FrameLayout(this).apply { setBackgroundColor(0xFF1A1A2E.toInt()) }
-        container.addView(cameraView, FrameLayout.LayoutParams(
+
+        cameraRenderer = ArCameraRenderer { sessionManager.session }
+        glSurfaceView = GLSurfaceView(this).apply {
+            preserveEGLContextOnPause = true
+            setEGLContextClientVersion(2)
+            setRenderer(cameraRenderer)
+            renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+        }
+        container.addView(glSurfaceView, FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
         ))
 
         val overlay = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(24, 48, 24, 48)
+            setPadding(32, 64, 32, 64)
         }
 
-        // Top bar
-        val topBar = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
         stateLabel = TextView(this).apply {
-            text = "● Waiting for Marker"; textSize = 13f; setTextColor(0xFFFFFFFF.toInt())
+            text = "● WAITING FOR MARKER"; textSize = 14f; setTextColor(0xFFFFFFFF.toInt())
+            setShadowLayer(4f, 0f, 0f, 0xFF000000.toInt())
         }
-        topBar.addView(stateLabel)
-        modeLabel = TextView(this).apply {
-            text = "DEMO MODE"; textSize = 10f; setTextColor(0xFFFF9800.toInt()); visibility = View.GONE
-        }
-        topBar.addView(modeLabel)
-        topBar.addView(FrameLayout(this), LinearLayout.LayoutParams(0, 1, 1f))
-        Button(this).apply {
-            text = "✕"; setOnClickListener { endAndFinish() }
-        }.also { topBar.addView(it) }
-        overlay.addView(topBar)
+        overlay.addView(stateLabel)
 
-        trackingLabel = TextView(this).apply {
-            text = ""; textSize = 11f; setTextColor(0x99FFFFFF.toInt())
+        instructionLabel = TextView(this).apply {
+            text = "Point camera at the entrance marker image"; textSize = 16f
+            setTextColor(0xCCFFFFFF.toInt()); setPadding(0, 8, 0, 0)
         }
-        overlay.addView(trackingLabel)
+        overlay.addView(instructionLabel)
+
+        overlay.addView(FrameLayout(this), LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f,
+        ))
 
         progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             max = 100; progress = 0; visibility = View.GONE
         }
         overlay.addView(progressBar)
 
-        // Remaining distance
-        remainingLabel = TextView(this).apply {
-            text = ""; textSize = 12f; setTextColor(0xCCFFFFFF.toInt()); gravity = Gravity.END; visibility = View.GONE
-        }
-        overlay.addView(remainingLabel)
-
-        overlay.addView(FrameLayout(this), LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f,
-        ))
-
-        // Arrival overlay
-        arrivalOverlay = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER
-            visibility = View.GONE; setPadding(32, 32, 32, 32); setBackgroundColor(0xDD000000.toInt())
-        }
-        val arrivalIcon = TextView(this).apply { text = "✓"; textSize = 48f; setTextColor(0xFF4CAF50.toInt()); gravity = Gravity.CENTER }
-        arrivalOverlay.addView(arrivalIcon)
-        val arrivalTitle = TextView(this).apply { text = "You've arrived!"; textSize = 24f; setTextColor(0xFFFFFFFF.toInt()); gravity = Gravity.CENTER }
-        arrivalOverlay.addView(arrivalTitle)
-        val arrivalDest = TextView(this).apply { text = "→ $destinationName"; textSize = 16f; setTextColor(0xCCFFFFFF.toInt()); gravity = Gravity.CENTER }
-        arrivalOverlay.addView(arrivalDest)
-        Button(this).apply {
-            text = "Done"; setOnClickListener { finish() }
-        }.also { arrivalOverlay.addView(it, LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
-        ).apply { topMargin = 24; gravity = Gravity.CENTER }) }
-        overlay.addView(arrivalOverlay)
-
-        // Instruction
-        instructionLabel = TextView(this).apply {
-            text = "Point camera at the entrance marker"; textSize = 18f
-            setTextColor(0xFFFFFFFF.toInt()); gravity = Gravity.CENTER
-            setPadding(24, 14, 24, 14); setBackgroundColor(0x88000000.toInt())
-        }
-        overlay.addView(instructionLabel)
-
-        // Debug panel
-        debugPanel = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL; setPadding(12, 10, 12, 10)
-            setBackgroundColor(0xAA000000.toInt()); visibility = View.GONE
-        }
-        markerStatusLabel = TextView(this).apply { text = "Marker: ✗"; textSize = 11f; setTextColor(0xFFFFFFFF.toInt()) }
-        arrowCountLabel = TextView(this).apply { text = "Arrows: 0"; textSize = 11f; setTextColor(0xFFFFFFFF.toInt()) }
-        progressLabel = TextView(this).apply { text = "Progress: 0%"; textSize = 11f; setTextColor(0xFFFFFFFF.toInt()) }
-        confidenceLabel = TextView(this).apply { text = "Confidence: OK"; textSize = 11f; setTextColor(0xFFFFFFFF.toInt()) }
-        debugPanel.addView(markerStatusLabel)
-        debugPanel.addView(arrowCountLabel)
-        debugPanel.addView(progressLabel)
-        debugPanel.addView(confidenceLabel)
-        overlay.addView(debugPanel)
-
-        // Buttons
-        val buttonRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(0, 16, 0, 0)
-        }
-        Button(this).apply {
-            text = "🐛"; setOnClickListener {
-                debugPanel.visibility = if (debugPanel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-            }
-        }.also { buttonRow.addView(it) }
-
         simulateButton = Button(this).apply {
-            text = "⚡ Simulate"; setOnClickListener { simulateAlignment() }
+            text = "⚡ START MANUALLY (SKIP MARKER)"; setPadding(32, 16, 32, 16)
+            setBackgroundColor(0xFFFF9800.toInt()); setTextColor(0xFFFFFFFF.toInt())
+            setOnClickListener { simulateAlignment() }
         }
-        buttonRow.addView(simulateButton)
+        overlay.addView(simulateButton, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+        ).apply { topMargin = 32 })
 
-        rescanButton = Button(this).apply {
-            text = "↻ Rescan"; visibility = View.GONE
-            setOnClickListener { rescanMarker() }
+        val closeButton = Button(this).apply {
+            text = "✕ CLOSE"; setOnClickListener { finish() }
         }
-        buttonRow.addView(rescanButton)
+        overlay.addView(closeButton)
 
-        advanceButton = Button(this).apply {
-            text = "▶ Advance"; visibility = View.GONE
-            setOnClickListener { advanceProgress() }
-        }
-        buttonRow.addView(advanceButton)
-
-        endButton = Button(this).apply {
-            text = "■ End"; visibility = View.GONE
-            setOnClickListener { endAndFinish() }
-        }
-        buttonRow.addView(endButton)
-
-        overlay.addView(buttonRow)
-        container.addView(overlay, FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
-        ))
+        container.addView(overlay)
         setContentView(container)
     }
 
     override fun onResume() {
         super.onResume()
+        if (checkCameraPermission()) {
+            checkArCoreAndResume()
+        } else {
+            requestCameraPermission()
+        }
+    }
+
+    private fun checkCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 101)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            checkArCoreAndResume()
+        }
+    }
+
+    private fun checkArCoreAndResume() {
+        try {
+            when (ArCoreApk.getInstance().requestInstall(this, !installRequested)) {
+                ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
+                    installRequested = true
+                    return
+                }
+                ArCoreApk.InstallStatus.INSTALLED -> resumeAr()
+            }
+        } catch (e: Exception) { resumeAr() }
+    }
+
+    private fun resumeAr() {
         sessionManager.createSession(this)
         sessionManager.resumeSession()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        sessionManager.pauseSession()
-        stopPoseUpdates()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sessionManager.stopSession()
-        stopPoseUpdates()
-    }
-
-    private fun endAndFinish() {
-        stopPoseUpdates()
-        sessionManager.stopSession()
-        finish()
+        glSurfaceView.onResume()
     }
 
     private fun simulateAlignment() {
         isSimulated = true
-        modeLabel.visibility = View.VISIBLE
         handleMarkerDetected(MarkerDetectionEvent(
             markerId = "marker-main", entranceNodeId = "n01",
             markerBuildingX = 0.0, markerBuildingY = 1.2, markerBuildingZ = 0.0,
             markerArX = 0.0, markerArY = 0.0, markerArZ = -1.0,
             markerArRotationYDeg = 0.0, markerBuildingRotationYDeg = 0.0, confidence = 1.0,
+            role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE,
         ))
-    }
-
-    private fun rescanMarker() {
-        stateLabel.text = "● Rescanning..."
-        stateLabel.setTextColor(0xFFFF9800.toInt())
-        instructionLabel.text = "Point camera at marker to recenter"
-    }
-
-    private fun advanceProgress() {
-        progress = min(progress + 0.15, 1.0)
-        remainingDistance = max(0.0, remainingDistance - 2.0)
-        updateUI()
-        checkArrival()
     }
 
     private fun handleMarkerDetected(event: MarkerDetectionEvent) {
         isAligned = true
-        stateLabel.text = "● Navigating"; stateLabel.setTextColor(0xFF2196F3.toInt())
-        markerStatusLabel.text = "Marker: ✓"; instructionLabel.text = "Follow the arrows"
+        stateLabel.text = "● NAVIGATING"; stateLabel.setTextColor(0xFF4CAF50.toInt())
+        instructionLabel.text = "Follow the AR arrows on the floor"
         simulateButton.visibility = View.GONE
-        rescanButton.visibility = View.VISIBLE
-        endButton.visibility = View.VISIBLE
         progressBar.visibility = View.VISIBLE
-        remainingLabel.visibility = View.VISIBLE
-
-        if (isSimulated) advanceButton.visibility = View.VISIBLE
-
-        val rotDeg = event.markerArRotationYDeg - event.markerBuildingRotationYDeg
-        val cosR = cos(Math.toRadians(rotDeg)); val sinR = sin(Math.toRadians(rotDeg))
-        val rbx = event.markerBuildingX * cosR + event.markerBuildingZ * sinR
-        val rbz = -event.markerBuildingX * sinR + event.markerBuildingZ * cosR
-        alignOffX = event.markerArX - rbx; alignOffY = event.markerArY - event.markerBuildingY
-        alignOffZ = event.markerArZ - rbz; alignRotYDeg = rotDeg
-
-        routeRenderer.setAlignmentTransform(alignOffX, alignOffY, alignOffZ, alignRotYDeg)
-        remainingDistance = 13.0
+        
+        routeRenderer.setAlignmentTransform(
+            event.markerArX - event.markerBuildingX,
+            event.markerArY - event.markerBuildingY,
+            event.markerArZ - event.markerBuildingZ,
+            event.markerArRotationYDeg - event.markerBuildingRotationYDeg
+        )
 
         val demoArrows = listOf(
-            ArrowRenderData("a0", 0.0, 0.05, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a1", 1.5, 0.05, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a2", 3.0, 0.05, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a3", 4.5, 0.05, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a4", 6.0, 0.05, 0.0, 0.0, 0.0, 1.0, ArrowRenderType.TURN_RIGHT, "Turn right"),
-            ArrowRenderData("a5", 6.0, 0.05, 1.5, 0.0, 0.0, 1.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a6", 6.0, 0.05, 3.0, 0.0, 0.0, 1.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a7", 6.0, 0.05, 4.0, -1.0, 0.0, 0.0, ArrowRenderType.TURN_LEFT, "Turn left"),
-            ArrowRenderData("a8", 4.5, 0.05, 4.0, -1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
-            ArrowRenderData("a9", 3.0, 0.05, 4.0, -1.0, 0.0, 0.0, ArrowRenderType.DESTINATION, "Conference Room"),
+            ArrowRenderData("a0", 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
+            ArrowRenderData("a1", 2.0, 0.0, 0.0, 1.0, 0.0, 0.0, ArrowRenderType.FOLLOW, null),
+            ArrowRenderData("a2", 4.0, 0.0, 0.0, 0.0, 0.0, 1.0, ArrowRenderType.TURN_RIGHT, "Turn Right")
         )
         routeRenderer.updateArrows(demoArrows)
-        arrowCountLabel.text = "Arrows: ${routeRenderer.renderedArrowCount}"
-        updateUI()
 
         if (!isSimulated) startPoseUpdates()
     }
 
     private fun startPoseUpdates() {
-        stopPoseUpdates()
         poseRunnable = object : Runnable {
             override fun run() {
-                sampleCameraPose()
-                handler.postDelayed(this, 500)
+                // In real app, update progress based on camera pose
+                handler.postDelayed(this, 1000)
             }
         }
-        handler.postDelayed(poseRunnable!!, 500)
+        handler.postAtFrontOfQueue(poseRunnable!!)
     }
 
-    private fun stopPoseUpdates() {
+    override fun onPause() {
+        super.onPause()
+        glSurfaceView.onPause()
+        sessionManager.pauseSession()
         poseRunnable?.let { handler.removeCallbacks(it) }
-        poseRunnable = null
-    }
-
-    private fun sampleCameraPose() {
-        if (!isAligned || isSimulated) return
-        val frame = sessionManager.getLatestFrame() ?: return
-        val pose = frame.camera.pose
-        val arX = pose.tx().toDouble(); val arY = pose.ty().toDouble(); val arZ = pose.tz().toDouble()
-
-        // Inverse alignment: AR-world → building-local
-        val rad = Math.toRadians(-alignRotYDeg)
-        val cosR = cos(rad); val sinR = sin(rad)
-        val tx = arX - alignOffX; val tz = arZ - alignOffZ
-        val bx = tx * cosR + tz * sinR
-        val bz = -tx * sinR + tz * cosR
-
-        // Nearest-segment projection
-        val routePoints = arrayOf(
-            doubleArrayOf(0.0, 0.0), doubleArrayOf(3.0, 0.0), doubleArrayOf(6.0, 0.0),
-            doubleArrayOf(6.0, 4.0), doubleArrayOf(3.0, 4.0),
-        )
-        val segLengths = doubleArrayOf(3.0, 3.0, 4.0, 3.0)
-        val totalDist = 13.0
-
-        var bestDist = Double.MAX_VALUE; var bestCum = 0.0; var cumDist = 0.0
-        for (i in 0 until routePoints.size - 1) {
-            val ax = routePoints[i][0]; val az = routePoints[i][1]
-            val bpx = routePoints[i+1][0]; val bpz = routePoints[i+1][1]
-            val dx = bpx - ax; val dz = bpz - az
-            var t = ((bx - ax) * dx + (bz - az) * dz) / (dx * dx + dz * dz)
-            t = max(0.0, min(1.0, t))
-            val px = ax + t * dx; val pz = az + t * dz
-            val d = sqrt((bx - px) * (bx - px) + (bz - pz) * (bz - pz))
-            if (d < bestDist) { bestDist = d; bestCum = cumDist + t * segLengths[i] }
-            cumDist += segLengths[i]
-        }
-
-        val newProgress = bestCum / totalDist
-        if (newProgress > progress) progress = min(newProgress, 1.0)
-        remainingDistance = max(0.0, totalDist - bestCum)
-        isLowConfidence = bestDist > 3.0
-
-        runOnUiThread { updateUI(); checkArrival() }
-    }
-
-    private fun updateUI() {
-        progressBar.progress = (progress * 100).toInt()
-        progressLabel.text = "Progress: ${(progress * 100).toInt()}%"
-        remainingLabel.text = "${String.format("%.1f", remainingDistance)}m remaining"
-        confidenceLabel.text = "Confidence: ${if (isLowConfidence) "⚠ Low" else "OK"}"
-    }
-
-    private fun checkArrival() {
-        if (progress >= 0.95 || remainingDistance < 1.5) {
-            arriveAtDestination()
-        } else if (progress >= 0.8) {
-            instructionLabel.text = "Approaching destination..."
-            stateLabel.text = "● Approaching"; stateLabel.setTextColor(0xFF4CAF50.toInt())
-        }
-    }
-
-    private fun arriveAtDestination() {
-        stopPoseUpdates()
-        arrivalOverlay.visibility = View.VISIBLE
-        instructionLabel.visibility = View.GONE
-        advanceButton.visibility = View.GONE
-        rescanButton.visibility = View.GONE
-        endButton.visibility = View.GONE
-        stateLabel.text = "● Arrived"; stateLabel.setTextColor(0xFF4CAF50.toInt())
     }
 }

@@ -93,15 +93,10 @@ class ArSessionManager {
 
     /** Get a human-readable tracking state from ARCore camera. */
     fun getTrackingStateLabel(): String {
-        val frame = try {
-            session?.update()
-        } catch (e: Exception) { null }
-
-        return when (frame?.camera?.trackingState) {
+        return when (session?.update()?.camera?.trackingState) {
             TrackingState.TRACKING -> "Normal"
             TrackingState.PAUSED -> "Paused"
             TrackingState.STOPPED -> "Stopped"
-            null -> "Unknown"
             else -> "Unknown"
         }
     }

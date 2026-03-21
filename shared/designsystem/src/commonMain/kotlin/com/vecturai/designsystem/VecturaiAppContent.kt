@@ -1,23 +1,41 @@
 package com.vecturai.designsystem
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.vecturai.designsystem.navigation.AppNavigation
+import com.vecturai.designsystem.navigation.Screen
+import com.vecturai.designsystem.navigation.VecturaiBottomBar
+import com.vecturai.designsystem.theme.VecturaiTheme
 
-/**
- * Root app content composable.
- *
- * This is the entry point for the Compose Multiplatform UI,
- * wrapping the theme and navigation structure.
- *
- * @param onNavigateToAr Callback to launch the native AR navigation screen
- */
 @Composable
 fun VecturaiAppContent(
-    onNavigateToAr: () -> Unit = {},
+    onNavigateToAr: (String?) -> Unit = {},
+    onPickImportFile: () -> Unit = {}
 ) {
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
     VecturaiTheme {
-        AppNavigation(
-            onNavigateToAr = onNavigateToAr,
-        )
+        Scaffold(
+            bottomBar = {
+                VecturaiBottomBar(
+                    currentScreen = currentScreen,
+                    onScreenSelected = { currentScreen = it }
+                )
+            }
+        ) { paddingValues ->
+            AppNavigation(
+                currentScreen = currentScreen,
+                onNavigate = { currentScreen = it },
+                onNavigateToAr = onNavigateToAr,
+                onPickImportFile = onPickImportFile,
+                modifier = Modifier.padding(paddingValues)
+            )
+        }
     }
 }

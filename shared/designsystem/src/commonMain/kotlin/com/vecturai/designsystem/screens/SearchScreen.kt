@@ -14,26 +14,51 @@ import com.vecturai.designsystem.VecturaiEmptyState
 /**
  * Search screen for finding rooms within the building.
  *
- * TODO: Connect to SearchUseCase for actual room search
- * TODO: Add room category filters
- * TODO: Show search suggestions from history
- * TODO: Navigate to Route Preview on room selection
+ * @param onRoomSelected Callback when a room is tapped, receives the room name
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
+    onRoomSelected: (String) -> Unit = {},
 ) {
     var searchQuery by remember { mutableStateOf("") }
+
+    // Demo room data
+    val allRooms = remember {
+        listOf(
+            "Conference Room A" to "Ground Floor • Meeting Room",
+            "Conference Room B" to "Ground Floor • Meeting Room",
+            "Kitchen" to "Ground Floor • Facility",
+            "Reception" to "Ground Floor • Lobby",
+            "Office 101" to "1st Floor • Office",
+            "Office 102" to "1st Floor • Office",
+            "Office 103" to "1st Floor • Office",
+            "Server Room" to "Basement • Utility",
+            "Break Room" to "Ground Floor • Facility",
+            "Restroom A" to "Ground Floor • Facility",
+            "Restroom B" to "1st Floor • Facility",
+            "Storage" to "Basement • Utility",
+        )
+    }
+
+    val filteredRooms = if (searchQuery.isEmpty()) {
+        allRooms
+    } else {
+        allRooms.filter { (name, desc) ->
+            name.contains(searchQuery, ignoreCase = true) ||
+                desc.contains(searchQuery, ignoreCase = true)
+        }
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         // Search bar
         SearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it },
-            onSearch = { /* TODO: Trigger search */ },
+            onSearch = { /* search is live-filtered */ },
             active = false,
-            onActiveChange = { /* TODO: Handle search active state */ },
+            onActiveChange = { },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -48,34 +73,43 @@ fun SearchScreen(
             },
         ) {}
 
-        if (searchQuery.isEmpty()) {
-            // Show categories when not searching
+        if (filteredRooms.isEmpty()) {
             VecturaiEmptyState(
                 icon = Icons.Default.SearchOff,
-                title = "Search for a destination",
-                description = "Type a room name, office number, or facility type to find your way.",
+                title = "No rooms found",
+                description = "Try a different search term.",
                 modifier = Modifier.weight(1f),
             )
         } else {
-            // TODO: Show real search results from SearchUseCase
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // Placeholder results
-                items(3) { index ->
-                    VecturaiCard(onClick = { /* TODO: Navigate to route preview */ }) {
-                        Text(
-                            text = "Room ${index + 101}",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Ground Floor • Office",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                items(filteredRooms.size) { index ->
+                    val (roomName, roomDesc) = filteredRooms[index]
+                    VecturaiCard(onClick = { onRoomSelected(roomName) }) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Icon(
+                                imageVector = Icons.Default.Room,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = roomName,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = roomDesc,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
                     }
                 }
             }
