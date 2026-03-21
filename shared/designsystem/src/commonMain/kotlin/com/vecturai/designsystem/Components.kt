@@ -9,6 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import com.vecturai.designsystem.navigation.Screen
+
 
 /**
  * Reusable UI components for the VecturAI design system.
@@ -146,4 +150,52 @@ fun VecturaiSectionHeader(
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
+}
+
+/**
+ * Bottom navigation bar for the application.
+ */
+@Composable
+fun VecturaiBottomBar(
+    currentScreen: Screen,
+    onScreenSelected: (Screen) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NavigationBar(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp,
+    ) {
+        val screens = listOf(
+            Screen.Home,
+            Screen.Search,
+            Screen.Import
+        )
+
+        screens.forEach { screen ->
+            NavigationBarItem(
+                selected = currentScreen == screen,
+                onClick = { onScreenSelected(screen) },
+                icon = {
+                    Icon(
+                        imageVector = when (screen) {
+                            Screen.Home -> Icons.Default.Home
+                            Screen.Search -> Icons.Default.Search
+                            Screen.Import -> Icons.Default.FileUpload
+                            else -> Icons.Default.Circle
+                        },
+                        contentDescription = screen.title
+                    )
+                },
+                label = { Text(screen.title) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                )
+            )
+        }
+    }
 }

@@ -10,8 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.vecturai.designsystem.navigation.AppNavigation
 import com.vecturai.designsystem.navigation.Screen
-import com.vecturai.designsystem.navigation.VecturaiBottomBar
-import com.vecturai.designsystem.theme.VecturaiTheme
 
 @Composable
 fun VecturaiAppContent(
