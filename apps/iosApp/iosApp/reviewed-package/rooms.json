@@ -1,0 +1,25 @@
+{
+    "rooms": [
+        {
+            "id": "mutfak",
+            "displayName": "Mutfak",
+            "destinationNodeId": "mutfak_door",
+            "category": "kitchen",
+            "description": "Kitchen area"
+        },
+        {
+            "id": "salon",
+            "displayName": "Salon",
+            "destinationNodeId": "salon_door",
+            "category": "living_room",
+            "description": "Living room"
+        },
+        {
+            "id": "yatak_odasi",
+            "displayName": "Yatak Odası",
+            "destinationNodeId": "yatak_odasi_door",
+            "category": "bedroom",
+            "description": "Bedroom"
+        }
+    ]
+}

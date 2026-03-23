@@ -1,0 +1,104 @@
+{
+    "nodes": [
+        {
+            "id": "entrance_a",
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "entrance",
+            "label": "Entrance A"
+        },
+        {
+            "id": "corridor_1",
+            "x": 2.5,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "junction",
+            "label": "Hallway 1"
+        },
+        {
+            "id": "corridor_2",
+            "x": 5.0,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "junction",
+            "label": "Hallway 2"
+        },
+        {
+            "id": "corridor_3",
+            "x": 7.5,
+            "y": 0.0,
+            "z": 0.0,
+            "type": "junction",
+            "label": "Hallway 3"
+        },
+        {
+            "id": "mutfak_door",
+            "x": 2.5,
+            "y": 0.0,
+            "z": -3.0,
+            "type": "room_entry",
+            "label": "Mutfak Door"
+        },
+        {
+            "id": "salon_door",
+            "x": 5.0,
+            "y": 0.0,
+            "z": 3.5,
+            "type": "room_entry",
+            "label": "Salon Door"
+        },
+        {
+            "id": "yatak_odasi_door",
+            "x": 7.5,
+            "y": 0.0,
+            "z": -3.0,
+            "type": "room_entry",
+            "label": "Yatak Odası Door"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e01",
+            "from": "entrance_a",
+            "to": "corridor_1",
+            "cost": 2.5,
+            "bidirectional": true
+        },
+        {
+            "id": "e02",
+            "from": "corridor_1",
+            "to": "corridor_2",
+            "cost": 2.5,
+            "bidirectional": true
+        },
+        {
+            "id": "e03",
+            "from": "corridor_2",
+            "to": "corridor_3",
+            "cost": 2.5,
+            "bidirectional": true
+        },
+        {
+            "id": "e04",
+            "from": "corridor_1",
+            "to": "mutfak_door",
+            "cost": 3.0,
+            "bidirectional": true
+        },
+        {
+            "id": "e05",
+            "from": "corridor_2",
+            "to": "salon_door",
+            "cost": 3.5,
+            "bidirectional": true
+        },
+        {
+            "id": "e06",
+            "from": "corridor_3",
+            "to": "yatak_odasi_door",
+            "cost": 3.0,
+            "bidirectional": true
+        }
+    ]
+}
