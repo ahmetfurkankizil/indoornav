@@ -22,6 +22,25 @@
     </array>
     <key>NSCameraUsageDescription</key>
     <string>VecturAI needs camera access for AR indoor navigation.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <!-- Allow plain HTTP to the dev-only admin API on localhost (simulator). -->
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+        <!-- Allow plain HTTP to a specific LAN host for real-device testing.
+             Change this IP to match your Mac's LAN address when testing on device.
+             This entry is intentionally narrow — only the exact host is exempted. -->
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>172.20.10.4</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSIncludesSubdomains</key>
+                <false/>
+            </dict>
+        </dict>
+    </dict>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>

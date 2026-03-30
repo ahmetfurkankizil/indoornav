@@ -32,3 +32,4 @@ include(":shared:designsystem")
 
 // ── Tools ───────────────────────────────────────────────
 include(":tools:nav-preprocessor")
+include(":tools:admin-api")

@@ -96,7 +96,7 @@ CI runs automatically on push/PR to `main` via GitHub Actions.
 - [Architecture Summary](docs/handoff/architecture-summary.md) — diagram + components
 - [Marker Placement](docs/demo/checkpoint-marker-placement.md) — physical setup
 
-### ADRs (1–24)
+### ADRs (1–31)
 
 | 1–9 | KMP, routing, preprocessing, marker alignment, single-floor, assisted authoring |
 |-----|---|
@@ -105,6 +105,87 @@ CI runs automatically on push/PR to `main` via GitHub Actions.
 | 16–18 | Controlled-route hardening, route-relative progress, recenter/rescan |
 | 19–21 | Checkpoint-marker correction, confidence-scored progress, recovery/off-route |
 | 22–24 | RC stabilization, CI/regression policy, presentation/operator handoff |
+| 25–26 | iOS truth-path navigation flow, reviewed package runtime truth |
+| 27–29 | Rolling lookahead AR guidance, entrance QR alignment, strict marker calibration |
+| 30–32 | Admin draft-ingestion pipeline (dev-only), admin draft review read-only, room editing + reviewed package export |
+
+## Admin Draft Pipeline (dev-only)
+
+A minimal backend + iOS admin surface for uploading Polycam GLB scans and generating draft navigation packages, then reviewing the generated output. This is dev-only infrastructure for the assisted-authoring workflow.
+
+### Run the admin API
+
+```bash
+# Start the admin API server (default port 8080)
+./gradlew :tools:admin-api:run
+
+# Run all admin API tests
+./gradlew :tools:admin-api:test
+```
+
+### Verify Phase 1 — Upload & Job Status
+
+```bash
+# With server already running:
+./scripts/verify-admin-draft-api.sh
+
+# Auto-start server, run tests, stop server:
+./scripts/verify-admin-draft-api.sh --start-server
+```
+
+### Verify Phase 2 — Draft Review
+
+```bash
+# With server already running:
+./scripts/verify-admin-draft-review.sh
+
+# Auto-start server, run tests, stop server:
+./scripts/verify-admin-draft-review.sh --start-server
+```
+
+### Verify Phase 3 — Room Edit + Export
+
+```bash
+# With server already running:
+./scripts/verify-admin-room-edit-and-export.sh
+
+# Auto-start server, run tests, stop server:
+./scripts/verify-admin-room-edit-and-export.sh --start-server
+```
+
+### iOS admin UI
+
+From the app home screen, tap "Admin Tools" to access the GLB upload and job status screens. On a succeeded job, tap "Review Draft" to open the review screen with SVG previews and room candidates. Tap any room row to edit its display name, category, and description. Use the "Export Reviewed Package" button to produce the 5-file reviewed package. The admin API must be running on localhost (simulator) or your LAN IP (real device). Set `AdminAPIClient.baseURL` for real device testing.
+
+### iOS networking — ATS / HTTP
+
+The admin API runs over plain HTTP (no TLS). iOS App Transport Security (ATS) blocks HTTP by default. The Info.plist includes targeted exceptions:
+
+| Scenario | How it works |
+|----------|-------------|
+| **Simulator** | `NSAllowsLocalNetworking = true` permits HTTP to `localhost` and `127.0.0.1`. No IP change needed. |
+| **Real device** | `localhost` on a physical device points to the phone itself, not your Mac. Set `AdminAPIClient.baseURL` to your Mac's LAN IP (e.g. `http://192.168.x.x:8080`). The LAN IP must also be listed in the `NSExceptionDomains` entry in Info.plist. Update the domain key to match your IP before building. |
+
+To update the LAN IP for real device testing:
+1. Find your Mac's IP: `ipconfig getifaddr en0`
+2. Edit `apps/iosApp/iosApp/Info.plist` — change the `NSExceptionDomains` key to match your IP
+3. Edit `apps/iosApp/iosApp/admin/AdminAPIClient.swift` line 8 — set `baseURL` to the same IP
+4. Rebuild and run on device
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/admin/draft-jobs` | Upload `.glb` (multipart, field: `file`) |
+| GET | `/admin/draft-jobs` | List all jobs |
+| GET | `/admin/draft-jobs/{id}` | Get job detail |
+| GET | `/admin/draft-jobs/{id}/artifacts` | List generated artifact filenames |
+| GET | `/admin/draft-jobs/{id}/summary` | Parsed draft summary (rooms, counts, stats) — merges room overrides |
+| GET | `/admin/draft-jobs/{id}/artifacts/{name}/content` | Raw artifact content (SVG/JSON) |
+| PATCH | `/admin/draft-jobs/{id}/rooms/{roomId}` | Update room display name, category, description |
+| POST | `/admin/draft-jobs/{id}/export-reviewed-package` | Export 5-file reviewed package |
+| GET | `/admin/draft-jobs/{id}/reviewed-package` | List exported package files |
+| GET | `/admin/draft-jobs/{id}/reviewed-package/{file}/content` | Serve exported file content |
 
 ## Known Limitations (v1.7)
 

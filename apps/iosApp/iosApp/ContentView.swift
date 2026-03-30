@@ -120,6 +120,7 @@ private struct PackageErrorView: View {
 
 private struct HomeView: View {
     @ObservedObject var flow: NavigationFlowModel
+    @State private var showAdminTools = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -163,7 +164,16 @@ private struct HomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding(.horizontal, 32)
+
+            Button(action: { showAdminTools = true }) {
+                Label("Admin Tools", systemImage: "wrench.and.screwdriver")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
             .padding(.bottom, 40)
+        }
+        .sheet(isPresented: $showAdminTools) {
+            AdminDraftJobsView()
         }
     }
 }

@@ -4,6 +4,211 @@
 
 VecturAI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
 
+## Phase 9 — Admin Room Editing + Reviewed Package Export (2026-03-30)
+
+### What Changed
+
+Phase 9 adds per-room metadata editing and reviewed package export to the admin draft pipeline. Admins can now rename rooms, set categories and descriptions, and export a 5-file reviewed package without touching the generated draft artifacts.
+
+1. **Room override persistence** (`RoomOverrideService`): Patches are stored in `<jobDir>/room_overrides.json` — a separate file that is never written by the pipeline. The generated `authoring_config.generated.json` is always read-only.
+2. **PATCH room endpoint**: `PATCH /admin/draft-jobs/{jobId}/rooms/{roomId}` — accepts `{ displayName?, category?, description? }`, validates the room ID against the draft config, rejects blank display names, and writes partial updates (existing fields preserved).
+3. **Summary merges overrides**: `GET /admin/draft-jobs/{jobId}/summary` now merges `room_overrides.json` into the room list before returning, so the iOS review screen always shows the current edited state.
+4. **Reviewed package exporter** (`ReviewedPackageExporter`): Produces all 5 reviewed-package files in `<jobDir>/reviewed-package/`: `manifest.json`, `rooms.json`, `nav_graph.json`, `entrance_markers.json`, `route_rendering.json`. Nodes/edges/markers are copied verbatim from the draft. Room metadata is merged from overrides.
+5. **Export endpoint**: `POST /admin/draft-jobs/{jobId}/export-reviewed-package` — returns `{ jobId, status, files[], exportPath, warnings[] }`.
+6. **Package listing + content endpoints**: `GET /admin/draft-jobs/{jobId}/reviewed-package` lists exported files; `GET /admin/draft-jobs/{jobId}/reviewed-package/{filename}/content` serves the JSON. Path traversal is blocked.
+7. **iOS room edit sheet** (`RoomEditSheet`): Tapping a room row in `AdminDraftReviewView` opens a form sheet with editable display name, category picker, and description field. Saves via `PATCH` and reloads the summary on success.
+8. **iOS export action**: "Export Reviewed Package" button in the review screen calls `POST export-reviewed-package`, shows progress, and lists the exported files on success.
+9. **iOS client methods**: `patchRoom()`, `exportReviewedPackage()`, `getExportedPackageFiles()`, `reviewedPackageFileContentURL()` added to `AdminAPIClient`. `RoomOverrideResponse` and `ExportResultResponse` models added.
+10. **Backend tests**: `RoomOverrideServiceTest` (8 tests), `ReviewedPackageExporterTest` (8 tests), `RoomEditAndExportRoutesTest` (11 integration tests).
+11. **Verification script**: `scripts/verify-admin-room-edit-and-export.sh` — uploads GLB, patches room, verifies summary reflects override, exports package, verifies all 5 files and edited values in rooms.json.
+12. **ADR-032**: Documents the override-not-mutation pattern and why package activation is deferred.
+
+### Extended API (Phase 9 additions)
+
+```
+PATCH /admin/draft-jobs/{jobId}/rooms/{roomId}
+    Body: { displayName?, category?, description? }
+    → RoomOverride { displayName, category, description, updatedAt }
+    → 404 if job not found, 400 if roomId unknown or displayName blank
+
+POST /admin/draft-jobs/{jobId}/export-reviewed-package
+    → ExportResult { jobId, status, files[], exportPath, warnings[] }
+    → 200 on success, 422 on failure, 404 if job not found
+
+GET /admin/draft-jobs/{jobId}/reviewed-package
+    → [filename, …]
+    → 404 if not yet exported
+
+GET /admin/draft-jobs/{jobId}/reviewed-package/{filename}/content
+    → raw JSON file content
+    → 404/400 for unknown filename or path traversal
+```
+
+### Running Room Edit + Export
+
+```bash
+# Start admin API (if not already running)
+./gradlew :tools:admin-api:run
+
+# Verify Phase 3 end-to-end
+./scripts/verify-admin-room-edit-and-export.sh
+
+# Or auto-start server
+./scripts/verify-admin-room-edit-and-export.sh --start-server
+
+# Run all backend tests (Phase 1 + Phase 2 + Phase 3)
+./gradlew :tools:admin-api:test
+```
+
+### iOS ATS / HTTP Dev Networking
+
+The admin API uses plain HTTP. iOS ATS blocks HTTP by default. `Info.plist` carries two targeted exceptions (no `NSAllowsArbitraryLoads`):
+- `NSAllowsLocalNetworking: true` — covers simulator (`localhost` / `127.0.0.1`)
+- `NSExceptionDomains` entry for the Mac's current LAN IP — covers real-device testing
+
+When your Mac's IP changes, update **both** the `NSExceptionDomains` key in `Info.plist` **and** `AdminAPIClient.baseURL`.
+
+### Known Limitations After Phase 9
+
+- Exported reviewed package is not automatically activated — it must be manually copied to the iOS bundle
+- No package activation / runtime switching in this phase
+- No Android admin UI
+- No multi-floor or multi-building support
+- Authentication and cloud deployment deferred
+
+### Intentionally Deferred (Post Phase 9)
+
+- Package activation / runtime switching from admin UI
+- Android admin UI
+- Authentication
+- Cloud deployment
+
+## Phase 8 — Admin Draft Review — Read-Only (2026-03-30)
+
+### What Changed
+
+Phase 8 adds read-only review of succeeded draft jobs from within the iOS admin UI. Admins can now inspect the generated draft before any editing or export step. This phase is strictly inspection only — no editing, no package activation.
+
+1. **Summary endpoint**: `GET /admin/draft-jobs/{jobId}/summary` — parses `authoring_config.generated.json`, `generation_metadata.json`, and `geometry_stats.json` from the job's output directory and returns a structured JSON summary. Fails gracefully if artifacts are missing.
+2. **Artifact content endpoint**: `GET /admin/draft-jobs/{jobId}/artifacts/{artifactName}/content` — serves the raw SVG or JSON artifact file with correct content type. Path traversal is blocked by validating against the job's known artifact list.
+3. **Summary data model** (`DraftSummary`): includes `buildingId`, `buildingName`, `floorId`, `artifactAvailability`, `counts` (nodes/edges/rooms/markers), `rooms[]`, `generationMetadata`, `geometryStats`, and `warnings[]`.
+4. **iOS review screen** (`AdminDraftReviewView`): accessible via "Review Draft" on the job detail screen (succeeded jobs only). Shows building metadata, counts, generation stats, a segmented Plan/Graph SVG preview via `WKWebView`, and the room candidate list.
+5. **Room candidate rows** (`DraftRoomRow`): read-only rows with display name, category badge, destination node ID, and description. Structured for future editing evolution.
+6. **iOS client methods**: `getDraftSummary(jobId:)` and `getArtifactContent(jobId:artifactName:)` added to `AdminAPIClient`. Response models (`DraftSummaryResponse`, `DraftRoomResponse`, etc.) added to the same file.
+7. **Backend tests**: `DraftSummaryExtractorTest` (8 tests covering parsing, missing files, warnings, artifact availability) and `SummaryAndArtifactRoutesTest` (12 tests covering HTTP responses, path traversal, missing jobs).
+8. **Verification script**: `scripts/verify-admin-draft-review.sh` — uploads sample GLB, waits for success, verifies summary endpoint, checks SVG content, tests path traversal rejection.
+9. **ADR-031**: Documents why Phase 2 is read-only and why draft review is separated from runtime package activation.
+
+### Extended API (Phase 8 additions)
+
+```
+GET /admin/draft-jobs/{jobId}/summary
+    → DraftSummary { jobId, buildingId, buildingName, floorId,
+                     artifactAvailability, counts, rooms[],
+                     generationMetadata, geometryStats, warnings[] }
+
+GET /admin/draft-jobs/{jobId}/artifacts/{artifactName}/content
+    → SVG / JSON raw file content
+    → 404 if artifact not in job's known list (path traversal protection)
+```
+
+### Running the Admin Draft Review
+
+```bash
+# Start admin API (if not already running)
+./gradlew :tools:admin-api:run
+
+# Verify Phase 2 end-to-end
+./scripts/verify-admin-draft-review.sh
+
+# Or auto-start server
+./scripts/verify-admin-draft-review.sh --start-server
+
+# Run all backend tests (Phase 1 + Phase 2)
+./gradlew :tools:admin-api:test
+```
+
+### Known Limitations After Phase 8
+
+- Draft review is read-only — no editing, renaming, or category changes (added in Phase 9)
+- SVG previews require the admin server to be running; they load from `localhost:8080` by default
+- No Android admin UI
+- No multi-floor or multi-building support
+
+### Intentionally Deferred (Post Phase 8)
+
+- Room name / category editing → Done in Phase 9
+- Reviewed package export from admin UI → Done in Phase 9
+- Package activation / runtime switching
+- Android admin UI
+- Authentication
+- Cloud deployment
+
+## Phase 7 — Admin Draft-Ingestion Pipeline (2026-03-29)
+
+### What Changed
+
+Phase 7 adds a dev-only admin pipeline for uploading Polycam GLB scans and generating draft navigation packages, with visibility from the iOS app. This is the first step toward assisted authoring from within the app.
+
+1. **Admin API backend**: `tools/admin-api/` — Ktor/JVM HTTP server that accepts `.glb` uploads, runs the existing `DraftPipeline` from `tools/nav-preprocessor`, and exposes job status and artifacts via REST endpoints. Filesystem-backed, no database.
+2. **Draft job lifecycle**: Jobs transition through `queued → processing → succeeded/failed`. Each job directory (`build/admin-draft-jobs/<jobId>/`) contains `job.json`, `input.glb`, and `output/` with generated artifacts.
+3. **API endpoints**: `POST /admin/draft-jobs` (upload), `GET /admin/draft-jobs` (list), `GET /admin/draft-jobs/{id}` (detail), `GET /admin/draft-jobs/{id}/artifacts` (artifact list).
+4. **iOS admin UI**: "Admin Tools" button on home screen opens a sheet with GLB file picker, upload action, job list with status indicators, and per-job detail view showing artifacts and errors. Completely isolated from the visitor navigation flow.
+5. **iOS admin API client**: `AdminAPIClient` with configurable `baseURL` (defaults to `localhost:8080` for simulator, overridable for LAN device testing). Isolated from `BuildingPackageLoader`.
+6. **Verification script**: `scripts/verify-admin-draft-api.sh` — uploads sample GLB, polls status, verifies artifacts, tests error rejection.
+7. **Backend tests**: Unit tests for job service (persistence, status transitions) and route tests (upload validation, error responses).
+8. **ADR-030**: Documents the decision for dev-only, filesystem-backed, minimal pipeline.
+
+### Admin API Architecture
+
+```
+iOS App (Admin Tools)          Admin API (Ktor)           nav-preprocessor
+       │                            │                           │
+       │  POST /admin/draft-jobs    │                           │
+       │  (multipart .glb upload)   │                           │
+       │ ────────────────────────►  │                           │
+       │                            │  DraftPipeline.execute()  │
+       │                            │ ────────────────────────► │
+       │                            │                           │
+       │                            │  ◄──── exit code + files  │
+       │                            │                           │
+       │  GET /admin/draft-jobs/{id}│                           │
+       │ ────────────────────────►  │                           │
+       │  ◄──── job status + artifacts                          │
+```
+
+### Running the Admin Pipeline
+
+```bash
+# Start admin API
+./gradlew :tools:admin-api:run
+
+# Verify end-to-end
+./scripts/verify-admin-draft-api.sh
+
+# Or auto-start server
+./scripts/verify-admin-draft-api.sh --start-server
+```
+
+### Known Limitations After Phase 7
+
+- Admin pipeline is dev-only (no auth, no cloud deployment)
+- Filesystem persistence does not scale
+- Synchronous processing blocks during draft generation
+- No room editing, map preview, or package export from admin UI
+- Admin UI does not modify the bundled reviewed package
+- No Android admin UI
+
+### Intentionally Deferred (Post Phase 7)
+
+- 2D map preview rendering in admin UI
+- Room name/category editing
+- Reviewed package export/activation from admin
+- Runtime package switching
+- Android admin UI
+- Authentication
+- Cloud deployment
+
 ## Phase 6 — Unified Entrance Poster & AR Deadlock Fix (2026-03-23)
 
 ### What Changed
@@ -298,6 +503,12 @@ open apps/iosApp/iosApp.xcodeproj
 
 # Regression checks (fast pre-commit)
 ./scripts/regression-checks.sh
+
+# Admin draft API (dev-only)
+./gradlew :tools:admin-api:run
+
+# Admin draft API verification
+./scripts/verify-admin-draft-api.sh
 ```
 
 ## Key Architecture Decisions
@@ -310,3 +521,4 @@ See `docs/adr/` for the full ADR log. Key ones:
 - ADR-027: AR guidance renders a rolling forward route slice driven by route progress
 - ADR-028: Entrance QR establishes initial iOS alignment and facing before AR guidance begins
 - ADR-029: Demo device path requires strict entrance marker asset matching and calibrated reviewed package coordinates
+- ADR-030: Dev-only admin draft-ingestion pipeline with filesystem persistence
