@@ -11,6 +11,8 @@ struct QRScanView: View {
 
     @State private var scanError: String?
     @State private var isProcessing = false
+    /// Incremented on retry to force a new QRCameraPreview (and fresh AVCaptureSession).
+    @State private var scanAttempt = 0
 
     var body: some View {
         ZStack {
@@ -19,6 +21,7 @@ struct QRScanView: View {
             Color.black.ignoresSafeArea()
             #else
             QRCameraPreview(onCodeScanned: handleScannedCode)
+                .id(scanAttempt) // force new VC + fresh camera session on retry
                 .ignoresSafeArea()
             #endif
 
@@ -64,7 +67,7 @@ struct QRScanView: View {
                         .background(.red.opacity(0.3))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                        Button(action: { scanError = nil; isProcessing = false }) {
+                        Button(action: { scanError = nil; isProcessing = false; scanAttempt += 1 }) {
                             Text("Try Again")
                                 .font(.callout).fontWeight(.medium)
                                 .foregroundStyle(.white)
@@ -141,7 +144,7 @@ struct QRScanView: View {
     #if targetEnvironment(simulator)
     private func simulateScan() {
         let demoPayload = """
-        {"type":"vecturai-entrance","buildingId":"house-demo-01","entranceId":"marker-entrance-a","v":1}
+        {"type":"vecturai-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}
         """
         handleScannedCode(demoPayload)
     }

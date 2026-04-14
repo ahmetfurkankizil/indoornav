@@ -9,8 +9,8 @@ import Foundation
 /// ```json
 /// {
 ///   "type": "vecturai-entrance",
-///   "buildingId": "house-demo-01",
-///   "entranceId": "marker-entrance-a",
+///   "buildingId": "19",
+///   "entranceId": "marker-main-entrance",
 ///   "v": 1
 /// }
 /// ```

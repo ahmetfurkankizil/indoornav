@@ -1,0 +1,566 @@
+{
+  "buildingId": "19",
+  "buildingName": "Rectorate Building",
+  "floorId": "1",
+  "asset": {
+    "glbFile": null,
+    "sourceApp": "manual_2d_measured_draft",
+    "scanDate": null
+  },
+  "tags": [
+    "main-floor",
+    "manual",
+    "2d-measured",
+    "navigation-draft"
+  ],
+  "entranceMarkers": [
+    {
+      "id": "marker-main-entrance",
+      "startNodeId": "n01",
+      "physicalWidthMeters": 0.21,
+      "physicalHeightMeters": 0.21,
+      "position": {
+        "x": 0.0,
+        "y": 1.6,
+        "z": 0.0
+      },
+      "forwardBasis": "+x",
+      "rotationYDegrees": 0.0,
+      "referenceImageName": null,
+      "notes": "Primary entrance marker at Point 1. Marker height set to eye level per user instruction."
+    }
+  ],
+  "checkpointMarkers": [],
+  "nodes": [
+    {
+      "id": "n01",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "entrance",
+      "label": "Entrance Point"
+    },
+    {
+      "id": "n02",
+      "x": 11.2,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "West Service-Core Junction"
+    },
+    {
+      "id": "n03",
+      "x": 19.42,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "East Service-Core Junction"
+    },
+    {
+      "id": "n04",
+      "x": 11.2,
+      "y": 0.0,
+      "z": 3.2,
+      "type": "junction",
+      "label": "Service Lobby"
+    },
+    {
+      "id": "n05",
+      "x": 15.31,
+      "y": 0.0,
+      "z": 1.2,
+      "type": "room_entry",
+      "label": "Elevators"
+    },
+    {
+      "id": "n06",
+      "x": 14.1,
+      "y": 0.0,
+      "z": 3.8,
+      "type": "room_entry",
+      "label": "Women's WC (West)"
+    },
+    {
+      "id": "n07",
+      "x": 14.8,
+      "y": 0.0,
+      "z": 5.2,
+      "type": "room_entry",
+      "label": "Men's WC (West)"
+    },
+    {
+      "id": "n08",
+      "x": 11.2,
+      "y": 0.0,
+      "z": 5.85,
+      "type": "junction",
+      "label": "South Hall Junction"
+    },
+    {
+      "id": "n09",
+      "x": 11.2,
+      "y": 0.0,
+      "z": 12.66,
+      "type": "entrance",
+      "label": "EB Building Entrance"
+    },
+    {
+      "id": "n10",
+      "x": 19.42,
+      "y": 0.0,
+      "z": 5.49,
+      "type": "junction",
+      "label": "East Lower Corridor Junction"
+    },
+    {
+      "id": "n11",
+      "x": 22.31,
+      "y": 0.0,
+      "z": 5.49,
+      "type": "room_entry",
+      "label": "Men's WC (East)"
+    },
+    {
+      "id": "n12",
+      "x": 23.52,
+      "y": 0.0,
+      "z": 5.49,
+      "type": "room_entry",
+      "label": "Women's WC (East)"
+    },
+    {
+      "id": "n13",
+      "x": 31.4,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "Cafe Corridor Projection"
+    },
+    {
+      "id": "n14",
+      "x": 31.4,
+      "y": 0.0,
+      "z": 1.2,
+      "type": "room_entry",
+      "label": "Fameo Cafe"
+    },
+    {
+      "id": "n15",
+      "x": 34.5,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "EA101 Corridor Projection"
+    },
+    {
+      "id": "n16",
+      "x": 34.5,
+      "y": 0.0,
+      "z": -2.3,
+      "type": "room_entry",
+      "label": "EA101 Classroom"
+    },
+    {
+      "id": "n17",
+      "x": 39.13,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "CS Lab Corridor Projection"
+    },
+    {
+      "id": "n18",
+      "x": 39.13,
+      "y": 0.0,
+      "z": 2.3,
+      "type": "room_entry",
+      "label": "CS Lab"
+    },
+    {
+      "id": "n19",
+      "x": 51.5,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "junction",
+      "label": "East Classroom Fork"
+    },
+    {
+      "id": "n20",
+      "x": 51.5,
+      "y": 0.0,
+      "z": -6.3,
+      "type": "room_entry",
+      "label": "ME Lab"
+    },
+    {
+      "id": "n21",
+      "x": 51.5,
+      "y": 0.0,
+      "z": -2.42,
+      "type": "room_entry",
+      "label": "EA 102 Classroom"
+    },
+    {
+      "id": "n22",
+      "x": 11.2,
+      "y": 0.0,
+      "z": -6.56,
+      "type": "stairs",
+      "label": "North Stairs Landing"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "from": "n01",
+      "to": "n02",
+      "cost": 11.2,
+      "bidirectional": true,
+      "label": "main corridor"
+    },
+    {
+      "id": "e02",
+      "from": "n02",
+      "to": "n03",
+      "cost": 8.22,
+      "bidirectional": true,
+      "label": "service core frontage"
+    },
+    {
+      "id": "e03",
+      "from": "n02",
+      "to": "n04",
+      "cost": 3.2,
+      "bidirectional": true,
+      "label": "service lobby access"
+    },
+    {
+      "id": "e04",
+      "from": "n04",
+      "to": "n08",
+      "cost": 2.65,
+      "bidirectional": true,
+      "label": "south hall continuation"
+    },
+    {
+      "id": "e05",
+      "from": "n08",
+      "to": "n09",
+      "cost": 6.81,
+      "bidirectional": true,
+      "label": "connector to EB Building Entrance"
+    },
+    {
+      "id": "e06",
+      "from": "n02",
+      "to": "n22",
+      "cost": 6.56,
+      "bidirectional": true,
+      "label": "north stairs access"
+    },
+    {
+      "id": "e07",
+      "from": "n04",
+      "to": "n05",
+      "cost": 4.57,
+      "bidirectional": true,
+      "label": "to elevators"
+    },
+    {
+      "id": "e08",
+      "from": "n04",
+      "to": "n06",
+      "cost": 2.96,
+      "bidirectional": true,
+      "label": "to west women's wc"
+    },
+    {
+      "id": "e09",
+      "from": "n08",
+      "to": "n07",
+      "cost": 3.66,
+      "bidirectional": true,
+      "label": "to west men's wc"
+    },
+    {
+      "id": "e10",
+      "from": "n03",
+      "to": "n10",
+      "cost": 5.49,
+      "bidirectional": true,
+      "label": "to lower east corridor"
+    },
+    {
+      "id": "e11",
+      "from": "n08",
+      "to": "n10",
+      "cost": 8.23,
+      "bidirectional": true,
+      "label": "lower corridor"
+    },
+    {
+      "id": "e12",
+      "from": "n10",
+      "to": "n11",
+      "cost": 2.89,
+      "bidirectional": true,
+      "label": "to east men's wc"
+    },
+    {
+      "id": "e13",
+      "from": "n10",
+      "to": "n12",
+      "cost": 4.1,
+      "bidirectional": true,
+      "label": "to east women's wc"
+    },
+    {
+      "id": "e14",
+      "from": "n03",
+      "to": "n13",
+      "cost": 11.98,
+      "bidirectional": true,
+      "label": "east main corridor"
+    },
+    {
+      "id": "e15",
+      "from": "n13",
+      "to": "n14",
+      "cost": 1.2,
+      "bidirectional": true,
+      "label": "to Fameo Cafe"
+    },
+    {
+      "id": "e16",
+      "from": "n13",
+      "to": "n15",
+      "cost": 3.1,
+      "bidirectional": true,
+      "label": "east main corridor"
+    },
+    {
+      "id": "e17",
+      "from": "n15",
+      "to": "n16",
+      "cost": 2.3,
+      "bidirectional": true,
+      "label": "to EA101 Classroom"
+    },
+    {
+      "id": "e18",
+      "from": "n15",
+      "to": "n17",
+      "cost": 4.63,
+      "bidirectional": true,
+      "label": "east main corridor"
+    },
+    {
+      "id": "e19",
+      "from": "n17",
+      "to": "n18",
+      "cost": 2.3,
+      "bidirectional": true,
+      "label": "to CS Lab"
+    },
+    {
+      "id": "e20",
+      "from": "n17",
+      "to": "n19",
+      "cost": 12.37,
+      "bidirectional": true,
+      "label": "east main corridor"
+    },
+    {
+      "id": "e21",
+      "from": "n19",
+      "to": "n20",
+      "cost": 6.3,
+      "bidirectional": true,
+      "label": "north branch to ME Lab"
+    },
+    {
+      "id": "e22",
+      "from": "n19",
+      "to": "n21",
+      "cost": 2.42,
+      "bidirectional": true,
+      "label": "north branch to EA 102 Classroom"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "west-men-wc",
+      "displayName": "Men's WC",
+      "destinationNodeId": "n07",
+      "category": "toilet",
+      "keywords": [
+        "men",
+        "wc",
+        "restroom",
+        "toilet"
+      ],
+      "aliases": [
+        "Men WC West",
+        "Men's WC West"
+      ],
+      "description": "West-side men's restroom near the elevators."
+    },
+    {
+      "id": "west-women-wc",
+      "displayName": "Women's WC",
+      "destinationNodeId": "n06",
+      "category": "toilet",
+      "keywords": [
+        "women",
+        "wc",
+        "restroom",
+        "toilet"
+      ],
+      "aliases": [
+        "Women WC West",
+        "Women's WC West"
+      ],
+      "description": "West-side women's restroom near the elevators."
+    },
+    {
+      "id": "elevators",
+      "displayName": "Elevators",
+      "destinationNodeId": "n05",
+      "category": "vertical_transport",
+      "keywords": [
+        "elevator",
+        "lift"
+      ],
+      "aliases": [
+        "Lift",
+        "Elevator Lobby"
+      ],
+      "description": "Main elevator bank on the main floor."
+    },
+    {
+      "id": "east-men-wc",
+      "displayName": "Men's WC",
+      "destinationNodeId": "n11",
+      "category": "toilet",
+      "keywords": [
+        "men",
+        "wc",
+        "restroom",
+        "toilet"
+      ],
+      "aliases": [
+        "Men WC East",
+        "Men's WC East"
+      ],
+      "description": "East-side men's restroom beside the lower corridor."
+    },
+    {
+      "id": "east-women-wc",
+      "displayName": "Women's WC",
+      "destinationNodeId": "n12",
+      "category": "toilet",
+      "keywords": [
+        "women",
+        "wc",
+        "restroom",
+        "toilet"
+      ],
+      "aliases": [
+        "Women WC East",
+        "Women's WC East"
+      ],
+      "description": "East-side women's restroom beside the lower corridor."
+    },
+    {
+      "id": "fameo-cafe",
+      "displayName": "Fameo Cafe",
+      "destinationNodeId": "n14",
+      "category": "cafe",
+      "keywords": [
+        "cafe",
+        "coffee",
+        "food",
+        "fameo"
+      ],
+      "aliases": [
+        "Cafe",
+        "Fameo"
+      ],
+      "description": "Fameo Cafe on the east corridor."
+    },
+    {
+      "id": "cs-lab",
+      "displayName": "CS Lab",
+      "destinationNodeId": "n18",
+      "category": "lab",
+      "keywords": [
+        "cs",
+        "computer science",
+        "lab"
+      ],
+      "aliases": [
+        "Computer Science Lab"
+      ],
+      "description": "Computer Science laboratory."
+    },
+    {
+      "id": "ea101",
+      "displayName": "EA101 Classroom",
+      "destinationNodeId": "n16",
+      "category": "classroom",
+      "keywords": [
+        "ea101",
+        "classroom",
+        "lecture room"
+      ],
+      "aliases": [
+        "EA 101",
+        "EA101"
+      ],
+      "description": "EA101 classroom."
+    },
+    {
+      "id": "me-lab",
+      "displayName": "ME Lab",
+      "destinationNodeId": "n20",
+      "category": "lab",
+      "keywords": [
+        "me",
+        "lab",
+        "mechanical engineering"
+      ],
+      "aliases": [
+        "ME Laboratory"
+      ],
+      "description": "ME Lab located on the northeast branch."
+    },
+    {
+      "id": "ea102",
+      "displayName": "EA 102 Classroom",
+      "destinationNodeId": "n21",
+      "category": "classroom",
+      "keywords": [
+        "ea102",
+        "classroom",
+        "lecture room"
+      ],
+      "aliases": [
+        "EA102",
+        "EA 102"
+      ],
+      "description": "EA 102 classroom."
+    }
+  ],
+  "routeRendering": {
+    "arrowSpacingMeters": 1.5,
+    "lookaheadDistanceMeters": 8.0,
+    "destinationThresholdMeters": 1.5,
+    "turnMarkerThresholdDegrees": 30.0,
+    "arrowHeightOffsetMeters": 0.05
+  },
+  "graphMetadata": {
+    "authorName": "Vectura AI",
+    "authoredDate": "2026-04-14",
+    "notes": "Main Floor of Rectorate Building. Coordinates use x=right, z=down on the user-provided 2D sketch. Long corridor distances come directly from the measured annotations. Room-entry offsets inside the service core and classroom doorway offsets were inferred from the drawn door positions where no explicit numeric offset was provided. Point 1 and Point 12 are entrances/checkpoints rather than rooms."
+  }
+}

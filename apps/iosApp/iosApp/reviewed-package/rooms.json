@@ -1,25 +1,74 @@
 {
     "rooms": [
         {
-            "id": "mutfak",
-            "displayName": "Mutfak",
-            "destinationNodeId": "mutfak_door",
-            "category": "kitchen",
-            "description": "Kitchen area"
+            "id": "west-men-wc",
+            "displayName": "Men's WC",
+            "destinationNodeId": "n07",
+            "category": "toilet",
+            "description": "West-side men's restroom near the elevators"
         },
         {
-            "id": "salon",
-            "displayName": "Salon",
-            "destinationNodeId": "salon_door",
-            "category": "living_room",
-            "description": "Living room"
+            "id": "west-women-wc",
+            "displayName": "Women's WC",
+            "destinationNodeId": "n06",
+            "category": "toilet",
+            "description": "West-side women's restroom near the elevators"
         },
         {
-            "id": "yatak_odasi",
-            "displayName": "Yatak Odası",
-            "destinationNodeId": "yatak_odasi_door",
-            "category": "bedroom",
-            "description": "Bedroom"
+            "id": "elevators",
+            "displayName": "Elevators",
+            "destinationNodeId": "n05",
+            "category": "vertical_transport",
+            "description": "Main elevator bank on the main floor"
+        },
+        {
+            "id": "east-men-wc",
+            "displayName": "Men's WC",
+            "destinationNodeId": "n11",
+            "category": "toilet",
+            "description": "East-side men's restroom beside the lower corridor"
+        },
+        {
+            "id": "east-women-wc",
+            "displayName": "Women's WC",
+            "destinationNodeId": "n12",
+            "category": "toilet",
+            "description": "East-side women's restroom beside the lower corridor"
+        },
+        {
+            "id": "fameo-cafe",
+            "displayName": "Fameo Cafe",
+            "destinationNodeId": "n14",
+            "category": "cafe",
+            "description": "Fameo Cafe on the east corridor"
+        },
+        {
+            "id": "cs-lab",
+            "displayName": "CS Lab",
+            "destinationNodeId": "n18",
+            "category": "lab",
+            "description": "Computer Science laboratory"
+        },
+        {
+            "id": "ea101",
+            "displayName": "EA101 Classroom",
+            "destinationNodeId": "n16",
+            "category": "classroom",
+            "description": "EA101 classroom"
+        },
+        {
+            "id": "me-lab",
+            "displayName": "ME Lab",
+            "destinationNodeId": "n20",
+            "category": "lab",
+            "description": "ME Lab on the northeast branch"
+        },
+        {
+            "id": "ea102",
+            "displayName": "EA 102 Classroom",
+            "destinationNodeId": "n21",
+            "category": "classroom",
+            "description": "EA 102 classroom"
         }
     ]
 }

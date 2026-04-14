@@ -1,12 +1,12 @@
 {
     "packageVersion": "1.0",
-    "buildingId": "house-demo-01",
-    "buildingName": "Demo House",
-    "floorId": "ground",
+    "buildingId": "19",
+    "buildingName": "Rectorate Building",
+    "floorId": "1",
     "reviewStatus": "reviewed",
     "reviewedBy": "vecturai-team",
-    "reviewedDate": "2026-03-22",
-    "notes": "Minimal reviewed house package for demo. 3 rooms, 1 entrance, single floor.",
+    "reviewedDate": "2026-04-14",
+    "notes": "Main floor navigation package for Rectorate Building. 10 destinations, 1 entrance. Converted from rectorate_main_floor_navigation.json.",
     "files": {
         "rooms": "rooms.json",
         "navGraph": "nav_graph.json",

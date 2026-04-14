@@ -34,16 +34,16 @@ python3 -c "
 import json, sys
 
 # Test 1: Valid payload parses correctly
-valid = '{\"type\":\"vecturai-entrance\",\"buildingId\":\"house-demo-01\",\"entranceId\":\"marker-entrance-a\",\"v\":1}'
+valid = '{\"type\":\"vecturai-entrance\",\"buildingId\":\"19\",\"entranceId\":\"marker-main-entrance\",\"v\":1}'
 p = json.loads(valid)
 assert p['type'] == 'vecturai-entrance', 'type mismatch'
-assert p['buildingId'] == 'house-demo-01', 'buildingId mismatch'
-assert p['entranceId'] == 'marker-entrance-a', 'entranceId mismatch'
+assert p['buildingId'] == '19', 'buildingId mismatch'
+assert p['entranceId'] == 'marker-main-entrance', 'entranceId mismatch'
 assert p['v'] == 1, 'version mismatch'
 print('PASS: Valid payload parses correctly')
 
 # Test 2: Missing type field is detectable
-bad = '{\"buildingId\":\"house-demo-01\",\"entranceId\":\"marker-entrance-a\",\"v\":1}'
+bad = '{\"buildingId\":\"19\",\"entranceId\":\"marker-main-entrance\",\"v\":1}'
 p = json.loads(bad)
 assert 'type' not in p, 'type should be missing'
 print('PASS: Missing type field is detectable')
@@ -57,14 +57,14 @@ except:
 
 # Test 4: Building ID matches manifest
 manifest = json.load(open('$PKG_DIR/manifest.json'))
-assert manifest['buildingId'] == 'house-demo-01', 'manifest buildingId unexpected'
-print('PASS: Manifest buildingId matches QR contract (house-demo-01)')
+assert manifest['buildingId'] == '19', 'manifest buildingId unexpected'
+print('PASS: Manifest buildingId matches QR contract (19 = Rectorate Building)')
 
 # Test 5: Entrance ID exists in entrance_markers
 markers = json.load(open('$PKG_DIR/entrance_markers.json'))
 marker_ids = [m['id'] for m in markers['entranceMarkers']]
-assert 'marker-entrance-a' in marker_ids, 'entrance marker not found'
-print('PASS: Entrance marker-entrance-a exists in package')
+assert 'marker-main-entrance' in marker_ids, 'entrance marker not found'
+print('PASS: Entrance marker-main-entrance exists in package')
 " 2>&1 | while IFS= read -r line; do
     if [[ "$line" == PASS:* ]]; then
         pass "${line#PASS: }"
@@ -100,14 +100,17 @@ for field in ['buildingId', 'buildingName', 'floorId', 'reviewStatus', 'packageV
     else:
         print(f'FAIL: manifest.{field} missing')
 
-# Rooms file has expected destinations
+# Rooms file: all rooms reference valid nodes in the nav graph
 rooms = json.load(open(os.path.join(pkg_dir, 'rooms.json')))
-room_names = [r['displayName'] for r in rooms['rooms']]
-for name in ['Mutfak', 'Salon', 'Yatak Odası']:
-    if name in room_names:
-        print(f'PASS: Room \"{name}\" present')
+graph = json.load(open(os.path.join(pkg_dir, 'nav_graph.json')))
+node_ids = {n['id'] for n in graph['nodes']}
+for room in rooms['rooms']:
+    dest = room['destinationNodeId']
+    name = room['displayName']
+    if dest in node_ids:
+        print(f'PASS: Room \"{name}\" ({room[\"id\"]}) references valid node {dest}')
     else:
-        print(f'FAIL: Room \"{name}\" missing')
+        print(f'FAIL: Room \"{name}\" ({room[\"id\"]}) references missing node {dest}')
 " 2>&1 | while IFS= read -r line; do
     if [[ "$line" == PASS:* ]]; then
         pass "${line#PASS: }"

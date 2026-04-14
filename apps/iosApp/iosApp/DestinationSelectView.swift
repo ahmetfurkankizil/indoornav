@@ -18,7 +18,17 @@ struct DestinationSelectView: View {
 
     private var groupedRooms: [(String, [BuildingPackageLoader.PackageRoom])] {
         let grouped = Dictionary(grouping: filteredRooms) { $0.category ?? "other" }
-        let order = ["kitchen", "living_room", "bedroom", "bathroom", "office", "other"]
+        // Preferred display order; any category not listed appears at the end.
+        let preferred = ["classroom", "lab", "cafe", "vertical_transport", "toilet",
+                         "kitchen", "living_room", "bedroom", "bathroom", "office", "other"]
+        var seen = Set<String>()
+        var order: [String] = []
+        for cat in preferred where grouped[cat] != nil {
+            order.append(cat); seen.insert(cat)
+        }
+        for cat in grouped.keys.sorted() where !seen.contains(cat) {
+            order.append(cat)
+        }
         return order.compactMap { cat in
             guard let r = grouped[cat], !r.isEmpty else { return nil }
             return (cat, r)
@@ -201,34 +211,49 @@ struct DestinationSelectView: View {
 
     private func iconForCategory(_ category: String?) -> String {
         switch category {
-        case "kitchen": return "fork.knife"
+        case "classroom":          return "graduationcap"
+        case "lab":                return "flask"
+        case "cafe":               return "cup.and.saucer"
+        case "vertical_transport": return "arrow.up.arrow.down"
+        case "toilet":             return "toilet"
+        case "kitchen":            return "fork.knife"
         case "living_room", "salon": return "sofa"
-        case "bedroom": return "bed.double"
-        case "bathroom": return "shower"
-        case "office": return "desktopcomputer"
-        default: return "door.left.hand.open"
+        case "bedroom":            return "bed.double"
+        case "bathroom":           return "shower"
+        case "office":             return "desktopcomputer"
+        default:                   return "door.left.hand.open"
         }
     }
 
     private func categoryColor(_ category: String?) -> Color {
         switch category {
-        case "kitchen": return .orange
+        case "classroom":          return .blue
+        case "lab":                return .purple
+        case "cafe":               return .orange
+        case "vertical_transport": return .teal
+        case "toilet":             return Color(.systemGray2)
+        case "kitchen":            return .orange
         case "living_room", "salon": return .blue
-        case "bedroom": return .indigo
-        case "bathroom": return .teal
-        case "office": return .green
-        default: return Color(.systemGray)
+        case "bedroom":            return .indigo
+        case "bathroom":           return .teal
+        case "office":             return .green
+        default:                   return Color(.systemGray)
         }
     }
 
     private func displayNameForCategory(_ category: String) -> String {
         switch category {
-        case "kitchen": return "Kitchen"
+        case "classroom":          return "Classrooms"
+        case "lab":                return "Laboratories"
+        case "cafe":               return "Cafe"
+        case "vertical_transport": return "Elevators"
+        case "toilet":             return "Restrooms"
+        case "kitchen":            return "Kitchen"
         case "living_room", "salon": return "Living Room"
-        case "bedroom": return "Bedroom"
-        case "bathroom": return "Bathroom"
-        case "office": return "Office"
-        default: return "Other"
+        case "bedroom":            return "Bedroom"
+        case "bathroom":           return "Bathroom"
+        case "office":             return "Office"
+        default:                   return "Other"
         }
     }
 }

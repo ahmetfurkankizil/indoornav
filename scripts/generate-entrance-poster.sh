@@ -23,8 +23,8 @@ cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 
 # --- Configuration (single source of truth) ---
-BUILDING_ID="house-demo-01"
-ENTRANCE_ID="marker-entrance-a"
+BUILDING_ID="19"
+ENTRANCE_ID="marker-main-entrance"
 QR_VERSION=1
 PHYSICAL_WIDTH_CM=21
 PHYSICAL_WIDTH_M="0.21"
@@ -170,6 +170,13 @@ else
     mkdir -p "${ASSET_CATALOG_DIR}"
     cp "${POSTER_FILE}" "${ASSET_IMAGE}"
     echo "  Copied to: ${ASSET_IMAGE}"
+
+    # Also copy to entrance_marker_display.imageset so the ARSessionManager
+    # rebuild path uses the same image (physicalSize is 0 when loaded from catalog).
+    DISPLAY_IMAGESET="${REPO_ROOT}/apps/iosApp/iosApp/Assets.xcassets/entrance_marker_display.imageset"
+    mkdir -p "${DISPLAY_IMAGESET}"
+    cp "${POSTER_FILE}" "${DISPLAY_IMAGESET}/entrance_marker.png"
+    echo "  Copied to: ${DISPLAY_IMAGESET}/entrance_marker.png (display imageset sync)"
 
     # Write/update Contents.json for the reference image
     cat > "${ASSET_CATALOG_DIR}/Contents.json" <<JSONEOF

@@ -1,20 +1,20 @@
 {
     "entranceMarkers": [
         {
-            "id": "marker-entrance-a",
-            "displayName": "Entrance A",
-            "startNodeId": "entrance_a",
+            "id": "marker-main-entrance",
+            "displayName": "Main Entrance",
+            "startNodeId": "n01",
             "physicalWidthMeters": 0.21,
             "physicalHeightMeters": 0.21,
             "position": {
                 "x": 0.0,
-                "y": 1.2,
+                "y": 1.6,
                 "z": 0.0
             },
-            "forwardBasis": "-z",
+            "forwardBasis": "+x",
             "rotationYDegrees": 0.0,
             "referenceImageName": "entrance_marker_main",
-            "notes": "Primary entrance marker, placed at eye level on entrance wall"
+            "notes": "Primary entrance marker at the main entrance. Reuses the known-good entrance_marker_main AR reference image. Marker height set to eye level (1.6m) per building measurement."
         }
     ]
 }

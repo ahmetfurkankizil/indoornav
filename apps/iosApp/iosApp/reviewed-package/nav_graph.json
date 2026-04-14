@@ -1,104 +1,50 @@
 {
     "nodes": [
-        {
-            "id": "entrance_a",
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "type": "entrance",
-            "label": "Entrance A"
-        },
-        {
-            "id": "corridor_1",
-            "x": 2.5,
-            "y": 0.0,
-            "z": 0.0,
-            "type": "junction",
-            "label": "Hallway 1"
-        },
-        {
-            "id": "corridor_2",
-            "x": 5.0,
-            "y": 0.0,
-            "z": 0.0,
-            "type": "junction",
-            "label": "Hallway 2"
-        },
-        {
-            "id": "corridor_3",
-            "x": 7.5,
-            "y": 0.0,
-            "z": 0.0,
-            "type": "junction",
-            "label": "Hallway 3"
-        },
-        {
-            "id": "mutfak_door",
-            "x": 2.5,
-            "y": 0.0,
-            "z": -3.0,
-            "type": "room_entry",
-            "label": "Mutfak Door"
-        },
-        {
-            "id": "salon_door",
-            "x": 5.0,
-            "y": 0.0,
-            "z": 3.5,
-            "type": "room_entry",
-            "label": "Salon Door"
-        },
-        {
-            "id": "yatak_odasi_door",
-            "x": 7.5,
-            "y": 0.0,
-            "z": -3.0,
-            "type": "room_entry",
-            "label": "Yatak Odası Door"
-        }
+        { "id": "n01", "x": 0.0,   "y": 0.0, "z": 0.0,   "type": "entrance",   "label": "Entrance Point" },
+        { "id": "n02", "x": 11.2,  "y": 0.0, "z": 0.0,   "type": "junction",   "label": "West Service-Core Junction" },
+        { "id": "n03", "x": 19.42, "y": 0.0, "z": 0.0,   "type": "junction",   "label": "East Service-Core Junction" },
+        { "id": "n04", "x": 11.2,  "y": 0.0, "z": 3.2,   "type": "junction",   "label": "Service Lobby" },
+        { "id": "n05", "x": 15.31, "y": 0.0, "z": 1.2,   "type": "room_entry", "label": "Elevators" },
+        { "id": "n06", "x": 14.1,  "y": 0.0, "z": 3.8,   "type": "room_entry", "label": "Women's WC (West)" },
+        { "id": "n07", "x": 14.8,  "y": 0.0, "z": 5.2,   "type": "room_entry", "label": "Men's WC (West)" },
+        { "id": "n08", "x": 11.2,  "y": 0.0, "z": 5.85,  "type": "junction",   "label": "South Hall Junction" },
+        { "id": "n09", "x": 11.2,  "y": 0.0, "z": 12.66, "type": "entrance",   "label": "EB Building Entrance" },
+        { "id": "n10", "x": 19.42, "y": 0.0, "z": 5.49,  "type": "junction",   "label": "East Lower Corridor Junction" },
+        { "id": "n11", "x": 22.31, "y": 0.0, "z": 5.49,  "type": "room_entry", "label": "Men's WC (East)" },
+        { "id": "n12", "x": 23.52, "y": 0.0, "z": 5.49,  "type": "room_entry", "label": "Women's WC (East)" },
+        { "id": "n13", "x": 31.4,  "y": 0.0, "z": 0.0,   "type": "junction",   "label": "Cafe Corridor Projection" },
+        { "id": "n14", "x": 31.4,  "y": 0.0, "z": 1.2,   "type": "room_entry", "label": "Fameo Cafe" },
+        { "id": "n15", "x": 34.5,  "y": 0.0, "z": 0.0,   "type": "junction",   "label": "EA101 Corridor Projection" },
+        { "id": "n16", "x": 34.5,  "y": 0.0, "z": -2.3,  "type": "room_entry", "label": "EA101 Classroom" },
+        { "id": "n17", "x": 39.13, "y": 0.0, "z": 0.0,   "type": "junction",   "label": "CS Lab Corridor Projection" },
+        { "id": "n18", "x": 39.13, "y": 0.0, "z": 2.3,   "type": "room_entry", "label": "CS Lab" },
+        { "id": "n19", "x": 51.5,  "y": 0.0, "z": 0.0,   "type": "junction",   "label": "East Classroom Fork" },
+        { "id": "n20", "x": 51.5,  "y": 0.0, "z": -6.3,  "type": "room_entry", "label": "ME Lab" },
+        { "id": "n21", "x": 51.5,  "y": 0.0, "z": -2.42, "type": "room_entry", "label": "EA 102 Classroom" },
+        { "id": "n22", "x": 11.2,  "y": 0.0, "z": -6.56, "type": "stairs",     "label": "North Stairs Landing" }
     ],
     "edges": [
-        {
-            "id": "e01",
-            "from": "entrance_a",
-            "to": "corridor_1",
-            "cost": 2.5,
-            "bidirectional": true
-        },
-        {
-            "id": "e02",
-            "from": "corridor_1",
-            "to": "corridor_2",
-            "cost": 2.5,
-            "bidirectional": true
-        },
-        {
-            "id": "e03",
-            "from": "corridor_2",
-            "to": "corridor_3",
-            "cost": 2.5,
-            "bidirectional": true
-        },
-        {
-            "id": "e04",
-            "from": "corridor_1",
-            "to": "mutfak_door",
-            "cost": 3.0,
-            "bidirectional": true
-        },
-        {
-            "id": "e05",
-            "from": "corridor_2",
-            "to": "salon_door",
-            "cost": 3.5,
-            "bidirectional": true
-        },
-        {
-            "id": "e06",
-            "from": "corridor_3",
-            "to": "yatak_odasi_door",
-            "cost": 3.0,
-            "bidirectional": true
-        }
+        { "id": "e01", "from": "n01", "to": "n02", "cost": 11.2,  "bidirectional": true },
+        { "id": "e02", "from": "n02", "to": "n03", "cost": 8.22,  "bidirectional": true },
+        { "id": "e03", "from": "n02", "to": "n04", "cost": 3.2,   "bidirectional": true },
+        { "id": "e04", "from": "n04", "to": "n08", "cost": 2.65,  "bidirectional": true },
+        { "id": "e05", "from": "n08", "to": "n09", "cost": 6.81,  "bidirectional": true },
+        { "id": "e06", "from": "n02", "to": "n22", "cost": 6.56,  "bidirectional": true },
+        { "id": "e07", "from": "n04", "to": "n05", "cost": 4.57,  "bidirectional": true },
+        { "id": "e08", "from": "n04", "to": "n06", "cost": 2.96,  "bidirectional": true },
+        { "id": "e09", "from": "n08", "to": "n07", "cost": 3.66,  "bidirectional": true },
+        { "id": "e10", "from": "n03", "to": "n10", "cost": 5.49,  "bidirectional": true },
+        { "id": "e11", "from": "n08", "to": "n10", "cost": 8.23,  "bidirectional": true },
+        { "id": "e12", "from": "n10", "to": "n11", "cost": 2.89,  "bidirectional": true },
+        { "id": "e13", "from": "n10", "to": "n12", "cost": 4.1,   "bidirectional": true },
+        { "id": "e14", "from": "n03", "to": "n13", "cost": 11.98, "bidirectional": true },
+        { "id": "e15", "from": "n13", "to": "n14", "cost": 1.2,   "bidirectional": true },
+        { "id": "e16", "from": "n13", "to": "n15", "cost": 3.1,   "bidirectional": true },
+        { "id": "e17", "from": "n15", "to": "n16", "cost": 2.3,   "bidirectional": true },
+        { "id": "e18", "from": "n15", "to": "n17", "cost": 4.63,  "bidirectional": true },
+        { "id": "e19", "from": "n17", "to": "n18", "cost": 2.3,   "bidirectional": true },
+        { "id": "e20", "from": "n17", "to": "n19", "cost": 12.37, "bidirectional": true },
+        { "id": "e21", "from": "n19", "to": "n20", "cost": 6.3,   "bidirectional": true },
+        { "id": "e22", "from": "n19", "to": "n21", "cost": 2.42,  "bidirectional": true }
     ]
 }
