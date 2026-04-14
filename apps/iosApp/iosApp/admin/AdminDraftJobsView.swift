@@ -163,6 +163,11 @@ class AdminDraftJobsViewModel: ObservableObject {
     @Published var showFilePicker = false
 
     private let client = AdminAPIClient()
+    private var pollTask: Task<Void, Never>?
+
+    deinit {
+        pollTask?.cancel()
+    }
 
     func loadJobs() {
         isLoadingJobs = true
@@ -170,10 +175,28 @@ class AdminDraftJobsViewModel: ObservableObject {
             do {
                 let fetched = try await client.listJobs()
                 self.jobs = fetched
+                self.schedulePollingIfNeeded(fetched)
             } catch {
                 print("[AdminDraftJobs] Failed to load jobs: \(error)")
             }
             self.isLoadingJobs = false
+        }
+    }
+
+    /// Polls every 3 seconds while any job is still queued or processing,
+    /// so the list reflects status updates without requiring manual refresh.
+    private func schedulePollingIfNeeded(_ jobs: [DraftJobResponse]) {
+        let hasActive = jobs.contains { $0.status == "queued" || $0.status == "processing" }
+        if hasActive {
+            pollTask?.cancel()
+            pollTask = Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                guard !Task.isCancelled else { return }
+                loadJobs()
+            }
+        } else {
+            pollTask?.cancel()
+            pollTask = nil
         }
     }
 

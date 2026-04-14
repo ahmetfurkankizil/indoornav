@@ -111,15 +111,25 @@ JOBS=$(curl -sf "$API_URL/admin/draft-jobs")
 check_output "GET /admin/draft-jobs returns array" "\[" "$JOBS"
 
 echo ""
-echo "── API: Upload GLB ──"
-UPLOAD_RESPONSE=$(curl -sf -X POST \
+echo "── API: Upload GLB (async — must return before pipeline completes) ──"
+# --max-time 10 proves the upload response is not blocked by the pipeline.
+# A synchronous pipeline on a real scan takes 30–120 s; if it timed out here
+# the backend regressed to synchronous processing.
+UPLOAD_RESPONSE=$(curl -sf --max-time 10 -X POST \
     -F "file=@$SAMPLE_GLB" \
-    "$API_URL/admin/draft-jobs")
+    "$API_URL/admin/draft-jobs" || echo "UPLOAD_TIMEOUT")
+
+if [ "$UPLOAD_RESPONSE" = "UPLOAD_TIMEOUT" ]; then
+    echo "  ✗ Upload response timed out after 10s — pipeline may be blocking the HTTP response"
+    ((failed++))
+    exit 1
+fi
+
 echo "  Response: $UPLOAD_RESPONSE"
 JOB_ID=$(echo "$UPLOAD_RESPONSE" | jq -r '.id')
 JOB_STATUS=$(echo "$UPLOAD_RESPONSE" | jq -r '.status')
 check_output "Upload returns job id" "." "$JOB_ID"
-check_output "Upload returns queued status" "queued" "$JOB_STATUS"
+check_output "Upload returns queued status immediately (async)" "queued" "$JOB_STATUS"
 
 echo ""
 echo "── API: Poll job status ──"

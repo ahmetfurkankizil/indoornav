@@ -85,7 +85,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 print("[ARSession]   physicalSize is zero for '\(markerImageName)' — rebuilding from UIImage")
                 // ARReferenceImage does NOT have a .cgImage property, so we
                 // load the same image from a regular Image Set in Assets.xcassets.
-                if let uiImage = UIImage(named: markerImageName) ?? UIImage(named: "entrance_marker_main"),
+                if let uiImage = UIImage(named: "entrance_marker_display"),
                    let cg = uiImage.cgImage {
                     let corrected = ARReferenceImage(cg, orientation: .up,
                                                      physicalWidth: CGFloat(markerPhysicalWidth))

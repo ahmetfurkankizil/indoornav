@@ -43,8 +43,10 @@ Full architecture with Mermaid diagram: [Architecture Summary](docs/handoff/arch
 |---------|------|------|
 | Search + preview | ✓ | ✓ |
 | AR route arrows | ✓ | ✓ |
+| Next-action guidance | ✓ | ✓ |
 | Progress tracking | Buttons | Camera |
 | Remaining distance | ✓ | ✓ |
+| Haptic feedback | ✓ | ✓ |
 | Arrival detection | ≥95% | Position + progress |
 | Rescan/recenter | — | ✓ |
 | Checkpoint correction | — | ✓ (optional) |

@@ -361,8 +361,10 @@ struct BuildingPackageLoader {
                     let prevDz = current.z - prevNode.z
                     let cross = prevDx * dirZ - prevDz * dirX
                     if abs(cross) > 0.3 {
-                        type = cross > 0 ? .turnLeft : .turnRight
-                        label = cross > 0 ? "Turn left" : "Turn right"
+                        // cross > 0 → clockwise in XZ plane (viewed from +Y) → RIGHT turn
+                        // cross < 0 → counterclockwise → LEFT turn
+                        type = cross > 0 ? .turnRight : .turnLeft
+                        label = cross > 0 ? "Turn right" : "Turn left"
                     } else {
                         type = .follow
                         label = nil

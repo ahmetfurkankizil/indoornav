@@ -22,6 +22,12 @@
     </array>
     <key>NSCameraUsageDescription</key>
     <string>VecturAI needs camera access for AR indoor navigation.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>VecturAI connects to the admin API on your local network for draft management.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_http._tcp</string>
+    </array>
     <key>NSAppTransportSecurity</key>
     <dict>
         <!-- Allow plain HTTP to the dev-only admin API on localhost (simulator). -->

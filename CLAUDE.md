@@ -4,6 +4,117 @@
 
 VecturAI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
 
+## Phase 11 — Client-Facing Polish (2026-04-13)
+
+### What Changed
+
+Phase 11 polishes the visitor-facing screens for client demos. No mechanics, data models, or AR rendering are changed.
+
+1. **AR overlay redesign**: Active navigation now shows a "next action" guidance card ("Turn left ahead", "Continue straight", "You're almost there") derived from the existing `ArrowPlacementData` turn markers. Progress strip shows remaining distance and walking ETA. Tracking confidence badge replaces raw ARKit quality strings with user-friendly labels ("Tracking", "Hold steady", "Re-centering...").
+2. **Haptic feedback**: `HapticManager` singleton fires four haptic events: route start (medium impact), imminent turn (warning notification within 2m), re-centering (light impact on tracking degradation), arrival (success notification). Gated by `isEnabled` flag.
+3. **Home screen polish**: Stronger visual hierarchy with gradient CTA button, value subtitle ("Find your way indoors"), admin tools moved to top-right gear icon to separate it from the visitor flow.
+4. **Destination selection**: Rooms grouped by category with section headers. Richer room cards showing descriptions and category badge pills. Flat list when searching.
+5. **Route preview**: Walking time estimate (distance / 1.2 m/s), "Walking" route type badge, polished summary card, gradient CTA.
+6. **Microcopy pass**: All user-facing strings updated from technical wording to calmer product language. Examples: "Detecting entrance poster..." → "Scanning...", "Follow the arrows" → "Follow the path", "Navigation Data Unavailable" → "Unable to load navigation data".
+7. **VecturTheme**: Lightweight style namespace with shared gradient, card background, and `vecturPrimaryButton()` modifier for consistent button styling.
+8. **ADR-033**: Documents the polish decisions and constraints.
+
+### New Files
+
+- `apps/iosApp/iosApp/VecturTheme.swift` — centralized style constants
+- `apps/iosApp/iosApp/HapticManager.swift` — haptic feedback singleton
+- `docs/adr/ADR-033-client-facing-polish.md`
+
+### Modified Files
+
+- `apps/iosApp/iosApp/ar/ARNavigationView.swift` — overlay redesign, next-action logic, haptic calls, microcopy
+- `apps/iosApp/iosApp/ContentView.swift` — home screen layout, microcopy
+- `apps/iosApp/iosApp/DestinationSelectView.swift` — category grouping, richer cards, microcopy
+- `apps/iosApp/iosApp/RoutePreviewView.swift` — walking time, compact card, microcopy
+
+### Verification
+
+Manual checklist:
+1. Home screen: gradient CTA, gear icon for admin, value subtitle
+2. Destination list: category sections, descriptions, badges
+3. Route preview: walking time, route type, polished card
+4. AR overlay: next-action card shows "Continue straight" / "Turn left ahead"
+5. AR overlay: tracking badge shows "Tracking" / "Hold steady" / "Re-centering..."
+6. AR overlay: progress strip with remaining distance and ETA
+7. Arrival: "You've reached {dest}" with spring animation
+8. Haptics: fire on alignment lock, near turn, re-centering, arrival
+9. Visitor flow still works end-to-end
+10. Admin tools still accessible via gear icon
+
+### Known Limitations After Phase 11
+
+- Microcopy is English-only; no localization framework
+- No voice guidance / TTS
+- No sound effects
+- No custom 3D arrow models
+- Haptics are iOS-only (no Android)
+
+### Intentionally Deferred (Post Phase 11)
+
+- Localization / i18n framework
+- Full design system with dark mode
+- Voice guidance / TTS
+- Sound effects system
+- Custom AR arrow models
+- Android parity
+
+## Phase 10 — Async Upload + Timeout Resilience (2026-04-13)
+
+### What Changed
+
+Phase 10 makes the admin draft upload resilient against GLB files that take a long time to process. The fix decouples the HTTP upload response from the preprocessing pipeline so the iOS client never experiences a timeout waiting for a slow pipeline to finish.
+
+1. **Upload is already asynchronous**: `POST /admin/draft-jobs` creates the job directory, writes `input.glb`, and returns `{ status: "queued" }` within milliseconds. Draft preprocessing runs in an in-process background coroutine (`CoroutineScope(Dispatchers.IO).launch`) and is never part of the HTTP request lifecycle.
+
+2. **Job lifecycle** (`queued → processing → succeeded/failed`): Status transitions are persisted to `job.json` as they occur. If the pipeline errors or throws, status becomes `failed` with a readable `errorMessage`; the job is never left stuck in `queued` or `processing`.
+
+3. **iOS client polls, never blocks**: After upload the app receives `queued` and navigates to the job detail view, which polls `GET /admin/draft-jobs/{id}` every 2 seconds until the job reaches a terminal state. The jobs list view (`AdminDraftJobsView`) also auto-polls every 3 seconds while any job is active, so status updates are visible without manual refresh.
+
+4. **Backend tests** (`AsyncJobLifecycleTest`): 5 new tests verify:
+   - `POST /admin/draft-jobs` returns `queued` within 5 s (never `succeeded`/`failed`)
+   - `createJob` persists `queued` before any pipeline work
+   - `runDraftGeneration` transitions to `failed` with a persisted error message for an invalid GLB
+   - `runDraftGeneration` throws (rather than silently succeeding) for a nonexistent job
+
+5. **Verification script updated**: `scripts/verify-admin-draft-api.sh` now uses `curl --max-time 10` for the upload step and reports a failure if the server does not respond within 10 s, proving the pipeline does not block the response.
+
+### Async Upload Contract
+
+```
+iOS Client                    Admin API (Ktor)               Background (Dispatchers.IO)
+    │                               │                                  │
+    │  POST /admin/draft-jobs       │                                  │
+    │  (multipart .glb)             │                                  │
+    │ ───────────────────────────►  │                                  │
+    │                               │  createJob() → job.json (queued) │
+    │  ◄─── 201 { status: queued }  │                                  │
+    │                               │  launch { runDraftGeneration() } ──►
+    │  (polls GET every 2–3 s)      │                                  │
+    │                               │                      queued → processing
+    │                               │                      pipeline.execute()
+    │                               │                      processing → succeeded/failed
+    │  GET /admin/draft-jobs/{id}   │                                  │
+    │ ───────────────────────────►  │  read job.json                   │
+    │  ◄─── { status: succeeded }   │                                  │
+```
+
+### Known Limitations After Phase 10
+
+- Same as Phase 9 — no database, no queue, no auth, single in-process worker
+
+### Intentionally Deferred (Post Phase 10)
+
+- Concurrent pipeline execution (currently one-at-a-time by JVM thread pool)
+- Package activation / runtime switching
+- Android admin UI
+- Authentication
+- Cloud deployment
+
 ## Phase 9 — Admin Room Editing + Reviewed Package Export (2026-03-30)
 
 ### What Changed

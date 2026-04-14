@@ -19,6 +19,8 @@
 		P2A2B2C2D2E2F2A2B2C2D2E2 /* QRScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P2A2B2C2D2E2F2A2B2C2D2E3 /* QRScanView.swift */; };
 		P3A3B3C3D3E3F3A3B3C3D3E3 /* DestinationSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */; };
 		P4A4B4C4D4E4F4A4B4C4D4E4 /* RoutePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */; };
+		VT01VT01VT01VT01VT01VT01 /* VecturTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */; };
+		HM01HM01HM01HM01HM01HM01 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */; };
 		Q1A1B1C1D1E1F1A1B1C1D1E1 /* QRPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */; };
 		AD01AD01AD01AD01AD01AD01 /* AdminAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD02AD02AD02AD02AD02AD02 /* AdminAPIClient.swift */; };
 		AD03AD03AD03AD03AD03AD03 /* AdminDraftJobsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD04AD04AD04AD04AD04AD04 /* AdminDraftJobsView.swift */; };
@@ -48,6 +50,8 @@
 		P2A2B2C2D2E2F2A2B2C2D2E3 /* QRScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRScanView.swift; path = iosApp/QRScanView.swift; sourceTree = "<group>"; };
 		P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DestinationSelectView.swift; path = iosApp/DestinationSelectView.swift; sourceTree = "<group>"; };
 		P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RoutePreviewView.swift; path = iosApp/RoutePreviewView.swift; sourceTree = "<group>"; };
+		VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VecturTheme.swift; path = iosApp/VecturTheme.swift; sourceTree = "<group>"; };
+		HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HapticManager.swift; path = iosApp/HapticManager.swift; sourceTree = "<group>"; };
 		Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRPayload.swift; path = iosApp/QRPayload.swift; sourceTree = "<group>"; };
 		R1A1B1C1D1E1F1A1B1C1D1E2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "iosApp/reviewed-package/manifest.json"; sourceTree = "<group>"; };
 		R2A2B2C2D2E2F2A2B2C2D2E3 /* rooms.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = rooms.json; path = "iosApp/reviewed-package/rooms.json"; sourceTree = "<group>"; };
@@ -111,6 +115,8 @@
 				Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */,
 				P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */,
 				P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */,
+				VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */,
+				HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */,
 				AA000004AA000004AA000004 /* ar */,
 				AD07AD07AD07AD07AD07AD07 /* admin */,
 				S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */,
@@ -231,6 +237,8 @@
 				Q1A1B1C1D1E1F1A1B1C1D1E1 /* QRPayload.swift in Sources */,
 				P3A3B3C3D3E3F3A3B3C3D3E3 /* DestinationSelectView.swift in Sources */,
 				P4A4B4C4D4E4F4A4B4C4D4E4 /* RoutePreviewView.swift in Sources */,
+				VT01VT01VT01VT01VT01VT01 /* VecturTheme.swift in Sources */,
+				HM01HM01HM01HM01HM01HM01 /* HapticManager.swift in Sources */,
 				AD01AD01AD01AD01AD01AD01 /* AdminAPIClient.swift in Sources */,
 				AD03AD03AD03AD03AD03AD03 /* AdminDraftJobsView.swift in Sources */,
 				AD05AD05AD05AD05AD05AD05 /* AdminJobDetailView.swift in Sources */,

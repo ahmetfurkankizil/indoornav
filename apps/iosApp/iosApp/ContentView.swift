@@ -11,6 +11,9 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
+            // Anchors ZStack to full screen including safe areas.
+            Color(.systemBackground).ignoresSafeArea()
+
             switch flow.state {
             case .home:
                 HomeView(flow: flow)
@@ -19,13 +22,7 @@ struct ContentView: View {
                 QRScanView(flow: flow)
 
             case .entranceConfirmed:
-                // Bottom sheet is presented over destination select;
-                // we transition to destinationSelect immediately after
-                // the sheet is dismissed.
                 DestinationSelectView(flow: flow)
-                    .onAppear {
-                        // entranceConfirmed shows a brief sheet then moves on
-                    }
 
             case .destinationSelect:
                 DestinationSelectView(flow: flow)
@@ -59,10 +56,9 @@ struct ContentView: View {
                 )
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: flowStateKey)
+        .animation(.easeInOut(duration: 0.2), value: flowStateKey)
     }
 
-    /// Stable key for animation grouping.
     private var flowStateKey: String {
         switch flow.state {
         case .home: return "home"
@@ -83,32 +79,32 @@ private struct PackageErrorView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             Spacer()
 
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 64))
+                .font(.system(size: 56))
                 .foregroundStyle(.orange)
+                .symbolRenderingMode(.hierarchical)
 
-            Text("Navigation Data Unavailable")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            VStack(spacing: 8) {
+                Text("Unable to Load Navigation Data")
+                    .font(.title3).fontWeight(.semibold)
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
 
             Button(action: onRetry) {
-                Label("Retry", systemImage: "arrow.clockwise")
+                Label("Try Again", systemImage: "arrow.clockwise")
                     .font(.headline)
-                    .padding()
                     .frame(maxWidth: .infinity)
-                    .background(.blue)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.vertical, 4)
             }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
             .padding(.horizontal, 32)
 
             Spacer()
@@ -116,62 +112,69 @@ private struct PackageErrorView: View {
     }
 }
 
-// MARK: - Home View (Dashboard)
+// MARK: - Home View
 
 private struct HomeView: View {
     @ObservedObject var flow: NavigationFlowModel
     @State private var showAdminTools = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            Image(systemName: "location.fill.viewfinder")
-                .font(.system(size: 72))
-                .foregroundStyle(.blue)
-
-            Text("VecturAI")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
-            Text("Indoor Navigation")
-                .font(.title2)
-                .foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            // Admin gear — top trailing, secondary visual weight
+            HStack {
+                Spacer()
+                Button(action: { showAdminTools = true }) {
+                    Image(systemName: "gearshape")
+                        .font(.body)
+                        .foregroundStyle(Color(.tertiaryLabel))
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+            }
 
             Spacer()
 
-            VStack(spacing: 8) {
-                Text("Navigate indoors with AR-guided directions")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            // App identity
+            VStack(spacing: 16) {
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 72))
+                    .foregroundStyle(.blue)
+                    .symbolRenderingMode(.hierarchical)
+
+                VStack(spacing: 4) {
+                    Text("VecturAI")
+                        .font(.largeTitle).fontWeight(.bold)
+                    Text("Indoor AR Navigation")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+            Spacer()
+
+            // Primary action
+            VStack(spacing: 12) {
+                Button(action: { flow.startQRScan() }) {
+                    Label("Scan Entrance Code", systemImage: "qrcode.viewfinder")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(.horizontal, 24)
+
+                Text("Scan the QR code at the building entrance to begin")
+                    .font(.footnote)
+                    .foregroundStyle(Color(.tertiaryLabel))
                     .multilineTextAlignment(.center)
-
-                Text("Scan a QR code at the building entrance to begin")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 32)
             }
-            .padding(.horizontal, 32)
 
             Spacer()
-
-            Button(action: { flow.startQRScan() }) {
-                Label("Scan QR Code", systemImage: "qrcode.viewfinder")
-                    .font(.headline)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.blue)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .padding(.horizontal, 32)
-
-            Button(action: { showAdminTools = true }) {
-                Label("Admin Tools", systemImage: "wrench.and.screwdriver")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.bottom, 40)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .sheet(isPresented: $showAdminTools) {
             AdminDraftJobsView()
         }
@@ -188,55 +191,50 @@ private struct EntranceConfirmedSheet: View {
         VStack {
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 0) {
+                // Drag handle
                 Capsule()
                     .fill(Color(.systemGray4))
                     .frame(width: 36, height: 5)
-                    .padding(.top, 8)
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
 
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 40))
+                    .font(.system(size: 44))
                     .foregroundStyle(.green)
+                    .symbolRenderingMode(.hierarchical)
+                    .padding(.bottom, 12)
+
+                Text("Entrance Confirmed")
+                    .font(.title3).fontWeight(.semibold)
+                    .padding(.bottom, 4)
 
                 Text("Starting from \(entranceName)")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-
-                Text("Choose your destination to begin navigation")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .padding(.bottom, 24)
 
                 Button(action: onContinue) {
-                    Text("Continue")
+                    Text("Choose Destination")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(.blue)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.vertical, 4)
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
                 .padding(.horizontal, 24)
-                .padding(.bottom, 20)
+                .padding(.bottom, 12)
             }
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.15), radius: 20, y: -5)
-            )
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.1), radius: 16, y: -4)
         }
         .transition(.move(edge: .bottom))
         .ignoresSafeArea(edges: .bottom)
     }
 }
 
-// MARK: - Preview
-// NOTE: This preview instantiates NavigationFlowModel which loads the reviewed
-// package from the bundle. It only shows the Home screen (no AR, no camera).
-// Do NOT add previews for ARNavigationView or QRScanView — they require
-// hardware (ARKit/camera) that will fail or consume excessive resources in
-// the preview canvas. If you need to preview AR-related views, use the
-// simulator with a "Simulate" button instead.
 #Preview {
     ContentView()
 }

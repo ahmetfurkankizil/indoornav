@@ -62,32 +62,31 @@ struct ARNavigationView: View {
 
     private var topBar: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
+            // State indicator (minimal — only when not navigating)
+            if !viewModel.isAligned {
                 HStack(spacing: 6) {
                     Circle()
                         .fill(viewModel.stateColor)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 7, height: 7)
                     Text(viewModel.sessionStateLabel)
                         .font(.caption)
-                        .fontWeight(.semibold)
+                        .fontWeight(.medium)
                         .foregroundStyle(.white)
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(.ultraThinMaterial)
+                .clipShape(Capsule())
+            }
 
-                if viewModel.isSimulated {
-                    Text("DEMO MODE")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.orange)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.orange.opacity(0.2))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
-
-                if viewModel.isAligned && viewModel.trackingQuality != "Normal" {
-                    Text("\(viewModel.trackingQuality)")
-                        .font(.caption2)
-                        .foregroundStyle(.yellow)
-                }
+            if viewModel.isSimulated {
+                Text("DEMO")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.orange.opacity(0.2))
+                    .clipShape(Capsule())
             }
 
             Spacer()
@@ -98,238 +97,264 @@ struct ARNavigationView: View {
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.white)
+                    .symbolRenderingMode(.hierarchical)
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 12)
+        .padding(.top, 8)
     }
 
     // MARK: - Pre-Alignment Overlay
 
     private var alignmentOverlay: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 0) {
             Spacer()
 
-            // Scanning animation
-            Image(systemName: "viewfinder")
-                .font(.system(size: 56))
-                .foregroundStyle(.white.opacity(0.8))
+            // Scanning card — sits at the bottom
+            VStack(spacing: 16) {
+                HStack(spacing: 14) {
+                    if viewModel.alignmentTimedOut {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(.orange)
+                            .symbolRenderingMode(.hierarchical)
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(width: 28, height: 28)
+                    }
 
-            Text("Point the camera at the entrance poster")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(viewModel.alignmentTimedOut ? viewModel.timeoutReasonMessage : "Looking for entrance sign…")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(2)
+                        Text(viewModel.alignmentTimedOut ? viewModel.timeoutHintMessage : "Point your camera at the entrance poster")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
 
-            Text("Hold steady at the same poster you scanned")
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.6))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                    Spacer(minLength: 0)
+                }
 
-            if viewModel.alignmentTimedOut {
-                VStack(spacing: 12) {
-                    Text(viewModel.timeoutReasonMessage)
-                        .font(.subheadline)
-                        .foregroundStyle(.orange)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-
-                    Text(viewModel.timeoutHintMessage)
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-
+                if viewModel.alignmentTimedOut {
                     HStack(spacing: 12) {
                         Button(action: { viewModel.retryAlignment() }) {
-                            Label("Retry", systemImage: "arrow.counterclockwise")
-                                .font(.callout).fontWeight(.medium)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 16).padding(.vertical, 10)
-                                .background(.blue.opacity(0.85))
-                                .clipShape(Capsule())
+                            Text("Retry")
+                                .font(.subheadline).fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 4)
                         }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
 
                         Button(action: {
                             viewModel.endNavigation()
                             isPresented = false
                         }) {
-                            Label("Cancel", systemImage: "xmark")
-                                .font(.callout).fontWeight(.medium)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 16).padding(.vertical, 10)
-                                .background(.gray.opacity(0.6))
-                                .clipShape(Capsule())
+                            Text("Cancel")
+                                .font(.subheadline).fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 4)
                         }
+                        .buttonStyle(.bordered)
+                        .controlSize(.regular)
                     }
-                }
-            } else {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.white)
-                    .scaleEffect(1.2)
-
-                Text("Detecting entrance poster...")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
-            }
-
-            // Simulate alignment button (for demo / testing)
-            #if targetEnvironment(simulator)
-            Button(action: { viewModel.simulateAlignment() }) {
-                Label("Simulate Marker Scan", systemImage: "qrcode.viewfinder")
-                    .font(.callout).fontWeight(.medium)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14).padding(.vertical, 10)
-                    .background(.blue.opacity(0.85))
-                    .clipShape(Capsule())
-            }
-            .padding(.top, 8)
-            #endif
-
-            Spacer()
-        }
-        .background(
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.6)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-    }
-
-    // MARK: - Active Navigation Overlay
-
-    private var activeNavigationOverlay: some View {
-        VStack(spacing: 12) {
-            VStack(spacing: 4) {
-                ProgressView(value: viewModel.progress, total: 1.0)
-                    .tint(viewModel.progress > 0.8 ? .green : .blue)
-
-                HStack {
-                    Text("\(Int(viewModel.progress * 100))%")
-                        .font(.caption2)
-                    Spacer()
-                    if viewModel.remainingDistance > 0 {
-                        Text("\(String(format: "%.1f", viewModel.remainingDistance))m remaining")
-                            .font(.caption2)
-                    }
-                }
-                .foregroundStyle(.white.opacity(0.7))
-            }
-            .padding(.horizontal, 32)
-
-            if !viewModel.currentInstruction.isEmpty {
-                Text(viewModel.currentInstruction)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
-
-            HStack {
-                Image(systemName: "location.fill")
-                    .foregroundStyle(.blue)
-                Text(viewModel.destinationLabel)
-                    .font(.callout)
-                    .foregroundStyle(.white.opacity(0.9))
-                Spacer()
-                if viewModel.isLowConfidence {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.yellow)
-                        .font(.caption)
-                }
-            }
-            .padding(.horizontal, 24)
-
-            HStack(spacing: 10) {
-                Button(action: { viewModel.showDebugPanel.toggle() }) {
-                    Image(systemName: "ladybug")
-                        .font(.callout)
-                        .foregroundStyle(.white)
-                        .padding(10)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
                 }
 
                 #if targetEnvironment(simulator)
-                Button(action: { viewModel.advanceProgress() }) {
-                    Label("Advance", systemImage: "forward.fill")
-                        .font(.callout).fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12).padding(.vertical, 10)
-                        .background(.indigo.opacity(0.7))
-                        .clipShape(Capsule())
+                Button(action: { viewModel.simulateAlignment() }) {
+                    Label("Simulate Scan", systemImage: "qrcode.viewfinder")
+                        .font(.subheadline).fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.regular)
+                .tint(.indigo)
                 #endif
+            }
+            .padding(20)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .padding(.horizontal, 12)
+            .padding(.bottom, 32)
+        }
+    }
 
-                Button(action: {
-                    viewModel.endNavigation()
-                    isPresented = false
-                }) {
-                    Label("End", systemImage: "stop.fill")
-                        .font(.callout).fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12).padding(.vertical, 10)
-                        .background(.red.opacity(0.7))
-                        .clipShape(Capsule())
+    // MARK: - Active Navigation Overlay
+    //
+    // Layout mirrors Apple Maps turn-by-turn:
+    //   top  → instruction banner (direction icon + text + distance)
+    //   bottom → ETA strip + End Route button
+
+    private var activeNavigationOverlay: some View {
+        VStack(spacing: 0) {
+            // ── Top instruction banner ──────────────────────────────────
+            instructionBanner
+                .padding(.horizontal, 12)
+
+            Spacer()
+
+            // ── Bottom HUD ──────────────────────────────────────────────
+            bottomHUD
+        }
+        .padding(.bottom, 32)
+    }
+
+    private var instructionBanner: some View {
+        HStack(spacing: 16) {
+            // Large direction icon — matches Apple Maps "maneuver icon" treatment
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .frame(width: 56, height: 56)
+                Image(systemName: viewModel.nextActionIcon)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(.blue)
+            }
+
+            // Instruction text + distance
+            VStack(alignment: .leading, spacing: 2) {
+                Text(viewModel.nextActionText)
+                    .font(.title3).fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                if let dist = viewModel.nextActionDistance, dist < 30 {
+                    Text("in \(String(format: "%.0f", dist)) m")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
             }
 
-            if viewModel.showDebugPanel {
-                debugPanel
+            Spacer()
+
+            // Tracking confidence — only shown when degraded
+            if viewModel.isLowConfidence {
+                Image(systemName: viewModel.trackingStatusIcon)
+                    .font(.body)
+                    .foregroundStyle(.yellow)
             }
         }
-        .padding(.bottom, 40)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+    }
+
+    private var bottomHUD: some View {
+        HStack(alignment: .center, spacing: 0) {
+            // ETA + distance
+            VStack(alignment: .leading, spacing: 2) {
+                if viewModel.remainingDistance > 0 {
+                    let etaSeconds = viewModel.remainingDistance / 1.2
+                    Text(formatETA(etaSeconds))
+                        .font(.title2).fontWeight(.bold)
+                        .foregroundStyle(.primary)
+                    Text("\(String(format: "%.0f", viewModel.remainingDistance)) m · \(viewModel.destinationLabel)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else {
+                    Text(viewModel.destinationLabel)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 20)
+
+            // Simulator advance button
+            #if targetEnvironment(simulator)
+            Button(action: { viewModel.advanceProgress() }) {
+                Image(systemName: "forward.fill")
+                    .font(.callout)
+                    .foregroundStyle(.white)
+                    .padding(10)
+                    .background(Color.indigo)
+                    .clipShape(Circle())
+            }
+            .padding(.trailing, 10)
+            #endif
+
+            // End Route
+            Button(action: {
+                viewModel.endNavigation()
+                isPresented = false
+            }) {
+                Text("End Route")
+                    .font(.subheadline).fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(Color(.systemRed))
+                    .clipShape(Capsule())
+            }
+            .padding(.trailing, 16)
+        }
+        .padding(.vertical, 14)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 12)
+    }
+
+    private func formatETA(_ seconds: Double) -> String {
+        if seconds < 60 { return "< 1 min" }
+        return "~\(Int(ceil(seconds / 60))) min"
     }
 
     // MARK: - Arrival Overlay
 
+    @State private var arrivalScale: CGFloat = 0.5
+
     private var arrivalOverlay: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 0) {
             Spacer()
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.green)
+            // Arrival card — sits at the bottom like Apple Maps arrival banner
+            VStack(spacing: 16) {
+                HStack(spacing: 14) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.green)
+                        .symbolRenderingMode(.hierarchical)
+                        .scaleEffect(arrivalScale)
+                        .onAppear {
+                            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                                arrivalScale = 1.0
+                            }
+                        }
 
-            Text("You've arrived at \(viewModel.destinationLabel)")
-                .font(.title).fontWeight(.bold)
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("You've Arrived")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text(viewModel.destinationLabel)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
 
-            VStack(spacing: 8) {
+                    Spacer()
+                }
+
                 Button(action: {
                     viewModel.endNavigation()
                     isPresented = false
                 }) {
                     Text("Done")
                         .font(.headline)
-                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .padding(.vertical, 4)
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
             }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 50)
+            .padding(20)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .padding(.horizontal, 12)
+            .padding(.bottom, 32)
         }
-        .background(
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.85)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
     }
 
     // MARK: - Configuration Error Overlay
@@ -342,7 +367,7 @@ struct ARNavigationView: View {
                 .font(.system(size: 56))
                 .foregroundStyle(.red)
 
-            Text("Poster Asset Missing")
+            Text("Setup needed")
                 .font(.title3)
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
@@ -353,7 +378,7 @@ struct ARNavigationView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
 
-            Text("Run generate-entrance-poster.sh and rebuild.")
+            Text("The entrance sign image needs to be added to this app.")
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.5))
                 .multilineTextAlignment(.center)
@@ -376,30 +401,6 @@ struct ARNavigationView: View {
         .background(Color.black.opacity(0.8))
     }
 
-    // MARK: - Debug Panel
-
-    private var debugPanel: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text("Debug").font(.caption).fontWeight(.bold)
-            Text("State: \(viewModel.sessionStateLabel)").font(.caption2)
-            Text("Aligned: \(viewModel.isAligned ? "Y" : "N")").font(.caption2)
-            Text("Arrows visible: \(viewModel.arrowCount)").font(.caption2)
-            Text("Progress: \(Int(viewModel.progress * 100))%").font(.caption2)
-            Text("Remaining: \(String(format: "%.1f", viewModel.remainingDistance))m").font(.caption2)
-            Text("To dest: \(String(format: "%.1f", viewModel.distanceToDestination))m").font(.caption2)
-            Text("Tracking: \(viewModel.trackingQuality)").font(.caption2)
-            Text("Confidence: \(viewModel.isLowConfidence ? "Low" : "OK")").font(.caption2)
-            Text("Mode: \(viewModel.isSimulated ? "Simulated" : "Live")").font(.caption2)
-            Text("Img candidates: \(viewModel.detectionCandidateCount)").font(.caption2)
-            Text("Rejected: \(viewModel.detectionRejectedCount)").font(.caption2)
-            Text("Expected marker: \(viewModel.expectedMarkerNameForDebug)").font(.caption2)
-        }
-        .foregroundStyle(.white)
-        .padding(10)
-        .background(.black.opacity(0.7))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .padding(.horizontal, 16)
-    }
 }
 
 // MARK: - ARView Container
@@ -449,10 +450,18 @@ class ARNavigationViewModel: ObservableObject {
     @Published var remainingDistance: Double = 0.0
     @Published var distanceToDestination: Double = 0.0
     @Published var isLowConfidence: Bool = false
-    @Published var showDebugPanel: Bool = false
     @Published var stateColor: Color = .orange
     @Published var alignmentTimedOut: Bool = false
     @Published var markerAssetError: String?
+
+    // Phase 11: Next-action guidance
+    @Published var nextActionIcon: String = "arrow.up"
+    @Published var nextActionText: String = "Follow the path"
+    @Published var nextActionDistance: Double? = nil
+
+    // Phase 11: Tracking status badge
+    @Published var trackingStatusLabel: String = "Tracking"
+    @Published var trackingStatusIcon: String = "location.fill"
 
     /// Categorized timeout reason for UI display.
     @Published var timeoutReasonMessage: String = "No matching entrance poster detected"
@@ -485,6 +494,8 @@ class ARNavigationViewModel: ObservableObject {
 
     private var poseTimer: Timer?
     private var alignmentTimeoutTimer: Timer?
+    /// Tracks the last arrow that triggered a turn haptic, to fire only once per turn.
+    private var lastHapticArrowId: String?
 
     /// Alignment timeout in seconds.
     private let alignmentTimeoutSeconds: TimeInterval = 30.0
@@ -517,6 +528,30 @@ class ARNavigationViewModel: ObservableObject {
                 // tracking is expected to be limited.
                 if isLimited && self?.isAligned == true {
                     self?.isLowConfidence = true
+                }
+
+                // Phase 11: Update tracking status badge
+                if !isLimited {
+                    self?.trackingStatusLabel = "Tracking"
+                    self?.trackingStatusIcon = "location.fill"
+                } else {
+                    switch reason {
+                    case "Move slower":
+                        self?.trackingStatusLabel = "Hold steady"
+                        self?.trackingStatusIcon = "hand.raised.fill"
+                    case "More visual detail needed":
+                        self?.trackingStatusLabel = "Look around slowly"
+                        self?.trackingStatusIcon = "eye.slash"
+                    case "Relocalizing":
+                        self?.trackingStatusLabel = "Re-centering..."
+                        self?.trackingStatusIcon = "arrow.triangle.2.circlepath"
+                        if self?.isAligned == true {
+                            HapticManager.shared.recentering()
+                        }
+                    default:
+                        self?.trackingStatusLabel = reason
+                        self?.trackingStatusIcon = "location.slash"
+                    }
                 }
             }
         }
@@ -698,7 +733,61 @@ class ARNavigationViewModel: ObservableObject {
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
 
+        updateNextAction()
         checkArrival(distToDest: distanceToDestination)
+    }
+
+    // MARK: - Next-Action Guidance (Phase 11)
+
+    /// Scans the arrow array ahead of the user to find the next turn or destination,
+    /// then updates the guidance card text, icon, and distance.
+    private func updateNextAction() {
+        guard let pkg = routePackage else { return }
+
+        // Find the next non-follow arrow ahead of the user
+        let upcoming = pkg.arrows.filter { $0.cumulativeDistance > userCumulativeDistance && $0.type != .follow }
+
+        if let next = upcoming.first {
+            let dist = next.cumulativeDistance - userCumulativeDistance
+            nextActionDistance = dist
+
+            switch next.type {
+            case .turnLeft:
+                nextActionIcon = "arrow.turn.up.left"
+                nextActionText = dist < 3.0 ? "Turn left now" : "Turn left ahead"
+            case .turnRight:
+                nextActionIcon = "arrow.turn.up.right"
+                nextActionText = dist < 3.0 ? "Turn right now" : "Turn right ahead"
+            case .uTurn:
+                nextActionIcon = "arrow.uturn.left"
+                nextActionText = dist < 3.0 ? "U-turn now" : "U-turn ahead"
+            case .destination:
+                nextActionIcon = "flag.fill"
+                nextActionText = dist < 3.0 ? "You're almost there" : "Continue to destination"
+            case .follow:
+                break
+            }
+
+            // Haptic: fire once when within 2 m of a turn
+            if dist < 2.0 && next.id != lastHapticArrowId {
+                lastHapticArrowId = next.id
+                if next.type == .turnLeft || next.type == .turnRight || next.type == .uTurn {
+                    HapticManager.shared.turnImminent()
+                }
+            }
+        } else {
+            // No turns or destination ahead — continue straight
+            nextActionIcon = "arrow.up"
+            nextActionText = "Continue straight"
+            nextActionDistance = nil
+        }
+
+        // Update instruction for approaching destination
+        if distanceToDestination < destinationThreshold * 2 {
+            nextActionIcon = "flag.fill"
+            nextActionText = "You're almost there"
+            stateColor = .green
+        }
     }
 
     func endNavigation() {
@@ -722,8 +811,9 @@ class ARNavigationViewModel: ObservableObject {
         isAligned = true
         sessionStateLabel = "Navigating"
         stateColor = .blue
-        currentInstruction = "Follow the arrows"
+        currentInstruction = "Follow the path"
         isLowConfidence = false
+        HapticManager.shared.routeStarted()
 
         if !isSimulated {
             progress = 0.0
@@ -841,11 +931,8 @@ class ARNavigationViewModel: ObservableObject {
             self.routeRenderer.updateVisibility(userCumulativeDistance: self.userCumulativeDistance)
             self.arrowCount = self.routeRenderer.renderedArrowCount
 
-            // Update instruction based on proximity
-            if destDist < self.destinationThreshold * 2 {
-                self.currentInstruction = "Approaching \(self.destinationLabel)..."
-                self.stateColor = .green
-            }
+            // Phase 11: Update next-action guidance
+            self.updateNextAction()
 
             self.checkArrival(distToDest: destDist)
         }
@@ -864,7 +951,8 @@ class ARNavigationViewModel: ObservableObject {
         hasArrived = true
         sessionStateLabel = "Arrived"
         stateColor = .green
-        currentInstruction = "You've arrived at \(destinationLabel)"
+        currentInstruction = "You've reached \(destinationLabel)"
+        HapticManager.shared.arrived()
 
         // Hide all guidance arrows on arrival
         routeRenderer.hideAllArrows()
