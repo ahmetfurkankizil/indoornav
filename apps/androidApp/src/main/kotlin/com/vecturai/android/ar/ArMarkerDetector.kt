@@ -5,17 +5,7 @@ import com.google.ar.core.Frame
 import com.google.ar.core.TrackingState
 import kotlin.math.atan2
 
-/**
- * Detects entrance and checkpoint marker augmented images and reports events.
- *
- * Entrance markers trigger session alignment (once).
- * Checkpoint markers emit correction events without restarting the session.
- */
 class ArMarkerDetector {
-
-    /**
-     * Known marker with registration metadata and role.
-     */
     data class KnownMarker(
         val markerId: String,
         val role: MarkerDetectionRole,
@@ -31,70 +21,94 @@ class ArMarkerDetector {
         CHECKPOINT,
     }
 
-    /** Registered markers by augmented image index. */
-    private val knownMarkersByIndex = mutableMapOf<Int, KnownMarker>()
+    sealed interface DetectionFailureReason {
+        data object NoCandidatesSeen : DetectionFailureReason
+        data class CandidatesRejected(val seen: Int, val names: List<String>) : DetectionFailureReason
+        data object AssetMissing : DetectionFailureReason
+    }
 
-    /** Fallback entrance marker metadata for single-marker backward compat. */
-    var markerId: String = ""
-    var markerNearestNodeId: String = ""
-    var markerBuildingX: Double = 0.0
-    var markerBuildingY: Double = 0.0
-    var markerBuildingZ: Double = 0.0
-    var markerBuildingRotationYDeg: Double = 0.0
+    private val knownMarkersByIndex = mutableMapOf<Int, KnownMarker>()
+    private val knownMarkersByName = mutableMapOf<String, KnownMarker>()
+
+    var expectedMarkerName: String? = null
+        private set
 
     var hasDetectedMarker: Boolean = false
         private set
 
+    var totalCandidatesSeen: Int = 0
+        private set
+
+    var rejectedCandidates: Int = 0
+        private set
+
+    var rejectedNames: List<String> = emptyList()
+        private set
+
+    val detectionFailureReason: DetectionFailureReason
+        get() = if (totalCandidatesSeen == 0) {
+            DetectionFailureReason.NoCandidatesSeen
+        } else {
+            DetectionFailureReason.CandidatesRejected(totalCandidatesSeen, rejectedNames)
+        }
+
     var onMarkerDetected: ((MarkerDetectionEvent) -> Unit)? = null
     var onCheckpointDetected: ((MarkerDetectionEvent) -> Unit)? = null
 
-    /**
-     * Configure the detector with entrance marker metadata (backward-compatible).
-     */
     fun configure(
         markerId: String,
+        markerName: String?,
         nearestNodeId: String,
         buildingX: Double,
         buildingY: Double,
         buildingZ: Double,
         buildingRotationYDeg: Double,
     ) {
-        this.markerId = markerId
-        this.markerNearestNodeId = nearestNodeId
-        this.markerBuildingX = buildingX
-        this.markerBuildingY = buildingY
-        this.markerBuildingZ = buildingZ
-        this.markerBuildingRotationYDeg = buildingRotationYDeg
-        this.hasDetectedMarker = false
+        expectedMarkerName = markerName
+        hasDetectedMarker = false
+        totalCandidatesSeen = 0
+        rejectedCandidates = 0
+        rejectedNames = emptyList()
+        knownMarkersByIndex.clear()
+        knownMarkersByName.clear()
+
+        if (markerName != null) {
+            knownMarkersByName[markerName] = KnownMarker(
+                markerId = markerId,
+                role = MarkerDetectionRole.ENTRANCE,
+                nearestNodeId = nearestNodeId,
+                buildingX = buildingX,
+                buildingY = buildingY,
+                buildingZ = buildingZ,
+                buildingRotationYDeg = buildingRotationYDeg,
+            )
+        }
     }
 
-    /**
-     * Register a known marker by augmented image index.
-     * Call after adding images to the augmented image database.
-     */
-    fun registerMarker(index: Int, marker: KnownMarker) {
+    fun registerMarker(index: Int, name: String, marker: KnownMarker) {
         knownMarkersByIndex[index] = marker
+        knownMarkersByName[name] = marker
     }
 
-    /**
-     * Process an ARCore frame, checking for augmented image detections.
-     * Call this each frame from the render loop.
-     *
-     * Unlike v1.5, continues processing checkpoint markers after entrance detection.
-     */
     fun processFrame(frame: Frame) {
         val augmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
         for (image in augmentedImages) {
             if (image.trackingState != TrackingState.TRACKING) continue
             if (image.trackingMethod != AugmentedImage.TrackingMethod.FULL_TRACKING) continue
 
-            // Extract pose
-            val pose = image.centerPose
-            val arX = pose.tx().toDouble()
-            val arY = pose.ty().toDouble()
-            val arZ = pose.tz().toDouble()
+            totalCandidatesSeen += 1
+            val detectedName = image.name
+            val known = knownMarkersByName[detectedName] ?: knownMarkersByIndex[image.index]
+            if (known == null) {
+                rejectedCandidates += 1
+                if (detectedName !in rejectedNames) {
+                    rejectedNames = rejectedNames + detectedName
+                }
+                println("[MarkerDetector] Rejected '$detectedName' (expected '${expectedMarkerName ?: "none"}')")
+                continue
+            }
 
-            // Extract Y rotation from pose quaternion
+            val pose = image.centerPose
             val qx = pose.qx().toDouble()
             val qy = pose.qy().toDouble()
             val qz = pose.qz().toDouble()
@@ -103,78 +117,51 @@ class ArMarkerDetector {
                 atan2(2.0 * (qw * qy + qx * qz), 1.0 - 2.0 * (qy * qy + qz * qz))
             )
 
-            // Try to match by index
-            val known = knownMarkersByIndex[image.index]
-            if (known != null) {
-                val event = MarkerDetectionEvent(
-                    markerId = known.markerId,
-                    entranceNodeId = known.nearestNodeId,
-                    markerBuildingX = known.buildingX,
-                    markerBuildingY = known.buildingY,
-                    markerBuildingZ = known.buildingZ,
-                    markerArX = arX,
-                    markerArY = arY,
-                    markerArZ = arZ,
-                    markerArRotationYDeg = arRotationYDeg,
-                    markerBuildingRotationYDeg = known.buildingRotationYDeg,
-                    confidence = 1.0,
-                    role = known.role,
-                )
+            val event = MarkerDetectionEvent(
+                markerId = known.markerId,
+                entranceNodeId = known.nearestNodeId,
+                markerBuildingX = known.buildingX,
+                markerBuildingY = known.buildingY,
+                markerBuildingZ = known.buildingZ,
+                markerArX = pose.tx().toDouble(),
+                markerArY = pose.ty().toDouble(),
+                markerArZ = pose.tz().toDouble(),
+                markerArRotationYDeg = arRotationYDeg,
+                markerBuildingRotationYDeg = known.buildingRotationYDeg,
+                confidence = 1.0,
+                role = known.role,
+            )
 
-                when (known.role) {
-                    MarkerDetectionRole.ENTRANCE -> {
-                        if (!hasDetectedMarker) {
-                            hasDetectedMarker = true
-                            println("[MarkerDetector] Entrance marker detected at AR ($arX, $arY, $arZ)")
-                            onMarkerDetected?.invoke(event)
-                        }
-                    }
-                    MarkerDetectionRole.CHECKPOINT -> {
-                        println("[MarkerDetector] Checkpoint marker '${known.markerId}' at AR ($arX, $arY, $arZ)")
-                        onCheckpointDetected?.invoke(event)
+            when (known.role) {
+                MarkerDetectionRole.ENTRANCE -> {
+                    if (!hasDetectedMarker) {
+                        hasDetectedMarker = true
+                        println("[MarkerDetector] Entrance marker aligned: $detectedName")
+                        onMarkerDetected?.invoke(event)
                     }
                 }
-                continue
-            }
 
-            // Fallback: first unregistered image treated as entrance (backward compat)
-            if (!hasDetectedMarker) {
-                hasDetectedMarker = true
-
-                val event = MarkerDetectionEvent(
-                    markerId = markerId,
-                    entranceNodeId = markerNearestNodeId,
-                    markerBuildingX = markerBuildingX,
-                    markerBuildingY = markerBuildingY,
-                    markerBuildingZ = markerBuildingZ,
-                    markerArX = arX,
-                    markerArY = arY,
-                    markerArZ = arZ,
-                    markerArRotationYDeg = arRotationYDeg,
-                    markerBuildingRotationYDeg = markerBuildingRotationYDeg,
-                    confidence = 1.0,
-                    role = MarkerDetectionRole.ENTRANCE,
-                )
-
-                println("[MarkerDetector] Marker detected at AR ($arX, $arY, $arZ)")
-                onMarkerDetected?.invoke(event)
+                MarkerDetectionRole.CHECKPOINT -> {
+                    onCheckpointDetected?.invoke(event)
+                }
             }
         }
     }
 
     fun reset() {
         hasDetectedMarker = false
+        totalCandidatesSeen = 0
+        rejectedCandidates = 0
+        rejectedNames = emptyList()
     }
 
     fun fullReset() {
-        hasDetectedMarker = false
+        reset()
         knownMarkersByIndex.clear()
+        knownMarkersByName.clear()
     }
 }
 
-/**
- * Marker detection event (mirrors MarkerAlignmentResult in shared code).
- */
 data class MarkerDetectionEvent(
     val markerId: String,
     val entranceNodeId: String,

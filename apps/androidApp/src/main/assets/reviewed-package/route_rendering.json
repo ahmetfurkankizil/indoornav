@@ -1,0 +1,7 @@
+{
+    "arrowSpacingMeters": 1.5,
+    "lookaheadDistanceMeters": 8.0,
+    "destinationThresholdMeters": 1.5,
+    "turnMarkerThresholdDegrees": 30.0,
+    "arrowHeightOffsetMeters": 0.05
+}
