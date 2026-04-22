@@ -233,6 +233,7 @@ class ArNavigationActivity : ComponentActivity() {
             markerBuildingX = 0.0, markerBuildingY = 1.2, markerBuildingZ = 0.0,
             markerArX = 0.0, markerArY = 0.0, markerArZ = -1.0,
             markerArRotationYDeg = 0.0, markerBuildingRotationYDeg = 0.0, confidence = 1.0,
+            role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE,
         ))
     }
 
@@ -308,7 +309,8 @@ class ArNavigationActivity : ComponentActivity() {
 
     private fun sampleCameraPose() {
         if (!isAligned || isSimulated) return
-        val frame = sessionManager.getLatestFrame() ?: return
+        val session = sessionManager.session ?: return
+        val frame = try { session.update() } catch (e: Exception) { null } ?: return
         val pose = frame.camera.pose
         val arX = pose.tx().toDouble(); val arY = pose.ty().toDouble(); val arZ = pose.tz().toDouble()
 
