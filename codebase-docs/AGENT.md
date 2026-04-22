@@ -1,5 +1,15 @@
 # AGENT.md
 
+## Important distinction
+
+`codebase-docs/` is generated repository context.
+It is not primary implementation code.
+
+Use it for navigation, narrowing scope, and dependency discovery.
+Use raw source files as the final source of truth for behavior and edits.
+
+--
+
 ## Purpose
 
 This repository includes a generated **codebase context pack** intended to let agents understand the system quickly without re-discovering the repository from scratch.
@@ -254,3 +264,6 @@ Use this compact policy:
 6. When you change code, update the context pack.
 
 That is the intended workflow.
+
+When searching for implementation, do not start from `codebase-docs/files/`.
+Start from `codebase-map.md` and use file dossiers only as pointers into raw source.
