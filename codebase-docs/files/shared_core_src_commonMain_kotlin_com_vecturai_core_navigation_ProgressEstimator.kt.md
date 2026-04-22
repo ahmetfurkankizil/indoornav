@@ -1,0 +1,35 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ProgressEstimator.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ProgressEstimator.kt`
+- **Type**: source
+- **Role**: Calculates the user's progress along a route by projecting their 3D position onto the route polyline.
+- **Imports / Includes**:
+    - `com.vecturai.core.ar.AlignmentTransform`
+    - `com.vecturai.core.ar.CameraPose`
+    - `com.vecturai.core.ar.ProgressUpdate`
+- **Exports / Public Surface**:
+    - `ProgressEstimator` class
+    - `configure(waypoints, alignment)`
+    - `update(cameraPose, trackingQuality)`
+    - `updateFromSimulated(progressFraction)`
+- **Main Symbols**:
+    - `ProgressEstimator`: class
+    - `projectOntoPolyline`: private helper for geometric projection
+    - `peakProgressDistance`: monotonic guard state
+- **Important Logic by Line Range**:
+    - `45-65`: `configure` logic; precomputes cumulative distances for every waypoint to speed up later lookups.
+    - `72-105`: `update` main loop; transforms camera pose to building-local, projects it, and applies the monotonic guard.
+    - `145-185`: `projectOntoPolyline` logic; standard point-to-segment projection algorithm iterated over all route segments.
+- **Uses**:
+    - `AlignmentTransform` (for coordinate conversion)
+    - `kotlin.math.sqrt`
+- **Used By**:
+    - `NavigationSessionCoordinator`
+- **Config / Constants / Protocol Details**:
+    - `monotonicToleranceMeters = 0.5`: Allows for minor tracking jitter without regressing progress.
+    - `offRouteThresholdMeters = 3.0`: Triggers "low confidence" if the user is too far from the path.
+- **Related Tests**:
+    - `ProgressEstimatorTest.kt` (TBD)
+- **Notes / Risks**:
+    - "Monotonic guard" ensures progress only increases, which prevents UI jumping but might be confusing if a user turns back significantly without a re-route.
+    - Assumes the user is on the same floor as the route segments.

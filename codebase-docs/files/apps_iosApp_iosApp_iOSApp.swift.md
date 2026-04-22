@@ -1,0 +1,21 @@
+# File Dossier: apps/iosApp/iosApp/iOSApp.swift
+
+- **Path**: `apps/iosApp/iosApp/iOSApp.swift`
+- **Type**: source
+- **Role**: Application entry point for the iOS platform, using the SwiftUI lifecycle.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `iOSApp` struct
+- **Main Symbols**:
+    - `iOSApp`: struct (App)
+- **Important Logic by Line Range**:
+    - `7-14`: Standard SwiftUI App entry point, launching `ContentView`.
+- **Uses**:
+    - `ContentView`
+- **Used By**:
+    - iOS Runtime (Entry point)
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Simple wrapper for the main content view.

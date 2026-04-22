@@ -1,0 +1,30 @@
+# File Dossier: .github/workflows/ci.yml
+
+- **Path**: `.github/workflows/ci.yml`
+- **Type**: build/tooling
+- **Role**: GitHub Actions CI workflow for automated testing and building.
+- **Imports / Includes**:
+    - `actions/checkout@v4`
+    - `actions/setup-java@v4`
+    - `actions/cache@v4`
+    - `actions/upload-artifact@v4`
+- **Exports / Public Surface**: N/A
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `3-7`: Triggers on push/PR to main.
+    - `10-48`: `test-and-build` job.
+    - `31-32`: Runs Preprocessor Tests.
+    - `34-35`: Runs Android Debug Build.
+    - `37-40`: Runs Demo Package Verification.
+- **Uses**:
+    - JDK 21 (Temurin)
+    - `./gradlew`
+    - `scripts/verify-demo-package.sh`
+- **Used By**:
+    - GitHub Actions.
+- **Config / Constants / Protocol Details**:
+    - Caches `~/.gradle/caches` and `~/.gradle/wrapper` based on hash of `**/*.gradle.kts` and `**/gradle-wrapper.properties`.
+- **Related Tests**:
+    - `:tools:nav-preprocessor:test`
+- **Notes / Risks**:
+    - Currently only runs preprocessor tests and android build; no iOS build in CI.

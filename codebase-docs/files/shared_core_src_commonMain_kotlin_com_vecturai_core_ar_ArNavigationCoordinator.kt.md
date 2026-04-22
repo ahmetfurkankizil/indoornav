@@ -1,0 +1,41 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/ar/ArNavigationCoordinator.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/ArNavigationCoordinator.kt`
+- **Type**: source
+- **Role**: Orchestrates the communication between the shared core and the platform-specific native AR layers.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.*`
+    - `com.vecturai.core.navigation.NavigationState`
+    - `com.vecturai.core.routing.RouteEngine`
+    - `com.vecturai.core.store.AppStore`
+- **Exports / Public Surface**:
+    - `ArNavigationCoordinator` class
+    - `prepareNavigation(buildingPackage, destination, startNodeId)`
+    - `startArSession()`
+    - `onMarkerAligned(result)`
+    - `onCheckpointMarkerObserved(event)`
+    - `stopSession()`
+    - `sessionState`: StateFlow<ArSessionState>
+- **Main Symbols**:
+    - `ArNavigationCoordinator`: class
+    - `_sessionState`: MutableStateFlow
+    - `_alignmentTransform`: MutableStateFlow
+- **Important Logic by Line Range**:
+    - `28-60`: `prepareNavigation` logic; computes the route, maps it to AR arrows, and transitions the app store to `Scanning`.
+    - `76-115`: `onMarkerAligned` logic; calculates the `AlignmentTransform`, transitions to `RenderingRoute`, and notifies the native bridge.
+    - `140-160`: `onCheckpointMarkerObserved` logic; applies bounded corrections to the alignment during active navigation.
+    - `188-205`: `simulateAlignment` logic; allows developers to bypass marker scanning with identity alignment for faster testing.
+- **Uses**:
+    - `RouteEngine` (for path calculation)
+    - `RouteToArrowMapper` (for AR visualization)
+    - `AlignmentTransform` (for coordinate conversion)
+    - `CorrectionCoordinator` (for mid-route alignment drift fix)
+    - `ArNavigationBridge` (platform-specific callback interface)
+- **Used By**:
+    - Platform-specific AR ViewModels (Android/iOS)
+- **Config / Constants / Protocol Details**:
+    - Uses `StateFlow` for cross-platform state distribution.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - This class is the primary "glue" between Kotlin logic and Swift/Kotlin-Android AR rendering.
+    - `simulateAlignment` is a critical tool for development but must not be exposed in production.

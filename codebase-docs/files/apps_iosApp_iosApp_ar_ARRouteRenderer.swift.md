@@ -1,0 +1,33 @@
+# File Dossier: apps/iosApp/iosApp/ar/ARRouteRenderer.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/ARRouteRenderer.swift`
+- **Type**: source
+- **Role**: RealityKit-based rendering engine for navigation visuals, implementing distance-based visibility and fading.
+- **Imports / Includes**:
+    - `RealityKit`
+    - `simd`
+- **Exports / Public Surface**:
+    - `ARRouteRenderer` class
+    - `placeAllArrows(...)`: initial scene setup
+    - `updateVisibility(...)`: per-frame visibility update
+    - `setAlignmentTransform(...)`
+- **Main Symbols**:
+    - `ARRouteRenderer`: class
+    - `ArrowPlacementData`: data transfer struct
+    - `ArrowState`: enum (hidden/active/fading)
+- **Important Logic by Line Range**:
+    - `68-106`: `placeAllArrows` instantiates `ModelEntity` objects for each arrow, transforms them from building-local to AR-world coordinates, and adds them to a root `AnchorEntity`.
+    - `113-140`: `updateVisibility` implements a rolling window of visible arrows: [user - 3m, user + 8m].
+    - `163-180`: `applyState` handles the visual transition, including alpha fading for arrows passed by the user.
+    - `190-217`: `createArrowEntity` generates primitive 3D geometry (boxes, spheres) with colors mapped to arrow types (Follow=Blue, Turn=Yellow, Destination=Green).
+- **Uses**:
+    - RealityKit
+- **Used By**:
+    - `ARNavigationViewModel`
+- **Config / Constants / Protocol Details**:
+    - Default lookahead: 8 meters.
+    - Default fade distance: 3 meters.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Efficiently manages scene graph by toggling `scale` and `opacity` instead of adding/removing entities per frame.
+    - Uses `SimpleMaterial` tinting for transparency effects.

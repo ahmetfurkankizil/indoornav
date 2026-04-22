@@ -1,0 +1,29 @@
+# File Dossier: shared/core/build.gradle.kts
+
+- **Path**: `shared/core/build.gradle.kts`
+- **Type**: build/tooling
+- **Role**: Build configuration for the shared core KMP module.
+- **Imports / Includes**:
+    - `libs.plugins.kotlin.multiplatform`
+    - `libs.plugins.kotlin.serialization`
+    - `libs.plugins.android.library`
+- **Exports / Public Surface**:
+    - `VecturaiCore` iOS Framework
+    - `com.vecturai.core` Android Library
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `7-20`: Kotlin Multiplatform targets; configures Android and iOS (X64, Arm64, Simulator).
+    - `14-16`: Configures the `VecturaiCore` static framework for iOS integration.
+    - `23-31`: `commonMain` dependencies; includes Coroutines, Serialization, DateTime, and Koin.
+    - `35-41`: Android-specific configuration (namespace, compileSdk, minSdk).
+- **Uses**:
+    - `gradle/libs.versions.toml` (via `libs`)
+- **Used By**:
+    - `:apps:androidApp`
+    - `:apps:iosApp` (via the exported framework)
+    - All shared feature modules (via `implementation(project(":shared:core"))`)
+- **Config / Constants / Protocol Details**:
+    - Standard KMP library structure.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Static framework linkage for iOS to avoid dynamic library overhead.

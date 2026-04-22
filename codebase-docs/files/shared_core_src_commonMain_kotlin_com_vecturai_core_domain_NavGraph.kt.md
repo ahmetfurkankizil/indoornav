@@ -1,0 +1,31 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavGraph.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavGraph.kt`
+- **Type**: source
+- **Role**: Defines the data structures for the indoor navigation graph (Nodes and Edges).
+- **Imports / Includes**:
+    - `kotlinx.serialization.Serializable`
+- **Exports / Public Surface**:
+    - `NavNode` data class
+    - `NodeType` enum
+    - `NavEdge` data class
+    - `NavGraph` data class
+- **Main Symbols**:
+    - `NavNode`: data class
+    - `NavEdge`: data class
+    - `NavGraph`: data class
+- **Important Logic by Line Range**:
+    - `61-71`: `NavEdge` definition with support for `bidirectional` traversal and `weight`.
+    - `91-110`: `NavGraph` helpers; `nodeMap` for fast lookup and `adjacencyList` which expands bidirectional edges for the routing engine.
+- **Uses**:
+    - Kotlinx Serialization
+- **Used By**:
+    - `RouteEngine` (for pathfinding)
+    - `BuildingRepository` (for data loading)
+    - `nav-preprocessor` (for generation)
+- **Config / Constants / Protocol Details**:
+    - Coordinate system: Building-local (meters), Y-up.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - `adjacencyList` is lazily computed on the first access, which might cause a minor stutter if the graph is very large.
+    - Currently limited to a single floor (`floorId`).

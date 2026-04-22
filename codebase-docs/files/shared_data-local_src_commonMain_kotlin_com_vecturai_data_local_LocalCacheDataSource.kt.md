@@ -1,0 +1,27 @@
+# File Dossier: shared/data-local/src/commonMain/kotlin/com/vecturai/data/local/LocalCacheDataSource.kt
+
+- **Path**: `shared/data-local/src/commonMain/kotlin/com/vecturai/data/local/LocalCacheDataSource.kt`
+- **Type**: source
+- **Role**: Interface defining the contract for local persistent caching of building navigation data.
+- **Imports / Includes**: N/A
+- **Exports / Public Surface**:
+    - `LocalCacheDataSource` interface
+    - `hasCachedData(buildingId)`
+    - `getCachedData(buildingId, dataType)`
+    - `cacheData(buildingId, dataType, jsonData)`
+    - `getCachedVersion(buildingId)`
+    - `clearCache(buildingId)`
+- **Main Symbols**:
+    - `LocalCacheDataSource`: interface
+- **Important Logic by Line Range**:
+    - `12-53`: Method declarations for CRUD operations on local cache.
+- **Uses**: N/A
+- **Used By**:
+    - `SqlDelightCacheDataSource` (Implementation)
+    - `BuildingRepository` (Core)
+- **Config / Constants / Protocol Details**:
+    - Designed to store JSON strings for building components (nav_graph, rooms, etc.).
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Currently an abstraction for future persistent storage.
+    - Planned implementation via SqlDelight for cross-platform SQLite support.

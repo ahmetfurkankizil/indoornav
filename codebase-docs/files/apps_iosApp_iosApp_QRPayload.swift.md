@@ -1,0 +1,28 @@
+# File Dossier: apps/iosApp/iosApp/QRPayload.swift
+
+- **Path**: `apps/iosApp/iosApp/QRPayload.swift`
+- **Type**: source
+- **Role**: Data model and parser for entrance QR code payloads, ensuring compatibility with the navigation system.
+- **Imports / Includes**:
+    - `Foundation`
+- **Exports / Public Surface**:
+    - `QRPayload` struct
+    - `parse(_:)`: static factory method
+    - `validate(against:)`: checks payload against building config
+- **Main Symbols**:
+    - `QRPayload`: struct (Codable)
+- **Important Logic by Line Range**:
+    - `54-69`: `parse` decodes JSON string and performs basic type/version validation.
+    - `72-85`: `validate` checks that the scanned `buildingId` matches the app's loaded package and that the `entranceId` exists in the `entranceMarkers` list.
+- **Uses**:
+    - `JSONDecoder`
+- **Used By**:
+    - `NavigationFlowModel`
+    - `QRScanView`
+- **Config / Constants / Protocol Details**:
+    - Protocol `type`: "vecturai-entrance"
+    - Current version: 1
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Crucial for secure/correct start of navigation.
+    - [TODO] indicates potential future expansion for more complex payloads.

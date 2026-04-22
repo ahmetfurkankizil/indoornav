@@ -1,0 +1,35 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/ar/AlignmentTransform.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/AlignmentTransform.kt`
+- **Type**: source
+- **Role**: Handles 3D coordinate transformations between building-local and AR-world spaces.
+- **Imports / Includes**:
+    - `kotlinx.serialization.Serializable`
+    - `kotlin.math.*`
+- **Exports / Public Surface**:
+    - `AlignmentTransform` data class
+    - `transformPoint(x, y, z)`
+    - `inverseTransformPoint(x, y, z)`
+    - `transformDirection(dx, dy, dz)`
+    - `fromMarkerAlignment(result)` (companion factory)
+- **Main Symbols**:
+    - `AlignmentTransform`: data class
+    - `fromMarkerAlignment`: static factory
+- **Important Logic by Line Range**:
+    - `28-44`: `transformPoint` logic; applies Y-rotation followed by translation.
+    - `55-73`: `inverseTransformPoint` logic; subtracts translation followed by negative Y-rotation.
+    - `88-111`: `fromMarkerAlignment` logic; calculates the transform components by comparing a detected marker's AR pose with its building-local coordinates.
+- **Uses**:
+    - `kotlin.math` (cos, sin, PI)
+- **Used By**:
+    - `NavigationSessionCoordinator`
+    - `ProgressEstimator`
+    - `ArNavigationBridge`
+- **Config / Constants / Protocol Details**:
+    - Assumes Y-up coordinate system for both spaces.
+    - Simplifies rotation to 1D (around Y axis) per ADR-007.
+- **Related Tests**:
+    - `AlignmentTransformTest.kt` (TBD)
+- **Notes / Risks**:
+    - Not suitable for buildings with steep ramps or multi-floor stairs where simple Y-rotation might be insufficient (requires 3D orientation).
+    - Accuracy depends entirely on the quality of the initial marker detection.

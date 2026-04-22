@@ -1,0 +1,29 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/loading/InMemoryPackageStore.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/loading/InMemoryPackageStore.kt`
+- **Type**: source
+- **Role**: In-memory cache for loaded building navigation packages.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.BuildingPackage`
+- **Exports / Public Surface**:
+    - `InMemoryPackageStore` class
+    - `put(buildingId, pkg)`
+    - `get(buildingId)`
+    - `has(buildingId)`
+    - `storedBuildingIds()`
+- **Main Symbols**:
+    - `InMemoryPackageStore`: class
+- **Important Logic by Line Range**:
+    - `18-20`: `packages` mutable map used for in-memory storage.
+    - `23-38`: Basic CRUD operations on the package map.
+- **Uses**:
+    - `BuildingPackage` domain model
+- **Used By**:
+    - `CoreModule` (DI)
+    - `DefaultBuildingRepository`
+    - `NavigationSessionCoordinator`
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Simplistic in-memory storage; packages are lost when the process terminates.
+    - Future plan is to replace this with a persistent SQLite (SqlDelight) cache.

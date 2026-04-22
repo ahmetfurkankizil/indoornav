@@ -1,0 +1,29 @@
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Theme.kt
+
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Theme.kt`
+- **Type**: source
+- **Role**: Root theme provider for the application, bridging custom colors with Material 3.
+- **Imports / Includes**:
+    - `androidx.compose.material3.MaterialTheme`
+    - `com.vecturai.designsystem.VecturaiColors`
+- **Exports / Public Surface**:
+    - `VecturaiTheme` Composable
+- **Main Symbols**:
+    - `VecturaiTheme`: function
+    - `LightColorScheme`: private val
+    - `DarkColorScheme`: private val
+- **Important Logic by Line Range**:
+    - `8-24`: Mapping of `VecturaiColors` to the Material 3 `lightColorScheme`.
+    - `26-42`: Mapping to `darkColorScheme`.
+    - `51-62`: `VecturaiTheme` implementation; provides the `colorScheme` and `typography` to the Compose hierarchy.
+- **Uses**:
+    - Compose Material 3
+    - `VecturaiColors`
+    - `VecturaiTypography`
+- **Used By**:
+    - `VecturaiAppContent`
+    - Any preview composables
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Dark mode is currently toggled via a parameter; future logic should automatically follow system settings.

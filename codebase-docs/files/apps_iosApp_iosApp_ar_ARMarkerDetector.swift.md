@@ -1,0 +1,28 @@
+# File Dossier: apps/iosApp/iosApp/ar/ARMarkerDetector.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/ARMarkerDetector.swift`
+- **Type**: source
+- **Role**: Native ARKit-based component for detecting reference images and reporting spatial alignment data.
+- **Imports / Includes**:
+    - `ARKit`
+- **Exports / Public Surface**:
+    - `ARMarkerDetector` class
+    - `configure(...)`: sets expected marker
+    - `processAnchor(_:)`: handles `ARImageAnchor`
+    - `MarkerDetectionEvent` struct
+- **Main Symbols**:
+    - `ARMarkerDetector`: class
+    - `KnownMarker`: internal metadata struct
+- **Important Logic by Line Range**:
+    - `100-157`: `processAnchor` extracts the 4x4 transform from an `ARImageAnchor`, calculates AR-space position and Y-rotation (`atan2`), and validates against `knownMarkers`.
+    - `123-130`: Strict matching: rejects any detected image that isn't the specific entrance marker defined in the config.
+- **Uses**:
+    - ARKit (ARImageAnchor)
+- **Used By**:
+    - `ARNavigationViewModel` (in `ARNavigationView.swift`)
+- **Config / Constants / Protocol Details**:
+    - Uses `atan2(transform.columns.0.z, transform.columns.0.x)` for robust Y-axis rotation extraction.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Critical for "Marker Alignment" feature on iOS.
+    - Includes diagnostic counters (`rejectedCandidates`, `totalCandidatesSeen`) for troubleshooting detection failures.

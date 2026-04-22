@@ -1,0 +1,36 @@
+# File Dossier: apps/iosApp/iosApp/ar/ARNavigationView.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/ARNavigationView.swift`
+- **Type**: source
+- **Role**: Primary SwiftUI view for the AR experience, hosting the RealityKit `ARView` and managing navigation UI overlays, state, and simulations.
+- **Imports / Includes**:
+    - `SwiftUI`
+    - `ARKit`
+    - `RealityKit`
+- **Exports / Public Surface**:
+    - `ARNavigationView` struct
+- **Main Symbols**:
+    - `ARNavigationView`: struct (View)
+    - `ARNavigationViewModel`: class (State manager)
+    - `ARViewContainer`: struct (UIViewRepresentable)
+- **Important Logic by Line Range**:
+    - `437-999`: `ARNavigationViewModel` (Internal)
+        - `582-585`: `markerDetector.onMarkerDetected` callback handles the transition from "Scanning" to "Navigating" by setting the alignment transform.
+        - `702-722`: `simulateAlignment` provides a fallback for testing in the iOS Simulator.
+        - `724-738`: `advanceProgress` (Sim only) and path tracking logic.
+        - `744-791`: `updateNextAction` (Phase 11) scans upcoming arrows to provide "Turn left ahead" / "You're almost there" guidance.
+    - `408-435`: `ARViewContainer` bridges the native RealityKit `ARView` into SwiftUI.
+- **Uses**:
+    - `ARSessionManager`
+    - `ARMarkerDetector`
+    - `ARRouteRenderer`
+    - `HapticManager`
+- **Used By**:
+    - `ContentView`
+- **Config / Constants / Protocol Details**:
+    - Alignment timeout: 30 seconds.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Complex orchestration of multiple native AR components.
+    - Uses `AnchorDetectionDelegate` (internal) to relay ARKit anchor events to the detector.
+    - Implements haptic feedback for turns and arrival.

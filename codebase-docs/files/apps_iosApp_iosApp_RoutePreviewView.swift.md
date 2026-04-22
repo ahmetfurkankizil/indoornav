@@ -1,0 +1,24 @@
+# File Dossier: apps/iosApp/iosApp/RoutePreviewView.swift
+
+- **Path**: `apps/iosApp/iosApp/RoutePreviewView.swift`
+- **Type**: source
+- **Role**: Summary screen showing the estimated walking time and route overview before navigation starts.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `RoutePreviewView` struct
+- **Main Symbols**:
+    - `RoutePreviewView`: struct (View)
+- **Important Logic by Line Range**:
+    - `42-60`: Calculates and displays walking time based on a constant walking speed (1.2 m/s).
+    - `62-114`: Visual "From/To" card showing the navigation start and end points.
+    - `125-140`: "Start AR Navigation" call to action.
+- **Uses**:
+    - `NavigationFlowModel`
+- **Used By**:
+    - `ContentView`
+- **Config / Constants / Protocol Details**:
+    - Walking speed assumed: 1.2 m/s.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Acts as a final confirmation gate for the user.

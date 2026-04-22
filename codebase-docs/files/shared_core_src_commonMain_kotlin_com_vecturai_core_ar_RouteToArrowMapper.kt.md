@@ -1,0 +1,33 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/ar/RouteToArrowMapper.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/RouteToArrowMapper.kt`
+- **Type**: source
+- **Role**: Logic for generating 3D arrow placements along a computed navigation route.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.NavGraph`
+    - `com.vecturai.core.domain.Route`
+    - `com.vecturai.core.domain.RouteRenderingConfig`
+- **Exports / Public Surface**:
+    - `RouteToArrowMapper` class
+    - `map(route, graph, config)`
+- **Main Symbols**:
+    - `RouteToArrowMapper`: class
+    - `computeTurnAngle`: private function for signed turn detection
+- **Important Logic by Line Range**:
+    - `47-57`: Path reconstruction from the route segments into a continuous list of nodes.
+    - `61-125`: Main interpolation loop; iterates over edges, computes direction vectors, and places `FOLLOW` arrows at configured intervals (`arrowSpacingMeters`).
+    - `77-105`: Turn detection logic; checks the angle between consecutive segments and inserts `TURN_LEFT/RIGHT` or `U_TURN` markers if thresholds are met.
+    - `128-145`: Final destination marker placement logic.
+- **Uses**:
+    - `NavGraph` (for spatial data)
+    - `RouteRenderingConfig` (for spacing and thresholds)
+    - `kotlin.math.*` (sqrt, atan2)
+- **Used By**:
+    - `ArNavigationCoordinator`
+- **Config / Constants / Protocol Details**:
+    - `arrowSpacingMeters`: Default 1.5m.
+    - `turnMarkerThresholdDegrees`: Default 30.0.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Linear interpolation assumes straight edges between nodes (standard for graph-based routing).
+    - Elevation changes (ramps) are supported via `positionY` interpolation.

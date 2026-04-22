@@ -1,0 +1,28 @@
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/navigation/AppNavigation.kt
+
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/navigation/AppNavigation.kt`
+- **Type**: source
+- **Role**: Main navigation shell for the non-AR parts of the application.
+- **Imports / Includes**:
+    - `com.vecturai.designsystem.screens.*`
+    - `androidx.compose.material3.Scaffold`
+- **Exports / Public Surface**:
+    - `AppNavigation` Composable
+- **Main Symbols**:
+    - `AppNavigation`: function
+    - `currentScreen`: internal state for tab selection
+- **Important Logic by Line Range**:
+    - `24`: Uses `remember { mutableStateOf }` for simple tab-based navigation state.
+    - `27-60`: `Scaffold` bottom bar implementation with 5 tabs (Home, Search, Preview, History, Settings).
+    - `64-74`: `when` block for switching between screen composables based on `currentScreen`.
+- **Uses**:
+    - `Screen` (navigation model)
+    - All feature screen composables
+- **Used By**:
+    - `VecturaiAppContent`
+- **Config / Constants / Protocol Details**:
+    - Does NOT use a complex navigation library (like Jetpack Navigation) to keep the KMP shared logic simple and dependency-light.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - The navigation is currently flat (tab-based). Nested navigation (e.g., Search -> Details) is not yet implemented in this common layer.
+    - AR navigation is out-of-band and triggered via the `onNavigateToAr` callback.

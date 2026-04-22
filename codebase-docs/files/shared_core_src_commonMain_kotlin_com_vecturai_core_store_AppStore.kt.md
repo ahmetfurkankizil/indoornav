@@ -1,0 +1,38 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/store/AppStore.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/store/AppStore.kt`
+- **Type**: source
+- **Role**: Central application state store using Kotlin flows for reactive updates.
+- **Imports / Includes**:
+    - `kotlinx.coroutines.flow.MutableStateFlow`
+    - `com.vecturai.core.domain.NavigationState`
+    - `com.vecturai.core.ar.ArSessionState`
+- **Exports / Public Surface**:
+    - `AppStore` class
+    - `navigationState`: StateFlow<NavigationState>
+    - `arSessionState`: StateFlow<ArSessionState>
+    - `currentSession`: StateFlow<NavigationSession?>
+    - `arrivalStatus`: StateFlow<ArrivalStatus>
+    - `selectedBuildingId`: StateFlow<String?>
+    - `selectedDestination`: StateFlow<Room?>
+    - `isLoading`: StateFlow<Boolean>
+    - Multiple update functions (e.g., `updateNavigationState`, `selectDestination`)
+    - `reset()`
+- **Main Symbols**:
+    - `AppStore`: class
+- **Important Logic by Line Range**:
+    - `17-80`: Definitions of private `MutableStateFlow`s and public `StateFlow`s for various app aspects (navigation, AR, session, loading).
+    - `84-93`: `reset` function to clear the app state (e.g., on logout or building change).
+- **Uses**:
+    - Kotlin Coroutines (Flow)
+- **Used By**:
+    - `CoreModule` (DI)
+    - `NavigationSessionCoordinator`
+    - Feature: Search
+    - UI Layer (Compose/SwiftUI ViewModels)
+- **Config / Constants / Protocol Details**:
+    - Uses `asStateFlow()` to prevent external mutation of private flows.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Thread-safe due to the nature of `StateFlow`.
+    - Acts as a simplified "Redux" or "Single Source of Truth" store for the KMP core.

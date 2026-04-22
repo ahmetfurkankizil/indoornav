@@ -1,0 +1,25 @@
+# File Dossier: gradle/libs.versions.toml
+
+- **Path**: `gradle/libs.versions.toml`
+- **Type**: build/tooling
+- **Role**: Gradle Version Catalog, centralizing all dependency and plugin versions.
+- **Imports / Includes**: N/A
+- **Exports / Public Surface**:
+    - `versions`
+    - `libraries`
+    - `plugins`
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `1-31`: Version definitions for Kotlin, Android, Ktor, SqlDelight, Koin, etc.
+    - `32-72`: Library group definitions.
+    - `73-81`: Plugin group definitions.
+- **Uses**: N/A
+- **Used By**:
+    - `build.gradle.kts` (Root and subprojects)
+- **Config / Constants / Protocol Details**:
+    - Kotlin: `2.1.10`
+    - AGP: `8.7.3`
+    - Compose Multiplatform: `1.7.3`
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Single source of truth for dependencies.

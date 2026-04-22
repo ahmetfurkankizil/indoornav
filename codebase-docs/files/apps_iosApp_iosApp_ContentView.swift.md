@@ -1,0 +1,29 @@
+# File Dossier: apps/iosApp/iosApp/ContentView.swift
+
+- **Path**: `apps/iosApp/iosApp/ContentView.swift`
+- **Type**: source
+- **Role**: Root view controller for the iOS application, managing the display of different screens based on the current navigation state.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `ContentView` struct
+- **Main Symbols**:
+    - `ContentView`: struct (View)
+- **Important Logic by Line Range**:
+    - `17-49`: `switch` statement driving the main UI flow: `.home`, `.qrScan`, `.entranceConfirmed`, `.destinationSelect`, `.routePreview`, `.arNavigation`.
+    - `33-45`: Integration of `ARNavigationView` when the state is `.arNavigation`, passing required routing data.
+    - `117-181`: `HomeView` implementation with a trigger for QR scanning and a hidden link to Admin tools.
+- **Uses**:
+    - `NavigationFlowModel`
+    - `QRScanView`
+    - `DestinationSelectView`
+    - `RoutePreviewView`
+    - `ARNavigationView`
+    - `AdminDraftJobsView`
+- **Used By**:
+    - `iOSApp`
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Central hub for the entire iOS user experience.
+    - Uses a `ZStack` to overlay a custom "Entrance Confirmed" bottom sheet.

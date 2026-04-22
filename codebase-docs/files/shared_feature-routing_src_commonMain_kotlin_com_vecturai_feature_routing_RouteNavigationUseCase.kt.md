@@ -1,0 +1,38 @@
+# File Dossier: shared/feature-routing/src/commonMain/kotlin/com/vecturai/feature/routing/RouteNavigationUseCase.kt
+
+- **Path**: `shared/feature-routing/src/commonMain/kotlin/com/vecturai/feature/routing/RouteNavigationUseCase.kt`
+- **Type**: source
+- **Role**: Orchestrates the transition from building discovery to active navigation, managing the core state machine transitions for the user.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.NavigationState`
+    - `com.vecturai.core.domain.Room`
+    - `com.vecturai.core.domain.Route`
+    - `com.vecturai.core.repository.BuildingRepository`
+    - `com.vecturai.core.routing.RouteEngine`
+    - `com.vecturai.core.store.AppStore`
+- **Exports / Public Surface**:
+    - `RouteNavigationUseCase` class
+    - `startNavigation(buildingId, destination)`
+    - `onMarkerDetected(buildingId, startNodeId, destination)`
+    - `onArrived()`
+    - `cancelNavigation()`
+- **Main Symbols**:
+    - `RouteNavigationUseCase`: class
+- **Important Logic by Line Range**:
+    - `35-43`: `startNavigation` sets the destination and moves state to `Scanning`.
+    - `55-95`: `onMarkerDetected` fetches the graph, entry nodes, computes the route via `RouteEngine`, and moves state to `Navigating`.
+    - `102-113`: `onArrived` transitions state to `Arrived`.
+- **Uses**:
+    - `RouteEngine` (Core)
+    - `AppStore` (Core)
+    - `BuildingRepository` (Core)
+- **Used By**:
+    - `FeatureRoutingModule` (DI)
+    - UI Layer (Navigation Controller)
+- **Config / Constants / Protocol Details**:
+    - Uses the first entry node ID found in the destination room metadata.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Central point for navigation state management.
+    - Error handling for missing graphs or missing entry points is implemented via the `NavigationState.Error` state.
+    - TODOs indicate missing logic for off-path recalculation and segment progress tracking (likely handled by platform-specific AR layers in current MVP).

@@ -1,0 +1,24 @@
+# File Dossier: apps/iosApp/iosApp/DestinationSelectView.swift
+
+- **Path**: `apps/iosApp/iosApp/DestinationSelectView.swift`
+- **Type**: source
+- **Role**: User interface for browsing and searching for navigation destinations within the building.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `DestinationSelectView` struct
+- **Main Symbols**:
+    - `DestinationSelectView`: struct (View)
+- **Important Logic by Line Range**:
+    - `10-17`: `filteredRooms` logic for real-time search across display names and categories.
+    - `19-36`: `groupedRooms` implements a custom category sorting and grouping for the list view.
+    - `151-189`: `roomRow` triggers the `selectDestination` action on the flow model.
+- **Uses**:
+    - `NavigationFlowModel`
+- **Used By**:
+    - `ContentView`
+- **Config / Constants / Protocol Details**:
+    - Preferred category order: classrooms, labs, cafes, etc.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Clean, search-focused UI matching standard iOS design patterns.

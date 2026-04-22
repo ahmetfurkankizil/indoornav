@@ -1,0 +1,22 @@
+# File Dossier: shared/feature-search/src/commonMain/kotlin/com/vecturai/feature/search/di/FeatureSearchModule.kt
+
+- **Path**: `shared/feature-search/src/commonMain/kotlin/com/vecturai/feature/search/di/FeatureSearchModule.kt`
+- **Type**: source
+- **Role**: Koin DI module for the search feature.
+- **Imports / Includes**:
+    - `com.vecturai.feature.search.SearchUseCase`
+    - `org.koin.dsl.module`
+- **Exports / Public Surface**:
+    - `featureSearchModule`: Koin Module
+- **Main Symbols**:
+    - `featureSearchModule`: val
+- **Important Logic by Line Range**:
+    - `6-8`: Factory definition for `SearchUseCase`.
+- **Uses**:
+    - Koin DSL
+    - `BuildingRepository` (Core, via `get()`)
+- **Used By**:
+    - Platform App initialization
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**: N/A

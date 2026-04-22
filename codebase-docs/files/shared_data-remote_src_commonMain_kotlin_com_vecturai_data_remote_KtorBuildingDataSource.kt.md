@@ -1,0 +1,29 @@
+# File Dossier: shared/data-remote/src/commonMain/kotlin/com/vecturai/data/remote/KtorBuildingDataSource.kt
+
+- **Path**: `shared/data-remote/src/commonMain/kotlin/com/vecturai/data/remote/KtorBuildingDataSource.kt`
+- **Type**: source
+- **Role**: Ktor-based implementation for fetching building data from the remote backend.
+- **Imports / Includes**:
+    - `io.ktor.client.*`
+    - `io.ktor.serialization.kotlinx.json.*`
+    - `kotlinx.serialization.json.Json`
+- **Exports / Public Surface**:
+    - `KtorBuildingDataSource` class
+    - Implementation of `RemoteBuildingDataSource`
+- **Main Symbols**:
+    - `KtorBuildingDataSource`: class
+    - `httpClient`: private Ktor client instance
+- **Important Logic by Line Range**:
+    - `25-36`: HttpClient configuration with `ContentNegotiation` and JSON serialization.
+    - `38-57`: Stubbed implementations for fetching manifests, data files, and version checks.
+- **Uses**:
+    - Ktor Client (Multiplatform)
+    - Kotlinx Serialization
+- **Used By**:
+    - `DataRemoteModule` (DI)
+- **Config / Constants / Protocol Details**:
+    - `baseUrl = "https://api.vecturai.com/v1"`
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Actual network calls are currently [TODO].
+    - Requires platform-specific HTTP engines (OkHttp for Android, Darwin for iOS) configured in `build.gradle.kts`.

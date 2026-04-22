@@ -1,0 +1,33 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/loading/DemoPackageProvider.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/loading/DemoPackageProvider.kt`
+- **Type**: source
+- **Role**: Provides hardcoded building data for the demo environment.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.*`
+    - `kotlinx.serialization.json.Json`
+- **Exports / Public Surface**:
+    - `DemoPackageProvider` object
+    - `buildPackage()`
+    - `curatedDestinations`: List<String>
+- **Main Symbols**:
+    - `DemoPackageProvider`: singleton object
+    - `navGraph()`: returns a 8-node demo graph
+    - `rooms()`: returns 4 demo rooms
+    - `entranceMarkers()`: returns 1 main entrance marker
+- **Important Logic by Line Range**:
+    - `27-46`: Hardcoded `NavGraph` construction with nodes and bidirectional edges.
+    - `70-104`: Hardcoded `Room` definitions with keywords and entry node mapping.
+    - `109-125`: `EntranceMarker` definition specifying physical dimensions (21cm x 21cm) for AR alignment.
+    - `140-146`: `buildPackage` aggregates all components into a `BuildingPackage`.
+- **Uses**:
+    - Domain models (`NavNode`, `NavEdge`, `Room`, `EntranceMarker`)
+- **Used By**:
+    - `CoreModule` (for DI injection into the `InMemoryPackageStore`)
+    - `DefaultBuildingRepository`
+- **Config / Constants / Protocol Details**:
+    - `buildingId = "demo-office-01"`
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - This file acts as the "source of truth" for the MVP demo. Any changes to the building layout for testing should be made here if not using external JSON.
+    - Large hardcoded strings/lists contribute to binary size but are negligible for the MVP.

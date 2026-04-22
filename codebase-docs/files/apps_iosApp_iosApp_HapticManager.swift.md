@@ -1,0 +1,22 @@
+# File Dossier: apps/iosApp/iosApp/HapticManager.swift
+
+- **Path**: `apps/iosApp/iosApp/HapticManager.swift`
+- **Type**: source
+- **Role**: Utility for providing tactile feedback during navigation events.
+- **Imports / Includes**:
+    - `UIKit`
+- **Exports / Public Surface**:
+    - `HapticManager` class (singleton)
+    - `routeStarted()`, `turnImminent()`, `recentering()`, `arrived()`
+- **Main Symbols**:
+    - `HapticManager`: class
+- **Important Logic by Line Range**:
+    - `23-44`: Mapping of navigation events to specific iOS feedback generator types (`UIImpactFeedbackGenerator`, `UINotificationFeedbackGenerator`).
+- **Uses**:
+    - UIKit Haptics
+- **Used By**:
+    - `ARNavigationViewModel` (in `ARNavigationView.swift`)
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Lightweight and performance-conscious (calls `prepare()` to reduce latency).

@@ -1,0 +1,66 @@
+# File Dossier: build.gradle.kts (Root)
+
+- **Path**: `build.gradle.kts`
+- **Type**: build/tooling
+- **Role**: Root build script for the Gradle project.
+- **Imports / Includes**:
+    - `libs.plugins.kotlin.multiplatform`
+    - `libs.plugins.kotlin.jvm`
+    - `libs.plugins.kotlin.android`
+    - `libs.plugins.kotlin.serialization`
+    - `libs.plugins.compose.multiplatform`
+    - `libs.plugins.android.application`
+    - `libs.plugins.android.library`
+    - `libs.plugins.sqldelight`
+- **Exports / Public Surface**:
+    - Project group: `com.vecturai`
+    - Project version: `0.1.0-SNAPSHOT`
+- **Main Symbols**: N/A (Declarative build script)
+- **Important Logic by Line Range**:
+    - `1-10`: Plugin declarations (applied false to be configured in subprojects).
+    - `12-15`: Global project configuration (group, version).
+- **Uses**:
+    - `gradle/libs.versions.toml` (via `alias(libs.plugins...)`)
+- **Used By**:
+    - All subprojects (via inheritance/configuration).
+- **Config / Constants / Protocol Details**:
+    - Uses Version Catalog for plugin and dependency management.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Minimal root script, most configuration is delegated to subprojects.
+
+---
+
+# File Dossier: settings.gradle.kts
+
+- **Path**: `settings.gradle.kts`
+- **Type**: build/tooling
+- **Role**: Project settings script, defines included modules and plugin repositories.
+- **Imports / Includes**:
+    - `:apps:androidApp`
+    - `:shared:core`
+    - `:shared:feature-search`
+    - `:shared:feature-routing`
+    - `:shared:feature-history`
+    - `:shared:feature-preview`
+    - `:shared:data-local`
+    - `:shared:data-remote`
+    - `:shared:designsystem`
+    - `:tools:nav-preprocessor`
+    - `:tools:admin-api`
+- **Exports / Public Surface**:
+    - Root project name: `VecturAI`
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `1-7`: `pluginManagement` (repositories: google, mavenCentral, gradlePluginPortal).
+    - `9-14`: `dependencyResolutionManagement` (repositories: google, mavenCentral).
+    - `16`: `rootProject.name` definition.
+    - `19-35`: Module inclusions (apps, shared, tools).
+- **Uses**: N/A
+- **Used By**:
+    - Gradle build system.
+- **Config / Constants / Protocol Details**:
+    - Explicitly notes that iOS app is built via Xcode, not Gradle.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Central point for module discovery.

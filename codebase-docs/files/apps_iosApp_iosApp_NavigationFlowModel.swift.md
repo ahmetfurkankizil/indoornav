@@ -1,0 +1,33 @@
+# File Dossier: apps/iosApp/iosApp/NavigationFlowModel.swift
+
+- **Path**: `apps/iosApp/iosApp/NavigationFlowModel.swift`
+- **Type**: source
+- **Role**: State machine and business logic coordinator for the iOS application's user flow.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `NavigationFlowModel` class
+    - `state`: current flow state
+    - `confirmedEntrance`: name of the confirmed entrance
+    - `selectDestination(_:)`: sets destination and precomputes route
+    - `startNavigation()`: transitions to AR
+- **Main Symbols**:
+    - `NavigationFlowModel`: class (ObservableObject)
+    - `FlowState`: enum (State definitions)
+- **Important Logic by Line Range**:
+    - `61-71`: `loadPackage` attempts to load the reviewed building package on startup; sets `.packageError` state on failure.
+    - `116-125`: `selectDestination` triggers the `BuildingPackageLoader.computeRoute` logic to prepare the navigation data.
+    - `93-102`: `confirmEntrance` validates a QR payload and retrieves the specific `validatedEntranceMarker` from the package.
+- **Uses**:
+    - `BuildingPackageLoader`
+    - `QRPayload`
+- **Used By**:
+    - `ContentView`
+    - `QRScanView`
+    - `DestinationSelectView`
+    - `RoutePreviewView`
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Single source of truth for the app's interactive state.
+    - Enforcement of "Reviewed Package ONLY" rule: will not fallback to draft data if package loading fails.

@@ -1,0 +1,41 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/NavigationSessionCoordinator.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/NavigationSessionCoordinator.kt`
+- **Type**: source
+- **Role**: Central orchestrator for the navigation state machine and session lifecycle.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.NavigationState`
+    - `com.vecturai.core.domain.Route`
+    - `com.vecturai.core.ar.AlignmentTransform`
+    - `com.vecturai.core.repository.HistoryRepository`
+- **Exports / Public Surface**:
+    - `NavigationSessionCoordinator` class
+    - `state`: StateFlow<NavigationState>
+    - `startScanning(buildingId, targetRoom)`
+    - `onMarkerDetected(markerId, alignment)`
+    - `updatePose(cameraPose)`
+    - `stopNavigation()`
+- **Main Symbols**:
+    - `NavigationSessionCoordinator`: class
+    - `_state`: MutableStateFlow
+    - `currentSession`: private var holding mutable session data
+- **Important Logic by Line Range**:
+    - `30-50`: `startScanning` transition logic; fetches the building and target room.
+    - `52-80`: `onMarkerDetected` logic; computes the initial route and transitions to `Navigating`.
+    - `82-110`: `updatePose` logic; feeds the camera pose to the `ProgressEstimator` and checks for arrival.
+    - `112-130`: `recordVisit` logic; persists the session data to the `HistoryRepository`.
+- **Uses**:
+    - `RouteEngine` (for path calculation)
+    - `ProgressEstimator` (for position tracking)
+    - `ArrivalDetector` (for destination checks)
+    - `HistoryRepository` (for persistence)
+- **Used By**:
+    - App ViewModels / Presenters
+    - AR shell implementations
+- **Config / Constants / Protocol Details**:
+    - Uses `kotlinx.coroutines.flow.StateFlow` for reactive state updates.
+- **Related Tests**:
+    - `NavigationSessionCoordinatorTest.kt` (TBD)
+- **Notes / Risks**:
+    - Coordinate system consistency between the AR session and the `NavGraph` is handled through the `AlignmentTransform`.
+    - Manual stop/cancel logic records a different completion status in history.

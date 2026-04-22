@@ -1,0 +1,28 @@
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Components.kt
+
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Components.kt`
+- **Type**: source
+- **Role**: Collection of reusable UI components following the VecturAI design language.
+- **Imports / Includes**:
+    - `androidx.compose.material3.*`
+- **Exports / Public Surface**:
+    - `VecturaiButton`
+    - `VecturaiCard`
+    - `VecturaiEmptyState`
+    - `VecturaiSectionHeader`
+- **Main Symbols**:
+    - `VecturaiButton`: composable
+    - `VecturaiCard`: composable
+- **Important Logic by Line Range**:
+    - `21-50`: `VecturaiButton`; custom button with 14dp rounded corners and integrated icon support.
+    - `56-93`: `VecturaiCard`; card component with consistent padding, elevation, and 16dp rounded corners.
+    - `99-133`: `VecturaiEmptyState`; helper for showing "no results" or "loading" placeholders.
+- **Uses**:
+    - Compose Material 3
+- **Used By**:
+    - All screens (`HomeScreen`, `SearchScreen`, etc.)
+- **Config / Constants / Protocol Details**:
+    - Uses hardcoded DP values for corner radii to ensure consistency across the app.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Component density is optimized for mobile touch targets (e.g., 52dp button height).

@@ -1,0 +1,26 @@
+# File Dossier: apps/iosApp/iosApp/ar/ARBridge.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/ARBridge.swift`
+- **Type**: source
+- **Role**: State observer and coordinator for the native iOS AR layer, designed to eventually bridge with the shared KMP logic.
+- **Imports / Includes**:
+    - `Foundation`
+    - `Combine`
+- **Exports / Public Surface**:
+    - `ARBridge` class
+    - `currentStateLabel`: published state description
+    - `startSession(...)`, `stopSession()`
+    - `onAlignmentEstablished(...)`
+    - `onRenderableRouteUpdated(...)`
+- **Main Symbols**:
+    - `ARBridge`: class (ObservableObject)
+- **Important Logic by Line Range**:
+    - `32-65`: Implementation of the `ArNavigationBridge` contract, updating local `@Published` properties based on lifecycle events.
+- **Uses**:
+    - N/A (Currently standalone, intended to use shared KMP)
+- **Used By**:
+    - [TBD] - Intended for use by the shared AR coordinator.
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Placeholder/Bridge class for future architectural alignment with Android's `ArBridge`.

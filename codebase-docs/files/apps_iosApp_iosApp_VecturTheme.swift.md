@@ -1,0 +1,22 @@
+# File Dossier: apps/iosApp/iosApp/VecturTheme.swift
+
+- **Path**: `apps/iosApp/iosApp/VecturTheme.swift`
+- **Type**: source
+- **Role**: Shared UI styling constants and view modifiers for the iOS application.
+- **Imports / Includes**:
+    - `SwiftUI`
+- **Exports / Public Surface**:
+    - `VecturTheme` enum
+    - `vecturPrimaryButton()`, `vecturSecondaryButton()` view extensions
+- **Main Symbols**:
+    - `VecturTheme`: enum (Namespace)
+- **Important Logic by Line Range**:
+    - `19-42`: View modifiers for standardized button styling, including gradients, shadows, and rounded corners.
+- **Uses**:
+    - SwiftUI
+- **Used By**:
+    - `ContentView`, `RoutePreviewView`, `QRScanView`, and others.
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Centralized styling reduces boilerplate and ensures a consistent look across the app.

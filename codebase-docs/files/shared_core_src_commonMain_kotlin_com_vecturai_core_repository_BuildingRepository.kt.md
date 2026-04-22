@@ -1,0 +1,31 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/repository/BuildingRepository.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/repository/BuildingRepository.kt`
+- **Type**: source
+- **Role**: Interface defining the data access contract for building-specific information.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.EntranceMarker`
+    - `com.vecturai.core.domain.NavGraph`
+    - `com.vecturai.core.domain.Room`
+- **Exports / Public Surface**:
+    - `BuildingRepository` interface
+    - `BuildingInfo` data class
+- **Main Symbols**:
+    - `BuildingRepository`: interface
+    - `getAvailableBuildings`: suspend function
+    - `getRooms`: suspend function
+    - `getNavGraph`: suspend function
+- **Important Logic by Line Range**:
+    - `23-64`: Interface method declarations for loading building metadata, rooms, graphs, and markers.
+    - `75-80`: `BuildingInfo` definition (id, name, version).
+- **Uses**:
+    - `NavGraph`, `Room`, `EntranceMarker` (Domain models)
+- **Used By**:
+    - `NavigationSessionCoordinator`
+    - `DefaultBuildingRepository` (Implementation)
+    - Feature: Search
+- **Config / Constants / Protocol Details**:
+    - Designed to support both local caching and remote fetching.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - In MVP, it focuses on single-building access but the interface is multi-building ready.

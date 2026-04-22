@@ -1,0 +1,33 @@
+# File Dossier: settings.gradle.kts
+
+- **Path**: `settings.gradle.kts`
+- **Type**: build/tooling
+- **Role**: Project settings script, defines included modules and plugin repositories.
+- **Imports / Includes**:
+    - `:apps:androidApp`
+    - `:shared:core`
+    - `:shared:feature-search`
+    - `:shared:feature-routing`
+    - `:shared:feature-history`
+    - `:shared:feature-preview`
+    - `:shared:data-local`
+    - `:shared:data-remote`
+    - `:shared:designsystem`
+    - `:tools:nav-preprocessor`
+    - `:tools:admin-api`
+- **Exports / Public Surface**:
+    - Root project name: `VecturAI`
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `1-7`: `pluginManagement` (repositories: google, mavenCentral, gradlePluginPortal).
+    - `9-14`: `dependencyResolutionManagement` (repositories: google, mavenCentral).
+    - `16`: `rootProject.name` definition.
+    - `19-35`: Module inclusions (apps, shared, tools).
+- **Uses**: N/A
+- **Used By**:
+    - Gradle build system.
+- **Config / Constants / Protocol Details**:
+    - Explicitly notes that iOS app is built via Xcode, not Gradle.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Central point for module discovery.

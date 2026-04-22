@@ -1,0 +1,28 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/di/CoreModule.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/di/CoreModule.kt`
+- **Type**: source
+- **Role**: Defines the dependency injection wiring for all core shared logic using Koin.
+- **Imports / Includes**:
+    - `org.koin.dsl.module`
+    - All core components (Routing, AR, Navigation, Loading, Repository)
+- **Exports / Public Surface**:
+    - `coreModule`: Koin `Module`
+- **Main Symbols**:
+    - `coreModule`: variable
+- **Important Logic by Line Range**:
+    - `28-60`: Singleton definitions for all core services.
+    - `41`: Injects `DijkstraRouteEngine` as the `RouteEngine` implementation.
+    - `46`: Injects `DefaultBuildingRepository` as the `BuildingRepository`.
+    - `57`: Injects `NavigationSessionCoordinator` with its dependencies (RouteEngine, Repository, etc.).
+- **Uses**:
+    - Koin DSL
+    - All core service classes
+- **Used By**:
+    - Platform-specific app initialization (Android `VecturaiApp.kt`, iOS app setup).
+- **Config / Constants / Protocol Details**:
+    - Follows the Koin `module { single { ... } }` pattern.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - History repository is currently hardcoded to `InMemoryHistoryRepository` in the core module; this may be overridden in platform modules for persistence.
+    - Central point of failure if circular dependencies are introduced.

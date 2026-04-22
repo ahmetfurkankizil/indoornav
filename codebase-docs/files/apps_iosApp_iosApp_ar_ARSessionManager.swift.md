@@ -1,0 +1,29 @@
+# File Dossier: apps/iosApp/iosApp/ar/ARSessionManager.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/ARSessionManager.swift`
+- **Type**: source
+- **Role**: Lifecycle manager for the `ARSession`, handling configuration, tracking state monitoring, and reference image loading.
+- **Imports / Includes**:
+    - `ARKit`
+    - `RealityKit`
+- **Exports / Public Surface**:
+    - `ARSessionManager` class
+    - `startSession(...)`, `stopSession()`
+    - `onTrackingStateChanged`: callback for UI updates
+    - `onMarkerAssetMissing`: error callback
+- **Main Symbols**:
+    - `ARSessionManager`: class (ARSessionDelegate)
+- **Important Logic by Line Range**:
+    - `39-127`: `startSession` configures `ARWorldTrackingConfiguration` with plane detection and loads reference images from the "AR Resources" asset group.
+    - `53-77`: Robust verification: ensures the expected entrance marker image exists in the bundle before starting, specifically handling the lack of simulator support for image detection.
+    - `84-99`: Special handling for zero-size reference images: attempts to rebuild them from a regular `UIImage` if the asset catalog didn't preserve physical dimensions.
+    - `167-191`: `session(_:cameraDidChangeTrackingState:)` maps ARKit internal states to human-readable instructions ("Move slower", "More visual detail needed").
+- **Uses**:
+    - ARKit
+- **Used By**:
+    - `ARNavigationViewModel`
+- **Config / Constants / Protocol Details**:
+    - Expected asset group name: "AR Resources".
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Interaction between `ARReferenceImage` and the asset catalog is a known platform pain point; this class contains specific workarounds for physical size preservation.

@@ -1,0 +1,29 @@
+# File Dossier: apps/iosApp/iosApp/QRScanView.swift
+
+- **Path**: `apps/iosApp/iosApp/QRScanView.swift`
+- **Type**: source
+- **Role**: Camera-based QR code scanning interface, providing real-time validation and error feedback.
+- **Imports / Includes**:
+    - `SwiftUI`
+    - `AVFoundation`
+- **Exports / Public Surface**:
+    - `QRScanView` struct
+- **Main Symbols**:
+    - `QRScanView`: struct (View)
+    - `QRCameraPreview`: struct (UIViewControllerRepresentable)
+    - `QRScannerViewController`: class (AVCaptureMetadataOutputObjectsDelegate)
+- **Important Logic by Line Range**:
+    - `123-142`: `handleScannedCode` coordinates parsing, validation against the flow model, and navigation state updates.
+    - `171-262`: `QRScannerViewController` manages the `AVCaptureSession`, sets up the camera preview layer, and listens for `.qr` metadata objects.
+    - `259`: `tearDownCamera()` ensures the camera is released so ARKit can acquire it later without conflict.
+- **Uses**:
+    - `AVCaptureSession`
+    - `QRPayload`
+    - `NavigationFlowModel`
+- **Used By**:
+    - `ContentView`
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Camera resource management is critical; any leak in `AVCaptureSession` will prevent the subsequent AR session from starting.
+    - Simulator fallback provides a "Simulate Scan" button.

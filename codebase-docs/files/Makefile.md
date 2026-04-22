@@ -1,0 +1,29 @@
+# File Dossier: Makefile
+
+- **Path**: `Makefile`
+- **Type**: build/tooling
+- **Role**: Utility build and development task runner.
+- **Imports / Includes**: N/A
+- **Exports / Public Surface**:
+    - Targets: `help`, `test-all`, `test-preprocessor`, `test-shared`, `android-debug`, `android-release`, `ios-open`, `preprocess`, `clean`, `verify-all`, `verify-package`, `verify-ios`, `inspect`, `generate-draft`
+- **Main Symbols**: N/A
+- **Important Logic by Line Range**:
+    - `10-12`: self-documenting `help` target.
+    - `16-23`: Test targets (Gradle wrapper calls).
+    - `27-34`: Android build/install targets.
+    - `38-42`: iOS project open and framework build targets.
+    - `46-60`: Preprocessor tool execution targets with specific sample arguments.
+    - `64-71`: Verification script triggers.
+- **Uses**:
+    - `./gradlew`
+    - `scripts/*.sh`
+    - `sample/demo-building/*`
+- **Used By**:
+    - Developers (manual execution).
+- **Config / Constants / Protocol Details**:
+    - Defines standard input/output paths for sample building preprocessing.
+- **Related Tests**:
+    - `test-preprocessor`
+    - `test-shared`
+- **Notes / Risks**:
+    - Convenient wrapper for complex CLI commands.

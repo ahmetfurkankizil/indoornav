@@ -1,0 +1,37 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/routing/DijkstraRouteEngine.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/routing/DijkstraRouteEngine.kt`
+- **Type**: source
+- **Role**: Implements the core pathfinding logic using Dijkstra's algorithm.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.NavGraph`
+    - `com.vecturai.core.domain.NavNode`
+    - `com.vecturai.core.domain.Route`
+    - `com.vecturai.core.domain.RouteSegment`
+- **Exports / Public Surface**:
+    - `DijkstraRouteEngine` class
+    - `computeRoute(graph, fromNodeId, toNodeId)`
+- **Main Symbols**:
+    - `DijkstraRouteEngine`: class
+    - `computeRoute`: suspend function
+    - `buildSegments`: private function for instruction generation
+    - `generateInstruction`: private function for turn-by-turn logic
+- **Important Logic by Line Range**:
+    - `32-60`: Dijkstra's algorithm implementation (distance map, prev map, unvisited set).
+    - `62-72`: Path reconstruction from the `prev` map.
+    - `74-106`: `buildSegments` logic; iterates through the path to calculate headings and distances.
+    - `108-132`: `generateInstruction` logic; classifies turns as "Turn right/left", "Continue straight", or "Arrive".
+- **Uses**:
+    - `NavGraph` (adjacency list and node map)
+    - `kotlin.math.*` (sqrt, atan2 for spatial calcs)
+- **Used By**:
+    - `NavigationRepository` (indirectly via `RouteEngine` interface)
+    - `NavigationSessionCoordinator`
+- **Config / Constants / Protocol Details**:
+    - `AVERAGE_WALKING_SPEED = 1.2`
+    - `TURN_THRESHOLD = 30.0`
+- **Related Tests**:
+    - `DijkstraRouteEngineTest.kt`
+- **Notes / Risks**:
+    - Uses a simple `minByOrNull` on the distance map instead of a priority queue; acceptable for current graph sizes (~100 nodes) but may need optimization for very large buildings.
+    - Turn instructions are simple and may not handle complex multi-path intersections gracefully without further logic.

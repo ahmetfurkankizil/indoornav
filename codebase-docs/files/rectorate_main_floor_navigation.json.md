@@ -1,0 +1,25 @@
+# File Dossier: rectorate_main_floor_navigation.json
+
+- **Path**: `rectorate_main_floor_navigation.json`
+- **Type**: config
+- **Role**: Manual measured draft of navigation data for the Rectorate building.
+- **Imports / Includes**: N/A
+- **Exports / Public Surface**:
+    - `buildingId`: "19"
+    - `nodes`, `edges`, `rooms`, `entranceMarkers`, `routeRendering`
+- **Main Symbols**: N/A (JSON data)
+- **Important Logic by Line Range**:
+    - `16-31`: `entranceMarkers` definition (marker-main-entrance at eye level 1.6m).
+    - `34-211`: 22 nodes (entrances, junctions, room_entries, stairs).
+    - `212-389`: 22 bidirectional edges with measured costs.
+    - `390-553`: Room metadata (displayName, category, keywords, aliases).
+    - `554-560`: `routeRendering` parameters (spacing, lookahead, threshold).
+- **Uses**: N/A
+- **Used By**:
+    - `nav-preprocessor` (as sample/input reference)
+    - Mobile apps (as sample data)
+- **Config / Constants / Protocol Details**:
+    - Coordinate system: building-local (+X right, +Y up, +Z down).
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Manual 2D measured draft; used as a ground truth for testing the routing engine.

@@ -1,0 +1,37 @@
+# File Dossier: shared/feature-search/src/commonMain/kotlin/com/vecturai/feature/search/SearchUseCase.kt
+
+- **Path**: `shared/feature-search/src/commonMain/kotlin/com/vecturai/feature/search/SearchUseCase.kt`
+- **Type**: source
+- **Role**: Business logic for searching rooms and points of interest within a building.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.Room`
+    - `com.vecturai.core.repository.BuildingRepository`
+- **Exports / Public Surface**:
+    - `SearchUseCase` class
+    - `searchRooms(buildingId, query)`: List<Room>
+    - `getRoomsByCategory(buildingId)`: Map<String, List<Room>>
+    - `getAllRooms(buildingId)`: List<Room>
+- **Main Symbols**:
+    - `SearchUseCase`: class
+    - `scoreMatch`: private function for ranking results
+- **Important Logic by Line Range**:
+    - `23-34`: `searchRooms` orchestrates the search by fetching all rooms and scoring them against the query.
+    - `54-75`: `scoreMatch` implements weighted ranking:
+        - Exact name match: 100 points
+        - Partial name match: 50 points
+        - Alias match: 30 points
+        - Keyword match: 20 points
+        - Category match: 10 points
+        - Description match: 5 points
+- **Uses**:
+    - `BuildingRepository` (Core)
+    - `Room` (Core)
+- **Used By**:
+    - `FeatureSearchModule` (DI)
+    - UI Layer (Room list and search bar)
+- **Config / Constants / Protocol Details**:
+    - Scoring weights are hardcoded.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Linear search through all rooms; performance may degrade for exceptionally large buildings (>1000 rooms).
+    - Case-insensitive search implemented via `.lowercase()`.

@@ -1,0 +1,30 @@
+# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ArrivalDetector.kt
+
+- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ArrivalDetector.kt`
+- **Type**: source
+- **Role**: Logic for determining when the user has reached their destination or is approaching it.
+- **Imports / Includes**:
+    - `kotlinx.serialization.Serializable`
+- **Exports / Public Surface**:
+    - `ArrivalStatus` sealed class
+    - `ArrivalDetector` class
+    - `check(progressFraction, distanceToDest, totalRouteDistance)`
+- **Main Symbols**:
+    - `ArrivalStatus`: sealed class
+    - `ArrivalDetector`: class
+- **Important Logic by Line Range**:
+    - `47-75`: `check` logic; implements two-stage detection (Approaching vs Arrived) based on either `progressFraction` or a direct `distanceToDestMeters`.
+    - `61`: Returns `Arrived` if within `destinationDistanceMeters` (1.5m).
+    - `66`: Returns `Arrived` if `progressFraction` exceeds `arrivalThreshold` (0.95).
+- **Uses**:
+    - Serialization
+- **Used By**:
+    - `NavigationSessionCoordinator`
+- **Config / Constants / Protocol Details**:
+    - `approachThreshold = 0.80`
+    - `arrivalThreshold = 0.95`
+    - `destinationDistanceMeters = 1.5`
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Progress-based arrival is an estimate derived from polyline projection and might trigger early if the user is near the destination but not at the door.
+    - Architecture allows for dropping in more precise VIO-based proximity detection in the future.

@@ -1,0 +1,30 @@
+# File Dossier: apps/iosApp/iosApp/ar/BuildingPackageLoader.swift
+
+- **Path**: `apps/iosApp/iosApp/ar/BuildingPackageLoader.swift`
+- **Type**: source
+- **Role**: Data access layer and routing engine for the iOS application, responsible for loading the multi-file reviewed navigation package and performing pathfinding.
+- **Imports / Includes**:
+    - `Foundation`
+- **Exports / Public Surface**:
+    - `BuildingPackageLoader` struct
+    - `loadReviewedPackage()`: reads JSON files from bundle
+    - `computeRoute(config:destinationRoomId:)`: pathfinding + arrow generation
+- **Main Symbols**:
+    - `BuildingPackageLoader`: struct
+    - `ReviewedConfig`: data structure for the full building config
+    - `LoadedPackage`: data structure for a computed route and associated metadata
+- **Important Logic by Line Range**:
+    - `148-234`: `loadReviewedPackage` parses `manifest.json` and uses it to locate and decode `rooms.json`, `nav_graph.json`, etc.
+    - `239-284`: `computeRoute` assembles an adjacency list and calls Dijkstra to find the shortest path.
+    - `288-318`: `dijkstra` implementation for shortest path calculation on the navigation graph.
+    - `322-390`: `generateArrows` converts a node path into a series of `ArrowPlacementData` objects with turn detection logic (using cross product for left/right turns).
+- **Uses**:
+    - Standard Library (JSONDecoder, sqrt, atan2)
+- **Used By**:
+    - `NavigationFlowModel`
+- **Config / Constants / Protocol Details**:
+    - Standard navigation package format: manifest, rooms, nav_graph, entrance_markers, route_rendering.
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Critical component: contains the core mathematical and algorithmic heart of the navigation system on iOS.
+    - Current implementation is standalone Swift; future versions might delegate this to the shared KMP core.

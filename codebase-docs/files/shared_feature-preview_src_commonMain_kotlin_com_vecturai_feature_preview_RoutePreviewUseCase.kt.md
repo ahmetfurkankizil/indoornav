@@ -1,0 +1,31 @@
+# File Dossier: shared/feature-preview/src/commonMain/kotlin/com/vecturai/feature/preview/RoutePreviewUseCase.kt
+
+- **Path**: `shared/feature-preview/src/commonMain/kotlin/com/vecturai/feature/preview/RoutePreviewUseCase.kt`
+- **Type**: source
+- **Role**: Logic for generating a step-by-step route summary without requiring an active AR session.
+- **Imports / Includes**:
+    - `com.vecturai.core.domain.Room`
+    - `com.vecturai.core.domain.Route`
+    - `com.vecturai.core.repository.BuildingRepository`
+    - `com.vecturai.core.routing.RouteEngine`
+- **Exports / Public Surface**:
+    - `RoutePreviewUseCase` class
+    - `getRoutePreview(buildingId, fromNodeId, destination)`
+    - `RoutePreview` data class
+    - `StepPreview` data class
+- **Main Symbols**:
+    - `RoutePreviewUseCase`: class
+    - `RoutePreview`: data model
+- **Important Logic by Line Range**:
+    - `30-48`: `getRoutePreview` computes the route using the `RouteEngine` and transforms the raw route segments into human-readable `StepPreview` objects.
+- **Uses**:
+    - `RouteEngine` (Core)
+    - `BuildingRepository` (Core)
+- **Used By**:
+    - `FeaturePreviewModule` (DI)
+    - Route Preview Screen
+- **Config / Constants / Protocol Details**: N/A
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Currently limited to text-based instructions.
+    - Future logic for 2D map overlay is planned (TODOs).

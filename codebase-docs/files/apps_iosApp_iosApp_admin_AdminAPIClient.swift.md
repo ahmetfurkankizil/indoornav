@@ -1,0 +1,27 @@
+# File Dossier: apps/iosApp/iosApp/admin/AdminAPIClient.swift
+
+- **Path**: `apps/iosApp/iosApp/admin/AdminAPIClient.swift`
+- **Type**: source
+- **Role**: API client for the internal developer tools, enabling GLB uploads, draft review, and package exporting from the iOS device.
+- **Imports / Includes**:
+    - `Foundation`
+- **Exports / Public Surface**:
+    - `AdminAPIClient` class
+    - `uploadGLB(...)`, `listJobs()`, `getDraftSummary(...)`, `patchRoom(...)`, `exportReviewedPackage(...)`
+- **Main Symbols**:
+    - `AdminAPIClient`: class
+    - `DraftJobResponse`, `DraftSummaryResponse`: response data models
+- **Important Logic by Line Range**:
+    - `14-43`: `uploadGLB` handles multipart/form-data upload for 3D scans.
+    - `123-144`: `patchRoom` allows editing room metadata directly from the iOS admin interface.
+    - `148-162`: `exportReviewedPackage` triggers the backend process to freeze the draft into a production-ready package.
+- **Uses**:
+    - `URLSession`
+- **Used By**:
+    - `AdminDraftJobsView`, `AdminDraftDetailView`
+- **Config / Constants / Protocol Details**:
+    - Default `baseURL`: `http://172.20.10.4:8080` (Configured for local development).
+- **Related Tests**: N/A
+- **Notes / Risks**:
+    - Admin-only functionality, gated by UI hidden in the `HomeView`.
+    - Hardcoded base URL needs to be updated for different network environments.
