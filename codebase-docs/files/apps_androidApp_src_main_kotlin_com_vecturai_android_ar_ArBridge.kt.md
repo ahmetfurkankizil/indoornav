@@ -30,7 +30,7 @@ Coordinates state between the Android AR UI and the shared KMP domain logic. Act
 
 ## Used By
 - `AndroidModule.kt`: Registered as a Koin singleton.
-- `ArNavigationActivity.kt`: Potential future usage for cleaner state management.
+- Android AR/navigation code as needed through dependency injection.
 
 ## Config / Constants / Protocol Details
 - Standard labels: "Waiting for Marker", "Navigating", "Arrived".
@@ -39,4 +39,4 @@ Coordinates state between the Android AR UI and the shared KMP domain logic. Act
 - None.
 
 ## Notes / Risks
-- Currently a lightweight bridge; more logic could be moved here from the Activity.
+- Currently a lightweight bridge; the modernized Android AR flow primarily uses `AndroidArNavigationViewModel`.

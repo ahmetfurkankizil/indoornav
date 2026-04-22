@@ -5,17 +5,21 @@
 - **Implemented In**:
     - `shared/core/src/commonMain/kotlin/com/vecturai/core/store/AppStore.kt`
     - `shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavigationState.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/navigation/AndroidNavigationFlowModel.kt`
 - **Used By**:
     - All feature modules (Search, History, etc.)
     - UI Layer (Compose/SwiftUI)
     - `NavigationSessionCoordinator`
+    - Android visitor flow screens
 - **Main Flow**:
     1. Components observe the `AppStore` for state changes (e.g., current navigation status, selected building).
     2. Components dispatch updates to the `AppStore` via specific setter methods.
     3. UI automatically reacts to state changes using `collectAsState` (Compose) or similar observers.
+    4. Android's visitor flow additionally uses `AndroidNavigationFlowModel` as a screen-level state machine for Home -> QR Scan -> Entrance Confirmed -> Destination Select -> Route Preview -> AR Navigation.
 - **Key Symbols**:
     - `AppStore`: Central singleton holding the `StateFlow`s.
     - `NavigationState`: Sealed class representing the app's current mode.
+    - `AndroidNavigationFlowModel.FlowState`: Android visitor navigation state machine.
 - **Config / Env / Flags**: N/A
 - **Data Structures / Protocols**:
     - `kotlinx.coroutines.flow.StateFlow`
@@ -23,6 +27,7 @@
     - [TBD]
 - **Related File Dossiers**:
     - [AppStore.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_store_AppStore.kt.md)
+    - [AndroidNavigationFlowModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_navigation_AndroidNavigationFlowModel.kt.md)
 - **Risks / Notes**:
     - Thread-safety is managed by `MutableStateFlow`.
     - Excessive state in the global store can lead to unnecessary UI recompositions; keep state granular where possible.

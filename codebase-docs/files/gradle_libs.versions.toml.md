@@ -2,24 +2,21 @@
 
 - **Path**: `gradle/libs.versions.toml`
 - **Type**: build/tooling
-- **Role**: Gradle Version Catalog, centralizing all dependency and plugin versions.
-- **Imports / Includes**: N/A
+- **Role**: Gradle Version Catalog, centralizing dependency and plugin versions.
 - **Exports / Public Surface**:
     - `versions`
     - `libraries`
     - `plugins`
-- **Main Symbols**: N/A
-- **Important Logic by Line Range**:
-    - `1-31`: Version definitions for Kotlin, Android, Ktor, SqlDelight, Koin, etc.
-    - `32-72`: Library group definitions.
-    - `73-83`: Plugin group definitions (including `kotlin-android` fix and `kotlin-compose` addition).
-- **Uses**: N/A
-- **Used By**:
-    - `build.gradle.kts` (Root and subprojects)
-- **Config / Constants / Protocol Details**:
+- **Important Entries**:
     - Kotlin: `2.1.10`
     - AGP: `8.7.3`
     - Compose Multiplatform: `1.7.3`
-- **Related Tests**: N/A
+    - AndroidX lifecycle: `2.8.7`
+    - CameraX: `1.5.1`
+    - ML Kit barcode scanning: `17.3.0`
+    - ARCore: `1.46.0`
+    - Kotlin serialization plugin alias
+- **Used By**:
+    - Root and module Gradle build scripts, especially `apps/androidApp/build.gradle.kts`.
 - **Notes / Risks**:
-    - Single source of truth for dependencies.
+    - Android app sync depends on these aliases existing for CameraX, ML Kit, lifecycle runtime compose, coroutines Android, and serialization JSON.

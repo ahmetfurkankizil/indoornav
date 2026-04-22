@@ -29,6 +29,15 @@ Categories:
       - src/
         - main/
           - AndroidManifest.xml
+          - assets/
+            - ar/
+              - entrance_marker_main.png
+            - reviewed-package/
+              - entrance_markers.json
+              - manifest.json
+              - nav_graph.json
+              - rooms.json
+              - route_rendering.json
           - kotlin/
             - com/
               - vecturai/
@@ -36,13 +45,25 @@ Categories:
                   - MainActivity.kt
                   - VecturaiApp.kt
                   - ar/
+                    - AndroidArNavigationViewModel.kt
+                    - AndroidHapticManager.kt
                     - ArBridge.kt
+                    - ArCoreCameraRenderer.kt
                     - ArMarkerDetector.kt
-                    - ArNavigationActivity.kt
                     - ArRouteRenderer.kt
                     - ArSessionManager.kt
+                  - data/
+                    - AndroidReviewedPackageLoader.kt
                   - di/
                     - AndroidModule.kt
+                  - navigation/
+                    - AndroidNavigationFlowModel.kt
+                  - qr/
+                    - QRPayload.kt
+                  - ui/
+                    - AndroidNavigationApp.kt
+                    - ArNavigationScreen.kt
+                    - QRScanScreen.kt
     - iosApp/
       - iosApp/
         - authoring_config.generated.json

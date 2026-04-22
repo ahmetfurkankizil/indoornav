@@ -1,34 +1,47 @@
-# Feature: AR Navigation
+# Feature: AR Navigation (Android)
 
-- **Feature Name**: AR Navigation
-- **Purpose**: Provides the immersive AR experience where users see navigation arrows overlaid on the real world.
+- **Feature Name**: AR Navigation (Android)
+- **Purpose**: Provides the Android visitor AR navigation experience with an ARCore camera feed, Compose overlays, entrance-poster alignment, rolling route arrows, next-action guidance, ETA HUD, and arrival feedback.
 - **Implemented In**:
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArNavigationActivity.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCoreCameraRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArSessionManager.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArRouteRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArBridge.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
 - **Used By**:
-    - Main App UI (Launch trigger)
+    - `AndroidNavigationApp.kt`
+    - `MainActivity.kt`
 - **Main Flow**:
-    1. **Initialization**: `ArNavigationActivity` starts and initializes the ARCore session via `ArSessionManager`.
-    2. **Scanning**: User points camera at the world. `ArMarkerDetector` searches for known markers.
-    3. **Alignment**: Marker detected -> `handleMarkerDetected` establishes the transformation between AR coordinates and building coordinates.
-    4. **Guidance**: `ArRouteRenderer` displays 3D arrows at path coordinates.
-    5. **Tracking**: `sampleCameraPose` updates progress as the user moves.
-    6. **Arrival**: Proximity to destination triggers the arrival overlay.
+    1. `AndroidNavigationFlowModel` reaches `ArNavigation` with a selected `LoadedPackage` and validated entrance marker.
+    2. `ArNavigationScreen` configures `AndroidArNavigationViewModel` and embeds a `GLSurfaceView`.
+    3. `ArCoreCameraRenderer` starts the ARCore session, draws the camera feed, and forwards each frame to the ViewModel.
+    4. `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
+    5. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
+    6. Compose draws projected arrows and Phase 11-style overlays on top of the AR camera feed.
 - **Key Symbols**:
-    - `ArNavigationActivity`
-    - `ArBridge`
-    - `ArRouteRenderer`
+    - `AndroidArNavigationViewModel`
+    - `ArNavigationUiState`
+    - `ArCoreCameraRenderer`
+    - `ArRouteRenderer.ProjectedArrow`
+    - `MarkerDetectionEvent`
 - **Config / Env / Flags**:
-    - `isSimulated`: Flag to bypass physical marker detection for testing.
+    - ARCore is required by `AndroidManifest.xml`.
+    - Marker image is loaded from `assets/ar/<referenceImageName>.png`.
+    - `simulateAlignment()` exists as a testing/development fallback from the alignment overlay.
 - **Data Structures / Protocols**:
-    - `ArrowRenderData`: Position, orientation, and type for 3D arrows.
-    - `MarkerDetectionEvent`: Payload from image detection.
+    - `ArrowPlacementData`: Position, orientation, type, label, and cumulative distance for route cues.
+    - `RouteRenderingConfig`: Arrow spacing, lookahead distance, destination threshold, turn threshold, and height offset.
+    - `ArNavigationUiState`: Compose-facing state for alignment, tracking, progress, next action, projected arrows, and arrival.
 - **Related Tests**:
-    - [TBD]
+    - None.
 - **Related File Dossiers**:
-    - [ArNavigationActivity.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArNavigationActivity.kt.md)
+    - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
+    - [ArCoreCameraRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCoreCameraRenderer.kt.md)
     - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
+    - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArRouteRenderer.kt.md)
+    - [ArSessionManager.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArSessionManager.kt.md)
+    - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md)
 - **Risks / Notes**:
-    - Highly dependent on lighting and surface texture for ARCore stability.
-    - Coordinate alignment is the most sensitive math section (Euler rotation + 3D translation).
+    - This commit removed the old `ArNavigationActivity`; Android AR is now single-activity Compose.
+    - Device validation remains important for ARCore marker detection, camera projection, and lifecycle behavior.

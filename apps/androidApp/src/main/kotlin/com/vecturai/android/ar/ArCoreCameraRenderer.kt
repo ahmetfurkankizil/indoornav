@@ -36,13 +36,17 @@ class ArCoreCameraRenderer(
         GLES20.glClearColor(0f, 0f, 0f, 1f)
         cameraTextureId = createExternalTexture()
         program = createProgram(VERTEX_SHADER, FRAGMENT_SHADER)
+        if (program == 0) {
+            println("[ArCoreRenderer] Failed to create shader program")
+            return
+        }
         positionAttrib = GLES20.glGetAttribLocation(program, "a_Position")
         texCoordAttrib = GLES20.glGetAttribLocation(program, "a_TexCoord")
         textureUniform = GLES20.glGetUniformLocation(program, "sTexture")
 
-        viewModel.startSession(context.applicationContext)
         viewModel.setCameraTexture(cameraTextureId)
         hasSetCameraTexture = true
+        viewModel.startSession(context.applicationContext)
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -133,19 +137,42 @@ class ArCoreCameraRenderer(
 
     private fun createProgram(vertexShaderCode: String, fragmentShaderCode: String): Int {
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
+        if (vertexShader == 0) return 0
         val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
-        return GLES20.glCreateProgram().also { handle ->
-            GLES20.glAttachShader(handle, vertexShader)
-            GLES20.glAttachShader(handle, fragmentShader)
-            GLES20.glLinkProgram(handle)
+        if (fragmentShader == 0) return 0
+
+        val handle = GLES20.glCreateProgram()
+        if (handle == 0) return 0
+
+        GLES20.glAttachShader(handle, vertexShader)
+        GLES20.glAttachShader(handle, fragmentShader)
+        GLES20.glLinkProgram(handle)
+
+        val linkStatus = IntArray(1)
+        GLES20.glGetProgramiv(handle, GLES20.GL_LINK_STATUS, linkStatus, 0)
+        if (linkStatus[0] == 0) {
+            val log = GLES20.glGetProgramInfoLog(handle)
+            println("[ArCoreRenderer] Program link error: $log")
+            GLES20.glDeleteProgram(handle)
+            return 0
         }
+        return handle
     }
 
     private fun loadShader(type: Int, shaderCode: String): Int {
-        return GLES20.glCreateShader(type).also { shader ->
-            GLES20.glShaderSource(shader, shaderCode)
-            GLES20.glCompileShader(shader)
+        val shader = GLES20.glCreateShader(type)
+        GLES20.glShaderSource(shader, shaderCode)
+        GLES20.glCompileShader(shader)
+
+        val compileStatus = IntArray(1)
+        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0)
+        if (compileStatus[0] == 0) {
+            val log = GLES20.glGetShaderInfoLog(shader)
+            println("[ArCoreRenderer] Shader compile error: $log")
+            GLES20.glDeleteShader(shader)
+            return 0
         }
+        return shader
     }
 
     private fun floatBufferOf(values: FloatArray): FloatBuffer =

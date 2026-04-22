@@ -7,21 +7,27 @@
 Authored Source (Android Activity)
 
 ## Role
-Application entry point. Hosts the Compose UI and triggers the AR navigation flow.
+Application entry point for the single-activity Android app. Hosts the Compose navigation flow and obtains Android flow/AR ViewModels from Koin.
 
 ## Imports / Includes
-- `com.vecturai.designsystem.VecturaiAppContent`
 - `androidx.activity.ComponentActivity`
+- `androidx.activity.compose.setContent`
+- `com.vecturai.android.navigation.AndroidNavigationFlowModel`
+- `com.vecturai.android.ar.AndroidArNavigationViewModel`
+- `com.vecturai.android.ui.AndroidNavigationApp`
+- `org.koin.androidx.viewmodel.ext.android.viewModel`
 
 ## Exports / Public Surface
-- `MainActivity`: Main entry point class.
+- `MainActivity`: Main launcher activity.
 
 ## Logic
-- Sets the content to `VecturaiAppContent`.
-- Provides a callback `onNavigateToAr` (placeholder for intent launch).
+- Creates `AndroidNavigationFlowModel` and `AndroidArNavigationViewModel` via Koin.
+- Calls `setContent` with `AndroidNavigationApp`, making Compose own the visitor flow and AR screen state.
 
 ## Uses
-- `VecturaiAppContent` (Shared UI).
+- `AndroidNavigationApp`
+- `AndroidNavigationFlowModel`
+- `AndroidArNavigationViewModel`
 
 ## Used By
 - `AndroidManifest.xml`: Defined as the LAUNCHER activity.

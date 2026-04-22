@@ -108,8 +108,8 @@ fun ArNavigationScreen(
                     viewModel.resumeSession()
                 }
                 Lifecycle.Event.ON_PAUSE -> {
-                    glSurfaceView?.onPause()
                     viewModel.pauseSession()
+                    glSurfaceView?.onPause()
                 }
                 else -> Unit
             }

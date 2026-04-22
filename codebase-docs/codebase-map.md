@@ -5,7 +5,7 @@ Vecturai is an end-to-end indoor navigation platform that enables users to navig
 
 ## Tech Stack
 - **Languages**: Kotlin (2.1.10), Swift (Native iOS)
-- **Frameworks**: Kotlin Multiplatform (KMP), Compose Multiplatform, ARKit (iOS), ARCore (Android)
+- **Frameworks**: Kotlin Multiplatform (KMP), Jetpack Compose / Compose Multiplatform, ARKit (iOS), ARCore (Android), CameraX, ML Kit Barcode Scanning
 - **Build System**: Gradle (8.11.1) with KTS, Version Catalogs
 - **Networking/Storage**: Ktor, SqlDelight
 - **Dependency Injection**: Koin
@@ -26,7 +26,7 @@ Vecturai follows a **Local-First AR architecture**.
 ## Subsystem Responsibilities
 - `shared/core`: Graph domain models, pathfinding engine, and AR alignment math.
 - `shared/designsystem`: Common Compose UI components and branding.
-- `apps/androidApp`: ARCore integration, camera lifecycle, and Android-native AR view.
+- `apps/androidApp`: Single-activity Jetpack Compose visitor flow, CameraX/ML Kit QR scanning, reviewed-package asset loading, and ARCore camera/alignment overlays.
 - `apps/iosApp`: ARKit integration, Swift-native AR visualization.
 - `tools/nav-preprocessor`: Geometry extraction, occupancy grid generation, and graph serialization.
 - `tools/admin-api`: Ktor-based management of navigation drafts and reviewed packages.
@@ -75,7 +75,7 @@ Vecturai follows a **Local-First AR architecture**.
 - **Asset Parsing**: Reliable extraction of floor planes and navigable geometry from heterogeneous GLB files.
 
 ## Coverage Summary
-- **Folders**: 165 / 165 (100%)
-- **Mapped Files**: 281 (Authored behavior-relevant source)
-- **Total Files Indexed**: 607 (Including artifacts and minimal assets)
+- **Folders**: 172 / 172 (100%)
+- **Mapped Files**: 294 (Authored behavior-relevant source)
+- **Total Files Indexed**: 634 (Including artifacts and minimal assets)
 - **Status**: COMPLETE

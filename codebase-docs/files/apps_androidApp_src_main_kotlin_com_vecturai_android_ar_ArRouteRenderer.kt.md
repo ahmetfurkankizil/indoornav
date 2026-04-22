@@ -7,36 +7,49 @@
 Authored Source (AR Visuals)
 
 ## Role
-Manages the positioning and transformation of 3D navigation arrows in the AR world. Handles the transition from building-local to AR-world coordinates.
+Manages Android AR route arrow state after alignment. Converts building-local arrow placements into AR-world coordinates, applies the rolling lookahead/fade-behind window, and projects visible arrows into screen coordinates for the Compose overlay.
 
 ## Imports / Includes
 - `android.opengl.Matrix`
+- `com.vecturai.android.data.ArrowPlacementData`
+- `com.vecturai.android.data.ArrowPlacementType`
 - `kotlin.math.cos`, `kotlin.math.sin`
 
 ## Exports / Public Surface
 - `ArRouteRenderer`: Main rendering coordinator.
-- `ArrowRenderData`: Metadata for arrow visuals.
+- `ArrowState`: `HIDDEN`, `ACTIVE`, or `FADING`.
+- `VisibleArrow`: AR-world arrow projection state.
+- `ProjectedArrow`: screen-space arrow used by Compose.
 
 ## Main Symbols
+- `configureRendering(...)`: Sets the lookahead and fade distances.
 - `setAlignmentTransform(...)`: Sets the global offset and rotation for world mapping.
-- `updateArrows(arrows)`: Updates the list of currently rendered navigation markers.
+- `placeAllArrows(...)` / `updateArrows(...)`: Stores full route arrow list after alignment.
+- `updateVisibility(userCumulativeDistance)`: Applies active lookahead and fade-behind state.
+- `projectVisibleArrows(...)`: Projects visible AR-world arrows through ARCore view/projection matrices.
 - `transformToAR(...)`: Projects building coords into AR space using the alignment matrix.
+- `hideAllArrows()` / `clearArrows()`: Used on arrival/end navigation.
 
-## Important Logic by Line Range
-- **50-70**: Matrix scaling based on `ArrowRenderType` (e.g., Turn arrows are larger).
-- **76-88**: Rotation-aware point transformation (Y-axis only).
+## Important Logic
+- Rolling lookahead shows arrows from current route progress to `current + lookaheadDistance`.
+- Fade-behind keeps recently passed arrows visible with reduced alpha/scale for `fadeDistance`.
+- `transformToAR` applies the yaw-only alignment transform established by the AR ViewModel.
+- `projectVisibleArrows` emits only arrows in/near normalized device coordinates.
 
 ## Uses
-- `android.opengl.Matrix`: For coordinate transformations.
+- `android.opengl.Matrix`: For view/projection transforms.
+- `ArrowPlacementData`: Route arrow source data from reviewed package routing.
 
 ## Used By
-- `ArNavigationActivity.kt`: Primary consumer for visualization.
+- `AndroidArNavigationViewModel.kt`: Owns alignment and visibility updates.
+- `ArNavigationScreen.kt`: Reads `ProjectedArrow` values through UI state.
 
 ## Config / Constants / Protocol Details
-- Arrow scales: FOLLOW (0.08f), TURN (0.12f), DESTINATION (0.15f).
+- Lookahead distance is configured from `route_rendering.json`.
+- Default fade distance: 3m.
 
 ## Related Tests
 - None.
 
 ## Notes / Risks
-- Rendering logic is currently data-only; requires an external engine (Sceneform/Filament) for actual GPU draw calls.
+- This renderer does not draw 3D meshes directly; it projects AR positions for the Compose arrow overlay on top of the ARCore camera feed.

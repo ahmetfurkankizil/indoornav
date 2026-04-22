@@ -7,37 +7,45 @@
 Authored Source (AR Engine Logic)
 
 ## Role
-Handles the detection of ARCore `AugmentedImage` trackables. Distinguishes between ENTRANCE and CHECKPOINT markers.
+Detects ARCore Augmented Images and converts strictly accepted entrance/checkpoint images into internal marker detection events. The detector mirrors the single-poster contract: only configured marker names or registered database indices are accepted.
 
 ## Imports / Includes
 - `com.google.ar.core.AugmentedImage`
 - `com.google.ar.core.Frame`
+- `com.google.ar.core.TrackingState`
+- `kotlin.math.atan2`
 
 ## Exports / Public Surface
 - `ArMarkerDetector`: Main detection engine.
+- `KnownMarker`: Registered marker metadata.
+- `MarkerDetectionRole`: `ENTRANCE` or `CHECKPOINT`.
+- `DetectionFailureReason`: Timeout diagnostics for no candidates, rejected candidates, or missing asset.
 - `MarkerDetectionEvent`: Data class for detection results.
 
 ## Main Symbols
-- `processFrame(frame)`: Iterates over updated trackables in every render frame.
-- `registerMarker(index, marker)`: Maps ARCore image database indices to building metadata.
-- `onMarkerDetected`: Callback for initial entrance alignment.
-- `onCheckpointDetected`: Callback for mid-route corrections.
+- `configure(...)`: Resets detector state and registers the expected entrance marker name/metadata.
+- `registerMarker(index, name, marker)`: Binds an ARCore image database index and image name to marker metadata.
+- `processFrame(frame)`: Scans fully tracking augmented images, rejects unknown names/indices, computes marker yaw, and emits callbacks.
+- `reset()` / `fullReset()`: Clear detection counters and optionally known marker registrations.
+- `onMarkerDetected`, `onCheckpointDetected`: Alignment/correction callbacks.
 
-## Important Logic by Line Range
-- **91-110**: Extracting pose (tx, ty, tz) and rotation (atan2 on quaternion) from ARCore image.
-- **112-140**: Role-based dispatch (Entrance vs Checkpoint).
+## Important Logic
+- Candidate filtering requires `TrackingState.TRACKING` and `FULL_TRACKING`.
+- Rejected marker names are retained for user-facing timeout hints.
+- Marker Y rotation is extracted from ARCore quaternion data and carried in `MarkerDetectionEvent`.
 
 ## Uses
-- `ARCore SDK`: For trackable management.
+- ARCore `Frame` and `AugmentedImage`.
+- `ArSessionManager` image database indices.
 
 ## Used By
-- `ArNavigationActivity.kt`: Primary consumer for world alignment.
+- `AndroidArNavigationViewModel.kt`: Configures the detector and consumes marker events to lock alignment.
 
 ## Config / Constants / Protocol Details
-- Uses `Math.toDegrees` and `atan2` to convert ARCore quaternions to building-aligned Y-rotation.
+- Marker name must match the reviewed package `referenceImageName` or its registered ARCore image index.
 
 ## Related Tests
 - None.
 
 ## Notes / Risks
-- Relies on physical marker width (`markerWidthMeters`) for depth accuracy.
+- No fallback to "any image" is allowed; this preserves strict marker validation.

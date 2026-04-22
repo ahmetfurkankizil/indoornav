@@ -3,9 +3,10 @@
     "repository": "vecturai",
     "root": "c:\\Users\\emirh\\Desktop\\bitirme\\vecturai",
     "description": "Indoor navigation system with AR support",
-    "generated_at": "2025-04-22T19:30:00Z",
-    "generated_from_range": "5a57a3c06efc1f353d1e500d127079216dcf0272...ff4b05150ebd020a98d91123df0f084dde8b73ee",
-    "last_incremental_update": "2025-04-22T19:30:00Z"
+    "generated_at": "2026-04-22T00:00:00+03:00",
+    "generated_from_range": "bf49840b36845ea9efe1220a6151c5211c72c0ba^..bf49840b36845ea9efe1220a6151c5211c72c0ba",
+    "coverage_verdict": "COMPLETE",
+    "last_incremental_update": "2026-04-22T00:00:00+03:00"
   },
   "folders": [
     {
@@ -37,6 +38,18 @@
       "status": "mapped"
     },
     {
+      "path": "apps\\androidApp\\src\\main\\assets",
+      "status": "mapped"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\ar",
+      "status": "mapped"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package",
+      "status": "mapped"
+    },
+    {
       "path": "apps\\androidApp\\src\\main\\kotlin",
       "status": "mapped"
     },
@@ -57,7 +70,23 @@
       "status": "mapped"
     },
     {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\data",
+      "status": "mapped"
+    },
+    {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\di",
+      "status": "mapped"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\navigation",
+      "status": "mapped"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\qr",
+      "status": "mapped"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui",
       "status": "mapped"
     },
     {
@@ -745,6 +774,75 @@
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_AndroidManifest.xml.md"
     },
     {
+      "path": "apps\\androidApp\\src\\main\\assets\\ar\\entrance_marker_main.png",
+      "category": "asset",
+      "status": "indexed_minimal",
+      "reason": "Android AR reference image asset",
+      "feature_tags": [
+        "ar-navigation"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package\\entrance_markers.json",
+      "category": "config",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "ar-alignment",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_entrance_markers.json.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package\\manifest.json",
+      "category": "config",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_manifest.json.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package\\nav_graph.json",
+      "category": "config",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "route-finding",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_nav_graph.json.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package\\rooms.json",
+      "category": "config",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "search-discovery",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_rooms.json.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\assets\\reviewed-package\\route_rendering.json",
+      "category": "config",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "ar-navigation",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_route_rendering.json.md"
+    },
+    {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\MainActivity.kt",
       "category": "source",
       "status": "mapped",
@@ -787,14 +885,38 @@
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArNavigationActivity.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\AndroidArNavigationViewModel.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
-        "ar-navigation"
+        "ar-navigation",
+        "ar-alignment",
+        "navigation-session-management"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArNavigationActivity.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\AndroidHapticManager.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "ar-navigation",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidHapticManager.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArCoreCameraRenderer.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "ar-navigation",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCoreCameraRenderer.kt.md"
     },
     {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArRouteRenderer.kt",
@@ -818,6 +940,18 @@
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArSessionManager.kt.md"
     },
     {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\data\\AndroidReviewedPackageLoader.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "route-finding",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_data_AndroidReviewedPackageLoader.kt.md"
+    },
+    {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\di\\AndroidModule.kt",
       "category": "source",
       "status": "mapped",
@@ -827,6 +961,65 @@
         "android-app"
       ],
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_di_AndroidModule.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\navigation\\AndroidNavigationFlowModel.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "android-app",
+        "navigation-session-management",
+        "app-state"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_navigation_AndroidNavigationFlowModel.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\qr\\QRPayload.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "navigation-data",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_qr_QRPayload.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui\\AndroidNavigationApp.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "android-app",
+        "design-system",
+        "route-preview",
+        "search-discovery"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_AndroidNavigationApp.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui\\ArNavigationScreen.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "ar-navigation",
+        "design-system",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui\\QRScanScreen.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "android-app",
+        "navigation-data"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_QRScanScreen.kt.md"
     },
     {
       "path": "apps\\iosApp\\iosApp.xcodeproj\\project.pbxproj",
@@ -1469,6 +1662,56 @@
       "artifact_link": null
     },
     {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_assets_reviewed-package_entrance_markers.json.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_assets_reviewed-package_manifest.json.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_assets_reviewed-package_nav_graph.json.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_assets_reviewed-package_rooms.json.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_assets_reviewed-package_route_rendering.json.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
       "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_MainActivity.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
@@ -1509,7 +1752,27 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArNavigationActivity.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidHapticManager.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCoreCameraRenderer.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1539,7 +1802,67 @@
       "artifact_link": null
     },
     {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_data_AndroidReviewedPackageLoader.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
       "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_di_AndroidModule.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_navigation_AndroidNavigationFlowModel.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_qr_QRPayload.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ui_AndroidNavigationApp.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ui_QRScanScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
