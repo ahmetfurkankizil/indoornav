@@ -3,34 +3,40 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# IDE
+# IDE - IntelliJ / Android Studio
 .idea/
 *.iml
+*.iws
 .DS_Store
+*.swp
+*.out
+*.app
+out/
 
 # Kotlin
+.kotlin/
+.konan/
 *.class
 *.log
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
 
 # Android
 local.properties
 *.apk
+*.ap_
 *.aab
 *.dex
-*.ap_
+captures/
+.externalNativeBuild/
+.cxx/
+lint/reports/
+lint/intermediate/
 
 # iOS
 *.xcuserdata
 *.xcworkspace
 DerivedData/
 Pods/
+.cocoapods/
 *.pbxuser
 *.mode1v3
 *.mode2v3

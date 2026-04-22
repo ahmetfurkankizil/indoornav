@@ -5,6 +5,7 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(21)
     androidTarget()
     iosX64()
     iosArm64()
@@ -23,4 +24,8 @@ android {
     namespace = "com.vecturai.feature.routing"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 }

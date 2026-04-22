@@ -5,6 +5,7 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(21)
     androidTarget()
     listOf(
         iosX64(),
@@ -32,5 +33,9 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
