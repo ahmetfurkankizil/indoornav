@@ -88,8 +88,22 @@ class AndroidArNavigationViewModel(
         routePackage: AndroidReviewedPackageLoader.LoadedPackage,
         entranceMarker: AndroidReviewedPackageLoader.PackageMarker?,
     ) {
+        alignmentTimeoutJob?.cancel()
+        sessionManager.stopSession()
+        routeRenderer.clearArrows()
+        markerDetector.fullReset()
+
         this.routePackage = routePackage
         this.entranceMarker = entranceMarker
+        sessionStarted = false
+        userCumulativeDistance = 0.0
+        alignmentOffsetX = 0.0
+        alignmentOffsetY = 0.0
+        alignmentOffsetZ = 0.0
+        alignmentRotYDeg = 0.0
+        lastPoseSampleMs = 0L
+        lastProjectedUpdateMs = 0L
+        lastHapticArrowId = null
         destinationThreshold = routePackage.config.routeRendering.destinationThresholdMeters
         routeRenderer.configureRendering(routePackage.config.routeRendering.lookaheadDistanceMeters)
         _uiState.value = ArNavigationUiState(
@@ -262,10 +276,32 @@ class AndroidArNavigationViewModel(
         alignmentTimeoutJob = null
         sessionManager.stopSession()
         routeRenderer.clearArrows()
+        markerDetector.fullReset()
         sessionStarted = false
+        userCumulativeDistance = 0.0
+        alignmentOffsetX = 0.0
+        alignmentOffsetY = 0.0
+        alignmentOffsetZ = 0.0
+        alignmentRotYDeg = 0.0
+        lastPoseSampleMs = 0L
+        lastProjectedUpdateMs = 0L
+        lastHapticArrowId = null
         _uiState.update {
             it.copy(
                 sessionStateLabel = "Ended",
+                isAligned = false,
+                hasArrived = false,
+                isSimulated = false,
+                progress = 0.0,
+                remainingDistance = 0.0,
+                distanceToDestination = 0.0,
+                arrowCount = 0,
+                isLowConfidence = false,
+                alignmentTimedOut = false,
+                markerAssetError = null,
+                nextActionIcon = NavigationActionIcon.Straight,
+                nextActionText = "Follow the path",
+                nextActionDistance = null,
                 projectedArrows = emptyList(),
             )
         }

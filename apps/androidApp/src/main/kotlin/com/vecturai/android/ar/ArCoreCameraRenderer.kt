@@ -44,9 +44,9 @@ class ArCoreCameraRenderer(
         texCoordAttrib = GLES20.glGetAttribLocation(program, "a_TexCoord")
         textureUniform = GLES20.glGetUniformLocation(program, "sTexture")
 
+        viewModel.startSession(context.applicationContext)
         viewModel.setCameraTexture(cameraTextureId)
         hasSetCameraTexture = true
-        viewModel.startSession(context.applicationContext)
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {

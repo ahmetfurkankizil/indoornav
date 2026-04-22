@@ -1,6 +1,7 @@
 package com.vecturai.android.ui
 
 import android.opengl.GLSurfaceView
+import android.os.Build
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -305,10 +306,12 @@ private fun AlignmentOverlay(
                 }
             }
 
-            Button(onClick = onSimulate, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Simulate Scan")
+            if (isLikelyEmulator()) {
+                Button(onClick = onSimulate, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Simulate Scan")
+                }
             }
         }
     }
@@ -566,3 +569,20 @@ private fun formatEta(seconds: Double): String {
 }
 
 private fun Double.roundMeters(): String = "%.0f".format(this)
+
+private fun isLikelyEmulator(): Boolean {
+    val fingerprint = Build.FINGERPRINT.lowercase()
+    val model = Build.MODEL.lowercase()
+    val manufacturer = Build.MANUFACTURER.lowercase()
+    val brand = Build.BRAND.lowercase()
+    val device = Build.DEVICE.lowercase()
+    val product = Build.PRODUCT.lowercase()
+    return fingerprint.startsWith("generic") ||
+        fingerprint.contains("emulator") ||
+        model.contains("google_sdk") ||
+        model.contains("emulator") ||
+        model.contains("android sdk built for") ||
+        manufacturer.contains("genymotion") ||
+        (brand.startsWith("generic") && device.startsWith("generic")) ||
+        product == "google_sdk"
+}
