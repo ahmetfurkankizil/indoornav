@@ -8,6 +8,7 @@
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArSessionManager.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArRouteRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArFeatureFlags.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
 - **Used By**:
     - `AndroidNavigationApp.kt`
@@ -16,14 +17,15 @@
     1. `AndroidNavigationFlowModel` reaches `ArNavigation` with a selected `LoadedPackage` and validated entrance marker.
     2. `ArNavigationScreen` configures `AndroidArNavigationViewModel` and embeds a `GLSurfaceView`.
     3. `ArCoreCameraRenderer` starts the ARCore session, draws the camera feed, and forwards each frame to the ViewModel.
-    4. `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
-    5. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
-    6. Compose draws projected arrows and Phase 11-style overlays on top of the AR camera feed.
+    4. If the AR session fails (e.g. camera busy), `AndroidArNavigationViewModel` performs an exponential backoff session rebuild.
+    5. `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
+    6. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
+    7. Compose draws projected arrows and Phase 11-style overlays on top of the AR camera feed.
 - **Key Symbols**:
     - `AndroidArNavigationViewModel`
     - `ArNavigationUiState`
     - `ArCoreCameraRenderer`
-    - `ArRouteRenderer.ProjectedArrow`
+    - `ArFeatureFlags.ArUnifiedCameraPipeline`
     - `MarkerDetectionEvent`
 - **Config / Env / Flags**:
     - ARCore is required by `AndroidManifest.xml`.
@@ -38,6 +40,7 @@
 - **Related File Dossiers**:
     - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
     - [ArCoreCameraRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCoreCameraRenderer.kt.md)
+    - [ArFeatureFlags.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArFeatureFlags.kt.md)
     - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
     - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArRouteRenderer.kt.md)
     - [ArSessionManager.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArSessionManager.kt.md)

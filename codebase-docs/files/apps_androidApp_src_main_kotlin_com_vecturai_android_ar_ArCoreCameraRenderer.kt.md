@@ -19,24 +19,26 @@ GLSurfaceView renderer that draws the ARCore camera feed as a full-screen extern
 - `ArCoreCameraRenderer`: `GLSurfaceView.Renderer` implementation.
 
 ## Main Symbols
-- `onSurfaceCreated(...)`: Creates external texture/shader program, starts AR session, and binds ARCore camera texture.
-- `onSurfaceChanged(...)`: Updates viewport dimensions.
-- `onDrawFrame(...)`: Calls `session.update()`, renders the camera background, and passes the frame to the ViewModel.
+- `onSurfaceCreated(...)`: Initializes OpenGL state, creates the external OES texture, and binds it to the AR session.
+- `onSurfaceChanged(...)`: Updates viewport and display geometry in the AR session.
+- `onDrawFrame(...)`: Orchestrates the per-frame lifecycle: updates the AR session, handles camera recovery if `session.update()` fails, and triggers background rendering.
 
 ## Important Logic
-- Uses `Frame.transformCoordinates2d` to map OpenGL NDC quad coordinates to ARCore texture coordinates.
-- Draws camera feed with a small vertex/fragment shader pair using `samplerExternalOES`.
-- Defers route arrow rendering to the Compose overlay via the ViewModel.
+- **Recovery Logic**: If `session.update()` fails (e.g. `CameraNotAvailableException`), it triggers a session rebuild via the ViewModel.
+- **Frame Validation**: Tracks if camera frames are actually being received; if not, it attempts recovery or surfaces an error after a timeout.
+- **Coordinate Transformation**: Uses `Frame.transformCoordinates2d` to ensure the camera feed is correctly oriented and scaled to the viewport.
 
 ## Uses
-- `AndroidArNavigationViewModel`
-- ARCore `Session` and `Frame`
+- `AndroidArNavigationViewModel`: Receives frames and handles session lifecycle.
+- ARCore `Session` and `Frame`.
 
 ## Used By
-- `ArNavigationScreen.kt`: Embedded in Compose via `AndroidView` / `GLSurfaceView`.
+- `ArNavigationScreen.kt`: Embedded in Compose via `AndroidView`.
 
 ## Related Tests
 - None.
 
 ## Notes / Risks
-- Shader compile/link status is not surfaced; visual validation on device is still required.
+- OpenGL operations are performed on the GL thread; any UI updates from the renderer must be dispatched to the main thread (via ViewModel).
+- Added logic to detect "black screen" states where ARCore is running but not delivering frames.
+

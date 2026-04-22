@@ -3,10 +3,11 @@
     "repository": "vecturai",
     "root": "c:\\Users\\emirh\\Desktop\\bitirme\\vecturai",
     "description": "Indoor navigation system with AR support",
-    "generated_at": "2026-04-22T00:00:00+03:00",
-    "generated_from_range": "bf49840b36845ea9efe1220a6151c5211c72c0ba^..bf49840b36845ea9efe1220a6151c5211c72c0ba",
+    "generated_at": "2026-04-23T00:42:00+03:00",
+    "generated_from_range": "bf49840b36845ea9efe1220a6151c5211c72c0ba..f0cdb2ca91fc69bb6599e78efe60da385d4b498b",
     "coverage_verdict": "COMPLETE",
-    "last_incremental_update": "2026-04-22T00:00:00+03:00"
+    "last_incremental_update": "2026-04-23T00:42:00+03:00"
+
   },
   "folders": [
     {
@@ -864,7 +865,19 @@
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_VecturaiApp.kt.md"
     },
     {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArFeatureFlags.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "ar-navigation",
+        "config"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArFeatureFlags.kt.md"
+    },
+    {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArBridge.kt",
+
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1732,7 +1745,18 @@
       "artifact_link": null
     },
     {
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArFeatureFlags.kt.md",
+      "category": "docs/artifact",
+      "status": "indexed_minimal",
+      "reason": "Documentation artifact for codebase context",
+      "feature_tags": [
+        "infrastructure"
+      ],
+      "artifact_link": null
+    },
+    {
       "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArBridge.kt.md",
+
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",

@@ -10,42 +10,47 @@ Authored Source (AR Infrastructure)
 Wraps the ARCore `Session` lifecycle and builds an Augmented Image database from the reviewed package entrance marker asset.
 
 ## Imports / Includes
-- `android.content.Context`
+- `android.app.Activity`
 - `android.graphics.BitmapFactory`
 - `com.google.ar.core.AugmentedImageDatabase`
 - `com.google.ar.core.Config`
 - `com.google.ar.core.Session`
+- `com.vecturai.android.ar.ArFeatureFlags`
 
 ## Exports / Public Surface
 - `ArSessionManager`: Lifecycle manager.
+- `SessionFailure`: Sealed class for categorized failures.
 
 ## Main Symbols
-- `createSession(context, markerImageAssetPath, markerImageName, markerWidthMeters)`: Loads marker bitmap from Android assets, adds it to an Augmented Image database, and configures ARCore.
+- `initializeEmptySession(activity)`: Creates an AR session without any reference images.
+- `createSession(activity, markerImageAssetPath, markerImageName, markerWidthMeters)`: Loads marker bitmap, sanitizes it (copying hardware bitmaps, ensuring opacity), and configures ARCore with an image database.
 - `setCameraTexture(textureId)`: Connects the GL camera background texture to ARCore.
 - `resumeSession()` / `pauseSession()`: ARCore lifecycle hooks.
-- `stopSession()`: Closes the session and clears loaded-image metadata.
+- `stopSession()`: Pauses and closes the session.
+- `awaitClosed()`: Suspends to allow session cleanup.
 
 ## Important Logic
-- Asset loading from `assets/ar/<referenceImageName>.png` is required before session creation succeeds.
-- Marker physical width comes from `entrance_markers.json`.
-- Session config uses latest camera image updates, horizontal plane finding, and auto focus.
+- **Activity Dependency**: Now requires `Activity` instead of `Context` for session creation to avoid ARCore initialization deadlocks.
+- **Bitmap Sanitization**: pro-actively copies `HARDWARE` bitmaps to `ARGB_8888` and ensures they are opaque before passing to ARCore to prevent native crashes.
+- **Unified Pipeline**: Respects `ArFeatureFlags.ArUnifiedCameraPipeline` to potentially preserve sessions between screens.
 
 ## Uses
 - ARCore SDK.
 - Android assets: marker reference image.
 
 ## Used By
-- `AndroidArNavigationViewModel.kt`: Creates/resumes/stops the session and sets the camera texture.
+- `AndroidArNavigationViewModel.kt`: Creates/resumes/stops the session.
 - `ArCoreCameraRenderer.kt`: Updates the session every GL frame.
+- `QRScanScreen.kt`: Uses `ArCoreQrPreview` which interacts with the session manager.
 
 ## Config / Constants / Protocol Details
 - Update Mode: `LATEST_CAMERA_IMAGE`.
 - Plane Finding: `HORIZONTAL`.
-- Reference image asset path: `ar/<referenceImageName>.png`.
 
 ## Related Tests
 - None.
 
 ## Notes / Risks
-- AR session creation can throw on unsupported devices.
-- Missing marker assets now surface as configuration errors rather than silent alignment timeouts.
+- Extensive debug logging (`[ARDiag]`) added for troubleshooting real-device camera issues.
+- `SessionFailure` provides user-friendly error messages for ARCore installation or device support issues.
+
