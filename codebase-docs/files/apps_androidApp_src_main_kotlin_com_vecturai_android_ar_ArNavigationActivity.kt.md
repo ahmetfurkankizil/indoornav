@@ -27,9 +27,9 @@ Main AR navigation interface. Manages the lifecycle of the AR session, marker de
 
 ## Important Logic by Line Range
 - **60-202**: UI initialization and marker detector configuration.
-- **228-237**: Demo simulation logic.
+- **228-239**: Demo simulation logic (now passes `MarkerDetectionRole`).
 - **252-291**: Alignment math (AR-to-Building transformation).
-- **309-349**: Progress tracking logic (Nearest-segment projection).
+- **309-349**: Progress tracking logic (Nearest-segment projection, using `session.update()`).
 - **358-375**: Arrival detection and overlay trigger.
 
 ## Uses

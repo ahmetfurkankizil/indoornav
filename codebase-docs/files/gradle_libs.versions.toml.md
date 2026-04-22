@@ -12,7 +12,7 @@
 - **Important Logic by Line Range**:
     - `1-31`: Version definitions for Kotlin, Android, Ktor, SqlDelight, Koin, etc.
     - `32-72`: Library group definitions.
-    - `73-81`: Plugin group definitions.
+    - `73-83`: Plugin group definitions (including `kotlin-android` fix and `kotlin-compose` addition).
 - **Uses**: N/A
 - **Used By**:
     - `build.gradle.kts` (Root and subprojects)

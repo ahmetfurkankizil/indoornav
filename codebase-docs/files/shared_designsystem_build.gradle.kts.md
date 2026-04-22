@@ -1,52 +1,31 @@
-# File Dossier: build.gradle.kts
+# File Dossier: build.gradle.kts (Design System)
 
 ## Path
-`shared\designsystem\build.gradle.kts`
+`shared/designsystem/build.gradle.kts`
 
 ## Type
-Build Configuration
+Authored Config (Gradle)
 
 ## Role
-Build Configuration for the shared component.
+Build configuration for the shared design system component, providing common Compose UI elements for both Android and iOS.
 
-## Logic Overview
-(Inferred from first 50 lines)
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.multiplatform)
-    alias(libs.plugins.android.library)
-}
+## Logic
+- Applies `kotlin-multiplatform`, `kotlin-compose`, `compose-multiplatform`, and `android-library` plugins.
+- Configures `androidTarget()` and iOS targets.
+- Defines dependencies for `commonMain` including `:shared:core`, Compose libraries, and Koin.
+- Configures Android `namespace` and `compileSdk`.
 
-kotlin {
-    androidTarget()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+## Dependencies
+- `:shared:core`: Shared domain models and logic.
+- `compose.runtime`, `compose.foundation`, `compose.material3`, `compose.ui`: Compose Multiplatform libraries.
+- `libs.koin-core`, `libs.koin-compose`: Dependency injection.
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":shared:core"))
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-        }
-    }
-}
-
-android {
-    namespace = "com.vecturai.designsystem"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
-    buildFeatures { compose = true }
-    composeOptions {
-        kotlinCompilerExtensionVersion = 
-```
+## Used By
+- `:apps:androidApp`
+- `:shared:feature-search`
+- `:shared:feature-routing`
+- `:shared:feature-history`
+- `:shared:feature-preview`
 
 ## Status
-Mapped (Pass 3 Normalization)
+Mapped (Incremental Update)
