@@ -4,46 +4,42 @@
 `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
 
 ## Type
-Authored Source (Android Compose AR UI)
+Authored Source (Android Compose AR Overlay)
 
 ## Role
-Compose AR navigation screen that hosts the ARCore camera surface and overlays projected route arrows, alignment guidance, next-action cards, tracking badge, ETA HUD, and arrival card.
+Passive AR navigation overlay that draws projected route arrows, alignment guidance, next-action cards, tracking badge, ETA HUD, and arrival card over `ArCameraActivity`'s Activity-owned ARCore camera view.
 
 ## Imports / Includes
-- Android `GLSurfaceView`
-- Jetpack Compose animation/foundation/material/icons/runtime APIs
-- `androidx.compose.ui.viewinterop.AndroidView`
-- `androidx.lifecycle.compose.collectAsStateWithLifecycle`
-- `com.vecturai.android.ar.AndroidArNavigationViewModel`
-- `com.vecturai.android.ar.ArCoreCameraRenderer`
-- `com.vecturai.android.navigation.AndroidNavigationFlowModel`
-- `com.vecturai.android.data.ArrowPlacementType`
+- Jetpack Compose animation/foundation/material/icons/runtime APIs.
+- `AndroidArNavigationViewModel`
+- `ArNavigationUiState`
+- `NavigationActionIcon`
+- `TrackingStatusIcon`
+- `ArrowPlacementType`
 
 ## Exports / Public Surface
-- `ArNavigationScreen(...)`
+- `ArNavigationScreen(viewModel, onEnd, onRetryActivity)`
 
 ## Main Symbols
-- `ArNavigationScreen`: Configures AR navigation and embeds `GLSurfaceView`.
+- `ArNavigationScreen`: Renders UI state only; it does not create or own a `GLSurfaceView`.
 - `ProjectedArrowLayer`: Draws projected arrow icons on top of camera feed.
-- `AlignmentOverlay`: Pre-alignment poster guidance and retry/simulate actions.
+- `AlignmentOverlay`: Pre-alignment poster guidance and timeout actions.
 - `ActiveNavigationOverlay`: Top guidance and bottom HUD during route following.
 - `InstructionBanner`: Next-action card.
-- `BottomHud`: Remaining distance, ETA, and end route action.
+- `BottomHud`: Remaining distance, ETA, simulated advance, and end route action.
 - `ArrivalOverlay`: Spring-animated arrival card.
 
 ## Important Logic
-- Calls `arViewModel.configure(...)` when route package changes.
-- Uses `AndroidView` to bridge Compose and `GLSurfaceView` without returning to an Activity-based AR screen.
-- Handles lifecycle by resuming/pausing AR session with the current lifecycle owner.
+- Session lifecycle, camera permission, GL surface creation, and renderer wiring moved to `ArCameraActivity`.
+- Error/timeout retry callbacks recreate the hosting Activity, yielding a fresh ARCore session instead of rebuilding in-place.
 - Bottom HUD ETA uses remaining distance at 1.2 m/s.
 
 ## Uses
 - `AndroidArNavigationViewModel`
-- `AndroidNavigationFlowModel`
-- `ArCoreCameraRenderer`
+- `ArNavigationUiState`
 
 ## Used By
-- `AndroidNavigationApp.kt`: Rendered for `FlowState.ArNavigation`.
+- `ArCameraActivity.kt`: Rendered for `Phase.ArNavigation`.
 
 ## Related Tests
 - None.

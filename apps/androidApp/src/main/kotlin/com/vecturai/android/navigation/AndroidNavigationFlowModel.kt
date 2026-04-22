@@ -1,27 +1,59 @@
 package com.vecturai.android.navigation
 
 import androidx.lifecycle.ViewModel
+import com.google.ar.core.Frame
 import com.vecturai.android.data.AndroidReviewedPackageLoader
+import com.vecturai.android.qr.ArFrameQrScanner
 import com.vecturai.android.qr.QRPayload
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-import com.vecturai.android.ar.ArSessionManager
-
 class AndroidNavigationFlowModel(
     private val packageLoader: AndroidReviewedPackageLoader,
-    val sessionManager: ArSessionManager,
 ) : ViewModel() {
 
-    sealed interface FlowState {
-        data object Home : FlowState
-        data object QrScan : FlowState
-        data class EntranceConfirmed(val entranceName: String) : FlowState
-        data object DestinationSelect : FlowState
-        data object RoutePreview : FlowState
-        data object ArNavigation : FlowState
-        data class PackageError(val message: String) : FlowState
+    sealed interface HomeState {
+        data object Home : HomeState
+        data class PackageError(val message: String) : HomeState
+    }
+
+    private val _state = MutableStateFlow<HomeState>(HomeState.Home)
+    val state: StateFlow<HomeState> = _state.asStateFlow()
+
+    init {
+        loadPackage()
+    }
+
+    fun retryPackageLoad() {
+        loadPackage()
+    }
+
+    private fun loadPackage() {
+        packageLoader.loadReviewedPackage()
+            .onSuccess {
+                _state.value = HomeState.Home
+            }
+            .onFailure { error ->
+                _state.value = HomeState.PackageError(
+                    error.message ?: "Unable to load navigation data",
+                )
+            }
+    }
+}
+
+class ArCameraFlowViewModel(
+    private val packageLoader: AndroidReviewedPackageLoader,
+) : ViewModel() {
+
+    sealed interface Phase {
+        data object Loading : Phase
+        data object QrScan : Phase
+        data class EntranceConfirmed(val entranceName: String) : Phase
+        data object DestinationSelect : Phase
+        data object RoutePreview : Phase
+        data object ArNavigation : Phase
+        data class FatalError(val message: String) : Phase
     }
 
     data class SessionData(
@@ -32,8 +64,8 @@ class AndroidNavigationFlowModel(
         val reviewedConfig: AndroidReviewedPackageLoader.ReviewedConfig? = null,
     )
 
-    private val _state = MutableStateFlow<FlowState>(FlowState.Home)
-    val state: StateFlow<FlowState> = _state.asStateFlow()
+    private val _phase = MutableStateFlow<Phase>(Phase.Loading)
+    val phase: StateFlow<Phase> = _phase.asStateFlow()
 
     private val _session = MutableStateFlow(SessionData())
     val session: StateFlow<SessionData> = _session.asStateFlow()
@@ -41,105 +73,70 @@ class AndroidNavigationFlowModel(
     private val _qrError = MutableStateFlow<String?>(null)
     val qrError: StateFlow<String?> = _qrError.asStateFlow()
 
+    private val qrScanner = ArFrameQrScanner { rawValue ->
+        onQRScanned(rawValue)
+    }
+
     val availableRooms: List<AndroidReviewedPackageLoader.PackageRoom>
         get() = _session.value.reviewedConfig?.rooms.orEmpty()
 
     init {
-        loadPackage()
+        loadPackageForCameraFlow()
     }
 
-    fun loadPackage() {
-        packageLoader.loadReviewedPackage()
-            .onSuccess { config ->
-                _session.value = _session.value.copy(reviewedConfig = config)
-                _state.value = FlowState.Home
-            }
-            .onFailure { error ->
-                _session.value = SessionData()
-                _state.value = FlowState.PackageError(error.message ?: "Unable to load navigation data")
-            }
-    }
+    fun entranceMarkerForSession(): AndroidReviewedPackageLoader.PackageMarker? =
+        _session.value.reviewedConfig?.entranceMarkers?.firstOrNull()
 
-    fun startQRScan() {
-        if (_session.value.reviewedConfig != null) {
-            _qrError.value = null
-            _state.value = FlowState.QrScan
+    fun onQrFrame(frame: Frame, rotationDegrees: Int) {
+        if (_phase.value == Phase.QrScan) {
+            qrScanner.scan(frame, rotationDegrees)
         }
-    }
-
-    fun onQRScanned(rawValue: String) {
-        val payload = QRPayload.parse(rawValue).getOrElse { error ->
-            _qrError.value = error.message
-            return
-        }
-
-        val config = _session.value.reviewedConfig ?: run {
-            _qrError.value = QRPayload.PayloadError.NotJSON.message
-            return
-        }
-
-        payload.validate(config)?.let { error ->
-            _qrError.value = error.message
-            return
-        }
-
-        confirmEntrance(payload)
     }
 
     fun clearQRError() {
         _qrError.value = null
+        qrScanner.reset()
     }
 
-    fun confirmEntrance(payload: QRPayload) {
-        val config = _session.value.reviewedConfig ?: return
-        val marker = config.entranceMarkers.firstOrNull { it.id == payload.entranceId }
-        val displayName = marker?.displayName ?: "Entrance"
-        _session.value = _session.value.copy(
-            confirmedEntrance = displayName,
-            validatedEntranceMarker = marker,
-        )
-        _state.value = FlowState.EntranceConfirmed(displayName)
-    }
+    fun onQRScanned(rawValue: String): Boolean {
+        val payload = QRPayload.parse(rawValue).getOrElse { error ->
+            _qrError.value = error.message
+            return false
+        }
 
-    fun confirmEntrance(name: String) {
-        val marker = _session.value.reviewedConfig?.entranceMarkers?.firstOrNull()
-        _session.value = _session.value.copy(
-            confirmedEntrance = name,
-            validatedEntranceMarker = marker,
-        )
-        _state.value = FlowState.EntranceConfirmed(name)
+        val config = _session.value.reviewedConfig ?: run {
+            _qrError.value = QRPayload.PayloadError.NotJSON.message
+            return false
+        }
+
+        payload.validate(config)?.let { error ->
+            _qrError.value = error.message
+            return false
+        }
+
+        confirmEntrance(payload)
+        return true
     }
 
     fun proceedToDestinationSelect() {
-        _state.value = FlowState.DestinationSelect
+        _phase.value = Phase.DestinationSelect
     }
 
     fun selectDestination(room: AndroidReviewedPackageLoader.PackageRoom) {
         val config = _session.value.reviewedConfig ?: return
-        val routePackage = packageLoader.computeRoute(config, room.id)
+        val routePackage = packageLoader.computeRoute(config, room.id) ?: return
         _session.value = _session.value.copy(
             selectedRoom = room,
             routePackage = routePackage,
         )
-        _state.value = FlowState.RoutePreview
+        _phase.value = Phase.RoutePreview
     }
 
     fun startNavigation() {
         val session = _session.value
         if (session.selectedRoom != null && session.routePackage != null) {
-            _state.value = FlowState.ArNavigation
+            _phase.value = Phase.ArNavigation
         }
-    }
-
-    fun endNavigation() {
-        _session.value = _session.value.copy(
-            confirmedEntrance = "",
-            selectedRoom = null,
-            routePackage = null,
-            validatedEntranceMarker = null,
-        )
-        _qrError.value = null
-        _state.value = FlowState.Home
     }
 
     fun goBackToDestinationSelect() {
@@ -147,10 +144,36 @@ class AndroidNavigationFlowModel(
             selectedRoom = null,
             routePackage = null,
         )
-        _state.value = FlowState.DestinationSelect
+        _phase.value = Phase.DestinationSelect
     }
 
-    fun retryPackageLoad() {
-        loadPackage()
+    override fun onCleared() {
+        qrScanner.close()
+        super.onCleared()
+    }
+
+    private fun loadPackageForCameraFlow() {
+        packageLoader.loadReviewedPackage()
+            .onSuccess { config ->
+                _session.value = SessionData(reviewedConfig = config)
+                _phase.value = Phase.QrScan
+            }
+            .onFailure { error ->
+                _session.value = SessionData()
+                _phase.value = Phase.FatalError(
+                    error.message ?: "Unable to load navigation data",
+                )
+            }
+    }
+
+    private fun confirmEntrance(payload: QRPayload) {
+        val config = _session.value.reviewedConfig ?: return
+        val marker = config.entranceMarkers.firstOrNull { it.id == payload.entranceId }
+        val displayName = marker?.displayName ?: "Entrance"
+        _session.value = _session.value.copy(
+            confirmedEntrance = displayName,
+            validatedEntranceMarker = marker,
+        )
+        _phase.value = Phase.EntranceConfirmed(displayName)
     }
 }

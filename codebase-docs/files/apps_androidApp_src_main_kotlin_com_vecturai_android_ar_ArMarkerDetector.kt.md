@@ -36,7 +36,7 @@ Detects ARCore Augmented Images and converts strictly accepted entrance/checkpoi
 
 ## Uses
 - ARCore `Frame` and `AugmentedImage`.
-- `ArSessionManager` image database indices.
+- ARCore augmented image database names/indices configured by `UnifiedArSession`.
 
 ## Used By
 - `AndroidArNavigationViewModel.kt`: Configures the detector and consumes marker events to lock alignment.

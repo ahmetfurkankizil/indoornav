@@ -7,40 +7,39 @@
 Authored Source (DI Configuration)
 
 ## Role
-Defines the Koin module for Android-specific dependencies, including ARCore helpers, haptics, reviewed-package loading, and Android ViewModels.
+Defines the Koin module for Android-specific dependencies, haptics, reviewed-package loading, AR navigation helpers, and Android ViewModels.
 
 ## Imports / Includes
-- `com.vecturai.android.ar.ArBridge`
-- `com.vecturai.android.ar.AndroidArNavigationViewModel`
-- `com.vecturai.android.ar.AndroidHapticManager`
-- `com.vecturai.android.ar.ArMarkerDetector`
-- `com.vecturai.android.ar.ArRouteRenderer`
-- `com.vecturai.android.ar.ArSessionManager`
-- `com.vecturai.android.data.AndroidReviewedPackageLoader`
-- `com.vecturai.android.navigation.AndroidNavigationFlowModel`
-- `org.koin.android.ext.koin.androidContext`
-- `org.koin.core.module.dsl.viewModel`
-- `org.koin.dsl.module`
+- `AndroidArNavigationViewModel`
+- `AndroidHapticManager`
+- `ArBridge`
+- `ArMarkerDetector`
+- `ArRouteRenderer`
+- `AndroidReviewedPackageLoader`
+- `AndroidNavigationFlowModel`
+- `ArCameraFlowViewModel`
+- Koin module and ViewModel DSL APIs
 
 ## Exports / Public Surface
-- `androidModule`: Android Koin module with singleton, factory, and ViewModel providers.
+- `androidModule`
 
 ## Logic
 - Registers `ArBridge`, `AndroidReviewedPackageLoader`, and `AndroidHapticManager` as singletons.
-- Registers AR session, marker detector, and route renderer as factories.
-- Registers `AndroidNavigationFlowModel` and `AndroidArNavigationViewModel` as Koin ViewModels.
+- Registers marker detector and route renderer as factories.
+- Registers `AndroidNavigationFlowModel`, `ArCameraFlowViewModel`, and `AndroidArNavigationViewModel` as Koin ViewModels.
+- `UnifiedArSession` is intentionally Activity-owned by `ArCameraActivity`, not a Koin singleton.
 
 ## Uses
 - `ArBridge`
 - `AndroidReviewedPackageLoader`
 - `AndroidHapticManager`
-- `ArSessionManager`
 - `ArMarkerDetector`
 - `ArRouteRenderer`
 
 ## Used By
 - `VecturaiApp.kt`: Loaded into the global Koin context.
-- `MainActivity.kt`: Resolves the registered ViewModels.
+- `MainActivity.kt`: Resolves the home ViewModel.
+- `ArCameraActivity.kt`: Resolves the camera-flow and AR navigation ViewModels.
 
 ## Related Tests
 - None.

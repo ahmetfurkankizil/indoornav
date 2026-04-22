@@ -1,13 +1,8 @@
 package com.vecturai.android.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.opengl.GLSurfaceView
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,7 +47,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -65,154 +59,46 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.core.content.ContextCompat
 import com.vecturai.android.ar.AndroidArNavigationViewModel
-import com.vecturai.android.ar.ArCoreCameraRenderer
 import com.vecturai.android.ar.ArNavigationUiState
 import com.vecturai.android.ar.NavigationActionIcon
 import com.vecturai.android.ar.TrackingStatusIcon
-import com.vecturai.android.data.AndroidReviewedPackageLoader
 import com.vecturai.android.data.ArrowPlacementType
-import kotlinx.coroutines.delay
 import kotlin.math.ceil
 import kotlin.math.roundToInt
-
-fun android.content.Context.findActivity(): android.app.Activity? {
-    var ctx = this
-    while (ctx is android.content.ContextWrapper) {
-        if (ctx is android.app.Activity) return ctx
-        ctx = ctx.baseContext
-    }
-    return null
-}
 
 @Composable
 fun ArNavigationScreen(
     viewModel: AndroidArNavigationViewModel,
-    routePackage: AndroidReviewedPackageLoader.LoadedPackage,
-    entranceMarker: AndroidReviewedPackageLoader.PackageMarker?,
-    destinationName: String,
     onEnd: () -> Unit,
+    onRetryActivity: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val activity = context.findActivity() ?: return
-    val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsState()
-    var configured by remember { mutableStateOf(false) }
-    var glSurfaceView by remember { mutableStateOf<GLSurfaceView?>(null) }
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED
-        )
-    }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        hasCameraPermission = granted
-    }
 
-    LaunchedEffect(Unit) {
-        if (!hasCameraPermission) {
-            permissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    LaunchedEffect(routePackage, entranceMarker, destinationName) {
-        configured = false
-        viewModel.configure(routePackage, entranceMarker)
-        configured = true
-    }
-
-    LaunchedEffect(configured, hasCameraPermission, glSurfaceView) {
-        viewModel.setReadyForSession(configured && hasCameraPermission && glSurfaceView != null)
-    }
-
-    val ready by viewModel.readyForSession.collectAsState()
-    LaunchedEffect(ready, routePackage, entranceMarker) {
-        if (ready) {
-            viewModel.startSession(activity)
-        }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    glSurfaceView?.onResume()
-                    if (uiState.sessionErrorMessage != null) {
-                        viewModel.rebuildSession(activity)
-                    } else {
-                        viewModel.resumeSession(activity)
-                    }
-                }
-                Lifecycle.Event.ON_PAUSE -> {
-                    viewModel.pauseSession()
-                    glSurfaceView?.onPause()
-                }
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            glSurfaceView?.onPause()
-            viewModel.endNavigation()
-        }
-    }
-
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
-        if (configured && hasCameraPermission) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { ctx ->
-                    GLSurfaceView(ctx).apply {
-                        setEGLContextClientVersion(2)
-                        preserveEGLContextOnPause = true
-                        setRenderer(ArCoreCameraRenderer(activity, viewModel))
-                        renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
-                        glSurfaceView = this
-                        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                            onResume()
-                        }
-                    }
-                },
-            )
-        }
-
+    Box(Modifier.fillMaxSize()) {
         ProjectedArrowLayer(uiState)
 
         Column(Modifier.fillMaxSize()) {
             ArTopBar(uiState = uiState, onEnd = onEnd)
             Spacer(Modifier.weight(1f))
             when {
-                !hasCameraPermission -> CameraPermissionOverlay(
-                    onRequest = { permissionLauncher.launch(Manifest.permission.CAMERA) },
-                    onCancel = onEnd,
-                )
                 uiState.markerAssetError != null -> ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
                 uiState.sessionErrorMessage != null -> SessionErrorOverlay(
                     message = uiState.sessionErrorMessage.orEmpty(),
                     isArCoreInstall = uiState.sessionErrorIsArCoreInstall,
-                    onRetry = { viewModel.rebuildSession(activity) },
+                    onRetry = onRetryActivity,
                     onEnd = onEnd,
                 )
                 uiState.hasArrived -> ArrivalOverlay(uiState, onEnd)
                 !uiState.isAligned -> AlignmentOverlay(
                     uiState = uiState,
-                    onRetry = { viewModel.retryAlignment(activity) },
+                    onRetry = onRetryActivity,
                     onCancel = onEnd,
                     onSimulate = viewModel::simulateAlignment,
                 )
@@ -587,22 +473,22 @@ private fun ConfigErrorOverlay(message: String, onEnd: () -> Unit) {
             Icons.Default.Warning,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = Color(0xFFEF4444)
+            tint = Color(0xFFEF4444),
         )
         Spacer(Modifier.height(24.dp))
         Text(
             "Setup needed",
             color = Color.White,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.height(12.dp))
         Text(
             message,
             color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
-            lineHeight = 22.sp
+            lineHeight = 22.sp,
         )
         Spacer(Modifier.height(32.dp))
         Button(
@@ -611,7 +497,7 @@ private fun ConfigErrorOverlay(message: String, onEnd: () -> Unit) {
                 .fillMaxWidth()
                 .height(52.dp),
             shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
         ) {
             Text("Go Back", fontWeight = FontWeight.SemiBold)
         }
@@ -619,7 +505,12 @@ private fun ConfigErrorOverlay(message: String, onEnd: () -> Unit) {
 }
 
 @Composable
-private fun SessionErrorOverlay(message: String, isArCoreInstall: Boolean, onRetry: () -> Unit, onEnd: () -> Unit) {
+private fun SessionErrorOverlay(
+    message: String,
+    isArCoreInstall: Boolean,
+    onRetry: () -> Unit,
+    onEnd: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -638,35 +529,6 @@ private fun SessionErrorOverlay(message: String, isArCoreInstall: Boolean, onRet
             Text(if (isArCoreInstall) "Install / Update ARCore" else "Try Again")
         }
         TextButton(onClick = onEnd, modifier = Modifier.fillMaxWidth()) {
-            Text("Go Back", color = Color.White)
-        }
-    }
-}
-
-@Composable
-private fun CameraPermissionOverlay(onRequest: () -> Unit, onCancel: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f))
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(56.dp), tint = Color(0xFFF59E0B))
-        Spacer(Modifier.height(20.dp))
-        Text("Camera Access Needed", color = Color.White, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Camera access lets VecturAI detect the entrance poster and show AR guidance.",
-            color = Color.White.copy(alpha = 0.8f),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-        )
-        Spacer(Modifier.height(24.dp))
-        Button(onClick = onRequest, modifier = Modifier.fillMaxWidth()) {
-            Text("Allow Camera")
-        }
-        TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
             Text("Go Back", color = Color.White)
         }
     }

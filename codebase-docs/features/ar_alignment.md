@@ -6,7 +6,7 @@
     - `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArSessionManager.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArSession.kt`
 - **Used By**:
     - `NavigationSessionCoordinator`
     - `ProgressEstimator`
@@ -17,7 +17,7 @@
     2. The `AlignmentTransform` is calculated by comparing the detected pose with the known building-local coordinates of that marker.
     3. The transform is applied to all subsequent AR camera poses to project them into building-local space.
     4. Nav nodes (arrows, markers) are projected from building-local space into AR-world space for rendering.
-    5. Android now reads the marker physical size/name/pose from `assets/reviewed-package/entrance_markers.json` and only accepts the matching ARCore Augmented Image.
+    5. Android now reads the marker physical size/name/pose from `assets/reviewed-package/entrance_markers.json`, preloads it into the Activity-owned `UnifiedArSession`, and only accepts the matching ARCore Augmented Image.
 - **Key Symbols**:
     - `AlignmentTransform`: Encapsulates rotation (around Y) and translation between coordinate systems.
     - `PoseModels`: Shared data types for position and orientation.

@@ -7,39 +7,43 @@
 Authored Source (Android Compose UI)
 
 ## Role
-Compose root and visitor-facing Android screens for the iOS-parity navigation flow: home, package error, destination selection, route preview, and entrance confirmation.
+Compose root for the Android Home/PackageError surface plus reusable visitor-flow child screens used by `ArCameraActivity`.
 
 ## Imports / Includes
 - Jetpack Compose foundation/material/icons/runtime APIs
-- `androidx.lifecycle.compose.collectAsStateWithLifecycle`
-- `com.vecturai.android.navigation.AndroidNavigationFlowModel`
-- `com.vecturai.android.ar.AndroidArNavigationViewModel`
-- `com.vecturai.android.data.AndroidReviewedPackageLoader`
+- `AndroidNavigationFlowModel`
+- `ArCameraFlowViewModel`
+- `AndroidReviewedPackageLoader`
+- `VecturaiTheme`
 
 ## Exports / Public Surface
 - `AndroidNavigationApp(...)`
+- `DestinationSelectScreen(...)`
+- `RoutePreviewScreen(...)`
+- `EntranceConfirmedSheet(...)`
 - `GradientPrimaryButton(...)`
 
 ## Main Symbols
-- `AndroidNavigationApp`: Switches on `FlowState` and composes the active screen.
-- `HomeScreen`: Polished home with gear icon and gradient CTA.
-- `DestinationSelectScreen`: Search, category grouping, rich room cards/badges.
-- `RoutePreviewScreen`: Walking estimate, route type badge, and start action.
-- `EntranceConfirmedSheet`: Confirmation before destination selection.
+- `AndroidNavigationApp`: Renders MainActivity's Home or PackageError only.
+- `HomeScreen`: Polished home with gear icon and gradient CTA; CTA launches `ArCameraActivity` through a callback.
+- `DestinationSelectScreen`: Activity-scoped destination picker, search, category grouping, rich room cards/badges.
+- `RoutePreviewScreen`: Activity-scoped walking estimate, route type badge, and start action.
+- `EntranceConfirmedSheet`: Camera-flow bottom sheet shown over the still-running ARCore preview.
 
 ## Important Logic
-- The flow state machine lives in `AndroidNavigationFlowModel`; this file renders and dispatches UI actions.
+- Home no longer transitions through QR, destination selection, preview, or AR navigation in-place.
+- The destination and preview composables are reusable overlays for `ArCameraActivity`; they operate on `ArCameraFlowViewModel`.
 - Walking time is calculated as `distance / 1.2 m/s`, matching iOS route preview copy.
 - Search flattens room display while non-search mode groups rooms by category.
 
 ## Uses
 - `AndroidNavigationFlowModel`
-- `AndroidArNavigationViewModel`
-- `QRScanScreen`
-- `ArNavigationScreen`
+- `ArCameraFlowViewModel`
+- `AndroidReviewedPackageLoader`
 
 ## Used By
-- `MainActivity.kt`: Root content.
+- `MainActivity.kt`: Root home content.
+- `ArCameraActivity.kt`: Reuses destination, route preview, and entrance-confirmed overlays.
 
 ## Related Tests
 - None.

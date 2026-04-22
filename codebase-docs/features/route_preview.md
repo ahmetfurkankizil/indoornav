@@ -5,17 +5,18 @@
 - **Implemented In**:
     - `shared/feature-preview/src/commonMain/kotlin/com/vecturai/feature/preview/RoutePreviewUseCase.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/AndroidNavigationApp.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/data/AndroidReviewedPackageLoader.kt`
 - **Used By**:
     - Destination Detail Screen
     - Route Preview Screen
-    - Android route preview in the visitor flow
+    - Android route preview overlay in the Activity-scoped AR camera flow
 - **Main Flow**:
     1. User selects a destination.
     2. UI calls `RoutePreviewUseCase.getRoutePreview`.
     3. Route is computed and returned as a list of text instructions and distances.
     4. UI displays the summary (Distance, Time, Steps).
-    5. Android's modernized flow computes `LoadedPackage` on destination selection and shows a polished summary card with distance, walking ETA (`distance / 1.2 m/s`), and a "Walking" badge before AR navigation.
+    5. Android's camera-owned flow computes `LoadedPackage` on destination selection and shows a polished summary card with distance, walking ETA (`distance / 1.2 m/s`), and a "Walking" badge as an opaque Compose overlay above the still-running ARCore session.
 - **Key Symbols**:
     - `RoutePreviewUseCase`
     - `RoutePreview`

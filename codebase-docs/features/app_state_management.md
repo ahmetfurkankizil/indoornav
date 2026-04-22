@@ -1,7 +1,7 @@
 # Feature: App State & Event Bus
 
 - **Feature Name**: App State & Event Bus
-- **Purpose**: Provides a unified, reactive source of truth for the application's global state and facilitates decoupled communication between components.
+- **Purpose**: Provides a unified, reactive source of truth for the application's global state and screen-level Android visitor flow phases.
 - **Implemented In**:
     - `shared/core/src/commonMain/kotlin/com/vecturai/core/store/AppStore.kt`
     - `shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavigationState.kt`
@@ -10,16 +10,17 @@
     - All feature modules (Search, History, etc.)
     - UI Layer (Compose/SwiftUI)
     - `NavigationSessionCoordinator`
-    - Android visitor flow screens
+    - Android home flow and Activity-scoped AR camera flow screens
 - **Main Flow**:
     1. Components observe the `AppStore` for state changes (e.g., current navigation status, selected building).
     2. Components dispatch updates to the `AppStore` via specific setter methods.
     3. UI automatically reacts to state changes using `collectAsState` (Compose) or similar observers.
-    4. Android's visitor flow additionally uses `AndroidNavigationFlowModel` as a screen-level state machine for Home -> QR Scan -> Entrance Confirmed -> Destination Select -> Route Preview -> AR Navigation.
+    4. Android splits visitor flow state by Activity ownership: `AndroidNavigationFlowModel` keeps MainActivity at Home/PackageError, while `ArCameraFlowViewModel` owns QrScan -> EntranceConfirmed -> DestinationSelect -> RoutePreview -> ArNavigation inside `ArCameraActivity`.
 - **Key Symbols**:
     - `AppStore`: Central singleton holding the `StateFlow`s.
     - `NavigationState`: Sealed class representing the app's current mode.
-    - `AndroidNavigationFlowModel.FlowState`: Android visitor navigation state machine.
+    - `AndroidNavigationFlowModel.HomeState`: MainActivity package readiness state.
+    - `ArCameraFlowViewModel.Phase`: Activity-scoped QR-to-AR navigation state machine.
 - **Config / Env / Flags**: N/A
 - **Data Structures / Protocols**:
     - `kotlinx.coroutines.flow.StateFlow`

@@ -4,45 +4,32 @@
 `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/QRScanScreen.kt`
 
 ## Type
-Authored Source (Android Compose QR Scanner)
+Authored Source (Android Compose QR Overlay)
 
 ## Role
-Camera-backed QR scanning screen for the entrance poster flow.
+Passive QR scan chrome rendered over the `ArCameraActivity` ARCore camera preview.
 
 ## Imports / Includes
-- Android camera permission APIs.
-- CameraX `Preview`, `ImageAnalysis`, `ProcessCameraProvider` (standard mode).
-- ARCore `Session` and `Frame` (unified mode).
-- ML Kit barcode scanning.
-- Jetpack Compose components.
-- `com.vecturai.android.ar.ArFeatureFlags`.
-- `com.vecturai.android.ar.ArSessionManager`.
+- Jetpack Compose layout/material/icon APIs.
+- `ArCameraFlowViewModel`.
 
 ## Exports / Public Surface
-- `QRScanScreen(flowModel)`: Composable entrypoint.
+- `QRScanScreen(flowModel, onCancel)`: Composable QR overlay entrypoint.
 
 ## Main Symbols
-- `QRScanScreen`: Host component that chooses the preview mode based on feature flags.
-- `CameraQrPreview`: Legacy mode using CameraX and ML Kit.
-- `ArCoreQrPreview`: Unified mode using ARCore to acquire camera frames for ML Kit scanning.
-- `QRScanChrome`: UI overlay for scanning status and errors.
+- `QRScanScreen`: Applies a 40% black dim overlay and renders QR scan chrome.
+- `QRScanChrome`: Header, scan reticle, scanning status, validation error, and retry button.
 
 ## Important Logic
-- **Preview Selection**: Uses `ArFeatureFlags.ArUnifiedCameraPipeline` to decide whether to use standard CameraX or an ARCore-backed preview.
-- **Unified Scanning**: In `ArCoreQrPreview`, it uses `sessionManager.createSessionWithoutMarker` to start a background AR session, then acquires camera images from AR frames for scanning.
-- **Camera Release Coordination**: Explicitly waits for the camera to close (using `CameraState` observer) before transitioning to the next screen in standard mode to prevent contention.
+- This file no longer owns camera permission, CameraX, `PreviewView`, `ImageAnalysis`, `ProcessCameraProvider`, or any ARCore session.
+- QR decoding happens in `ArFrameQrScanner` from frames supplied by `UnifiedArRenderer`.
+- Retry clears the ViewModel QR error and unlocks the scanner; it does not touch camera/session lifecycle.
 
 ## Uses
-- `AndroidNavigationFlowModel`: State management.
-- `ArSessionManager`: Lifecycle management (unified mode).
-- ML Kit Barcode Scanning.
+- `ArCameraFlowViewModel`
 
 ## Used By
-- `AndroidNavigationApp.kt`: Main navigation host.
+- `ArCameraActivity.kt`: Renders during `Phase.QrScan`.
 
 ## Related Tests
 - None.
-
-## Notes / Risks
-- Unified mode minimizes camera "flicker" when transitioning from QR scan to AR navigation but relies on ARCore stability.
-

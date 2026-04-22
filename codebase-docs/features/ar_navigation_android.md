@@ -1,31 +1,36 @@
 # Feature: AR Navigation (Android)
 
 - **Feature Name**: AR Navigation (Android)
-- **Purpose**: Provides the Android visitor AR navigation experience with an ARCore camera feed, Compose overlays, entrance-poster alignment, rolling route arrows, next-action guidance, ETA HUD, and arrival feedback.
+- **Purpose**: Provides the Android visitor AR navigation experience with one Activity-owned ARCore camera session, Compose overlays, AR-frame QR scanning, entrance-poster alignment, rolling route arrows, next-action guidance, ETA HUD, and arrival feedback.
 - **Implemented In**:
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCoreCameraRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArSessionManager.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArSession.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArRouteRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArFeatureFlags.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/qr/ArFrameQrScanner.kt`
     - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
+    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/QRScanScreen.kt`
 - **Used By**:
     - `AndroidNavigationApp.kt`
     - `MainActivity.kt`
 - **Main Flow**:
-    1. `AndroidNavigationFlowModel` reaches `ArNavigation` with a selected `LoadedPackage` and validated entrance marker.
-    2. `ArNavigationScreen` configures `AndroidArNavigationViewModel` and embeds a `GLSurfaceView`.
-    3. `ArCoreCameraRenderer` starts the ARCore session, draws the camera feed, and forwards each frame to the ViewModel.
-    4. If the AR session fails (e.g. camera busy), `AndroidArNavigationViewModel` performs an exponential backoff session rebuild.
-    5. `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
-    6. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
-    7. Compose draws projected arrows and Phase 11-style overlays on top of the AR camera feed.
+    1. `MainActivity` renders Home/PackageError only; tapping Start launches `ArCameraActivity`.
+    2. `ArCameraActivity` owns one `UnifiedArSession`, one `GLSurfaceView`, one GL camera texture, and one `UnifiedArRenderer` for the whole QR-to-navigation flow.
+    3. `UnifiedArSession` creates/configures/resumes a single ARCore `Session` after camera permission, ARCore install readiness, and GL texture creation are satisfied. It pauses on Activity pause and closes only on Activity destroy.
+    4. `UnifiedArRenderer` draws the ARCore camera background every frame and dispatches frames by phase: QR frames to `ArCameraFlowViewModel`/`ArFrameQrScanner`, navigation frames to `AndroidArNavigationViewModel`.
+    5. QR scanning uses `Frame.acquireCameraImage()` and ML Kit barcode scanning; no CameraX preview, `ImageAnalysis`, or camera provider is used.
+    6. Destination selection and route preview are opaque Compose overlays above the still-running AR session.
+    7. In AR navigation, `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
+    8. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
 - **Key Symbols**:
     - `AndroidArNavigationViewModel`
+    - `ArCameraActivity`
     - `ArNavigationUiState`
-    - `ArCoreCameraRenderer`
-    - `ArFeatureFlags.ArUnifiedCameraPipeline`
+    - `UnifiedArSession`
+    - `UnifiedArRenderer`
+    - `ArFrameQrScanner`
     - `MarkerDetectionEvent`
 - **Config / Env / Flags**:
     - ARCore is required by `AndroidManifest.xml`.
@@ -39,12 +44,15 @@
     - None.
 - **Related File Dossiers**:
     - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
-    - [ArCoreCameraRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCoreCameraRenderer.kt.md)
-    - [ArFeatureFlags.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArFeatureFlags.kt.md)
+    - [ArCameraActivity.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCameraActivity.kt.md)
+    - [UnifiedArRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArRenderer.kt.md)
+    - [UnifiedArSession.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArSession.kt.md)
     - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
     - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArRouteRenderer.kt.md)
-    - [ArSessionManager.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArSessionManager.kt.md)
+    - [ArFrameQrScanner.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_qr_ArFrameQrScanner.kt.md)
     - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md)
+    - [QRScanScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_QRScanScreen.kt.md)
 - **Risks / Notes**:
-    - This commit removed the old `ArNavigationActivity`; Android AR is now single-activity Compose.
+    - The old CameraX QR scanner and the old AR session rebuild/backoff path have been removed.
+    - Camera ownership is intentionally wasteful during destination selection and route preview: ARCore remains resumed under opaque Compose overlays.
     - Device validation remains important for ARCore marker detection, camera projection, and lifecycle behavior.

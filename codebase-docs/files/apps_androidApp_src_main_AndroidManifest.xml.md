@@ -12,7 +12,7 @@ Declares application components, permissions, hardware requirements, and ARCore 
 ## Logic
 - Permissions: `CAMERA`, `INTERNET`, `VIBRATE`.
 - Feature requirement: `android.hardware.camera.ar` required.
-- Activity: `MainActivity` is the sole launcher activity.
+- Activities: `MainActivity` is the launcher/home activity; `.ar.ArCameraActivity` is a non-exported AR camera flow Activity.
 - Application theme: platform light no-action-bar theme for Compose ownership.
 - Metadata: `com.google.ar.core` required.
 

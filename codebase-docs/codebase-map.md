@@ -5,13 +5,13 @@ Vecturai is an end-to-end indoor navigation platform that enables users to navig
 
 ## Tech Stack
 - **Languages**: Kotlin (2.1.10), Swift (Native iOS)
-- **Frameworks**: Kotlin Multiplatform (KMP), Jetpack Compose / Compose Multiplatform, ARKit (iOS), ARCore (Android), CameraX, ML Kit Barcode Scanning
+- **Frameworks**: Kotlin Multiplatform (KMP), Jetpack Compose / Compose Multiplatform, ARKit (iOS), ARCore (Android), ML Kit Barcode Scanning
 - **Build System**: Gradle (8.11.1) with KTS, Version Catalogs
 - **Networking/Storage**: Ktor, SqlDelight
 - **Dependency Injection**: Koin
 
 ## Entrypoints
-- **Android**: `apps/androidApp/src/main/kotlin/com/vecturai/android/MainActivity.kt`
+- **Android**: `apps/androidApp/src/main/kotlin/com/vecturai/android/MainActivity.kt` (Home/PackageError), `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt` (QR-to-AR camera flow)
 - **iOS**: `apps/iosApp/iosApp/iOSApp.swift`
 - **Admin API**: `tools/admin-api/src/main/kotlin/com/vecturai/tools/admin/Application.kt`
 - **CLI Tools**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/Main.kt`
@@ -26,7 +26,7 @@ Vecturai follows a **Local-First AR architecture**.
 ## Subsystem Responsibilities
 - `shared/core`: Graph domain models, pathfinding engine, and AR alignment math.
 - `shared/designsystem`: Common Compose UI components and branding.
-- `apps/androidApp`: Single-activity Jetpack Compose visitor flow, CameraX/ML Kit QR scanning, reviewed-package asset loading, and ARCore camera/alignment overlays.
+- `apps/androidApp`: Jetpack Compose visitor flow, reviewed-package asset loading, and Android AR camera/alignment overlays. Home runs in `MainActivity`; QR scan, entrance confirm, destination select, route preview, and AR navigation run inside `ArCameraActivity` over one long-lived ARCore session. QR decoding uses ML Kit on ARCore camera frames; CameraX is not part of the visitor flow.
 - `apps/iosApp`: ARKit integration, Swift-native AR visualization.
 - `tools/nav-preprocessor`: Geometry extraction, occupancy grid generation, and graph serialization.
 - `tools/admin-api`: Ktor-based management of navigation drafts and reviewed packages.

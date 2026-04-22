@@ -12,11 +12,10 @@
     - AGP: `8.7.3`
     - Compose Multiplatform: `1.7.3`
     - AndroidX lifecycle: `2.8.7`
-    - CameraX: `1.5.1`
     - ML Kit barcode scanning: `17.3.0`
     - ARCore: `1.46.0`
     - Kotlin serialization plugin alias
 - **Used By**:
     - Root and module Gradle build scripts, especially `apps/androidApp/build.gradle.kts`.
 - **Notes / Risks**:
-    - Android app sync depends on these aliases existing for CameraX, ML Kit, lifecycle runtime compose, coroutines Android, and serialization JSON.
+    - Android app sync depends on aliases for ML Kit, ARCore, lifecycle runtime compose, coroutines Android, and serialization JSON.

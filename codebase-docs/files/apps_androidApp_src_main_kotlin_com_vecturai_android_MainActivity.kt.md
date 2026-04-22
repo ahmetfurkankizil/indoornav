@@ -7,27 +7,29 @@
 Authored Source (Android Activity)
 
 ## Role
-Application entry point for the single-activity Android app. Hosts the Compose navigation flow and obtains Android flow/AR ViewModels from Koin.
+Launcher Activity for the Android app. Hosts only the Home/PackageError Compose surface and launches `ArCameraActivity` for the camera-owned visitor flow.
 
 ## Imports / Includes
+- `android.content.Intent`
 - `androidx.activity.ComponentActivity`
 - `androidx.activity.compose.setContent`
-- `com.vecturai.android.navigation.AndroidNavigationFlowModel`
-- `com.vecturai.android.ar.AndroidArNavigationViewModel`
-- `com.vecturai.android.ui.AndroidNavigationApp`
-- `org.koin.androidx.viewmodel.ext.android.viewModel`
+- `com.vecturai.android.ar.ArCameraActivity`
+- `AndroidNavigationFlowModel`
+- `AndroidNavigationApp`
+- Koin `viewModel`
 
 ## Exports / Public Surface
-- `MainActivity`: Main launcher activity.
+- `MainActivity`
 
 ## Logic
-- Creates `AndroidNavigationFlowModel` and `AndroidArNavigationViewModel` via Koin.
-- Calls `setContent` with `AndroidNavigationApp`, making Compose own the visitor flow and AR screen state.
+- Creates `AndroidNavigationFlowModel` via Koin.
+- Calls `setContent` with `AndroidNavigationApp`.
+- Home CTA launches `ArCameraActivity` with an explicit `Intent`.
 
 ## Uses
 - `AndroidNavigationApp`
 - `AndroidNavigationFlowModel`
-- `AndroidArNavigationViewModel`
+- `ArCameraActivity`
 
 ## Used By
 - `AndroidManifest.xml`: Defined as the LAUNCHER activity.

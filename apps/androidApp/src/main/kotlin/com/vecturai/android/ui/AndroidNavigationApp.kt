@@ -72,8 +72,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vecturai.android.ar.AndroidArNavigationViewModel
 import com.vecturai.android.data.AndroidReviewedPackageLoader
+import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
 import com.vecturai.designsystem.VecturaiTheme
 import kotlin.math.ceil
@@ -81,10 +81,9 @@ import kotlin.math.ceil
 @Composable
 fun AndroidNavigationApp(
     flowModel: AndroidNavigationFlowModel,
-    arViewModel: AndroidArNavigationViewModel,
+    onStartNavigation: () -> Unit,
 ) {
     val state by flowModel.state.collectAsState()
-    val session by flowModel.session.collectAsState()
 
     VecturaiTheme {
         Box(
@@ -93,34 +92,11 @@ fun AndroidNavigationApp(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             when (val current = state) {
-                AndroidNavigationFlowModel.FlowState.Home -> HomeScreen(flowModel)
-                AndroidNavigationFlowModel.FlowState.QrScan -> QRScanScreen(flowModel)
-                is AndroidNavigationFlowModel.FlowState.EntranceConfirmed -> {
-                    DestinationSelectScreen(flowModel)
-                    EntranceConfirmedSheet(
-                        entranceName = current.entranceName,
-                        onContinue = flowModel::proceedToDestinationSelect,
-                    )
-                }
-                AndroidNavigationFlowModel.FlowState.DestinationSelect -> DestinationSelectScreen(flowModel)
-                AndroidNavigationFlowModel.FlowState.RoutePreview -> RoutePreviewScreen(flowModel)
-                AndroidNavigationFlowModel.FlowState.ArNavigation -> {
-                    val routePackage = session.routePackage
-                    val room = session.selectedRoom
-                    if (routePackage != null && room != null) {
-                        ArNavigationScreen(
-                            viewModel = arViewModel,
-                            routePackage = routePackage,
-                            entranceMarker = session.validatedEntranceMarker,
-                            destinationName = room.displayName,
-                            onEnd = {
-                                arViewModel.endNavigation()
-                                flowModel.endNavigation()
-                            },
-                        )
-                    }
-                }
-                is AndroidNavigationFlowModel.FlowState.PackageError -> PackageErrorScreen(
+                AndroidNavigationFlowModel.HomeState.Home -> HomeScreen(
+                    flowModel = flowModel,
+                    onStartNavigation = onStartNavigation,
+                )
+                is AndroidNavigationFlowModel.HomeState.PackageError -> PackageErrorScreen(
                     message = current.message,
                     onRetry = flowModel::retryPackageLoad,
                 )
@@ -131,7 +107,10 @@ fun AndroidNavigationApp(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeScreen(flowModel: AndroidNavigationFlowModel) {
+private fun HomeScreen(
+    flowModel: AndroidNavigationFlowModel,
+    onStartNavigation: () -> Unit,
+) {
     var showAdminTools by remember { mutableStateOf(false) }
 
     Column(
@@ -184,7 +163,7 @@ private fun HomeScreen(flowModel: AndroidNavigationFlowModel) {
             GradientPrimaryButton(
                 text = "Scan Entrance Code",
                 icon = Icons.Default.QrCodeScanner,
-                onClick = flowModel::startQRScan,
+                onClick = onStartNavigation,
             )
             Text(
                 "Scan the QR code at the building entrance to begin",
@@ -236,7 +215,10 @@ private fun PackageErrorScreen(message: String, onRetry: () -> Unit) {
 }
 
 @Composable
-private fun DestinationSelectScreen(flowModel: AndroidNavigationFlowModel) {
+fun DestinationSelectScreen(
+    flowModel: ArCameraFlowViewModel,
+    onCancel: () -> Unit,
+) {
     val session by flowModel.session.collectAsState()
     var searchText by remember { mutableStateOf("") }
     val rooms = flowModel.availableRooms
@@ -259,7 +241,7 @@ private fun DestinationSelectScreen(flowModel: AndroidNavigationFlowModel) {
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         CenteredTopBar(
             title = "Choose Destination",
-            onBack = flowModel::endNavigation,
+            onBack = onCancel,
         )
 
         Row(
@@ -400,7 +382,7 @@ private fun RoomRow(
 }
 
 @Composable
-private fun RoutePreviewScreen(flowModel: AndroidNavigationFlowModel) {
+fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     val session by flowModel.session.collectAsState()
     val distance = session.routePackage?.totalDistance ?: 0.0
 
@@ -530,7 +512,7 @@ private fun CenteredTopBar(title: String, onBack: () -> Unit) {
 }
 
 @Composable
-private fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
+fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
     AnimatedVisibility(
         visible = true,
         enter = slideInVertically { it } + fadeIn(),

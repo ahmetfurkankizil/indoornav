@@ -26,6 +26,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ar.ArCameraActivity"
+            android:exported="false" />
+
         <!-- ARCore metadata -->
         <meta-data
             android:name="com.google.ar.core"

@@ -4,47 +4,49 @@
 `apps/androidApp/src/main/kotlin/com/vecturai/android/navigation/AndroidNavigationFlowModel.kt`
 
 ## Type
-Authored Source (Android Navigation Flow State)
+Authored Source (Android Flow State)
 
 ## Role
-Android ViewModel that mirrors the iOS visitor navigation flow: home, QR scan, entrance confirmation, destination selection, route preview, AR navigation, and package error.
+Defines the Android visitor flow state split between MainActivity and the dedicated AR camera Activity.
 
 ## Imports / Includes
 - `androidx.lifecycle.ViewModel`
-- `com.vecturai.android.data.AndroidReviewedPackageLoader`
-- `com.vecturai.android.qr.QRPayload`
+- ARCore `Frame`
+- `AndroidReviewedPackageLoader`
+- `ArFrameQrScanner`
+- `QRPayload`
 - Kotlin `StateFlow` / `MutableStateFlow`
 
 ## Exports / Public Surface
 - `AndroidNavigationFlowModel`
-- `FlowState`
-- `SessionData`
-- `state`
-- `session`
-- `qrError`
-- `availableRooms`
+- `AndroidNavigationFlowModel.HomeState`
+- `ArCameraFlowViewModel`
+- `ArCameraFlowViewModel.Phase`
+- `ArCameraFlowViewModel.SessionData`
 
 ## Main Symbols
-- `loadPackage()` / `retryPackageLoad()`: Loads bundled reviewed package and transitions to home or package error.
-- `startQRScan()` / `onQRScanned(rawValue)`: Starts scanner and validates QR payload.
-- `confirmEntrance(...)`: Stores the validated entrance marker and moves to entrance confirmation.
-- `proceedToDestinationSelect()`, `selectDestination(room)`, `startNavigation()`: Advance the visitor flow.
-- `endNavigation()` / `goBackToDestinationSelect()`: Reset or backtrack session state.
+- `AndroidNavigationFlowModel`: MainActivity-only package readiness model (`Home` or `PackageError`).
+- `ArCameraFlowViewModel`: Activity-scoped QR-to-AR state machine.
+- `ArCameraFlowViewModel.onQrFrame(frame, rotationDegrees)`: Sends ARCore camera frames to ML Kit QR scanning.
+- `ArCameraFlowViewModel.onQRScanned(rawValue)`: Parses and validates VecturAI entrance QR payloads.
+- `selectDestination(room)` / `startNavigation()`: Computes the route package and advances to AR navigation.
 
 ## Important Logic
-- QR payloads are validated against the loaded manifest building id and entrance marker ids.
-- Destination selection computes a route package immediately so route preview and AR navigation share the same data.
-- Ending navigation clears visitor-specific session state and returns to home.
+- Home no longer drives the post-home visitor flow. It only verifies that the bundled reviewed package can load.
+- QR scan, entrance confirmation, destination selection, route preview, and AR navigation are scoped to `ArCameraActivity`.
+- QR scanning accepts only valid `vecturai-entrance` payloads matching the loaded manifest building id and entrance marker id.
+- Route computation still happens immediately when a destination is selected so route preview and AR navigation share the same `LoadedPackage`.
 
 ## Uses
 - `AndroidReviewedPackageLoader`
+- `ArFrameQrScanner`
 - `QRPayload`
 
 ## Used By
-- `MainActivity.kt`
-- `AndroidNavigationApp.kt`
-- `QRScanScreen.kt`
-- `ArNavigationScreen.kt`
+- `MainActivity.kt`: Uses `AndroidNavigationFlowModel`.
+- `ArCameraActivity.kt`: Uses `ArCameraFlowViewModel`.
+- `AndroidNavigationApp.kt`: Renders Home/PackageError from `AndroidNavigationFlowModel`.
+- `QRScanScreen.kt`, `DestinationSelectScreen`, `RoutePreviewScreen`: Render Activity-scoped phases from `ArCameraFlowViewModel`.
 
 ## Related Tests
 - None.

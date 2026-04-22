@@ -24,7 +24,7 @@ Defines Android entrance marker metadata for QR validation and AR alignment.
 - `AndroidReviewedPackageLoader.kt`
 - `AndroidNavigationFlowModel.kt`
 - `AndroidArNavigationViewModel.kt`
-- `ArSessionManager.kt`
+- `UnifiedArSession.kt`
 
 ## Notes
 - `referenceImageName` must match `assets/ar/<name>.png`.

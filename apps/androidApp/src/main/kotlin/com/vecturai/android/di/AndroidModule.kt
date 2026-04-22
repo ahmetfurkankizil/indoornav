@@ -5,8 +5,8 @@ import com.vecturai.android.ar.AndroidHapticManager
 import com.vecturai.android.ar.ArBridge
 import com.vecturai.android.ar.ArMarkerDetector
 import com.vecturai.android.ar.ArRouteRenderer
-import com.vecturai.android.ar.ArSessionManager
 import com.vecturai.android.data.AndroidReviewedPackageLoader
+import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -21,12 +21,12 @@ val androidModule = module {
     single { AndroidReviewedPackageLoader(androidContext()) }
     single { AndroidHapticManager(androidContext()) }
 
-    single { ArSessionManager() }
     factory { ArMarkerDetector() }
     factory { ArRouteRenderer() }
 
-    viewModel { AndroidNavigationFlowModel(get(), get()) }
-    viewModel { AndroidArNavigationViewModel(get(), get(), get(), get()) }
+    viewModel { AndroidNavigationFlowModel(get()) }
+    viewModel { ArCameraFlowViewModel(get()) }
+    viewModel { AndroidArNavigationViewModel(get(), get(), get()) }
 
     // TODO: Provide Android-specific SqlDelight driver
     // TODO: Provide Android-specific Ktor engine (OkHttp)
