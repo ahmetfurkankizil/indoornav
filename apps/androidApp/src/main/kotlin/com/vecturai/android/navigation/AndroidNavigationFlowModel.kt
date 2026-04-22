@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+import com.vecturai.android.ar.ArSessionManager
+
 class AndroidNavigationFlowModel(
     private val packageLoader: AndroidReviewedPackageLoader,
+    val sessionManager: ArSessionManager,
 ) : ViewModel() {
 
     sealed interface FlowState {

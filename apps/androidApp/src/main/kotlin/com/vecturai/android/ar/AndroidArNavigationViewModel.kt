@@ -37,6 +37,8 @@ data class ArNavigationUiState(
     val isLowConfidence: Boolean = false,
     val alignmentTimedOut: Boolean = false,
     val markerAssetError: String? = null,
+    val sessionErrorMessage: String? = null,
+    val sessionErrorIsArCoreInstall: Boolean = false,
     val timeoutReasonMessage: String = "No matching entrance poster detected",
     val timeoutHintMessage: String = "",
     val nextActionIcon: NavigationActionIcon = NavigationActionIcon.Straight,
@@ -70,6 +72,9 @@ class AndroidArNavigationViewModel(
     private val _uiState = MutableStateFlow(ArNavigationUiState())
     val uiState: StateFlow<ArNavigationUiState> = _uiState.asStateFlow()
 
+    private val _readyForSession = MutableStateFlow(false)
+    val readyForSession: StateFlow<Boolean> = _readyForSession.asStateFlow()
+
     private var routePackage: AndroidReviewedPackageLoader.LoadedPackage? = null
     private var entranceMarker: AndroidReviewedPackageLoader.PackageMarker? = null
     private var sessionStarted = false
@@ -83,13 +88,17 @@ class AndroidArNavigationViewModel(
     private var lastPoseSampleMs = 0L
     private var lastProjectedUpdateMs = 0L
     private var lastHapticArrowId: String? = null
+    private var rebuildAttempts = 0
+    private var isRebuilding = false
+    private var pendingResume = false
 
-    fun configure(
+    suspend fun configure(
         routePackage: AndroidReviewedPackageLoader.LoadedPackage,
         entranceMarker: AndroidReviewedPackageLoader.PackageMarker?,
     ) {
         alignmentTimeoutJob?.cancel()
         sessionManager.stopSession()
+        sessionManager.awaitClosed()
         routeRenderer.clearArrows()
         markerDetector.fullReset()
 
@@ -112,8 +121,19 @@ class AndroidArNavigationViewModel(
         )
     }
 
-    fun startSession(context: Context) {
+    fun startSession(activity: android.app.Activity) {
         if (sessionStarted) return
+        
+        if (androidx.core.content.ContextCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            _uiState.update {
+                it.copy(
+                    markerAssetError = "Camera permission is required to start AR.",
+                    sessionStateLabel = "Permission Denied",
+                )
+            }
+            return
+        }
+        
         val marker = entranceMarker ?: routePackage?.config?.entranceMarkers?.firstOrNull()
         val markerImageName = marker?.referenceImageName ?: "entrance_marker_main"
         val markerWidth = marker?.physicalWidthMeters ?: 0.21
@@ -131,14 +151,27 @@ class AndroidArNavigationViewModel(
 
         val assetPath = "ar/$markerImageName.png"
         val index = sessionManager.createSession(
-            context = context,
+            activity = activity,
             markerImageAssetPath = assetPath,
             markerImageName = markerImageName,
             markerWidthMeters = markerWidth,
         ).getOrElse { error ->
+            val failure = sessionManager.lastFailure
+            if (failure is SessionFailure.ArCoreInstallRequired || failure is SessionFailure.DeviceUnsupported || failure is SessionFailure.InvalidReferenceImage) {
+                rebuildAttempts = 3 // Prevent further retries
+                _uiState.update {
+                    it.copy(
+                        sessionErrorMessage = failure.detail,
+                        sessionErrorIsArCoreInstall = failure is SessionFailure.ArCoreInstallRequired,
+                        sessionStateLabel = "Camera unavailable",
+                    )
+                }
+                return
+            }
+
             _uiState.update {
                 it.copy(
-                    markerAssetError = "Marker image '$markerImageName' not found in Android assets. Rebuild with assets/ar/$markerImageName.png.",
+                    markerAssetError = "AR camera frames are unavailable. Close other camera apps, allow camera access, then reopen navigation. Details: ${error.message ?: "unknown ARCore update error"}",
                     sessionStateLabel = "Configuration Error",
                 )
             }
@@ -161,31 +194,73 @@ class AndroidArNavigationViewModel(
         )
 
         sessionStarted = true
-        sessionManager.resumeSession()
+        pendingResume = true
         _uiState.update {
             it.copy(
-                sessionStateLabel = "Waiting for Poster",
+                sessionStateLabel = "Cooling down camera...",
                 alignmentTimedOut = false,
                 markerAssetError = null,
+                sessionErrorMessage = null,
             )
         }
-        startAlignmentTimeout()
     }
 
-    fun retryAlignment(context: Context) {
+    fun rebuildSession(activity: android.app.Activity) {
+        if (isRebuilding) return
+        isRebuilding = true
+        viewModelScope.launch {
+            if (rebuildAttempts >= 3) {
+                val failure = sessionManager.lastFailure
+                _uiState.update {
+                    it.copy(
+                        sessionErrorMessage = failure?.detail ?: "Failed to start AR camera.",
+                        sessionErrorIsArCoreInstall = failure is SessionFailure.ArCoreInstallRequired,
+                        sessionStateLabel = "Camera unavailable",
+                    )
+                }
+                isRebuilding = false
+                return@launch
+            }
+            
+            rebuildAttempts++
+            _uiState.update {
+                it.copy(
+                    sessionStateLabel = "Reconnecting Camera...",
+                    sessionErrorMessage = null,
+                )
+            }
+            
+            sessionManager.stopSession()
+            sessionManager.awaitClosed()
+            val backoffMs = when (rebuildAttempts) {
+                1 -> 500L
+                2 -> 1500L
+                else -> 3500L
+            }
+            delay(backoffMs)
+            
+            sessionStarted = false
+            pendingResume = true
+            startSession(activity)
+            isRebuilding = false
+        }
+    }
+
+    fun retryAlignment(activity: android.app.Activity) {
         alignmentTimeoutJob?.cancel()
         markerDetector.reset()
-        sessionStarted = false
-        sessionManager.stopSession()
         _uiState.update {
             it.copy(
                 alignmentTimedOut = false,
                 sessionStateLabel = "Waiting for Poster",
+                markerAssetError = null,
+                sessionErrorMessage = null,
                 timeoutReasonMessage = "No matching entrance poster detected",
                 timeoutHintMessage = "",
             )
         }
-        startSession(context)
+        rebuildAttempts = 0
+        rebuildSession(activity)
     }
 
     fun simulateAlignment() {
@@ -259,16 +334,82 @@ class AndroidArNavigationViewModel(
 
     fun currentSession(): Session? = sessionManager.session
 
-    fun setCameraTexture(textureId: Int) {
-        sessionManager.setCameraTexture(textureId)
+    fun isSessionRunning(): Boolean = sessionManager.isSessionRunning
+
+    fun setReadyForSession(ready: Boolean) {
+        _readyForSession.value = ready
     }
 
-    fun resumeSession() {
-        sessionManager.resumeSession()
+    fun onCameraTextureBound(activity: android.app.Activity) {
+        if (pendingResume) {
+            pendingResume = false
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                resumeSession(activity)
+            }
+        }
+    }
+
+    fun setCameraTexture(textureId: Int): Boolean {
+        return sessionManager.setCameraTexture(textureId)
+    }
+
+    fun resumeSession(activity: android.app.Activity? = null) {
+        val resumed = sessionManager.resumeSession()
+        if (sessionManager.session != null && !resumed) {
+            if (activity != null) {
+                rebuildSession(activity)
+            } else {
+                val failure = sessionManager.lastFailure
+                _uiState.update {
+                    it.copy(
+                        sessionErrorMessage = failure?.detail ?: sessionManager.trackingStateDescription,
+                        sessionErrorIsArCoreInstall = failure is SessionFailure.ArCoreInstallRequired,
+                        sessionStateLabel = "Camera unavailable",
+                    )
+                }
+            }
+        } else if (resumed) {
+            rebuildAttempts = 0
+            _uiState.update { it.copy(sessionErrorMessage = null) }
+            if (!_uiState.value.isAligned && alignmentTimeoutJob == null) {
+                startAlignmentTimeout()
+            }
+        }
     }
 
     fun pauseSession() {
         sessionManager.pauseSession()
+    }
+
+    fun cameraSessionStatus(): String = sessionManager.trackingStateDescription
+
+    fun onCameraStarting() {
+        _uiState.update {
+            it.copy(
+                sessionStateLabel = "Starting Camera",
+                sessionErrorMessage = null,
+            )
+        }
+    }
+
+    fun onCameraFrameAvailable() {
+        if (_uiState.value.sessionErrorMessage != null) {
+            _uiState.update { it.copy(sessionErrorMessage = null) }
+        }
+        if (!_uiState.value.isAligned && _uiState.value.sessionStateLabel == "Starting Camera") {
+            _uiState.update { it.copy(sessionStateLabel = "Waiting for Poster") }
+        }
+    }
+
+    fun onSessionUpdateFailed(message: String) {
+        val failure = sessionManager.lastFailure
+        _uiState.update {
+            it.copy(
+                sessionErrorMessage = message,
+                sessionErrorIsArCoreInstall = failure is SessionFailure.ArCoreInstallRequired,
+                sessionStateLabel = "Camera unavailable",
+            )
+        }
     }
 
     fun endNavigation() {
@@ -278,6 +419,9 @@ class AndroidArNavigationViewModel(
         routeRenderer.clearArrows()
         markerDetector.fullReset()
         sessionStarted = false
+        pendingResume = false
+        rebuildAttempts = 0
+        isRebuilding = false
         userCumulativeDistance = 0.0
         alignmentOffsetX = 0.0
         alignmentOffsetY = 0.0
@@ -299,6 +443,7 @@ class AndroidArNavigationViewModel(
                 isLowConfidence = false,
                 alignmentTimedOut = false,
                 markerAssetError = null,
+                sessionErrorMessage = null,
                 nextActionIcon = NavigationActionIcon.Straight,
                 nextActionText = "Follow the path",
                 nextActionDistance = null,

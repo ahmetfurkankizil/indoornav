@@ -4,7 +4,10 @@ import android.content.Context
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.view.Surface
+import android.view.WindowManager
 import com.google.ar.core.Coordinates2d
+import com.google.ar.core.Session
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -12,7 +15,7 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class ArCoreCameraRenderer(
-    private val context: Context,
+    private val activity: android.app.Activity,
     private val viewModel: AndroidArNavigationViewModel,
 ) : GLSurfaceView.Renderer {
     private var program = 0
@@ -22,7 +25,13 @@ class ArCoreCameraRenderer(
     private var cameraTextureId = 0
     private var width = 1
     private var height = 1
-    private var hasSetCameraTexture = false
+    private var textureBoundSession: Session? = null
+    private var firstFrameWaitStartMs = 0L
+    private var hasReceivedCameraFrame = false
+    private var hasReportedNoFrames = false
+    private var consecutiveUpdateFailures = 0
+    private var firstUpdateFailureMs = 0L
+    private var lastRecoveryAttemptMs = 0L
 
     private val quadCoords = floatBufferOf(floatArrayOf(
         -1f, -1f,
@@ -35,6 +44,13 @@ class ArCoreCameraRenderer(
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(0f, 0f, 0f, 1f)
         cameraTextureId = createExternalTexture()
+        textureBoundSession = null
+        firstFrameWaitStartMs = 0L
+        hasReceivedCameraFrame = false
+        hasReportedNoFrames = false
+        consecutiveUpdateFailures = 0
+        firstUpdateFailureMs = 0L
+        lastRecoveryAttemptMs = 0L
         program = createProgram(VERTEX_SHADER, FRAGMENT_SHADER)
         if (program == 0) {
             println("[ArCoreRenderer] Failed to create shader program")
@@ -44,36 +60,106 @@ class ArCoreCameraRenderer(
         texCoordAttrib = GLES20.glGetAttribLocation(program, "a_TexCoord")
         textureUniform = GLES20.glGetUniformLocation(program, "sTexture")
 
-        viewModel.startSession(context.applicationContext)
-        viewModel.setCameraTexture(cameraTextureId)
-        hasSetCameraTexture = true
+        bindCameraTextureIfNeeded(viewModel.currentSession())
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         this.width = width.coerceAtLeast(1)
         this.height = height.coerceAtLeast(1)
         GLES20.glViewport(0, 0, this.width, this.height)
+        viewModel.currentSession()?.let(::setDisplayGeometry)
     }
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         val session = viewModel.currentSession() ?: return
-        if (!hasSetCameraTexture && cameraTextureId != 0) {
-            viewModel.setCameraTexture(cameraTextureId)
-            hasSetCameraTexture = true
+        bindCameraTextureIfNeeded(session)
+
+        if (!viewModel.isSessionRunning()) {
+            return
         }
+        setDisplayGeometry(session)
 
         val frame = try {
             session.update()
         } catch (t: Throwable) {
-            println("[ArCoreRenderer] session.update failed: ${t.message}")
+            val detail = errorDetail(t)
+            println("[ArCoreRenderer] session.update failed: $detail")
+            
+            if (t is com.google.ar.core.exceptions.CameraNotAvailableException) {
+                viewModel.rebuildSession(activity)
+                return
+            }
+            
+            consecutiveUpdateFailures += 1
+            val now = System.currentTimeMillis()
+            if (firstUpdateFailureMs == 0L) {
+                firstUpdateFailureMs = now
+            }
+
+            viewModel.onCameraStarting()
+            recoverCameraSessionIfNeeded(now)
+            if (now - firstUpdateFailureMs >= 35_000L) {
+                viewModel.onSessionUpdateFailed(
+                    "AR camera frames are unavailable. Close other camera apps, allow camera access, then reopen navigation. Details: $detail",
+                )
+            }
             return
         }
+        consecutiveUpdateFailures = 0
+        firstUpdateFailureMs = 0L
 
         if (frame.timestamp != 0L) {
+            hasReceivedCameraFrame = true
+            hasReportedNoFrames = false
+            firstFrameWaitStartMs = 0L
+            viewModel.onCameraFrameAvailable()
             drawCameraBackground(frame)
+        } else if (!hasReceivedCameraFrame) {
+            val now = System.currentTimeMillis()
+            if (firstFrameWaitStartMs == 0L) {
+                firstFrameWaitStartMs = now
+            } else if (!hasReportedNoFrames && now - firstFrameWaitStartMs > 4_000L) {
+                hasReportedNoFrames = true
+                viewModel.onCameraStarting()
+                recoverCameraSessionIfNeeded(now)
+            }
         }
         viewModel.onFrame(frame, width, height)
+    }
+
+    private fun bindCameraTextureIfNeeded(session: Session?) {
+        if (session == null || cameraTextureId == 0 || textureBoundSession === session) return
+        if (viewModel.setCameraTexture(cameraTextureId)) {
+            textureBoundSession = session
+            viewModel.onCameraTextureBound(activity)
+        }
+    }
+
+    private fun setDisplayGeometry(session: Session) {
+        try {
+            session.setDisplayGeometry(displayRotation(), width, height)
+        } catch (t: Throwable) {
+            println("[ArCoreRenderer] setDisplayGeometry failed: ${t.message}")
+        }
+    }
+
+    private fun recoverCameraSessionIfNeeded(now: Long = System.currentTimeMillis()) {
+        if (now - lastRecoveryAttemptMs < 1_000L) return
+        lastRecoveryAttemptMs = now
+        viewModel.rebuildSession(activity)
+    }
+
+    private fun errorDetail(error: Throwable): String {
+        val type = error::class.java.simpleName.ifBlank { error::class.java.name }
+        val message = error.message
+        return if (message.isNullOrBlank() || message == "null") type else "$type: $message"
+    }
+
+    @Suppress("DEPRECATION")
+    private fun displayRotation(): Int {
+        val windowManager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+        return windowManager?.defaultDisplay?.rotation ?: Surface.ROTATION_0
     }
 
     private fun drawCameraBackground(frame: com.google.ar.core.Frame) {

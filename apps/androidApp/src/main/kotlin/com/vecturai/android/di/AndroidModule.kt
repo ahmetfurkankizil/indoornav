@@ -21,11 +21,11 @@ val androidModule = module {
     single { AndroidReviewedPackageLoader(androidContext()) }
     single { AndroidHapticManager(androidContext()) }
 
-    factory { ArSessionManager() }
+    single { ArSessionManager() }
     factory { ArMarkerDetector() }
     factory { ArRouteRenderer() }
 
-    viewModel { AndroidNavigationFlowModel(get()) }
+    viewModel { AndroidNavigationFlowModel(get(), get()) }
     viewModel { AndroidArNavigationViewModel(get(), get(), get(), get()) }
 
     // TODO: Provide Android-specific SqlDelight driver

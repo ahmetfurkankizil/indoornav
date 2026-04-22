@@ -2,6 +2,8 @@ package com.vecturai.android.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -58,13 +60,21 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.vecturai.android.ar.ArSessionManager
+import com.vecturai.android.ar.ArFeatureFlags
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
 import java.util.concurrent.atomic.AtomicBoolean
+import androidx.camera.core.CameraState
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun QRScanScreen(flowModel: AndroidNavigationFlowModel) {
     val context = LocalContext.current
     var retryToken by remember { mutableStateOf(0) }
+    var isReleasing by remember { mutableStateOf(false) }
     var hasPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
@@ -81,21 +91,41 @@ fun QRScanScreen(flowModel: AndroidNavigationFlowModel) {
 
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         if (hasPermission) {
-            CameraQrPreview(
-                retryToken = retryToken,
-                onCodeScanned = flowModel::onQRScanned,
-            )
+            if (ArFeatureFlags.ArUnifiedCameraPipeline) {
+                ArCoreQrPreview(
+                    sessionManager = flowModel.sessionManager,
+                    retryToken = retryToken,
+                    onCodeScanned = flowModel::onQRScanned,
+                    onReleasing = { isReleasing = true }
+                )
+            } else {
+                CameraQrPreview(
+                    retryToken = retryToken,
+                    onCodeScanned = flowModel::onQRScanned,
+                    onReleasing = { isReleasing = true }
+                )
+            }
         } else {
             CameraPermissionCard(onRequest = { launcher.launch(Manifest.permission.CAMERA) })
         }
 
-        QRScanChrome(
-            flowModel = flowModel,
-            onRetry = {
-                flowModel.clearQRError()
-                retryToken++
-            },
-        )
+        if (isReleasing) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.8f)), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color.White)
+                    Spacer(Modifier.height(16.dp))
+                    Text("Releasing camera...", color = Color.White)
+                }
+            }
+        } else {
+            QRScanChrome(
+                flowModel = flowModel,
+                onRetry = {
+                    flowModel.clearQRError()
+                    retryToken++
+                },
+            )
+        }
     }
 }
 
@@ -208,7 +238,11 @@ private fun CameraPermissionCard(onRequest: () -> Unit) {
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-private fun CameraQrPreview(retryToken: Int, onCodeScanned: (String) -> Unit) {
+private fun CameraQrPreview(
+    retryToken: Int,
+    onCodeScanned: (String) -> Unit,
+    onReleasing: () -> Unit = {}
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val scanner = remember {
@@ -243,6 +277,8 @@ private fun CameraQrPreview(retryToken: Int, onCodeScanned: (String) -> Unit) {
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build()
 
+                    var boundCamera: androidx.camera.core.Camera? = null
+
                     analysis.setAnalyzer(ContextCompat.getMainExecutor(ctx)) { imageProxy ->
                         if (locked.get() || !processing.compareAndSet(false, true)) {
                             imageProxy.close()
@@ -257,21 +293,53 @@ private fun CameraQrPreview(retryToken: Int, onCodeScanned: (String) -> Unit) {
                         }
 
                         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                        var scannedRaw: String? = null
                         scanner.process(image)
                             .addOnSuccessListener { barcodes ->
                                 val raw = barcodes.firstOrNull { it.rawValue != null }?.rawValue
                                 if (raw != null && locked.compareAndSet(false, true)) {
-                                    onCodeScanned(raw)
+                                    scannedRaw = raw
                                 }
                             }
                             .addOnCompleteListener {
                                 processing.set(false)
                                 imageProxy.close()
+                                val raw = scannedRaw
+                                if (raw != null) {
+                                    println("[QRScan] Code detected, releasing camera...")
+                                    onReleasing()
+                                    analysis.clearAnalyzer()
+                                    scanner.close()
+                                    provider.unbindAll()
+                                    
+                                    val cameraInfo = boundCamera?.cameraInfo
+                                    if (cameraInfo != null) {
+                                        lifecycleOwner.lifecycleScope.launch {
+                                            var isClosed = false
+                                            val observer = Observer<CameraState> { state ->
+                                                if (state.type == CameraState.Type.CLOSED) {
+                                                    isClosed = true
+                                                }
+                                            }
+                                            cameraInfo.cameraState.observe(lifecycleOwner, observer)
+                                            val start = System.currentTimeMillis()
+                                            while (!isClosed && System.currentTimeMillis() - start < 3000L) {
+                                                delay(50)
+                                            }
+                                            cameraInfo.cameraState.removeObserver(observer)
+                                            println("[QRScan] Notifying flow model after release...")
+                                            onCodeScanned(raw)
+                                        }
+                                    } else {
+                                        println("[QRScan] Fallback notifying flow model...")
+                                        onCodeScanned(raw)
+                                    }
+                                }
                             }
                     }
 
                     provider.unbindAll()
-                    provider.bindToLifecycle(
+                    boundCamera = provider.bindToLifecycle(
                         lifecycleOwner,
                         CameraSelector.DEFAULT_BACK_CAMERA,
                         preview,
@@ -294,4 +362,120 @@ private fun CameraQrPreview(retryToken: Int, onCodeScanned: (String) -> Unit) {
             scanner.close()
         }
     }
+}
+
+@Composable
+private fun ArCoreQrPreview(
+    sessionManager: ArSessionManager,
+    retryToken: Int,
+    onCodeScanned: (String) -> Unit,
+    onReleasing: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val activity = context.findActivity() ?: return
+
+    val scanner = remember {
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build()
+        BarcodeScanning.getClient(options)
+    }
+    val locked = remember { AtomicBoolean(false) }
+    val processing = remember { AtomicBoolean(false) }
+
+    LaunchedEffect(retryToken) {
+        locked.set(false)
+        processing.set(false)
+        sessionManager.createSessionWithoutMarker(activity)
+        sessionManager.resumeSession()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (!ArFeatureFlags.ArUnifiedCameraPipeline) {
+                sessionManager.stopSession()
+            }
+            scanner.close()
+        }
+    }
+
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { ctx ->
+            android.opengl.GLSurfaceView(ctx).apply {
+                setEGLContextClientVersion(2)
+                preserveEGLContextOnPause = true
+                setRenderer(object : android.opengl.GLSurfaceView.Renderer {
+                    var textureId = 0
+                    var textureBoundSession: com.google.ar.core.Session? = null
+
+                    override fun onSurfaceCreated(gl: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
+                        android.opengl.GLES20.glClearColor(0f, 0f, 0f, 1f)
+                        val textures = IntArray(1)
+                        android.opengl.GLES20.glGenTextures(1, textures, 0)
+                        textureId = textures[0]
+                        android.opengl.GLES20.glBindTexture(android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId)
+                    }
+
+                    override fun onSurfaceChanged(gl: javax.microedition.khronos.opengles.GL10?, width: Int, height: Int) {
+                        android.opengl.GLES20.glViewport(0, 0, width, height)
+                    }
+
+                    override fun onDrawFrame(gl: javax.microedition.khronos.opengles.GL10?) {
+                        android.opengl.GLES20.glClear(android.opengl.GLES20.GL_COLOR_BUFFER_BIT or android.opengl.GLES20.GL_DEPTH_BUFFER_BIT)
+                        val session = sessionManager.session ?: return
+                        
+                        if (textureBoundSession !== session) {
+                            sessionManager.setCameraTexture(textureId)
+                            textureBoundSession = session
+                        }
+
+                        try {
+                            val frame = session.update()
+                            if (locked.get() || !processing.compareAndSet(false, true)) return
+                            
+                            val image = try {
+                                frame.acquireCameraImage()
+                            } catch (e: Exception) {
+                                processing.set(false)
+                                null
+                            } ?: return
+                            
+                            val windowManager = activity.getSystemService(android.content.Context.WINDOW_SERVICE) as? android.view.WindowManager
+                            val rotation = windowManager?.defaultDisplay?.rotation ?: android.view.Surface.ROTATION_0
+                            val degrees = when (rotation) {
+                                android.view.Surface.ROTATION_0 -> 90
+                                android.view.Surface.ROTATION_90 -> 0
+                                android.view.Surface.ROTATION_180 -> 270
+                                android.view.Surface.ROTATION_270 -> 180
+                                else -> 90
+                            }
+
+                            val inputImage = InputImage.fromMediaImage(image, degrees)
+                            var scannedRaw: String? = null
+                            scanner.process(inputImage)
+                                .addOnSuccessListener { barcodes ->
+                                    val raw = barcodes.firstOrNull { it.rawValue != null }?.rawValue
+                                    if (raw != null && locked.compareAndSet(false, true)) {
+                                        scannedRaw = raw
+                                    }
+                                }
+                                .addOnCompleteListener {
+                                    image.close()
+                                    processing.set(false)
+                                    val raw = scannedRaw
+                                    if (raw != null) {
+                                        onReleasing()
+                                        onCodeScanned(raw)
+                                    }
+                                }
+                        } catch (t: Throwable) {
+                            processing.set(false)
+                        }
+                    }
+                })
+                renderMode = android.opengl.GLSurfaceView.RENDERMODE_CONTINUOUSLY
+            }
+        }
+    )
 }
