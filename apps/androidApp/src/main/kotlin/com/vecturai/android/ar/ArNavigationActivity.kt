@@ -21,6 +21,10 @@ import androidx.core.content.ContextCompat
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import kotlin.math.*
 
 /**
@@ -34,6 +38,7 @@ class ArNavigationActivity : ComponentActivity() {
     private val routeRenderer = ArRouteRenderer()
     private lateinit var cameraRenderer: ArCameraRenderer
     private lateinit var glSurfaceView: GLSurfaceView
+    private lateinit var previewView: PreviewView
 
     private lateinit var stateLabel: TextView
     private lateinit var instructionLabel: TextView
@@ -71,6 +76,14 @@ class ArNavigationActivity : ComponentActivity() {
             setRenderer(cameraRenderer)
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
+        
+        previewView = PreviewView(this).apply {
+            visibility = View.GONE
+        }
+
+        container.addView(previewView, FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
+        ))
         container.addView(glSurfaceView, FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
         ))
@@ -155,8 +168,35 @@ class ArNavigationActivity : ComponentActivity() {
 
     private fun resumeAr() {
         sessionManager.createSession(this)
-        sessionManager.resumeSession()
-        glSurfaceView.onResume()
+        if (sessionManager.session != null) {
+            glSurfaceView.visibility = View.VISIBLE
+            previewView.visibility = View.GONE
+            sessionManager.resumeSession()
+            glSurfaceView.onResume()
+        } else {
+            glSurfaceView.visibility = View.GONE
+            previewView.visibility = View.VISIBLE
+            startCameraXFallback()
+        }
+    }
+
+    private fun startCameraXFallback() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview)
+                // Automatically switch to navigation mode
+                simulateAlignment()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, ContextCompat.getMainExecutor(this))
     }
 
     private fun simulateAlignment() {

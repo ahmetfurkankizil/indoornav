@@ -5,8 +5,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
         android:name="android.hardware.camera.ar"
-        android:required="true" />
+        android:required="false" />
 
     <application
         android:name=".VecturaiApp"
@@ -34,7 +37,7 @@
         <!-- ARCore metadata -->
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" />
+            android:value="optional" />
 
     </application>
 </manifest>
