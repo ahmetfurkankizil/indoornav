@@ -2,9 +2,9 @@
 
 ## Summary
 - **Total Folders**: 172 (100% Indexed)
-- **Total Files**: 636 (100% Indexed)
-- **Mapped Files (Authored/Behavioral)**: 295 (100% Dossiered)
-- **Minimal Files (Binary/Artifacts/Vendored)**: 336
+- **Total Files**: 638 (100% Indexed)
+- **Mapped Files (Authored/Behavioral)**: 296 (100% Dossiered)
+- **Minimal Files (Binary/Artifacts/Vendored)**: 337
 - **Skipped Files (Internal/Temporary)**: 5
 - **Unresolved Files**: 0
 
