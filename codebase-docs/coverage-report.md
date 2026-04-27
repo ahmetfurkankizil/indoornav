@@ -31,7 +31,7 @@
 The Vecturai repository is 100% mapped and indexed. All authored logic is documented in high-accuracy dossiers, and the top-level architecture is clearly defined for future agentic consumption.
 
 ## Last Incremental Update
-- **Range**: `bf49840b36845ea9efe1220a6151c5211c72c0ba..f0cdb2ca91fc69bb6599e78efe60da385d4b498b`
-- **Scope**: Android AR lifecycle hardening, unified camera pipeline (ARCore-backed QR scanning), exponential backoff session recovery, and refined navigation guidance.
-- **Full Audit Recommendation**: NO. The incremental update accurately captures the targeted AR hardening changes.
+- **Range**: `a9d5304caab89210dc30b89297445663d6dd16d9..28ecf48c91cd96c1283f2751c28fdec0141ee39c`
+- **Scope**: Streamlined AR navigation flow, replacing `ArSessionManager` with `UnifiedArSession` and `ArCoreCameraRenderer` with `UnifiedArRenderer`, and integrating `ArCameraActivity` and `ArFrameQrScanner`.
+- **Full Audit Recommendation**: NO. The incremental update accurately captures the targeted AR hardening changes and refactoring.
 

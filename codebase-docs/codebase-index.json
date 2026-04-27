@@ -3,10 +3,10 @@
     "repository": "vecturai",
     "root": "c:\\Users\\emirh\\Desktop\\bitirme\\vecturai",
     "description": "Indoor navigation system with AR support",
-    "generated_at": "2026-04-23T00:42:00+03:00",
-    "generated_from_range": "bf49840b36845ea9efe1220a6151c5211c72c0ba..f0cdb2ca91fc69bb6599e78efe60da385d4b498b",
+    "generated_at": "2026-04-27T16:22:17+03:00",
+    "generated_from_range": "a9d5304caab89210dc30b89297445663d6dd16d9..28ecf48c91cd96c1283f2751c28fdec0141ee39c",
     "coverage_verdict": "COMPLETE",
-    "last_incremental_update": "2026-04-23T00:42:00+03:00"
+    "last_incremental_update": "2026-04-27T16:22:17+03:00"
 
   },
   "folders": [
