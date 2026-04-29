@@ -3,6 +3,7 @@ package com.vecturai.android.ar
 import android.Manifest
 import android.content.pm.PackageManager
 import android.opengl.GLSurfaceView
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -71,6 +72,7 @@ class ArCameraActivity : ComponentActivity() {
     private var resumeJob: Job? = null
     private var cameraTextureId = 0
     private var askedForPermission = false
+    private val isEmulator by lazy { isLikelyEmulator() }
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -108,6 +110,10 @@ class ArCameraActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (isEmulator) {
+            showPermissionOverlay.value = false
+            return
+        }
         glSurfaceView?.onResume()
         if (hasCameraPermission()) {
             showPermissionOverlay.value = false
@@ -140,27 +146,30 @@ class ArCameraActivity : ComponentActivity() {
         val needsPermission by showPermissionOverlay
 
         Box(Modifier.fillMaxSize().background(Color.Black)) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { context ->
-                    GLSurfaceView(context).apply {
-                        setEGLContextClientVersion(2)
-                        preserveEGLContextOnPause = true
-                        setRenderer(renderer)
-                        renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
-                        glSurfaceView = this
-                        if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                            onResume()
+            if (!isEmulator) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { context ->
+                        GLSurfaceView(context).apply {
+                            setEGLContextClientVersion(2)
+                            preserveEGLContextOnPause = true
+                            setRenderer(renderer)
+                            renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+                            glSurfaceView = this
+                            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                                onResume()
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
 
             when (val currentPhase = phase) {
                 ArCameraFlowViewModel.Phase.Loading -> LoadingOverlay()
                 ArCameraFlowViewModel.Phase.QrScan -> QRScanScreen(
                     flowModel = flowModel,
                     onCancel = ::finishFlow,
+                    onSimulateScan = ::simulateEntranceScan,
                 )
                 is ArCameraFlowViewModel.Phase.EntranceConfirmed -> EntranceConfirmedSheet(
                     entranceName = currentPhase.entranceName,
@@ -176,6 +185,9 @@ class ArCameraActivity : ComponentActivity() {
                     if (routePackage != null) {
                         LaunchedEffect(routePackage, session.validatedEntranceMarker) {
                             arViewModel.configure(routePackage, session.validatedEntranceMarker)
+                            if (isEmulator) {
+                                arViewModel.simulateAlignment()
+                            }
                         }
                         ArNavigationScreen(
                             viewModel = arViewModel,
@@ -204,6 +216,9 @@ class ArCameraActivity : ComponentActivity() {
     }
 
     private fun resumeCameraWhenReady() {
+        if (isEmulator) {
+            return
+        }
         if (!hasCameraPermission()) {
             showPermissionOverlay.value = true
             return
@@ -221,6 +236,10 @@ class ArCameraActivity : ComponentActivity() {
                 marker = flowModel.entranceMarkerForSession(),
             )
         }
+    }
+
+    private fun simulateEntranceScan() {
+        flowModel.onQRScanned(DEMO_QR_PAYLOAD)
     }
 
     private fun onArFrame(frame: Frame, width: Int, height: Int, rotationDegrees: Int) {
@@ -252,6 +271,44 @@ class ArCameraActivity : ComponentActivity() {
 
     private fun hasCameraPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+    private fun isLikelyEmulator(): Boolean {
+        val fingerprint = Build.FINGERPRINT.lowercase()
+        val model = Build.MODEL.lowercase()
+        val manufacturer = Build.MANUFACTURER.lowercase()
+        val brand = Build.BRAND.lowercase()
+        val device = Build.DEVICE.lowercase()
+        val product = Build.PRODUCT.lowercase()
+        val hardware = Build.HARDWARE.lowercase()
+        val board = Build.BOARD.lowercase()
+        val bootloader = Build.BOOTLOADER.lowercase()
+        return fingerprint.startsWith("generic") ||
+            fingerprint.contains("emulator") ||
+            fingerprint.contains("sdk_gphone") ||
+            fingerprint.contains("sdk_phone") ||
+            model.contains("google_sdk") ||
+            model.contains("sdk_gphone") ||
+            model.contains("sdk phone") ||
+            model.contains("emulator") ||
+            model.contains("android sdk built for") ||
+            hardware.contains("goldfish") ||
+            hardware.contains("ranchu") ||
+            board.contains("goldfish") ||
+            board.contains("ranchu") ||
+            bootloader.contains("unknown") ||
+            manufacturer.contains("genymotion") ||
+            (brand.startsWith("generic") && device.startsWith("generic")) ||
+            product == "google_sdk" ||
+            product.contains("sdk_gphone") ||
+            product.contains("sdk_phone") ||
+            product.contains("emulator") ||
+            product.contains("vbox")
+    }
+
+    private companion object {
+        const val DEMO_QR_PAYLOAD =
+            """{"type":"vecturai-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}"""
+    }
 }
 
 @Composable

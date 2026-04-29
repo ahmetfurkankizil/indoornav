@@ -39,6 +39,7 @@ import com.vecturai.android.navigation.ArCameraFlowViewModel
 fun QRScanScreen(
     flowModel: ArCameraFlowViewModel,
     onCancel: () -> Unit,
+    onSimulateScan: (() -> Unit)? = null,
 ) {
     Box(
         Modifier
@@ -51,6 +52,7 @@ fun QRScanScreen(
                 flowModel.clearQRError()
             },
             onCancel = onCancel,
+            onSimulateScan = onSimulateScan,
         )
     }
 }
@@ -60,6 +62,7 @@ private fun QRScanChrome(
     flowModel: ArCameraFlowViewModel,
     onRetry: () -> Unit,
     onCancel: () -> Unit,
+    onSimulateScan: (() -> Unit)?,
 ) {
     val error by flowModel.qrError.collectAsState()
 
@@ -120,6 +123,11 @@ private fun QRScanChrome(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodySmall,
                             )
+                        }
+                    }
+                    if (onSimulateScan != null) {
+                        Button(onClick = onSimulateScan, modifier = Modifier.fillMaxWidth()) {
+                            Text("Simulate Entrance Scan")
                         }
                     }
                 } else {
