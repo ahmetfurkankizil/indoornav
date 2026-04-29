@@ -25,13 +25,14 @@ Compose root for the Android Home/PackageError surface plus reusable visitor-flo
 
 ## Main Symbols
 - `AndroidNavigationApp`: Renders MainActivity's Home or PackageError only.
-- `HomeScreen`: Polished home with gear icon and gradient CTA; CTA launches `ArCameraActivity` through a callback.
+- `HomeScreen`: Dark welcome screen with dotted background, centered logo/title/feature pills, bottom-anchored CTA group, and gear icon; CTA launches `ArCameraActivity` through a callback.
 - `DestinationSelectScreen`: Activity-scoped destination picker, search, category grouping, rich room cards/badges.
 - `RoutePreviewScreen`: Activity-scoped walking estimate, route type badge, and start action.
 - `EntranceConfirmedSheet`: Camera-flow bottom sheet shown over the still-running ARCore preview.
 
 ## Important Logic
 - Home no longer transitions through QR, destination selection, preview, or AR navigation in-place.
+- The welcome screen uses a local Compose drawing helper for the dotted background; it does not alter navigation behavior.
 - The destination and preview composables are reusable overlays for `ArCameraActivity`; they operate on `ArCameraFlowViewModel`.
 - Walking time is calculated as `distance / 1.2 m/s`, matching iOS route preview copy.
 - Search flattens room display while non-search mode groups rooms by category.

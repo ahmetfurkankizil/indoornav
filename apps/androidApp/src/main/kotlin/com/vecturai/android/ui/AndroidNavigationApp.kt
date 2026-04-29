@@ -6,14 +6,16 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,6 +66,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -113,64 +116,105 @@ private fun HomeScreen(
 ) {
     var showAdminTools by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF070D18)),
     ) {
-        Row(
+        DotGridBackground()
+
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.End,
+                .align(Alignment.TopEnd)
+                .padding(top = 8.dp, end = 16.dp)
+                .size(40.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(0xFF121A28).copy(alpha = 0.92f))
+                .border(1.dp, Color(0xFF253149), RoundedCornerShape(14.dp)),
+            contentAlignment = Alignment.Center,
         ) {
             IconButton(onClick = { showAdminTools = true }) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Admin Tools",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = Color(0xFF8C99AD),
+                    modifier = Modifier.size(22.dp),
                 )
             }
         }
-
-        Spacer(Modifier.weight(1f))
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Icon(
-                imageVector = Icons.Default.Map,
-                contentDescription = null,
-                modifier = Modifier.size(72.dp),
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("VecturAI", fontSize = 34.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    "Find your way indoors",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
-        Spacer(Modifier.weight(2f))
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+                .fillMaxSize()
+                .padding(horizontal = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            GradientPrimaryButton(
-                text = "Scan Entrance Code",
-                icon = Icons.Default.QrCodeScanner,
-                onClick = onStartNavigation,
-            )
+            Spacer(Modifier.weight(1f))
+
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(Color(0xFF148BFF)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.size(43.dp),
+                    tint = Color.White,
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+
             Text(
-                "Scan the QR code at the building entrance to begin",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = "VecturAI",
+                color = Color.White,
+                fontSize = 31.sp,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 34.sp,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = "Find any room in seconds.",
+                color = Color(0xFF8994A6),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                FeaturePill("Live AR")
+                FeaturePill("Smart Routes")
+                FeaturePill("Indoor Maps")
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            WelcomePrimaryButton(onClick = onStartNavigation)
+
+            Spacer(Modifier.height(18.dp))
+
+            Text(
+                text = "Enter code manually",
+                color = Color(0xFF697486),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                text = "Scan the QR code at any building entrance",
+                color = Color(0xFF465164),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
             )
+            Spacer(Modifier.height(24.dp))
         }
     }
 
@@ -190,6 +234,74 @@ private fun HomeScreen(
                 Spacer(Modifier.height(16.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun DotGridBackground() {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val spacing = 22.dp.toPx()
+        val radius = 0.85.dp.toPx()
+        var x = 10.dp.toPx()
+        while (x < size.width) {
+            var y = 14.dp.toPx()
+            while (y < size.height) {
+                drawCircle(
+                    color = Color(0xFF263750).copy(alpha = 0.36f),
+                    radius = radius,
+                    center = Offset(x, y),
+                )
+                y += spacing
+            }
+            x += spacing
+        }
+    }
+}
+
+@Composable
+private fun FeaturePill(text: String) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = Color(0xFF071C33).copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, Color(0xFF0B60AE)),
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            color = Color(0xFF238CFF),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun WelcomePrimaryButton(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color(0xFF168BFF))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Icons.Default.QrCodeScanner,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(22.dp),
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = "Scan Entrance Code",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+        )
     }
 }
 
