@@ -7,45 +7,37 @@ app/src/main/java/com/example/vecturai/ui/navigation/NavigationScreen.kt
 source
 
 ## Role
-AR UI for real-time indoor navigation guidance.
+Main UI component for the navigation experience, displaying the AR view and guidance overlays.
 
 ## Imports / Includes
-- `io.github.sceneview.ar.ARSceneView`
-- `com.example.vecturai.ar.ArrowRenderer`
-- `com.example.vecturai.ui.CameraPermissionGate`
+- `com.example.vecturai.ui.navigation.NavigationViewModel`
+- `androidx.compose.runtime.collectAsState`
 
 ## Exports / Public Surface
-- `NavigationRoute` (Composable): Entry point with ViewModel injection.
-- `NavigationScreen` (Composable): Main UI state machine.
+- `NavigationScreen` (Composable)
 
 ## Main Symbols
-- `NavigationArScene`: Renders the path markers and the floating navigation arrow.
-- `NavigationDiagnostics`: Debug panel for tracking status and distances.
-- `BuildingPicker`: UI for selecting which saved graph to load.
-- `ArrivedPanel`: Final UI state upon reaching the destination.
+- `NavigationScreen`: Host composable that switches content based on `uiState.phase`.
+- `NavigationOverlay`: Displays the distance to destination and current waypoint name.
+- `RelocalizeButton`: Triggers manual re-computation of the graph fit.
 
 ## Important Logic by Line Range
-- L81-107: `NavigationPhase` state machine driving the visibility of different UI panels.
-- L141-195: `ARSceneView` integration.
-- L171-172: `isSmoothTransformEnabled` configuration for the 3D arrow to reduce jitter.
-- L182-192: Fallback rendering logic if `arrow.glb` asset is missing (renders a Cube + Sphere composition).
+- L45-120: Screen layout and phase-based navigation (Selecting building -> Localizing -> Navigating).
+- L140-160: Integration with `NavigationViewModel` to drive AR model positions.
 
 ## Uses
 - `NavigationViewModel.kt`
-- `ArSessionConfig.kt`
-- `SceneView` library
-- `ArAssetUtils.kt` [Pending Mapping]
+- `ArAssetUtils.kt`
 
 ## Used By
-- `MainActivity.kt` (Route mapping)
+- `MainActivity.kt`
 
 ## Config / Constants / Protocol Details
-- Arrow Model: `arrow.glb` (expected in assets).
-- Color coding: Cyan (0xFF00BCD4) for resolved anchors, Amber (0xFFFFC107) for estimated positions.
+N/A
 
 ## Related Tests
 N/A
 
 ## Notes / Risks
-- Asset validation via `hasValidGlbAsset` is crucial to prevent `SceneView` crashes.
-- Relies on `PoseNode` for placing markers in 3D space.
+- UI is highly dynamic; many components are hidden/shown based on tracking state.
+- Guidance text reflects the `activePath` current node label.

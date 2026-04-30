@@ -7,23 +7,26 @@ app/src/main/java/com/example/vecturai/graph/Pathfinder.kt
 source
 
 ## Role
-Shortest path calculation engine.
+Shortest path calculation engine with turn-cost awareness and path smoothing.
 
 ## Imports / Includes
 - `java.util.PriorityQueue`
+- `kotlin.math.acos`
 
 ## Exports / Public Surface
 - `Pathfinder` (class)
 - `shortestPath(startId, goalId)` (function)
 
 ## Main Symbols
-- `adjacentEdges` (property): Bidirectional adjacency list built from the graph's edges.
-- `shortestPath` (function): Implementation of Dijkstra's algorithm.
+- `shortestPath`: Implementation of A* algorithm using `SearchState` to track direction.
+- `edgeCost`: Calculates traversal cost including turn penalties (`TURN_COST_METERS_PER_RADIAN`) and edge multipliers (Stairs/Elevator).
+- `smoothPath`: Iteratively removes intermediate nodes that don't significantly change the path shape.
+- `SearchState`: Identifies a node combined with the direction it was entered from.
 
 ## Important Logic by Line Range
-- L7-15: Adjacency list construction, ensuring all edges are treated as bidirectional.
-- L23-39: Dijkstra core loop using a `PriorityQueue` with `compareBy`.
-- L42-43: Path reconstruction from the `previous` map.
+- L11-79: A* core loop with turn-cost integration via `SearchState`.
+- L81-98: `edgeCost` logic calculating turn angles between incoming and outgoing edges.
+- L100-134: `smoothPath` and `canDropIntermediate` logic using point-to-segment distance.
 
 ## Uses
 - `MapGraph.kt`
@@ -32,11 +35,12 @@ Shortest path calculation engine.
 - `NavigationViewModel.kt`
 
 ## Config / Constants / Protocol Details
-N/A
+- `TURN_COST_METERS_PER_RADIAN`: 0.6m penalty per radian of turning.
+- `SMOOTHING_MAX_DEVIATION_M`: 0.75m threshold for smoothing.
 
 ## Related Tests
 - `app/src/test/java/com/example/vecturai/graph/PathfinderTest.kt`
 
 ## Notes / Risks
-- Returns `null` if no path is found or if start/goal IDs are invalid.
-- Efficiency is $O(E \log V)$ which is suitable for indoor mapping graphs.
+- Turn-cost calculation only considers the horizontal component of the movement.
+- Intermediate labeled nodes are never dropped by the smoother.

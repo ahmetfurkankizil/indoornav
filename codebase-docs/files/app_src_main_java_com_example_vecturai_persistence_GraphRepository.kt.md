@@ -7,45 +7,41 @@ app/src/main/java/com/example/vecturai/persistence/GraphRepository.kt
 source
 
 ## Role
-Local file-based persistence for navigation graphs.
+Handles file system persistence for graphs and localization metadata.
 
 ## Imports / Includes
-- `android.content.Context`
-- `kotlinx.coroutines.Dispatchers`
 - `kotlinx.serialization.json.Json`
+- `java.io.File`
 
 ## Exports / Public Surface
 - `GraphRepository` (class)
-- `save(graph)` (suspend function)
-- `load(buildingName)` (suspend function)
-- `listBuildings()` (suspend function)
+- `save(graph)` / `load(name)`
+- `saveLocalizationHint(name, hint)` / `loadLocalizationHint(name)`
+- `LocalizationHint` (data class)
 
 ## Main Symbols
-- `directory` (property): target directory `filesDir/graphs`.
-- `json` (property): Configured `Json` instance with `prettyPrint` and `ignoreUnknownKeys`.
-- `toFileName()` (extension function): Sanitizes building names for safe file storage.
+- `graphsDir`: Directory for graph JSON files.
+- `hintsDir`: Directory for building-specific localization hints.
+- `LocalizationHint`: Stores `lastResolvedAnchorIds` and `lastUserGraphPose` for faster startup.
 
 ## Important Logic by Line Range
-- L20: Application-specific directory creation.
-- L22-25: IO-dispatched JSON serialization and write.
-- L27-30: IO-dispatched read and deserialization.
-- L40-44: Filename sanitization logic.
+- L35-50: JSON serialization/deserialization logic.
+- L60-80: Hint management logic.
 
 ## Uses
 - `MapGraph.kt`
-- Kotlinx Serialization
 
 ## Used By
 - `MappingViewModel.kt`
 - `NavigationViewModel.kt`
 
 ## Config / Constants / Protocol Details
-- JSON format: Pretty printed, ignores unknown keys for forward compatibility.
-- Storage Location: `filesDir/graphs` (private internal storage).
+- Uses `encodeToString` and `decodeFromString` for persistence.
+- Filenames derived from building titles.
 
 ## Related Tests
 N/A
 
 ## Notes / Risks
-- Uses `Dispatchers.IO` for all file operations to avoid blocking the main thread.
-- File naming logic replaces non-alphanumeric characters with underscores.
+- `ignoreUnknownKeys = true` allows for some schema evolution without crashes.
+- Repository is initialized with `context.filesDir`.

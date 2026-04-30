@@ -13,27 +13,32 @@ Calculates the shortest navigable route between two points in an indoor environm
 ## Main Flow
 1. Receives a `MapGraph` containing nodes and edges.
 2. Constructs a bidirectional adjacency list.
-3. Uses Dijkstra's algorithm to find the sequence of `MapNode` objects from the start to the destination.
-4. Returns the ordered list for navigation guidance.
+3. Uses A* algorithm (weighted Dijkstra) to find the sequence of `MapNode` objects.
+   - **Cost Factors:** Includes physical distance, turn penalties (`TURN_COST_METERS_PER_RADIAN`), and edge type multipliers (Stairs/Elevators).
+4. **Path Smoothing:** Drops redundant intermediate nodes if they don't have labels and don't deviate significantly from a straight line.
+5. Returns the optimized list for navigation guidance.
 
 ## Key Symbols
 - `Pathfinder.shortestPath()`
-- `MapEdge.distanceMeters`
+- `Pathfinder.edgeCost()`
+- `Pathfinder.smoothPath()`
 
 ## Config / Env / Flags
-N/A
+- `TURN_COST_METERS_PER_RADIAN`: Penalizes sharp turns to prefer straight corridors.
+- `STAIRS_MULTIPLIER`: Increases cost of using stairs.
+- `SMOOTHING_MAX_DEVIATION_M`: Threshold for dropping intermediate nodes.
 
 ## Data Structures / Protocols
 - `MapGraph`: The underlying data model.
-- `PriorityQueue`: Used for efficient node selection in Dijkstra.
+- `SearchState`: Tracks node and incoming direction for turn-cost calculation.
 
 ## Related Tests
 - [PathfinderTest.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/app/src/test/java/com/example/vecturai/graph/PathfinderTest.kt)
 
 ## Related File Dossiers
-- [MapGraph.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-document/files/app_src_main_java_com_example_vecturai_graph_MapGraph.kt.md)
-- [Pathfinder.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-document/files/app_src_main_java_com_example_vecturai_graph_Pathfinder.kt.md)
+- [MapGraph.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/app_src_main_java_com_example_vecturai_graph_MapGraph.kt.md)
+- [Pathfinder.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/app_src_main_java_com_example_vecturai_graph_Pathfinder.kt.md)
 
 ## Risks / Notes
-- The pathfinder assumes a static graph; if the environment changes, a new map must be created.
-- Unreachable goals return a null path.
+- Smoothing might over-simplify paths in very tight zigzag environments.
+- Vertical costs (Stairs/Elevators) are static multipliers.

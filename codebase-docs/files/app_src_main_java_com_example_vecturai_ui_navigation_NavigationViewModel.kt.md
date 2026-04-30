@@ -7,10 +7,10 @@ app/src/main/java/com/example/vecturai/ui/navigation/NavigationViewModel.kt
 source
 
 ## Role
-Orchestrates the localization, pathfinding, and real-time guidance during navigation.
+Orchestrates localization consensus, pathfinding, path projection, and real-time guidance during navigation.
 
 ## Imports / Includes
-- `com.example.vecturai.ar.ArrowRenderer`
+- `com.example.vecturai.ar.Relocalizer`
 - `com.example.vecturai.ar.CloudAnchorHelper`
 - `com.example.vecturai.graph.Pathfinder`
 - `com.example.vecturai.persistence.GraphRepository`
@@ -20,22 +20,25 @@ Orchestrates the localization, pathfinding, and real-time guidance during naviga
 - `uiState` (StateFlow<NavigationUiState>)
 - `selectBuilding(name)` (function)
 - `selectDestination(id)` (function)
+- `relocalizeNow()` (function)
 
 ## Main Symbols
-- `NavigationPhase` (Enum): Lifecycle of a navigation session.
-- `MAX_PARALLEL_RESOLVES`: Constant (40) for concurrent anchor resolution.
-- `RELOCALIZE_INTERVAL_MS`: Constant (15s) for periodic drift correction.
-- `startResolveLoopIfReady`: Manages the background coroutine for resolving Cloud Anchors.
-- `updateNavigationProgress`: Drives the arrow rendering and waypoint advancement.
+- `recomputeGraphToSession`: Uses `Relocalizer` to compute a weighted Procrustes fit between the session and graph.
+- `refreshDisplayedNodePoses`: Lerps node poses for smooth UI transitions during localization updates.
+- `updateNavigationProgress`: Handles waypoint advancement and drives the 3D arrow.
+- `projectToPath`: Calculates the user's progress along the path segments even when distant from anchors.
+- `maybeReroute`: Triggers a new `Pathfinder` call if the user deviates from the path.
+- `startResolveLoopIfReady`: Manages "First Fix" and "Maintenance" resolve loops.
 
 ## Important Logic by Line Range
-- L185-208: `onSessionUpdated` hook. Triggers progress updates and handles tracking loss recovery.
-- L210-240: Path selection logic using `Pathfinder`.
-- L275-297: The resolve loop. Chunks nodes for parallel resolution to improve localization speed.
-- L313: Updates the global `graphToSessionPose` upon any successful anchor resolution.
-- L382-403: Waypoint arrival logic using `WAYPOINT_ADVANCE_DISTANCE_M` (1.2m).
+- L304-347: Multi-phase resolve loop (First Fix vs Maintenance).
+- L469-499: Consensus fitting logic using `Relocalizer` with outlier rejection.
+- L501-545: lerp-based smoothing of node poses for the UI.
+- L656-701: Navigation progress logic including path projection and advancement.
+- L703-732: Automatic rerouting logic.
 
 ## Uses
+- `Relocalizer.kt`
 - `CloudAnchorHelper.kt`
 - `Pathfinder.kt`
 - `GraphRepository.kt`
@@ -46,11 +49,14 @@ Orchestrates the localization, pathfinding, and real-time guidance during naviga
 - `NavigationScreen.kt`
 
 ## Config / Constants / Protocol Details
-- `RESOLVE_TIMEOUT_MS`: 20 seconds per anchor resolve attempt.
+- `GRAPH_FIT_CHANGE_EPSILON_M`: Threshold to update the display after fit change.
+- `DISPLAY_POSE_CATCHUP_HZ`: smoothing frequency.
+- `CONFIDENCE_DISTANCE_DECAY_M`: Spatial decay for anchor confidence.
 
 ## Related Tests
-N/A
+N/A (Integration level)
 
 ## Notes / Risks
-- Parallel resolution is resource-intensive; capped at 40 to avoid session instability.
-- Drift correction depends on finding at least one anchor that was hosted in a similar lighting/feature environment.
+- `Relocalizer` integration significantly improves stability by using all visible anchors.
+- Path projection ensures the arrow remains useful even when far from known nodes.
+- Lerping prevents "jumping" when new anchors resolve.

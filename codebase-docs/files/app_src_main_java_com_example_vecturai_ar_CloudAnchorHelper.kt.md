@@ -28,7 +28,6 @@ Coroutine-based facade for ARCore Cloud Anchor asynchronous operations.
 ## Important Logic by Line Range
 - L20-62: `hostAnchor` implementation. Handles cancellation by canceling the ARCore future and detaching the local anchor.
 - L67-96: `resolveAnchor` implementation. Manages async callback and result mapping.
-- L98-104: Auto-reconfiguration logic using `ArSessionConfig`.
 
 ## Uses
 - `ArSessionConfig.kt`
@@ -39,7 +38,7 @@ Coroutine-based facade for ARCore Cloud Anchor asynchronous operations.
 - `NavigationViewModel.kt`
 
 ## Config / Constants / Protocol Details
-- Default TTL: 1 day (MVP limitation).
+- Default TTL: 1 day.
 
 ## Related Tests
 N/A

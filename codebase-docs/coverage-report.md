@@ -4,8 +4,8 @@
 | Metric | Count |
 | :--- | :--- |
 | **Total Folders** | 18 |
-| **Total Files** | 63 |
-| **Mapped** | 35 |
+| **Total Files** | 65 |
+| **Mapped** | 37 |
 | **Indexed Minimal** | 12 |
 | **Skipped with Reason** | 16 |
 | **Unresolved** | 0 |

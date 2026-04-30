@@ -13,30 +13,35 @@ Provides turn-by-turn AR guidance to lead a user from their current location to 
 
 ## Main Flow
 1. **Selection:** User picks a saved building graph and a destination room.
-2. **Localization:** The app resolves Cloud Anchors from the graph to synchronize the local AR space with the graph coordinate system.
-3. **Routing:** `Pathfinder` computes the shortest path between the closest node and the target.
+2. **Localization:** The app resolves Cloud Anchors from the graph. `Relocalizer` computes a consensus alignment between the AR session and the graph.
+3. **Routing:** `Pathfinder` computes an optimized path.
 4. **Guidance:** A 3D arrow appears in front of the user, pointing toward the next waypoint.
-5. **Advancement:** As the user reaches a waypoint (within 1.2m), the arrow updates to point to the next one.
-6. **Arrival:** Guidance ends when the user reaches the final destination node.
+5. **Path Projection:** The user's position is projected onto the active path segments (`projectToPath`) to determine the "Current Node" even between anchors.
+6. **Rerouting:** If the user deviates significantly from the path (`maybeReroute`), a new path is computed automatically.
+7. **Advancement:** As the user reaches a waypoint (within `WAYPOINT_ADVANCE_DISTANCE_M`), the arrow updates to the next one.
+8. **Arrival:** Guidance ends when the user reaches the final destination node.
 
 ## Key Symbols
-- `NavigationViewModel.startResolveLoopIfReady()`
-- `NavigationViewModel.updateNavigationProgress()`
+- `NavigationViewModel.projectToPath()`
+- `NavigationViewModel.maybeReroute()`
+- `NavigationViewModel.recomputeGraphToSession()`
 - `ArrowRenderer.WAYPOINT_ADVANCE_DISTANCE_M`
 
 ## Config / Env / Flags
-- `MAX_PARALLEL_RESOLVES`: Set to 40 for optimal performance/stability balance.
+- `MAX_PARALLEL_RESOLVES`: Number of concurrent anchor resolve attempts.
+- `REROUTE_DEVIATION_M`: Distance threshold to trigger automatic rerouting.
 
 ## Data Structures / Protocols
 - `NavigationPhase`: Loading -> SelectBuilding -> Localizing -> PickingDestination -> Navigating -> Arrived.
+- `PathProjection`: Stores the closest segment and perpendicular distance.
 
 ## Related Tests
 N/A
 
 ## Related File Dossiers
-- [NavigationScreen.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-document/files/app_src_main_java_com_example_vecturai_ui_navigation_NavigationScreen.kt.md)
-- [NavigationViewModel.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-document/files/app_src_main_java_com_example_vecturai_ui_navigation_NavigationViewModel.kt.md)
+- [NavigationScreen.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/app_src_main_java_com_example_vecturai_ui_navigation_NavigationScreen.kt.md)
+- [NavigationViewModel.kt](file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/app_src_main_java_com_example_vecturai_ui_navigation_NavigationViewModel.kt.md)
 
 ## Risks / Notes
-- Navigation requires an internet connection to resolve Cloud Anchors.
-- Drift correction happens every 15 seconds to maintain alignment over long walks.
+- Navigation requires an internet connection for anchor resolution.
+- Drift correction and outlier rejection maintain alignment accuracy during movement.

@@ -7,46 +7,45 @@ app/src/main/java/com/example/vecturai/ar/PoseUtils.kt
 source
 
 ## Role
-Math utility library for 3D vectors and ARCore Pose transformations.
+Low-level math and utility functions for `Pose` and `Vec3` operations.
 
 ## Imports / Includes
 - `com.google.ar.core.Pose`
-- `kotlin.math.*`
 
 ## Exports / Public Surface
-- `Vec3` (data class): Custom 3D vector with arithmetic operators.
-- `Pose.translationVec()`: Extension to get Vec3 from Pose.
-- `Pose.forwardVec()`: Extension to get normalized forward direction.
-- `distanceMeters(...)`: Overloaded distance functions for Poses and Vec3s.
-- `sessionFromGraphPose(...)`: Computes the transformation from graph-space to session-space.
-- `estimateSessionPose(...)`: Projects a graph node into session-space.
-- `yawDegreesToward(...)`: Calculates horizontal rotation angle toward a target.
+- `Vec3` (data class with math operators)
+- `Pose.translationVec()`
+- `Pose.forwardVec()`
+- `distanceMeters(a, b)`
+- `relativePose(origin, pose)`
+- `estimateSessionPose(sessionFromGraph, node)`
+- `positionInFrontOfCamera(cameraPose, meters)`
+- `Vec3.rotateY(radians)`
 
 ## Main Symbols
-- `Vec3`: Core geometry primitive.
-- `sessionFromGraphPose`: Critical for localizing the user within a loaded graph.
-- `rotateY`: Rotates a vector around the vertical axis.
+- `Vec3`: Custom lightweight 3D vector for coordinate math.
+- `positionInFrontOfCamera`: Projects a point at camera height in the forward direction.
+- `estimateSessionPose`: Computes where a graph node should be in session space given a global transform.
+- `sessionFromGraphPose`: Computes the session-to-graph offset from a single resolved node.
 
 ## Important Logic by Line Range
-- L15-17: Operator overloading for `Vec3`.
-- L31-34: Forward vector extraction from ARCore's Z-axis.
-- L68-72: Coordinate system synchronization logic.
-- L74-77: Atan2-based yaw calculation.
+- L10-27: `Vec3` definition with `horizontal()` and `normalized()` helpers.
+- L82-91: `positionInFrontOfCamera` logic using flat-forward projection.
 
 ## Uses
-- ARCore SDK
+- `MapGraph.kt` (via `MapNode`)
 
 ## Used By
 - `ArrowRenderer.kt`
-- `MappingViewModel.kt`
 - `NavigationViewModel.kt`
+- `Relocalizer.kt`
 
 ## Config / Constants / Protocol Details
-- Direction: Forward is `-Z` in ARCore camera space.
+N/A
 
 ## Related Tests
 N/A
 
 ## Notes / Risks
-- `Vec3.normalized()` defaults to `-Z` if length is zero to avoid division by zero.
-- `sessionFromGraphPose` assumes a single rigid transformation is sufficient for local drift correction.
+- `forwardVec` uses ARCore's Z-axis inversion to get standard forward direction.
+- `rotateY` handles horizontal rotation only.
