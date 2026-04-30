@@ -52,7 +52,7 @@ class ArRouteRenderer {
     private var rotationYRad: Double = 0.0
 
     private var lookaheadDistance = 8.0
-    private var fadeDistance = 3.0
+    private var fadeDistance = 1.5
     private var arrowHeightOffset = 0.05
     private var allArrows: List<ArrowPlacementData> = emptyList()
     private var arrowStates: Map<String, ArrowState> = emptyMap()

@@ -123,7 +123,6 @@ fun ArNavigationScreen(
                 else -> ActiveNavigationOverlay(
                     uiState = uiState,
                     onEnd = onEnd,
-                    onAdvance = viewModel::advanceProgress,
                 )
             }
         }
@@ -292,7 +291,6 @@ private fun AlignmentOverlay(
 private fun ActiveNavigationOverlay(
     uiState: ArNavigationUiState,
     onEnd: () -> Unit,
-    onAdvance: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
         InstructionBanner(
@@ -302,7 +300,7 @@ private fun ActiveNavigationOverlay(
                 .padding(start = 12.dp, top = 8.dp, end = 12.dp),
         )
         Spacer(Modifier.weight(1f))
-        BottomHud(uiState = uiState, onEnd = onEnd, onAdvance = onAdvance)
+        BottomHud(uiState = uiState, onEnd = onEnd)
     }
 }
 
@@ -384,7 +382,7 @@ private fun InstructionBanner(uiState: ArNavigationUiState, modifier: Modifier =
 }
 
 @Composable
-private fun BottomHud(uiState: ArNavigationUiState, onEnd: () -> Unit, onAdvance: () -> Unit) {
+private fun BottomHud(uiState: ArNavigationUiState, onEnd: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -423,11 +421,6 @@ private fun BottomHud(uiState: ArNavigationUiState, onEnd: () -> Unit, onAdvance
                 }
             }
 
-            if (uiState.isSimulated) {
-                IconButton(onClick = onAdvance) {
-                    Icon(Icons.Default.FastForward, contentDescription = "Advance", tint = Color(0xFF168BFF))
-                }
-            }
 
             Box(
                 modifier = Modifier

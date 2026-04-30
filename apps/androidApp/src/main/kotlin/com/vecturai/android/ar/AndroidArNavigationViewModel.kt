@@ -3,6 +3,7 @@ package com.vecturai.android.ar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ar.core.Frame
+import com.google.ar.core.Pose
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.vecturai.android.data.AndroidReviewedPackageLoader
@@ -22,7 +23,8 @@ import kotlin.math.sqrt
 
 data class ArNavigationUiState(
     val sessionStateLabel: String = "Initializing",
-    val trackingStatusLabel: String = "Tracking",
+    val trackingStatusLabel: String = "Initializing...",
+    val cameraPose: Pose? = null,
     val trackingStatusIcon: TrackingStatusIcon = TrackingStatusIcon.Location,
     val destinationLabel: String = "",
     val arrivalLocationLabel: String = "",
@@ -208,6 +210,12 @@ class AndroidArNavigationViewModel(
         val pkg = routePackage ?: return
         userCumulativeDistance = min(userCumulativeDistance + 2.0, pkg.totalDistance)
         val remaining = max(0.0, pkg.totalDistance - userCumulativeDistance)
+        updateUiState(remaining)
+        checkArrival(remaining)
+    }
+
+    private fun updateUiState(remaining: Double) {
+        val pkg = routePackage ?: return
         routeRenderer.updateVisibility(userCumulativeDistance)
         val next = computeNextAction(remaining)
         _uiState.update {
@@ -221,13 +229,85 @@ class AndroidArNavigationViewModel(
                 nextActionDistance = next.distance,
             )
         }
-        checkArrival(remaining)
     }
 
-    fun onFrame(frame: Frame, _width: Int, _height: Int) {
+    fun updateCameraPose(frame: Frame) {
+        val pose = frame.camera.pose
+        _uiState.update { it.copy(cameraPose = pose) }
+
         if (pendingSimulateAlignment) {
             simulateAlignment(frame)
         }
+
+        // AUTO-PROGRESS: Track user's position along the path automatically
+        if (_uiState.value.isAligned) {
+            updateAutoProgress(pose)
+        }
+    }
+
+    private fun updateAutoProgress(pose: Pose) {
+        val pkg = routePackage ?: return
+        
+        // 1. Convert AR position back to Building Space
+        val worldX = pose.tx().toDouble()
+        val worldZ = pose.tz().toDouble()
+        
+        val relX = worldX - alignmentOffsetX
+        val relZ = worldZ - alignmentOffsetZ
+        
+        val rotRad = Math.toRadians(alignmentRotYDeg)
+        val cosR = kotlin.math.cos(rotRad)
+        val sinR = kotlin.math.sin(rotRad)
+        
+        // Inverse CCW rotation to get building coordinates
+        val buildingX = relX * cosR + relZ * sinR
+        val buildingZ = -relX * sinR + relZ * cosR
+        
+        // 2. Find the closest point on the path segments to determine distance
+        var bestDistanceOnPath = userCumulativeDistance
+        val nodes = pkg.routeNodeIds.mapNotNull { id -> pkg.config.nodes.find { it.id == id } }
+        
+        var tempCumulative = 0.0
+        var minDistanceToSegmentSq = Double.MAX_VALUE
+        
+        for (i in 0 until nodes.size - 1) {
+            val a = nodes[i]
+            val b = nodes[i + 1]
+            val dx = b.x - a.x
+            val dz = b.z - a.z
+            val segLenSq = dx * dx + dz * dz
+            if (segLenSq < 0.001) continue
+            
+            // Project point onto segment: t = [(p-a) . (b-a)] / |b-a|^2
+            var t = ((buildingX - a.x) * dx + (buildingZ - a.z) * dz) / segLenSq
+            t = t.coerceIn(0.0, 1.0)
+            
+            val projX = a.x + t * dx
+            val projZ = a.z + t * dz
+            
+            val distSq = (buildingX - projX) * (buildingX - projX) + (buildingZ - projZ) * (buildingZ - projZ)
+            
+            // Only update if this segment is very close to user (prevents jumping to wrong floors/rooms)
+            if (distSq < minDistanceToSegmentSq && distSq < 16.0) { // 4m radius threshold
+                minDistanceToSegmentSq = distSq
+                bestDistanceOnPath = tempCumulative + t * kotlin.math.sqrt(segLenSq)
+            }
+            tempCumulative += kotlin.math.sqrt(segLenSq)
+        }
+        
+        // Only progress forward (or slightly backward to handle jitter, but mostly forward)
+        if (bestDistanceOnPath > userCumulativeDistance - 0.5) {
+            userCumulativeDistance = max(userCumulativeDistance, bestDistanceOnPath)
+            
+            // CRITICAL: Trigger UI updates after distance change
+            val remaining = max(0.0, pkg.totalDistance - userCumulativeDistance)
+            updateUiState(remaining)
+            checkArrival(remaining)
+        }
+    }
+
+    fun onFrame(frame: Frame, _width: Int, _height: Int) {
+        updateCameraPose(frame)
         markerDetector.processFrame(frame)
         updateTrackingStatus(frame)
 
