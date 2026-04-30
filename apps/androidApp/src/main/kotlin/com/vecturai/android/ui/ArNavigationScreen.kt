@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -66,20 +65,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vecturai.android.ar.AndroidArNavigationViewModel
 import com.vecturai.android.ar.ArNavigationUiState
 import com.vecturai.android.ar.NavigationActionIcon
 import com.vecturai.android.ar.TrackingStatusIcon
-import com.vecturai.android.data.ArrowPlacementType
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 @Composable
 fun ArNavigationScreen(
@@ -91,8 +86,6 @@ fun ArNavigationScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Box(Modifier.fillMaxSize()) {
-        ProjectedArrowLayer(uiState)
-
         if (uiState.hasArrived) {
             ArrivalOverlay(uiState, onEnd)
         } else {
@@ -121,46 +114,6 @@ fun ArNavigationScreen(
                     uiState = uiState,
                     onEnd = onEnd,
                     onAdvance = viewModel::advanceProgress,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProjectedArrowLayer(uiState: ArNavigationUiState) {
-    val density = LocalDensity.current
-    Box(Modifier.fillMaxSize()) {
-        uiState.projectedArrows.forEach { arrow ->
-            val sizeDp = when (arrow.type) {
-                ArrowPlacementType.FOLLOW -> 34.dp
-                ArrowPlacementType.TURN_LEFT, ArrowPlacementType.TURN_RIGHT -> 42.dp
-                ArrowPlacementType.U_TURN, ArrowPlacementType.DESTINATION -> 46.dp
-            }
-            val sizePx = with(density) { sizeDp.toPx() * arrow.scale }
-            Box(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            (arrow.xPx - sizePx / 2f).roundToInt(),
-                            (arrow.yPx - sizePx / 2f).roundToInt(),
-                        )
-                    }
-                    .size(sizeDp)
-                    .graphicsLayer {
-                        alpha = arrow.alpha
-                        scaleX = arrow.scale
-                        scaleY = arrow.scale
-                    }
-                    .clip(CircleShape)
-                    .background(colorForArrow(arrow.type).copy(alpha = 0.9f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = iconForArrow(arrow.type),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(sizeDp * 0.58f),
                 )
             }
         }
@@ -936,21 +889,6 @@ private fun trackingIcon(icon: TrackingStatusIcon): ImageVector = when (icon) {
     TrackingStatusIcon.Eye -> Icons.Default.VisibilityOff
     TrackingStatusIcon.Recenter -> Icons.Default.Sync
     TrackingStatusIcon.Lost -> Icons.Default.LocationOn
-}
-
-private fun iconForArrow(type: ArrowPlacementType): ImageVector = when (type) {
-    ArrowPlacementType.FOLLOW -> Icons.Default.Navigation
-    ArrowPlacementType.TURN_LEFT -> Icons.Default.SubdirectoryArrowLeft
-    ArrowPlacementType.TURN_RIGHT -> Icons.Default.SubdirectoryArrowRight
-    ArrowPlacementType.U_TURN -> Icons.Default.UTurnLeft
-    ArrowPlacementType.DESTINATION -> Icons.Default.Flag
-}
-
-private fun colorForArrow(type: ArrowPlacementType): Color = when (type) {
-    ArrowPlacementType.FOLLOW -> Color(0xFF2563EB)
-    ArrowPlacementType.TURN_LEFT, ArrowPlacementType.TURN_RIGHT -> Color(0xFFF59E0B)
-    ArrowPlacementType.U_TURN -> Color(0xFFEA580C)
-    ArrowPlacementType.DESTINATION -> Color(0xFF10B981)
 }
 
 private fun formatEta(seconds: Double): String {

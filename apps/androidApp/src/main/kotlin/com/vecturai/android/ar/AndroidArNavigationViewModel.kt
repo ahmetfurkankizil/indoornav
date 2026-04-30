@@ -45,7 +45,6 @@ data class ArNavigationUiState(
     val nextActionIcon: NavigationActionIcon = NavigationActionIcon.Straight,
     val nextActionText: String = "Follow the path",
     val nextActionDistance: Double? = null,
-    val projectedArrows: List<ArRouteRenderer.ProjectedArrow> = emptyList(),
 )
 
 enum class NavigationActionIcon {
@@ -66,7 +65,7 @@ enum class TrackingStatusIcon {
 
 class AndroidArNavigationViewModel(
     private val markerDetector: ArMarkerDetector,
-    private val routeRenderer: ArRouteRenderer,
+    internal val routeRenderer: ArRouteRenderer,
     private val haptics: AndroidHapticManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ArNavigationUiState())
@@ -82,7 +81,6 @@ class AndroidArNavigationViewModel(
     private var alignmentRotYDeg = 0.0
     private var alignmentTimeoutJob: Job? = null
     private var lastPoseSampleMs = 0L
-    private var lastProjectedUpdateMs = 0L
     private var lastHapticArrowId: String? = null
 
     fun configure(
@@ -101,10 +99,12 @@ class AndroidArNavigationViewModel(
         alignmentOffsetZ = 0.0
         alignmentRotYDeg = 0.0
         lastPoseSampleMs = 0L
-        lastProjectedUpdateMs = 0L
         lastHapticArrowId = null
         destinationThreshold = routePackage.config.routeRendering.destinationThresholdMeters
-        routeRenderer.configureRendering(routePackage.config.routeRendering.lookaheadDistanceMeters)
+        routeRenderer.configureRendering(
+            lookaheadDistanceMeters = routePackage.config.routeRendering.lookaheadDistanceMeters,
+            arrowHeightOffsetMeters = routePackage.config.routeRendering.arrowHeightOffsetMeters,
+        )
 
         val marker = entranceMarker ?: routePackage.config.entranceMarkers.firstOrNull()
         val markerImageName = marker?.referenceImageName ?: "entrance_marker_main"
@@ -190,7 +190,7 @@ class AndroidArNavigationViewModel(
         checkArrival(remaining)
     }
 
-    fun onFrame(frame: Frame, width: Int, height: Int) {
+    fun onFrame(frame: Frame, _width: Int, _height: Int) {
         markerDetector.processFrame(frame)
         updateTrackingStatus(frame)
 
@@ -199,20 +199,6 @@ class AndroidArNavigationViewModel(
             if (!_uiState.value.isSimulated && now - lastPoseSampleMs >= 500L) {
                 lastPoseSampleMs = now
                 sampleCameraPose(frame)
-            }
-            if (now - lastProjectedUpdateMs >= 100L) {
-                lastProjectedUpdateMs = now
-                val viewMatrix = FloatArray(16)
-                val projectionMatrix = FloatArray(16)
-                frame.camera.getViewMatrix(viewMatrix, 0)
-                frame.camera.getProjectionMatrix(projectionMatrix, 0, 0.1f, 100f)
-                val projected = routeRenderer.projectVisibleArrows(
-                    viewMatrix = viewMatrix,
-                    projectionMatrix = projectionMatrix,
-                    width = width,
-                    height = height,
-                )
-                _uiState.update { it.copy(projectedArrows = projected) }
             }
         }
     }
@@ -228,7 +214,6 @@ class AndroidArNavigationViewModel(
         alignmentOffsetZ = 0.0
         alignmentRotYDeg = 0.0
         lastPoseSampleMs = 0L
-        lastProjectedUpdateMs = 0L
         lastHapticArrowId = null
         _uiState.update {
             it.copy(
@@ -249,7 +234,6 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = NavigationActionIcon.Straight,
                 nextActionText = "Follow the path",
                 nextActionDistance = null,
-                projectedArrows = emptyList(),
             )
         }
     }
@@ -512,7 +496,6 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = NavigationActionIcon.Destination,
                 nextActionText = "You've reached ${it.destinationLabel}",
                 arrowCount = 0,
-                projectedArrows = emptyList(),
             )
         }
     }

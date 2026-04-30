@@ -97,6 +97,7 @@ class ArCameraActivity : ComponentActivity() {
         UnifiedArRenderer(
             activity = this,
             unifiedSession = unifiedSession,
+            routeRenderer = arViewModel.routeRenderer,
             onTextureCreated = { textureId ->
                 cameraTextureId = textureId
                 if (!textureReady.isCompleted) {

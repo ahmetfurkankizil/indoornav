@@ -3,6 +3,8 @@ package com.vecturai.android.ar
 import android.opengl.Matrix
 import com.vecturai.android.data.ArrowPlacementData
 import com.vecturai.android.data.ArrowPlacementType
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -31,6 +33,19 @@ class ArRouteRenderer {
         val scale: Float,
     )
 
+    data class RenderableArrow3D(
+        val arrowId: String,
+        val type: ArrowPlacementType,
+        val worldX: Float,
+        val worldY: Float,
+        val worldZ: Float,
+        val floorWorldY: Float,
+        val headingRad: Float,
+        val alpha: Float,
+        val scale: Float,
+        val isImminent: Boolean,
+    )
+
     private var offsetX: Double = 0.0
     private var offsetY: Double = 0.0
     private var offsetZ: Double = 0.0
@@ -38,18 +53,23 @@ class ArRouteRenderer {
 
     private var lookaheadDistance = 8.0
     private var fadeDistance = 3.0
+    private var arrowHeightOffset = 0.05
     private var allArrows: List<ArrowPlacementData> = emptyList()
     private var arrowStates: Map<String, ArrowState> = emptyMap()
     private var visibleArrows: List<VisibleArrow> = emptyList()
+    private val snapshotRef = AtomicReference<List<RenderableArrow3D>>(emptyList())
 
     val renderedArrowCount: Int get() = visibleArrows.size
+    fun snapshot(): List<RenderableArrow3D> = snapshotRef.get()
 
     fun configureRendering(
         lookaheadDistanceMeters: Double,
         fadeDistanceMeters: Double = 3.0,
+        arrowHeightOffsetMeters: Double = 0.05,
     ) {
         lookaheadDistance = lookaheadDistanceMeters
         fadeDistance = fadeDistanceMeters
+        arrowHeightOffset = arrowHeightOffsetMeters
     }
 
     fun setAlignmentTransform(
@@ -68,6 +88,7 @@ class ArRouteRenderer {
         allArrows = arrows
         arrowStates = arrows.associate { it.id to ArrowState.HIDDEN }
         visibleArrows = emptyList()
+        snapshotRef.set(emptyList())
     }
 
     fun updateArrows(arrows: List<ArrowPlacementData>) {
@@ -112,18 +133,58 @@ class ArRouteRenderer {
 
         arrowStates = nextStates
         visibleArrows = visible
+        snapshotRef.set(buildRenderableSnapshot(visible, userCumulativeDistance))
         return visibleArrows
     }
 
     fun hideAllArrows() {
         arrowStates = allArrows.associate { it.id to ArrowState.HIDDEN }
         visibleArrows = emptyList()
+        snapshotRef.set(emptyList())
     }
 
     fun clearArrows() {
         allArrows = emptyList()
         arrowStates = emptyMap()
         visibleArrows = emptyList()
+        snapshotRef.set(emptyList())
+    }
+
+    private fun buildRenderableSnapshot(
+        visible: List<VisibleArrow>,
+        userCumulativeDistance: Double,
+    ): List<RenderableArrow3D> {
+        if (visible.isEmpty()) return emptyList()
+
+        val imminentArrowId = allArrows
+            .firstOrNull {
+                it.cumulativeDistance >= userCumulativeDistance &&
+                    it.type != ArrowPlacementType.FOLLOW
+            }
+            ?.id
+            ?: allArrows.firstOrNull { it.cumulativeDistance >= userCumulativeDistance }?.id
+
+        return visible.map { v ->
+            val arForward = transformDirectionToAR(v.arrow.forwardDx, v.arrow.forwardDy, v.arrow.forwardDz)
+            val headingRad = atan2(arForward[0], arForward[2])
+            val floor = transformToAR(
+                v.arrow.positionX,
+                v.arrow.positionY - arrowHeightOffset,
+                v.arrow.positionZ,
+            )
+            RenderableArrow3D(
+                arrowId = v.arrow.id,
+                type = v.arrow.type,
+                worldX = v.worldX,
+                worldY = v.worldY,
+                worldZ = v.worldZ,
+                floorWorldY = floor[1],
+                headingRad = headingRad,
+                alpha = v.alpha,
+                scale = v.scale,
+                isImminent = v.arrow.id == imminentArrowId,
+            )
+        }
     }
 
     fun projectVisibleArrows(

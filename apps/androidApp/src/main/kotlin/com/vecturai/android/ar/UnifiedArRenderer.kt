@@ -18,6 +18,7 @@ import javax.microedition.khronos.opengles.GL10
 class UnifiedArRenderer(
     private val activity: android.app.Activity,
     private val unifiedSession: UnifiedArSession,
+    private val routeRenderer: ArRouteRenderer,
     private val onTextureCreated: (Int) -> Unit,
     private val onFrame: (Frame, Int, Int, Int) -> Unit,
     private val onFatalFailure: (Throwable) -> Unit,
@@ -29,6 +30,7 @@ class UnifiedArRenderer(
     private var cameraTextureId = 0
     private var width = 1
     private var height = 1
+    private val arrow3D = ArArrow3DRenderer()
 
     private val quadCoords = floatBufferOf(
         floatArrayOf(
@@ -52,6 +54,7 @@ class UnifiedArRenderer(
         texCoordAttrib = GLES20.glGetAttribLocation(program, "a_TexCoord")
         textureUniform = GLES20.glGetUniformLocation(program, "sTexture")
         onTextureCreated(cameraTextureId)
+        arrow3D.onSurfaceCreated()
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -76,6 +79,16 @@ class UnifiedArRenderer(
 
         if (frame.timestamp != 0L) {
             drawCameraBackground(frame)
+            val viewMatrix = FloatArray(16)
+            val projectionMatrix = FloatArray(16)
+            frame.camera.getViewMatrix(viewMatrix, 0)
+            frame.camera.getProjectionMatrix(projectionMatrix, 0, 0.1f, 100f)
+            arrow3D.draw(
+                arrows = routeRenderer.snapshot(),
+                viewMatrix = viewMatrix,
+                projectionMatrix = projectionMatrix,
+                frameTimeMs = System.nanoTime() / 1_000_000L,
+            )
             onFrame(frame, width, height, displayRotationDegrees())
         }
     }
