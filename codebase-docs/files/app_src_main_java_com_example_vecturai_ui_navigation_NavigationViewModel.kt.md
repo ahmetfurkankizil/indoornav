@@ -31,11 +31,11 @@ Orchestrates localization consensus, pathfinding, path projection, and real-time
 - `startResolveLoopIfReady`: Manages "First Fix" and "Maintenance" resolve loops.
 
 ## Important Logic by Line Range
-- L304-347: Multi-phase resolve loop (First Fix vs Maintenance).
-- L469-499: Consensus fitting logic using `Relocalizer` with outlier rejection.
-- L501-545: lerp-based smoothing of node poses for the UI.
-- L656-701: Navigation progress logic including path projection and advancement.
-- L703-732: Automatic rerouting logic.
+- L328-371: Multi-phase resolve loop (First Fix vs Maintenance).
+- L491-528: Consensus fitting logic using `Relocalizer` with outlier rejection.
+- L638-672: lerp-based smoothing of node poses for the UI.
+- L723-785: Navigation progress logic including path projection and advancement.
+- L787-814: Automatic rerouting logic.
 
 ## Uses
 - `Relocalizer.kt`

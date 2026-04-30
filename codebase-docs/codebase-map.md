@@ -41,9 +41,9 @@
 
 ## Coverage Summary
 - **Total Folders:** 18
-- **Total Files:** 65
+- **Total Files:** 68
 - **Status:** COMPLETE
-- **Mapped:** 37 files.
+- **Mapped:** 40 files.
 - **Unresolved:** 0 files.
 
 ---

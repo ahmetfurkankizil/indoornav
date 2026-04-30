@@ -20,13 +20,12 @@ Performs coordinate system alignment (Procrustes analysis) between the AR sessio
 
 ## Main Symbols
 - `Correspondence`: Pairs a graph-coordinate pose with its resolved session-coordinate pose.
-- `fitGraphToSession`: Computes a single `Pose` that represents the transform from graph space to session space, using weighted averaging of translation and rotation.
+- `fitGraphToSession`: Computes a single `Pose` (2D Procrustes fit) representing the transform from graph space to session space.
 - `rejectOutliers`: Filters out correspondences that deviate significantly from a proposed fit.
-- `averageDirectRotation`: Computes the weighted average of quaternions using a reference to handle double-cover issues.
 
 ## Important Logic by Line Range
-- L12-50: `fitGraphToSession` implementation, handling single-point and multi-point fitting.
-- L63-90: Quaternion averaging logic.
+- L15-68: `fitGraphToSession` implementation, handling single-point and multi-point 2D fitting.
+- L70-79: `rejectOutliers` logic using residual distance checks.
 
 ## Uses
 - `PoseUtils.kt` (via `translationVec` and `distanceMeters`)

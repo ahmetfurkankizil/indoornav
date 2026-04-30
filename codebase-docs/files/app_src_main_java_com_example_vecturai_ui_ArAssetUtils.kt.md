@@ -16,10 +16,10 @@ Helper for validating binary AR assets.
 - `hasValidGlbAsset(context, assetPath)` (function)
 
 ## Main Symbols
-- `hasValidGlbAsset`: Checks the first 4 bytes of an asset for the `glTF` magic header.
+- `hasValidGlbAsset`: Verifies GLB magic header, version (2), and declared file length.
 
 ## Important Logic by Line Range
-- L5-14: Opens the asset stream and verifies the header bytes `[0x67, 0x6C, 0x54, 0x46]`.
+- L5-25: Opens asset stream, verifies `glTF` magic, checks version, and validates declared length against actual file size.
 
 ## Uses
 - Android AssetManager

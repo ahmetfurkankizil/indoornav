@@ -18,12 +18,12 @@ Main UI component for the navigation experience, displaying the AR view and guid
 
 ## Main Symbols
 - `NavigationScreen`: Host composable that switches content based on `uiState.phase`.
-- `NavigationOverlay`: Displays the distance to destination and current waypoint name.
-- `RelocalizeButton`: Triggers manual re-computation of the graph fit.
+- `NavigationArScene`: Renders node spheres and the 3D arrow using SceneView.
+- `NavigationDiagnostics`: Top-center overlay with tracking info and relocalize controls.
 
 ## Important Logic by Line Range
-- L45-120: Screen layout and phase-based navigation (Selecting building -> Localizing -> Navigating).
-- L140-160: Integration with `NavigationViewModel` to drive AR model positions.
+- L74-126: Screen layout and phase-based navigation host.
+- L180-261: `ARSceneView` integration and rendering of node spheres and the arrow.
 
 ## Uses
 - `NavigationViewModel.kt`

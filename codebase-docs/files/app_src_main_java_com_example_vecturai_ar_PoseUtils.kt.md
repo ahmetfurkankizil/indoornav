@@ -15,12 +15,11 @@ Low-level math and utility functions for `Pose` and `Vec3` operations.
 ## Exports / Public Surface
 - `Vec3` (data class with math operators)
 - `Pose.translationVec()`
-- `Pose.forwardVec()`
+- `Pose.forwardVec()` (returns nullable Vec3)
 - `distanceMeters(a, b)`
 - `relativePose(origin, pose)`
 - `estimateSessionPose(sessionFromGraph, node)`
 - `positionInFrontOfCamera(cameraPose, meters)`
-- `Vec3.rotateY(radians)`
 
 ## Main Symbols
 - `Vec3`: Custom lightweight 3D vector for coordinate math.
@@ -30,7 +29,7 @@ Low-level math and utility functions for `Pose` and `Vec3` operations.
 
 ## Important Logic by Line Range
 - L10-27: `Vec3` definition with `horizontal()` and `normalized()` helpers.
-- L82-91: `positionInFrontOfCamera` logic using flat-forward projection.
+- L91-112: `positionInFrontOfCamera` logic using flat-forward projection and vertical offset.
 
 ## Uses
 - `MapGraph.kt` (via `MapNode`)

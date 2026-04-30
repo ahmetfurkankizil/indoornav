@@ -22,12 +22,12 @@ Coroutine-based facade for ARCore Cloud Anchor asynchronous operations.
 
 ## Main Symbols
 - `hostAnchor`: Wraps `hostCloudAnchorAsync` in a coroutine.
-- `resolveAnchor`: Wraps `resolveCloudAnchorAsync` in a coroutine.
-- `ensureCloudAnchorModeEnabled`: Defensive check to enable Cloud Anchor mode if it was disabled.
+- `resolveAnchor`: Wraps `resolveCloudAnchorAsync` in a coroutine with timeout handling and `ResolveCloudAnchorFuture` cancellation.
+- `assertCloudAnchorModeEnabled`: Defensive check to ensure Cloud Anchor mode is active.
 
 ## Important Logic by Line Range
-- L20-62: `hostAnchor` implementation. Handles cancellation by canceling the ARCore future and detaching the local anchor.
-- L67-96: `resolveAnchor` implementation. Manages async callback and result mapping.
+- L20-56: `hostAnchor` implementation.
+- L58-103: `resolveAnchor` implementation with `withTimeout` and future cancellation.
 
 ## Uses
 - `ArSessionConfig.kt`

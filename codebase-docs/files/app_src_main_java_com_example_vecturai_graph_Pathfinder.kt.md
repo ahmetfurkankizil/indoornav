@@ -24,9 +24,9 @@ Shortest path calculation engine with turn-cost awareness and path smoothing.
 - `SearchState`: Identifies a node combined with the direction it was entered from.
 
 ## Important Logic by Line Range
-- L11-79: A* core loop with turn-cost integration via `SearchState`.
-- L81-98: `edgeCost` logic calculating turn angles between incoming and outgoing edges.
-- L100-134: `smoothPath` and `canDropIntermediate` logic using point-to-segment distance.
+- L26-82: A* core loop with turn-cost integration via `SearchState`.
+- L84-101: `edgeCost` logic calculating turn angles.
+- L103-137: `smoothPath` and `canDropIntermediate` logic.
 
 ## Uses
 - `MapGraph.kt`

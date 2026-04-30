@@ -6,9 +6,9 @@
     "tech_stack": ["Kotlin", "Android", "ARCore", "Gradle"]
   },
   "metadata": {
-    "generated_at": "2026-04-30T22:56:00Z",
-    "generated_from_range": "648fe7517b2ae86edea083f725b848e96751b592...a8b7b8aaa1dd71f80b15cedfde82a1978e9fe0ac",
-    "last_incremental_update": "2026-04-30T22:56:00Z"
+    "generated_at": "2026-05-01T00:50:00Z",
+    "generated_from_range": "a8b7b8aaa1dd71f80b15cedfde82a1978e9fe0ac...862f05fcd96ea076afe00670be8cd976a5b9dee7",
+    "last_incremental_update": "2026-05-01T00:50:00Z"
   },
   "folders": [
     { "path": ".gradle", "type": "cache", "status": "skipped_with_reason", "reason": "Build cache and internal Gradle state" },
@@ -42,6 +42,9 @@
     { "path": "IMPLEMENTATION_NOTES.md", "type": "docs", "status": "mapped", "feature_tags": ["System_Audit_Documentation"], "artifact_link": "file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/IMPLEMENTATION_NOTES.md.md" },
     { "path": "local.properties", "type": "config", "status": "mapped", "feature_tags": ["Project_Infrastructure"], "artifact_link": "file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/local.properties.md" },
     { "path": "settings.gradle.kts", "type": "build", "status": "mapped", "feature_tags": ["Project_Infrastructure"], "artifact_link": "file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/settings.gradle.kts.md" },
+    { "path": "fix.md", "type": "docs", "status": "mapped", "feature_tags": ["System_Audit_Documentation"] },
+    { "path": "polish.md", "type": "docs", "status": "mapped", "feature_tags": ["System_Audit_Documentation"] },
+    { "path": "relocalization-and-pathfinding.md", "type": "docs", "status": "mapped", "feature_tags": ["System_Audit_Documentation"] },
     { "path": "app/.gitignore", "type": "config", "status": "skipped_with_reason", "reason": "Standard Android gitignore" },
     { "path": "app/build.gradle.kts", "type": "build", "status": "mapped", "feature_tags": ["Project_Infrastructure"], "artifact_link": "file:///c:/Users/emirh/Desktop/vecturDENEME/codebase-docs/files/app_build.gradle.kts.md" },
     { "path": "app/proguard-rules.pro", "type": "config", "status": "skipped_with_reason", "reason": "Standard Proguard rules" },
