@@ -3,8 +3,6 @@ package com.example.vecturai.ui.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.vecturai.ar.ArrowPose
-import com.example.vecturai.ar.ArrowRenderer
 import com.example.vecturai.ar.CloudAnchorHelper
 import com.example.vecturai.ar.Correspondence
 import com.example.vecturai.ar.Relocalizer
@@ -23,6 +21,7 @@ import com.example.vecturai.persistence.GraphRepository
 import com.example.vecturai.persistence.LocalizationHint
 import com.google.ar.core.Anchor
 import com.google.ar.core.Frame
+import com.google.ar.core.Plane
 import com.google.ar.core.Pose
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
@@ -72,7 +71,7 @@ data class NavigationUiState(
     val nodePoses: List<SessionNodePose> = emptyList(),
     val resolveAttemptCount: Int = 0,
     val lastResolveError: String? = null,
-    val arrowPose: ArrowPose? = null,
+    val routeVisualState: RouteVisualState = RouteVisualState.Empty,
     val distanceToNextMeters: Float? = null,
     val distanceToDestinationMeters: Float? = null,
     val statusMessage: String = "Loading saved maps...",
@@ -94,14 +93,16 @@ class NavigationViewModel(
     private var graphToSessionPose: Pose? = null
     private var hasReceivedArFrame = false
     private var lastDisplayedPoseUpdateNanos: Long? = null
-    private var lastYawUpdateNanos: Long? = null
-    private var lastSmoothedYawDegrees: Float? = null
-    private var lastPitchUpdateNanos: Long? = null
-    private var lastSmoothedPitchDegrees: Float? = null
     private var lastLocalizationHint: LocalizationHint? = null
     private var lastRerouteAtMs = 0L
     private var lastHintSavedAtMs = 0L
     private var lastFitAtMs = 0L
+    private var lastDetectedFloorY: Float? = null
+    private var lastRouteSignature: String? = null
+    private var lastRouteVisualFloor: Int? = null
+    private var lastRouteProjectionNanos: Long? = null
+    private var lastSmoothedRouteCumulativeMeters: Float? = null
+    private var lastTransitionCueKey: String? = null
     private val resolvedAnchors = mutableMapOf<String, Anchor>()
     private val displayedNodePoses = mutableMapOf<String, Pose>()
     private val lastFitAnchorPositions = mutableMapOf<String, Vec3>()
@@ -109,6 +110,7 @@ class NavigationViewModel(
     private val nodeLastAttemptAtMs = mutableMapOf<String, Long>()
     private val anchorResolvedAtMs = mutableMapOf<String, Long>()
     private val anchorPausedSinceMs = mutableMapOf<String, Long>()
+    private val floorHeightEstimator = FloorHeightEstimator()
 
     private val _uiState = MutableStateFlow(NavigationUiState())
     val uiState: StateFlow<NavigationUiState> = _uiState.asStateFlow()
@@ -154,7 +156,7 @@ class NavigationViewModel(
                     graph = null,
                     nodePoses = emptyList(),
                     path = emptyList(),
-                    arrowPose = null,
+                    routeVisualState = RouteVisualState.Empty,
                     distanceToNextMeters = null,
                     distanceToDestinationMeters = null,
                     resolvedAnchorCount = 0,
@@ -202,7 +204,7 @@ class NavigationViewModel(
         _uiState.update {
             it.copy(
                 trackingState = "AR session failed",
-                arrowPose = null,
+                routeVisualState = RouteVisualState.Empty,
                 statusMessage = "AR session could not start.",
                 errorMessage = error.message ?: error::class.java.simpleName
             )
@@ -220,6 +222,11 @@ class NavigationViewModel(
         latestCameraPose = cameraPose
 
         val trackingState = frame.camera.trackingState
+        lastDetectedFloorY = if (trackingState == TrackingState.TRACKING) {
+            detectFloorY(session, cameraPose)
+        } else {
+            null
+        }
         updateAnchorTrackingStates()
         var state = _uiState.value.copy(trackingState = trackingState.name)
 
@@ -252,7 +259,7 @@ class NavigationViewModel(
         } else if (state.phase == NavigationPhase.Navigating) {
             resetNavigationSmoothing()
             state = state.copy(
-                arrowPose = null,
+                routeVisualState = RouteVisualState.Empty,
                 statusMessage = "Move slowly to recover AR tracking."
             )
         }
@@ -271,7 +278,12 @@ class NavigationViewModel(
         val path = Pathfinder(graph).shortestPath(startNodeId, destinationNodeId)
         if (path.isNullOrEmpty()) {
             _uiState.update {
-                it.copy(errorMessage = "No route found to the selected room.")
+                it.copy(
+                    routeVisualState = RouteVisualState.Empty,
+                    distanceToNextMeters = null,
+                    distanceToDestinationMeters = null,
+                    errorMessage = "No route found to the selected room."
+                )
             }
             return
         }
@@ -284,9 +296,10 @@ class NavigationViewModel(
                 selectedDestinationId = destinationNodeId,
                 path = path,
                 currentWaypointIndex = initialWaypointIndex,
+                routeVisualState = RouteVisualState.Empty,
                 distanceToNextMeters = if (path.size == 1) 0f else null,
                 distanceToDestinationMeters = if (path.size == 1) 0f else null,
-                statusMessage = if (path.size == 1) "You are already at the destination." else "Follow the floating arrow.",
+                statusMessage = if (path.size == 1) "You are already at the destination." else "Follow the blue floor arrows.",
                 errorMessage = null
             )
         }
@@ -303,7 +316,7 @@ class NavigationViewModel(
                 selectedDestinationId = null,
                 path = emptyList(),
                 currentWaypointIndex = 0,
-                arrowPose = null,
+                routeVisualState = RouteVisualState.Empty,
                 distanceToNextMeters = null,
                 distanceToDestinationMeters = null,
                 statusMessage = "Pick another room."
@@ -732,7 +745,18 @@ class NavigationViewModel(
         }
         if (state.phase != NavigationPhase.Navigating) return state
 
-        val projection = projectToPath(state, cameraPose)
+        val transform = graphToSessionPose ?: return state.copy(routeVisualState = RouteVisualState.Empty)
+        val graph = state.graph ?: return state.copy(routeVisualState = RouteVisualState.Empty)
+        val cameraPosition = cameraPose.translationVec()
+        val userFloor = inferUserFloor(state, cameraPose)
+        val routeNodes = buildRouteSampleNodes(state, transform)
+        val routeEdges = buildRouteSampleEdges(state, graph)
+        val projection = RouteVisualSampler.projectToPath(
+            nodes = routeNodes,
+            edges = routeEdges,
+            userPosition = cameraPosition,
+            currentFloor = userFloor
+        )
         val projectedWaypointIndex = projection?.let {
             (it.segmentIndex + 1).coerceAtMost(state.path.lastIndex)
         }
@@ -746,41 +770,80 @@ class NavigationViewModel(
             state = state.copy(currentWaypointIndex = targetIndex)
         }
 
-        val transform = graphToSessionPose ?: return state
-        val graph = state.graph ?: return state
         val waypoint = state.currentWaypoint ?: return state
         val targetWaypointPose = guidancePose(waypoint, transform)
-        val cameraPosition = cameraPose.translationVec()
         val waypointPosition = targetWaypointPose.translationVec()
         val horizontalDistance = horizontalDistanceMeters(cameraPosition, waypointPosition)
         val previousNode = state.path.getOrNull(state.currentWaypointIndex - 1)
         val isVertical = isVerticalEdgeBetween(graph, previousNode, waypoint) ||
             (previousNode != null && previousNode.floor != waypoint.floor)
-        val userFloor = inferUserFloor(state, cameraPose)
-        val shouldAdvance = horizontalDistance <= ArrowRenderer.WAYPOINT_ADVANCE_DISTANCE_M &&
+        val passedWaypointByProjection = projection?.let {
+            it.segmentIndex >= state.currentWaypointIndex
+        } == true
+        val shouldAdvance = (passedWaypointByProjection || horizontalDistance <= WAYPOINT_ADVANCE_DISTANCE_M) &&
             (!isVertical || waypoint.floor == userFloor)
 
         if (shouldAdvance) {
             return advancedFromWaypointState(state)
         }
 
-        val arrowPose = ArrowRenderer.floatingArrowPose(cameraPose, waypointPosition)
-            ?.let {
-                it.copy(
-                    yawDegrees = smoothYawDegrees(it.yawDegrees),
-                    pitchDegrees = smoothPitchDegrees(it.pitchDegrees)
+        val smoothedProjection = projection?.let {
+            it.copy(
+                cumulativeMeters = smoothRouteProjectionMeters(
+                    rawMeters = it.cumulativeMeters,
+                    routeSignature = routeSignature(state.path),
+                    floor = userFloor
                 )
-            }
-        val distanceToNext = if (isVertical) {
+            )
+        }
+        val floorEstimate = smoothedProjection?.let {
+            floorHeightEstimator.estimate(
+                floor = userFloor,
+                routeCameraHeightY = routeCameraHeightAtProjection(routeNodes, it) ?: cameraPosition.y,
+                cameraY = cameraPosition.y,
+                detectedFloorY = lastDetectedFloorY
+            )
+        }
+        val routeVisualState = if (smoothedProjection != null && floorEstimate != null) {
+            RouteVisualSampler.sample(
+                nodes = routeNodes,
+                edges = routeEdges,
+                projection = smoothedProjection,
+                currentFloor = userFloor,
+                floorHeightEstimate = floorEstimate
+            )
+        } else {
+            RouteVisualState.Empty
+        }
+        resetRouteProjectionIfTransitionChanged(routeVisualState.transitionCue)
+
+        val visualDistances = smoothedProjection?.let {
+            RouteVisualSampler.distances(
+                nodes = routeNodes,
+                edges = routeEdges,
+                projection = it,
+                currentFloor = userFloor
+            )
+        }
+        val distanceToNext = visualDistances?.distanceToNextMeters ?: if (isVertical) {
             distanceMeters(cameraPosition, waypointPosition)
         } else {
             horizontalDistance
         }
         return state.copy(
-            arrowPose = arrowPose,
+            routeVisualState = routeVisualState,
             distanceToNextMeters = distanceToNext,
-            distanceToDestinationMeters = distanceToDestination(cameraPose, state),
-            statusMessage = navigationStatusMessage(state, waypoint)
+            distanceToDestinationMeters = visualDistances?.distanceToDestinationMeters
+                ?: distanceToDestination(cameraPose, state),
+            statusMessage = navigationStatusMessage(
+                state = state,
+                waypoint = waypoint,
+                routeNodes = routeNodes,
+                routeEdges = routeEdges,
+                projection = smoothedProjection,
+                currentFloor = userFloor,
+                routeVisualState = routeVisualState
+            )
         )
     }
 
@@ -805,52 +868,116 @@ class NavigationViewModel(
             path = newPath,
             currentWaypointIndex = initialWaypointIndex(newPath),
             phase = if (newPath.size == 1) NavigationPhase.Arrived else NavigationPhase.Navigating,
-            arrowPose = if (newPath.size == 1) null else state.arrowPose,
+            routeVisualState = RouteVisualState.Empty,
             distanceToNextMeters = if (newPath.size == 1) 0f else state.distanceToNextMeters,
             distanceToDestinationMeters = if (newPath.size == 1) 0f else state.distanceToDestinationMeters,
             statusMessage = if (newPath.size == 1) "You are already at the destination." else "Route adjusted."
         )
     }
 
-    private fun projectToPath(state: NavigationUiState, cameraPose: Pose): PathProjection? {
+    private fun projectToPath(state: NavigationUiState, cameraPose: Pose): RouteProjection? {
         val transform = graphToSessionPose ?: return null
+        val graph = state.graph ?: return null
         if (state.path.size < 2) return null
         val userFloor = inferUserFloor(state, cameraPose)
-        val camHorizontal = cameraPose.translationVec().horizontal()
-        val poses = state.path.map { node ->
-            guidancePose(node, transform).translationVec().horizontal()
-        }
-
-        var bestIndex = 0
-        var bestT = 0f
-        var bestDistance = Float.MAX_VALUE
-        for (index in 0 until poses.lastIndex) {
-            val fromNode = state.path[index]
-            val toNode = state.path[index + 1]
-            if (fromNode.floor != userFloor || toNode.floor != userFloor) continue
-            val a = poses[index]
-            val b = poses[index + 1]
-            val ab = b - a
-            val len2 = ab.x * ab.x + ab.z * ab.z
-            if (len2 < 1e-4f) continue
-            val fromA = camHorizontal - a
-            val t = (fromA.x * ab.x + fromA.z * ab.z) / len2
-            val clampedT = t.coerceIn(0f, 1f)
-            val projected = a + ab * clampedT
-            val distance = (camHorizontal - projected).length()
-            if (distance < bestDistance) {
-                bestDistance = distance
-                bestIndex = index
-                bestT = clampedT
-            }
-        }
-
-        if (bestDistance == Float.MAX_VALUE) return null
-        return PathProjection(
-            segmentIndex = bestIndex,
-            segmentT = bestT,
-            perpDist = bestDistance
+        return RouteVisualSampler.projectToPath(
+            nodes = buildRouteSampleNodes(state, transform),
+            edges = buildRouteSampleEdges(state, graph),
+            userPosition = cameraPose.translationVec(),
+            currentFloor = userFloor
         )
+    }
+
+    private fun buildRouteSampleNodes(
+        state: NavigationUiState,
+        transform: Pose
+    ): List<RouteSampleNode> =
+        state.path.map { node ->
+            RouteSampleNode(
+                id = node.id,
+                position = guidancePose(node, transform).translationVec(),
+                floor = node.floor
+            )
+        }
+
+    private fun buildRouteSampleEdges(
+        state: NavigationUiState,
+        graph: MapGraph
+    ): List<RouteSampleEdge> =
+        state.path.zipWithNext().map { (from, to) ->
+            RouteSampleEdge(
+                fromId = from.id,
+                toId = to.id,
+                kind = graph.edgeBetween(from.id, to.id)?.kind ?: EdgeKind.STAIRS
+            )
+        }
+
+    private fun routeCameraHeightAtProjection(
+        routeNodes: List<RouteSampleNode>,
+        projection: RouteProjection
+    ): Float? {
+        val from = routeNodes.getOrNull(projection.segmentIndex) ?: return null
+        val to = routeNodes.getOrNull(projection.segmentIndex + 1) ?: return from.position.y
+        return lerp(from.position.y, to.position.y, projection.segmentT.coerceIn(0f, 1f))
+    }
+
+    private fun smoothRouteProjectionMeters(
+        rawMeters: Float,
+        routeSignature: String,
+        floor: Int
+    ): Float {
+        val now = System.nanoTime()
+        if (lastRouteSignature != routeSignature || lastRouteVisualFloor != floor) {
+            lastRouteSignature = routeSignature
+            lastRouteVisualFloor = floor
+            lastRouteProjectionNanos = now
+            lastSmoothedRouteCumulativeMeters = rawMeters
+            return rawMeters
+        }
+
+        val previous = lastSmoothedRouteCumulativeMeters
+        val previousNanos = lastRouteProjectionNanos
+        lastRouteProjectionNanos = now
+        if (previous == null || previousNanos == null) {
+            lastSmoothedRouteCumulativeMeters = rawMeters
+            return rawMeters
+        }
+
+        if (abs(rawMeters - previous) < ROUTE_PROJECTION_DEADBAND_M) {
+            return previous
+        }
+
+        val elapsedSeconds = ((now - previousNanos) / NANOS_PER_SECOND)
+            .coerceIn(0f, MAX_BLEND_DELTA_SECONDS)
+        val alpha = (1f - exp((-ROUTE_PROJECTION_SMOOTHING_HZ * elapsedSeconds).toDouble()).toFloat())
+            .coerceIn(0f, 1f)
+        val smoothed = lerp(previous, rawMeters, alpha)
+        lastSmoothedRouteCumulativeMeters = smoothed
+        return smoothed
+    }
+
+    private fun resetRouteProjectionIfTransitionChanged(cue: RouteTransitionCue?) {
+        val cueKey = cue?.let { "${it.kind}:${it.fromFloor}:${it.toFloor}" }
+        if (lastTransitionCueKey != cueKey) {
+            lastRouteProjectionNanos = null
+            lastSmoothedRouteCumulativeMeters = null
+        }
+        lastTransitionCueKey = cueKey
+    }
+
+    private fun routeSignature(path: List<MapNode>): String =
+        path.joinToString(separator = ">") { it.id }
+
+    private fun detectFloorY(session: Session, cameraPose: Pose): Float? {
+        val cameraY = cameraPose.ty()
+        return runCatching { session.getAllTrackables(Plane::class.java) }
+            .getOrDefault(emptyList<Plane>())
+            .asSequence()
+            .filter { it.trackingState == TrackingState.TRACKING }
+            .filter { it.type == Plane.Type.HORIZONTAL_UPWARD_FACING }
+            .map { it.centerPose.ty() }
+            .filter { floorY -> cameraY - floorY in MIN_CAMERA_TO_FLOOR_M..MAX_CAMERA_TO_FLOOR_M }
+            .minByOrNull { floorY -> abs((cameraY - floorY) - DEFAULT_CAMERA_TO_FLOOR_M) }
     }
 
     private fun closestNodeIdToCamera(state: NavigationUiState, cameraPose: Pose): String? {
@@ -876,7 +1003,7 @@ class NavigationViewModel(
             resetNavigationSmoothing()
             state.copy(
                 phase = NavigationPhase.Arrived,
-                arrowPose = null,
+                routeVisualState = RouteVisualState.Empty,
                 distanceToNextMeters = 0f,
                 distanceToDestinationMeters = 0f,
                 statusMessage = "You have arrived."
@@ -885,6 +1012,7 @@ class NavigationViewModel(
             resetNavigationSmoothing()
             state.copy(
                 currentWaypointIndex = nextIndex,
+                routeVisualState = RouteVisualState.Empty,
                 statusMessage = "Waypoint reached. Continue forward."
             )
         }
@@ -892,8 +1020,36 @@ class NavigationViewModel(
 
     private fun initialWaypointIndex(path: List<MapNode>): Int = if (path.size > 1) 1 else 0
 
-    private fun navigationStatusMessage(state: NavigationUiState, waypoint: MapNode): String =
-        floorTransitionMessage(state, waypoint) ?: "Follow the floating arrow."
+    private fun navigationStatusMessage(
+        state: NavigationUiState,
+        waypoint: MapNode,
+        routeNodes: List<RouteSampleNode>,
+        routeEdges: List<RouteSampleEdge>,
+        projection: RouteProjection?,
+        currentFloor: Int,
+        routeVisualState: RouteVisualState
+    ): String {
+        routeVisualState.transitionCue?.let { cue ->
+            return transitionMessage(cue)
+        }
+        floorTransitionMessage(state, waypoint)?.let { return it }
+        projection?.let {
+            when (RouteVisualSampler.turnDirectionNearProjection(routeNodes, routeEdges, it, currentFloor)) {
+                RouteTurnDirection.LEFT -> return "Turn left and follow the blue floor arrows."
+                RouteTurnDirection.RIGHT -> return "Turn right and follow the blue floor arrows."
+                null -> Unit
+            }
+        }
+        return "Follow the blue floor arrows."
+    }
+
+    private fun transitionMessage(cue: RouteTransitionCue): String {
+        val transport = when (cue.kind) {
+            EdgeKind.ELEVATOR -> "elevator"
+            else -> "stairs"
+        }
+        return "Take the $transport to floor ${cue.toFloor}."
+    }
 
     private fun floorTransitionMessage(state: NavigationUiState, waypoint: MapNode): String? {
         if (state.currentWaypointIndex <= 0) return null
@@ -955,65 +1111,6 @@ class NavigationViewModel(
             sum += distanceMeters(poses[index], poses[index + 1])
         }
         return sum
-    }
-
-    private fun smoothYawDegrees(targetYawDegrees: Float): Float {
-        val now = System.nanoTime()
-        val previousYaw = lastSmoothedYawDegrees
-        val previousNanos = lastYawUpdateNanos
-        lastYawUpdateNanos = now
-
-        if (previousYaw == null || previousNanos == null) {
-            lastSmoothedYawDegrees = targetYawDegrees
-            return targetYawDegrees
-        }
-
-        val elapsedSeconds = ((now - previousNanos) / NANOS_PER_SECOND)
-            .coerceIn(0f, MAX_BLEND_DELTA_SECONDS)
-        val alpha = (1f - exp((-YAW_SMOOTHING_HZ * elapsedSeconds).toDouble()).toFloat())
-            .coerceIn(0f, 1f)
-        val delta = shortestYawDelta(previousYaw, targetYawDegrees)
-        val smoothedYaw = if (abs(delta) < 0.1f) {
-            targetYawDegrees
-        } else {
-            normalizeYawDegrees(previousYaw + delta * alpha)
-        }
-        lastSmoothedYawDegrees = smoothedYaw
-        return smoothedYaw
-    }
-
-    private fun smoothPitchDegrees(targetPitchDegrees: Float): Float {
-        val now = System.nanoTime()
-        val previousPitch = lastSmoothedPitchDegrees
-        val previousNanos = lastPitchUpdateNanos
-        lastPitchUpdateNanos = now
-
-        if (previousPitch == null || previousNanos == null) {
-            lastSmoothedPitchDegrees = targetPitchDegrees
-            return targetPitchDegrees
-        }
-
-        val elapsedSeconds = ((now - previousNanos) / NANOS_PER_SECOND)
-            .coerceIn(0f, MAX_BLEND_DELTA_SECONDS)
-        val alpha = (1f - exp((-YAW_SMOOTHING_HZ * elapsedSeconds).toDouble()).toFloat())
-            .coerceIn(0f, 1f)
-        val smoothedPitch = lerp(previousPitch, targetPitchDegrees, alpha)
-        lastSmoothedPitchDegrees = smoothedPitch
-        return smoothedPitch
-    }
-
-    private fun shortestYawDelta(fromDegrees: Float, toDegrees: Float): Float {
-        var delta = (toDegrees - fromDegrees) % 360f
-        if (delta > 180f) delta -= 360f
-        if (delta < -180f) delta += 360f
-        return delta
-    }
-
-    private fun normalizeYawDegrees(degrees: Float): Float {
-        var normalized = degrees % 360f
-        if (normalized <= -180f) normalized += 360f
-        if (normalized > 180f) normalized -= 360f
-        return normalized
     }
 
     private fun updateAnchorTrackingStates() {
@@ -1087,6 +1184,8 @@ class NavigationViewModel(
         lastDisplayedPoseUpdateNanos = null
         lastFitAtMs = 0L
         lastFitAnchorPositions.clear()
+        lastDetectedFloorY = null
+        floorHeightEstimator.reset()
         resetNavigationSmoothing()
     }
 
@@ -1100,11 +1199,12 @@ class NavigationViewModel(
     }
 
     private fun resetNavigationSmoothing() {
-        lastYawUpdateNanos = null
-        lastSmoothedYawDegrees = null
-        lastPitchUpdateNanos = null
-        lastSmoothedPitchDegrees = null
         lastDisplayedPoseUpdateNanos = null
+        lastRouteSignature = null
+        lastRouteVisualFloor = null
+        lastRouteProjectionNanos = null
+        lastSmoothedRouteCumulativeMeters = null
+        lastTransitionCueKey = null
     }
 
     override fun onCleared() {
@@ -1122,12 +1222,6 @@ class NavigationViewModel(
             return NavigationViewModel(graphRepository) as T
         }
     }
-
-    private data class PathProjection(
-        val segmentIndex: Int,
-        val segmentT: Float,
-        val perpDist: Float
-    )
 
     companion object {
         private const val MAX_PARALLEL_RESOLVES = 8
@@ -1147,8 +1241,11 @@ class NavigationViewModel(
         private const val CONFIDENCE_TIME_DECAY_SECONDS = 60f
         private const val REROUTE_INTERVAL_MS = 3_000L
         private const val REROUTE_DEVIATION_M = 3f
+        private const val WAYPOINT_ADVANCE_DISTANCE_M = 1.2f
+        private const val ROUTE_PROJECTION_SMOOTHING_HZ = 6f
+        private const val MIN_CAMERA_TO_FLOOR_M = 0.6f
+        private const val MAX_CAMERA_TO_FLOOR_M = 2.2f
         private const val DISPLAY_POSE_CATCHUP_HZ = 4f
-        private const val YAW_SMOOTHING_HZ = 8f
         private const val MAX_BLEND_DELTA_SECONDS = 0.25f
         private const val NANOS_PER_SECOND = 1_000_000_000f
     }

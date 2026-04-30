@@ -97,6 +97,45 @@ class PathfinderTest {
         assertEquals(listOf("a", "b", "c", "d"), Pathfinder(graph).shortestPath("a", "d")?.map { it.id })
     }
 
+    @Test
+    fun directTriangleEdgeWinsWhenShorter() {
+        val graph = MapGraph(
+            buildingName = "test",
+            createdAtEpochMs = 0L,
+            nodes = listOf(
+                node("a", x = 0f, z = 0f),
+                node("b", x = 1f, z = 1f),
+                node("c", x = 2f, z = 0f)
+            ),
+            edges = listOf(
+                MapEdge("a", "b", 1.2f),
+                MapEdge("b", "c", 1.2f),
+                MapEdge("a", "c", 1.8f)
+            )
+        )
+
+        assertEquals(listOf("a", "c"), Pathfinder(graph).shortestPath("a", "c")?.map { it.id })
+    }
+
+    @Test
+    fun missingDirectEdgePreservesIntermediateCorner() {
+        val graph = MapGraph(
+            buildingName = "test",
+            createdAtEpochMs = 0L,
+            nodes = listOf(
+                node("a", x = 0f, z = 0f),
+                node("b", x = 1f, z = 1f),
+                node("c", x = 2f, z = 0f)
+            ),
+            edges = listOf(
+                MapEdge("a", "b", 1f),
+                MapEdge("b", "c", 1f)
+            )
+        )
+
+        assertEquals(listOf("a", "b", "c"), Pathfinder(graph).shortestPath("a", "c")?.map { it.id })
+    }
+
     private fun node(
         id: String,
         label: String? = null,

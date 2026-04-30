@@ -9,6 +9,7 @@ object ArSessionConfig {
         config.focusMode = Config.FocusMode.AUTO
         config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
         config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+        config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL
         if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
             config.depthMode = Config.DepthMode.AUTOMATIC
         }

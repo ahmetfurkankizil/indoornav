@@ -31,8 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vecturai.ar.ArSessionConfig
-import com.example.vecturai.ar.ArrowPose
-import com.example.vecturai.ar.ArrowRenderer
 import com.example.vecturai.persistence.GraphRepository
 import com.example.vecturai.ui.CameraPermissionGate
 import com.example.vecturai.ui.hasValidGlbAsset
@@ -43,6 +41,7 @@ import dev.romainguy.kotlin.math.Float3
 import dev.romainguy.kotlin.math.Quaternion
 import io.github.sceneview.ar.ARSceneView
 import io.github.sceneview.ar.rememberARCameraStream
+import io.github.sceneview.SceneScope
 import io.github.sceneview.material.setColor
 import io.github.sceneview.material.setRoughness
 import io.github.sceneview.math.Position
@@ -81,7 +80,11 @@ fun NavigationScreen(
         Box(Modifier.fillMaxSize()) {
             NavigationArScene(
                 nodePoses = state.nodePoses,
-                arrowPose = state.arrowPose,
+                routeVisualState = if (state.phase == NavigationPhase.Navigating) {
+                    state.routeVisualState
+                } else {
+                    RouteVisualState.Empty
+                },
                 onSessionCreated = viewModel::onSessionCreated,
                 onSessionFailed = viewModel::onSessionFailed,
                 onSessionUpdated = viewModel::onSessionUpdated
@@ -128,7 +131,7 @@ fun NavigationScreen(
 @Composable
 private fun NavigationArScene(
     nodePoses: List<SessionNodePose>,
-    arrowPose: ArrowPose?,
+    routeVisualState: RouteVisualState,
     onSessionCreated: (com.google.ar.core.Session) -> Unit,
     onSessionFailed: (Throwable) -> Unit,
     onSessionUpdated: (com.google.ar.core.Session, com.google.ar.core.Frame) -> Unit
@@ -142,36 +145,43 @@ private fun NavigationArScene(
         cameraStream.isDepthOcclusionEnabled = false
     }
 
-    val arrowModelInstance = remember { mutableStateOf<ModelInstance?>(null) }
-    val arrowMaterial = remember { mutableStateOf<MaterialInstance?>(null) }
+    val arrowModelInstances = remember { mutableStateOf<List<ModelInstance>>(emptyList()) }
+    val arrowFallbackMaterials = remember { mutableStateOf<List<MaterialInstance>>(emptyList()) }
     LaunchedEffect(modelLoader, materialLoader, context) {
         val valid = withContext(Dispatchers.IO) {
             hasValidGlbAsset(context, "arrow.glb")
         }
-        val model = if (valid) {
-            runCatching { modelLoader.createModelInstance("arrow.glb") }.getOrNull()
+        val models = if (valid) {
+            runCatching {
+                modelLoader.createInstancedModel("arrow.glb", FLOOR_ARROW_RENDER_POOL_SIZE)
+            }.getOrDefault(emptyList())
         } else {
-            null
+            emptyList()
         }
-        arrowModelInstance.value = model
-        arrowMaterial.value = if (model == null) {
-            materialLoader.createColorInstance(Color(0xFFFF5722), roughness = 1.0f)
+        arrowModelInstances.value = models
+        arrowFallbackMaterials.value = if (models.isEmpty()) {
+            List(FLOOR_ARROW_RENDER_POOL_SIZE) { index ->
+                materialLoader.createColorInstance(
+                    FLOOR_ARROW_BLUE.copy(alpha = fallbackArrowAlpha(index)),
+                    roughness = 0.9f
+                )
+            }
         } else {
-            null
+            emptyList()
         }
     }
-    val currentArrowModelInstance = arrowModelInstance.value
-    DisposableEffect(currentArrowModelInstance) {
+    val currentArrowModelInstances = arrowModelInstances.value
+    DisposableEffect(currentArrowModelInstances) {
         onDispose {
-            currentArrowModelInstance?.let { modelInstance ->
+            currentArrowModelInstances.firstOrNull()?.let { modelInstance ->
                 runCatching { modelLoader.destroyModel(modelInstance.asset) }
             }
         }
     }
-    val currentArrowMaterial = arrowMaterial.value
-    DisposableEffect(currentArrowMaterial) {
+    val currentArrowFallbackMaterials = arrowFallbackMaterials.value
+    DisposableEffect(currentArrowFallbackMaterials) {
         onDispose {
-            currentArrowMaterial?.let { material ->
+            currentArrowFallbackMaterials.forEach { material ->
                 runCatching { materialLoader.destroyMaterialInstance(material) }
             }
         }
@@ -217,42 +227,44 @@ private fun NavigationArScene(
             }
         }
 
-        key("nav-arrow") {
-            val displayedPose = remember { mutableStateOf<Pose?>(null) }
-            val visible = arrowPose != null
-            arrowPose?.let { displayedPose.value = it.toArPose() }
-            displayedPose.value?.let { pose ->
-                PoseNode(
-                    pose = pose,
-                    visibleCameraTrackingStates = if (visible) {
-                        setOf(TrackingState.TRACKING)
-                    } else {
-                        emptySet()
-                    },
-                    apply = {
-                        isSmoothTransformEnabled = false
-                    }
-                ) {
-                    val modelInstance = arrowModelInstance.value
-                    val material = arrowMaterial.value
-                    if (modelInstance != null) {
-                        ModelNode(
-                            modelInstance = modelInstance,
-                            autoAnimate = false,
-                            position = Position(z = -ARROW_HALF_LENGTH_LOCAL_M),
-                            scale = Scale(ARROW_MODEL_SCALE)
-                        )
-                    } else if (material != null) {
-                        CubeNode(
-                            size = Size(x = 0.08f, y = 0.05f, z = 0.30f),
-                            center = Position(z = 0.15f - ARROW_HALF_LENGTH_LOCAL_M),
-                            materialInstance = material
-                        )
-                        SphereNode(
-                            radius = 0.06f,
-                            center = Position(z = 0.36f - ARROW_HALF_LENGTH_LOCAL_M),
-                            materialInstance = material
-                        )
+        val arrowsByIndex = routeVisualState.arrows.associateBy { it.sampleIndex }
+        for (sampleIndex in 0 until FLOOR_ARROW_RENDER_POOL_SIZE) {
+            key("floor-arrow-$sampleIndex") {
+                val displayedPose = remember { mutableStateOf<Pose?>(null) }
+                val displayedScale = remember { mutableStateOf(1f) }
+                val arrow = arrowsByIndex[sampleIndex]
+                val visible = arrow != null
+                arrow?.let {
+                    displayedPose.value = it.toArPose()
+                    displayedScale.value = it.scale
+                }
+                displayedPose.value?.let { pose ->
+                    PoseNode(
+                        pose = pose,
+                        visibleCameraTrackingStates = if (visible) {
+                            setOf(TrackingState.TRACKING)
+                        } else {
+                            emptySet()
+                        },
+                        apply = {
+                            isSmoothTransformEnabled = false
+                        }
+                    ) {
+                        val modelInstance = arrowModelInstances.value.getOrNull(sampleIndex)
+                        val material = arrowFallbackMaterials.value.getOrNull(sampleIndex)
+                        if (modelInstance != null) {
+                            ModelNode(
+                                modelInstance = modelInstance,
+                                autoAnimate = false,
+                                position = Position(z = -ARROW_HALF_LENGTH_LOCAL_M),
+                                scale = Scale(ARROW_MODEL_SCALE * displayedScale.value)
+                            )
+                        } else if (material != null) {
+                            FloorArrowFallback(
+                                material = material,
+                                scale = displayedScale.value
+                            )
+                        }
                     }
                 }
             }
@@ -260,9 +272,46 @@ private fun NavigationArScene(
     }
 }
 
-// arrow.glb is authored in meter-like units with roughly 0.92m length on +Z.
-private const val ARROW_MODEL_SCALE = 0.45f
-private const val ARROW_HALF_LENGTH_LOCAL_M = 0.21f
+@Composable
+private fun SceneScope.FloorArrowFallback(
+    material: MaterialInstance,
+    scale: Float
+) {
+    val visualScale = ARROW_MODEL_SCALE * scale
+    CubeNode(
+        size = Size(x = 0.16f, y = 0.03f, z = 0.42f),
+        center = Position(z = -0.11f),
+        scale = Scale(visualScale),
+        materialInstance = material
+    )
+    CubeNode(
+        size = Size(x = 0.28f, y = 0.03f, z = 0.24f),
+        center = Position(z = 0.18f),
+        scale = Scale(visualScale),
+        materialInstance = material
+    )
+    CubeNode(
+        size = Size(x = 0.14f, y = 0.03f, z = 0.20f),
+        center = Position(x = -0.13f, z = 0.12f),
+        scale = Scale(visualScale),
+        materialInstance = material
+    )
+    CubeNode(
+        size = Size(x = 0.14f, y = 0.03f, z = 0.20f),
+        center = Position(x = 0.13f, z = 0.12f),
+        scale = Scale(visualScale),
+        materialInstance = material
+    )
+}
+
+// arrow.glb is centered, low profile, and authored in meter-like units with local +Z forward.
+private const val ARROW_MODEL_SCALE = 1.0f
+private const val ARROW_HALF_LENGTH_LOCAL_M = 0.0f
+private val FLOOR_ARROW_BLUE = Color(0xFF03A9F4)
+
+private fun fallbackArrowAlpha(sampleIndex: Int): Float =
+    (1f - (FLOOR_ARROW_START_AHEAD_M + sampleIndex * FLOOR_ARROW_SPACING_M) / FLOOR_ARROW_MAX_DISTANCE_M)
+        .coerceIn(0.28f, 1f)
 
 private fun confidenceColor(confidence: Float): Color {
     val clamped = confidence.coerceIn(0f, 1f)
@@ -284,22 +333,11 @@ private fun confidenceColor(confidence: Float): Color {
     )
 }
 
-private fun ArrowPose.toArPose(): Pose {
-    val yawDegrees = yawDegrees + ArrowRenderer.ARROW_MODEL_YAW_OFFSET_DEG
+private fun FloorArrowPose.toArPose(): Pose {
     val yaw = Quaternion.fromAxisAngle(Float3(0f, 1f, 0f), yawDegrees)
-    val pitch = Quaternion.fromAxisAngle(Float3(1f, 0f, 0f), -pitchDegrees)
-    val rotationPose = Pose(
-        floatArrayOf(0f, 0f, 0f),
-        floatArrayOf(yaw.x, yaw.y, yaw.z, yaw.w)
-    ).compose(
-        Pose(
-            floatArrayOf(0f, 0f, 0f),
-            floatArrayOf(pitch.x, pitch.y, pitch.z, pitch.w)
-        )
-    )
     return Pose(
         floatArrayOf(position.x, position.y, position.z),
-        floatArrayOf(rotationPose.qx(), rotationPose.qy(), rotationPose.qz(), rotationPose.qw())
+        floatArrayOf(yaw.x, yaw.y, yaw.z, yaw.w)
     )
 }
 
