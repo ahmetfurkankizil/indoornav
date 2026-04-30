@@ -71,15 +71,24 @@ fun sessionFromGraphPose(resolvedNode: MapNode, resolvedSessionPose: Pose): Pose
 fun estimateSessionPose(sessionFromGraph: Pose, node: MapNode): Pose =
     sessionFromGraph.compose(node.graphPose())
 
-fun yawDegreesToward(from: Vec3, to: Vec3): Float {
-    val direction = (to - from).horizontal().normalized()
+fun yawDegreesToward(from: Vec3, to: Vec3): Float? {
+    val direction = (to - from).horizontal()
+    if (direction.length() < 1e-3f) return null
     return Math.toDegrees(atan2(direction.x.toDouble(), direction.z.toDouble())).toFloat()
 }
 
 fun poseAt(position: Vec3): Pose = Pose.makeTranslation(position.x, position.y, position.z)
 
-fun positionInFrontOfCamera(cameraPose: Pose, meters: Float): Vec3 =
-    cameraPose.translationVec() + cameraPose.forwardVec() * meters
+fun positionInFrontOfCamera(cameraPose: Pose, meters: Float): Vec3 {
+    val camera = cameraPose.translationVec()
+    val forward = cameraPose.forwardVec()
+    val flatForward = Vec3(forward.x, 0f, forward.z).normalized()
+    return Vec3(
+        x = camera.x + flatForward.x * meters,
+        y = camera.y,
+        z = camera.z + flatForward.z * meters
+    )
+}
 
 fun Vec3.rotateY(radians: Float): Vec3 =
     Vec3(

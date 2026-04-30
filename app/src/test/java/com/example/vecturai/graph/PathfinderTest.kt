@@ -41,12 +41,54 @@ class PathfinderTest {
         assertNull(Pathfinder(graph).shortestPath("a", "b"))
     }
 
-    private fun node(id: String): MapNode =
+    @Test
+    fun shortestPathHonorsOneWayEdges() {
+        val graph = MapGraph(
+            buildingName = "test",
+            createdAtEpochMs = 0L,
+            nodes = listOf(node("a"), node("b")),
+            edges = listOf(
+                MapEdge("a", "b", 1f, bidirectional = false)
+            )
+        )
+
+        assertEquals(listOf("a", "b"), Pathfinder(graph).shortestPath("a", "b")?.map { it.id })
+        assertNull(Pathfinder(graph).shortestPath("b", "a"))
+    }
+
+    @Test
+    fun shortestPathPenalizesStairs() {
+        val graph = MapGraph(
+            buildingName = "test",
+            createdAtEpochMs = 0L,
+            nodes = listOf(
+                node("a", x = 0f, z = 0f),
+                node("b", label = "landing", x = 1f, z = 0.1f),
+                node("c", x = 2f, z = 0f)
+            ),
+            edges = listOf(
+                MapEdge("a", "c", 2f, kind = EdgeKind.STAIRS),
+                MapEdge("a", "b", 1.1f),
+                MapEdge("b", "c", 1.1f)
+            )
+        )
+
+        assertEquals(listOf("a", "b", "c"), Pathfinder(graph).shortestPath("a", "c")?.map { it.id })
+    }
+
+    private fun node(
+        id: String,
+        label: String? = null,
+        x: Float = 0f,
+        y: Float = 0f,
+        z: Float = 0f
+    ): MapNode =
         MapNode(
             id = id,
             cloudAnchorId = "cloud-$id",
-            xMeters = 0f,
-            yMeters = 0f,
-            zMeters = 0f
+            label = label,
+            xMeters = x,
+            yMeters = y,
+            zMeters = z
         )
 }

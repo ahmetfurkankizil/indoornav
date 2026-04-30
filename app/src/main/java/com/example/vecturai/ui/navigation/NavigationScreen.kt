@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -28,16 +29,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vecturai.ar.ArSessionConfig
 import com.example.vecturai.ar.ArrowPose
+import com.example.vecturai.ar.ArrowRenderer
 import com.example.vecturai.persistence.GraphRepository
 import com.example.vecturai.ui.CameraPermissionGate
 import com.example.vecturai.ui.hasValidGlbAsset
+import com.google.ar.core.Pose
+import dev.romainguy.kotlin.math.Float3
+import dev.romainguy.kotlin.math.Quaternion
 import io.github.sceneview.ar.ARSceneView
+import io.github.sceneview.ar.rememberARCameraStream
 import io.github.sceneview.math.Position
-import io.github.sceneview.math.Rotation
+import io.github.sceneview.math.Scale
 import io.github.sceneview.math.Size
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberMaterialLoader
-import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
 
 @Composable
@@ -121,21 +126,25 @@ private fun NavigationArScene(
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
     val materialLoader = rememberMaterialLoader(engine)
+    val cameraStream = rememberARCameraStream(materialLoader)
+    SideEffect {
+        cameraStream.isDepthOcclusionEnabled = true
+    }
 
-    val resolvedMaterial = remember(materialLoader) {
-        materialLoader.createColorInstance(Color(0xFF00BCD4), roughness = 0.5f)
-    }
-    val estimatedMaterial = remember(materialLoader) {
-        materialLoader.createColorInstance(Color(0xFFFFC107), roughness = 0.7f)
-    }
-    val arrowMaterial = remember(materialLoader) {
-        materialLoader.createColorInstance(Color(0xFFFF5722), roughness = 0.45f)
-    }
     val hasArrowAsset = remember(context) { hasValidGlbAsset(context, "arrow.glb") }
-    val arrowModelInstance = if (hasArrowAsset) {
-        rememberModelInstance(modelLoader, "arrow.glb")
-    } else {
-        null
+    val arrowModelInstance = remember(modelLoader, hasArrowAsset) {
+        if (hasArrowAsset) {
+            runCatching { modelLoader.createModelInstance("arrow.glb") }.getOrNull()
+        } else {
+            null
+        }
+    }
+    val arrowMaterial = remember(materialLoader, arrowModelInstance) {
+        if (arrowModelInstance == null) {
+            materialLoader.createColorInstance(Color(0xFFFF5722), roughness = 0.45f)
+        } else {
+            null
+        }
     }
 
     ARSceneView(
@@ -143,6 +152,7 @@ private fun NavigationArScene(
         engine = engine,
         modelLoader = modelLoader,
         materialLoader = materialLoader,
+        cameraStream = cameraStream,
         planeRenderer = false,
         sessionConfiguration = ArSessionConfig::configureIndoorCloudSession,
         onSessionCreated = onSessionCreated,
@@ -151,10 +161,16 @@ private fun NavigationArScene(
     ) {
         nodePoses.forEach { nodePose ->
             key(nodePose.nodeId) {
-                val material = if (nodePose.isResolved) resolvedMaterial else estimatedMaterial
+                val confidence = nodePose.confidence.coerceIn(0f, 1f)
+                val material = remember(materialLoader, confidence) {
+                    materialLoader.createColorInstance(
+                        confidenceColor(confidence),
+                        roughness = 0.75f - 0.25f * confidence
+                    )
+                }
                 PoseNode(pose = nodePose.pose) {
                     SphereNode(
-                        radius = if (nodePose.isResolved) 0.1f else 0.07f,
+                        radius = 0.07f + 0.03f * confidence,
                         center = Position(y = 0.08f),
                         materialInstance = material
                     )
@@ -162,41 +178,60 @@ private fun NavigationArScene(
             }
         }
 
-        arrowPose?.let { pose ->
-            Node(
-                position = pose.position.toScenePosition(),
-                rotation = Rotation(y = pose.yawDegrees),
-                apply = {
-                    // Smooth transform avoids jumpy camera-relative arrows between AR frames.
-                    isSmoothTransformEnabled = true
-                    smoothTransformSpeed = 10f
-                }
-            ) {
-                if (arrowModelInstance != null) {
-                    ModelNode(
-                        modelInstance = arrowModelInstance,
-                        autoAnimate = true,
-                        scaleToUnits = 0.45f
-                    )
-                } else {
-                    CubeNode(
-                        size = Size(x = 0.08f, y = 0.05f, z = 0.46f),
-                        center = Position(z = 0.18f),
-                        materialInstance = arrowMaterial
-                    )
-                    SphereNode(
-                        radius = 0.12f,
-                        center = Position(z = 0.45f),
-                        materialInstance = arrowMaterial
-                    )
+        key("nav-arrow") {
+            arrowPose?.let { pose ->
+                PoseNode(
+                    pose = pose.toArPose(),
+                    apply = {
+                        isSmoothTransformEnabled = false
+                    }
+                ) {
+                    if (arrowModelInstance != null) {
+                        ModelNode(
+                            modelInstance = arrowModelInstance,
+                            autoAnimate = true,
+                            scale = Scale(ARROW_MODEL_SCALE)
+                        )
+                    } else if (arrowMaterial != null) {
+                        CubeNode(
+                            size = Size(x = 0.08f, y = 0.05f, z = 0.46f),
+                            center = Position(z = 0.18f),
+                            materialInstance = arrowMaterial
+                        )
+                        SphereNode(
+                            radius = 0.09f,
+                            center = Position(z = 0.50f),
+                            materialInstance = arrowMaterial
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-private fun com.example.vecturai.ar.Vec3.toScenePosition(): Position =
-    Position(x = x, y = y, z = z)
+// arrow.glb is authored in meter-like units with roughly 0.92m length on +Z.
+private const val ARROW_MODEL_SCALE = 0.45f
+
+private fun confidenceColor(confidence: Float): Color {
+    val low = Color(0xFFFFC107)
+    val high = Color(0xFF00BCD4)
+    return Color(
+        red = low.red + (high.red - low.red) * confidence,
+        green = low.green + (high.green - low.green) * confidence,
+        blue = low.blue + (high.blue - low.blue) * confidence,
+        alpha = 1f
+    )
+}
+
+private fun ArrowPose.toArPose(): Pose {
+    val yawDegrees = yawDegrees + ArrowRenderer.ARROW_MODEL_YAW_OFFSET_DEG
+    val quaternion = Quaternion.fromAxisAngle(Float3(0f, 1f, 0f), yawDegrees)
+    return Pose(
+        floatArrayOf(position.x, position.y, position.z),
+        floatArrayOf(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+    )
+}
 
 @Composable
 private fun NavigationDiagnostics(
