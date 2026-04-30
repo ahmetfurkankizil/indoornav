@@ -3,10 +3,10 @@
     "repository": "vecturai",
     "root": "c:\\Users\\emirh\\Desktop\\bitirme\\vecturai",
     "description": "Indoor navigation system with AR support",
-    "generated_at": "2026-04-27T16:32:31+03:00",
-    "generated_from_range": "a9d5304caab89210dc30b89297445663d6dd16d9..28ecf48c91cd96c1283f2751c28fdec0141ee39c",
+    "generated_at": "2026-04-30T06:37:31+03:00",
+    "generated_from_range": "4877a6ab8a7605d392cfec5ff402b85e0de55998..ac5d46d5ddacaf115bc170555714a4fc368f0805",
     "coverage_verdict": "COMPLETE",
-    "last_incremental_update": "2026-04-27T16:32:31+03:00"
+    "last_incremental_update": "2026-04-30T06:37:31+03:00"
 
   },
   "folders": [
@@ -751,6 +751,16 @@
       "reason": "Root documentation",
       "feature_tags": [],
       "artifact_link": "codebase-docs/files/README.md.md"
+    },
+    {
+      "path": "VecturAI Standalone.html",
+      "category": "docs",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "design_system"
+      ],
+      "artifact_link": "codebase-docs/files/VecturAI_Standalone.html.md"
     },
     {
       "path": "apps\\androidApp\\build.gradle.kts",

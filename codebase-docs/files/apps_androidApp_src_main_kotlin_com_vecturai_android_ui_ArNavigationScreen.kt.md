@@ -22,17 +22,18 @@ Passive AR navigation overlay that draws projected route arrows, alignment guida
 
 ## Main Symbols
 - `ArNavigationScreen`: Renders UI state only; it does not create or own a `GLSurfaceView`.
-- `ProjectedArrowLayer`: Draws projected arrow icons on top of camera feed.
-- `AlignmentOverlay`: Pre-alignment poster guidance and timeout actions.
-- `ActiveNavigationOverlay`: Top guidance and bottom HUD during route following.
-- `InstructionBanner`: Next-action card.
-- `BottomHud`: Remaining distance, ETA, simulated advance, and end route action.
-- `ArrivalOverlay`: Spring-animated arrival card.
+- `ProjectedArrowLayer`: Draws projected 3D arrow icons pinned to building-local coordinates.
+- `AlignmentOverlay`: Premium pre-alignment guidance with actionable hints (No poster detected, Hold steady).
+- `ActiveNavigationOverlay`: Hosts the `NextActionCard`, `TrackingBadge`, and `ProgressStrip`.
+- `NextActionCard`: Prominent guidance card ("Turn left ahead", etc.) with dynamic icons and distance lookahead.
+- `TrackingBadge`: Context-aware status label ("Tracking", "Hold steady", "Re-centering...").
+- `ProgressStrip`: Compact bottom HUD with remaining distance, ETA, and end-route action.
+- `ArrivalOverlay`: Spring-animated success card with "You've reached [Destination]".
 
 ## Important Logic
-- Session lifecycle, camera permission, GL surface creation, and renderer wiring moved to `ArCameraActivity`.
-- Error/timeout retry callbacks recreate the hosting Activity, yielding a fresh ARCore session instead of rebuilding in-place.
-- Bottom HUD ETA uses remaining distance at 1.2 m/s.
+- Navigation guidance: derived from `AndroidArNavigationViewModel.ArNavigationUiState`, ensuring zero-latency UI updates.
+- Visual consistency: uses the same glassmorphic design tokens (blur, borders, vibrant accents) as the home screen.
+- ETA calculation: distance-based estimate matching the iOS client logic for platform parity.
 
 ## Uses
 - `AndroidArNavigationViewModel`

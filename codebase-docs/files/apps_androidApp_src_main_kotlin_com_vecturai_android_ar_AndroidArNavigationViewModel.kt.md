@@ -24,6 +24,7 @@ Android ViewModel for route configuration, entrance-poster alignment, progress p
 - `AndroidArNavigationViewModel`
 
 ## Main Symbols
+- `ArNavigationUiState`: State object containing route info, next-action guidance, tracking labels, and arrival status.
 - `configure(routePackage, entranceMarker)`: Resets route/alignment state, configures marker detection, and starts the alignment timeout.
 - `onFrame(frame, width, height)`: Per-frame marker detection, tracking status, camera pose sampling, arrow projection, and progress updates.
 - `simulateAlignment()`: Development fallback for emulator/non-marker testing.
@@ -33,10 +34,10 @@ Android ViewModel for route configuration, entrance-poster alignment, progress p
 
 ## Important Logic
 - `UnifiedArSession` and `UnifiedArRenderer` now own all session lifecycle and frame delivery.
-- There is no resume, pause, rebuild, backoff, or camera-texture logic in this ViewModel.
-- Marker detection remains strict: only the reviewed package entrance marker image/name is accepted.
-- Coordinate transformations assume the marker pose establishes the AR-world to building-local transform.
-- Haptics fire for route start, imminent turn, re-centering, and arrival.
+- Refined tracking labels: "Tracking", "Hold steady", "Re-centering..." based on ARCore `TrackingState` and failure reasons.
+- Route progress: tracks total distance, current node, and ETA (at 1.2 m/s).
+- Next-action card: derives guidance text and icons (straight, left, right, arrival) from the lookahead arrow.
+- Haptics: `AndroidHapticManager` fires events for alignment lock (medium), turn warning (notification), re-centering (light), and arrival (success).
 
 ## Uses
 - `ArMarkerDetector`
