@@ -66,11 +66,11 @@ class AndroidReviewedPackageLoader(
 
     @Serializable
     data class RouteRenderingConfig(
-        val arrowSpacingMeters: Double,
-        val lookaheadDistanceMeters: Double,
-        val destinationThresholdMeters: Double,
-        val turnMarkerThresholdDegrees: Double,
-        val arrowHeightOffsetMeters: Double,
+        val arrowSpacingMeters: Double = 0.6,
+        val lookaheadDistanceMeters: Double = 8.0,
+        val destinationThresholdMeters: Double = 1.2,
+        val turnMarkerThresholdDegrees: Double = 25.0,
+        val arrowHeightOffsetMeters: Double = 0.1,
     )
 
     @Serializable
@@ -89,6 +89,27 @@ class AndroidReviewedPackageLoader(
         val navGraph: String,
         val entranceMarkers: String,
         val routeRendering: String,
+    )
+
+    @Serializable
+    data class UnifiedFloor(
+        val floorId: String,
+        val floorNumber: Int,
+        val floorName: String,
+        val floorY: Double,
+        val nodes: List<PackageNode>,
+        val edges: List<PackageEdge>,
+    )
+
+    @Serializable
+    data class UnifiedPackage(
+        val buildingId: String,
+        val buildingName: String,
+        val version: Int,
+        val floors: List<UnifiedFloor>,
+        val entranceMarkers: List<PackageMarker>,
+        val buildingWidthMeters: Double = 25.0,
+        val routeRendering: RouteRenderingConfig,
     )
 
     @Serializable
@@ -169,19 +190,84 @@ class AndroidReviewedPackageLoader(
         )
     }
 
+    fun parseUnifiedPackage(jsonString: String): Result<ReviewedConfig> = try {
+        val unified = json.decodeFromString<UnifiedPackage>(jsonString)
+        
+        // SMART SCALE DETECTOR: Calculate the actual width of the map in units
+        val allNodesRaw = unified.floors.flatMap { it.nodes }
+        val minX = allNodesRaw.minOfOrNull { it.x } ?: 0.0
+        val maxX = allNodesRaw.maxOfOrNull { it.x } ?: 1.0
+        val mapUnitWidth = maxX - minX
+        
+        // Scale factor: Real Meters / Map Units
+        val scaleFactor = if (mapUnitWidth > 0.1) unified.buildingWidthMeters / mapUnitWidth else 1.0
+        
+        println("[PackageLoader] Map unit width: $mapUnitWidth, Target width: ${unified.buildingWidthMeters}m, Scale factor: $scaleFactor")
+
+        val allNodes = allNodesRaw.map { n ->
+            n.copy(x = n.x * scaleFactor, y = n.y * scaleFactor, z = n.z * scaleFactor)
+        }
+        val allEdges = unified.floors.flatMap { it.edges }
+        
+        val rooms = allNodes.filter { it.type == "room" }.map { n ->
+            PackageRoom(
+                id = n.id,
+                displayName = n.label ?: "Room ${n.id.take(4)}",
+                destinationNodeId = n.id,
+                category = "room"
+            )
+        }
+
+        val scaledMarkers = unified.entranceMarkers.map { m ->
+            m.copy(
+                position = m.position.copy(
+                    x = m.position.x * scaleFactor,
+                    y = m.position.y * scaleFactor,
+                    z = m.position.z * scaleFactor
+                )
+            )
+        }
+
+        Result.success(
+            ReviewedConfig(
+                manifest = Manifest(
+                    packageVersion = unified.version.toString(),
+                    buildingId = unified.buildingId,
+                    buildingName = unified.buildingName,
+                    floorId = unified.floors.firstOrNull()?.floorId ?: "0",
+                    reviewStatus = "published",
+                    files = ManifestFiles("", "", "", "")
+                ),
+                rooms = rooms,
+                nodes = allNodes,
+                edges = allEdges,
+                entranceMarkers = scaledMarkers,
+                routeRendering = unified.routeRendering
+            )
+        )
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
     fun computeRoute(config: ReviewedConfig, destinationRoomId: String): LoadedPackage? {
         val nodeMap = config.nodes.associateBy { it.id }
         val adjacency = mutableMapOf<String, MutableList<Pair<String, Double>>>()
+        println("[RouteDebug] --- LOADING EDGES ---")
         for (edge in config.edges) {
+            println("[RouteDebug] Edge in package: ${edge.from} -> ${edge.to} (cost: ${edge.cost})")
             adjacency.getOrPut(edge.from) { mutableListOf() }.add(edge.to to edge.cost)
             if (edge.bidirectional) {
                 adjacency.getOrPut(edge.to) { mutableListOf() }.add(edge.from to edge.cost)
             }
         }
+        println("[RouteDebug] --- END EDGES ---")
 
         val startNodeId = config.entranceMarkers.firstOrNull()?.startNodeId
+            ?: config.nodes.find { it.type == "entrance" }?.id
             ?: config.nodes.firstOrNull()?.id
             ?: return null
+        
+        println("[RouteDebug] Starting navigation from node: $startNodeId")
         val room = config.rooms.firstOrNull { it.id == destinationRoomId } ?: return null
         val routeNodeIds = dijkstra(startNodeId, room.destinationNodeId, adjacency)
         if (routeNodeIds.size < 2) return null
@@ -275,53 +361,63 @@ class AndroidReviewedPackageLoader(
     ): List<ArrowPlacementData> {
         if (nodes.size < 2) return emptyList()
 
+        // LOGGING: Verify the path nodes in Logcat
+        println("[RouteDebug] Path Nodes: ${nodes.map { "${it.id}(${it.x}, ${it.z})" }.joinToString(" -> ")}")
+
         val arrows = mutableListOf<ArrowPlacementData>()
         var cumulativeDistance = 0.0
 
-        for (i in 0 until nodes.lastIndex) {
+        for (i in 0 until nodes.size - 1) {
             val current = nodes[i]
             val next = nodes[i + 1]
             val dx = next.x - current.x
             val dz = next.z - current.z
             val segmentLength = sqrt(dx * dx + dz * dz)
-            if (segmentLength <= 0.01) continue
+            
+            if (segmentLength < 0.05) continue // Skip tiny segments
 
             val directionX = dx / segmentLength
             val directionZ = dz / segmentLength
+
+            // Calculate how many arrows for this specific segment
+            // We ensure at least one arrow at the start of the segment
             val count = max(1, (segmentLength / spacing).toInt())
+            val actualSpacing = segmentLength / count
 
             for (step in 0 until count) {
                 val t = step.toDouble() / count.toDouble()
-                val arrowCumulative = cumulativeDistance + t * segmentLength
-                val type: ArrowPlacementType
-                val label: String?
+                val arrowX = current.x + t * dx
+                val arrowZ = current.z + t * dz
+                val arrowCumulative = cumulativeDistance + (t * segmentLength)
 
-                if (i == nodes.size - 2 && step == count - 1) {
-                    type = ArrowPlacementType.DESTINATION
-                    label = destinationLabel
-                } else if (step == 0 && i > 0) {
-                    val previous = nodes[i - 1]
-                    val previousDx = current.x - previous.x
-                    val previousDz = current.z - previous.z
-                    val cross = previousDx * directionZ - previousDz * directionX
-                    if (abs(cross) > 0.3) {
-                        type = if (cross > 0) ArrowPlacementType.TURN_RIGHT else ArrowPlacementType.TURN_LEFT
-                        label = if (cross > 0) "Turn right" else "Turn left"
-                    } else {
-                        type = ArrowPlacementType.FOLLOW
-                        label = null
+                var type = ArrowPlacementType.FOLLOW
+                var label: String? = null
+
+                // TURN DETECTION: Check if this is the start of a segment and we have a previous segment
+                if (step == 0 && i > 0) {
+                    val prev = nodes[i - 1]
+                    val prevDx = current.x - prev.x
+                    val prevDz = current.z - prev.z
+                    val prevLen = sqrt(prevDx * prevDx + prevDz * prevDz)
+                    if (prevLen > 0.01) {
+                        val pDx = prevDx / prevLen
+                        val pDz = prevDz / prevLen
+                        // Cross product for turn direction
+                        val cross = pDx * directionZ - pDz * directionX
+                        if (abs(cross) > 0.05) { // High sensitivity
+                            type = if (cross > 0) ArrowPlacementType.TURN_RIGHT else ArrowPlacementType.TURN_LEFT
+                            label = if (cross > 0) "Turn right" else "Turn left"
+                            println("[RouteDebug] TURN detected at ${current.id}: $label (cross: $cross)")
+                        }
                     }
-                } else {
-                    type = ArrowPlacementType.FOLLOW
-                    label = null
                 }
 
                 arrows.add(
                     ArrowPlacementData(
                         id = "a${arrows.size}",
-                        positionX = current.x + t * dx,
+                        positionX = arrowX,
                         positionY = current.y + heightOffset,
-                        positionZ = current.z + t * dz,
+                        positionZ = arrowZ,
                         forwardDx = directionX,
                         forwardDy = 0.0,
                         forwardDz = directionZ,
@@ -331,9 +427,30 @@ class AndroidReviewedPackageLoader(
                     )
                 )
             }
-
             cumulativeDistance += segmentLength
         }
+
+        // Add final destination marker at the very last node
+        val lastNode = nodes.last()
+        val prevNode = nodes[nodes.size - 2]
+        val lastDx = lastNode.x - prevNode.x
+        val lastDz = lastNode.z - prevNode.z
+        val lastLen = sqrt(lastDx * lastDx + lastDz * lastDz)
+        
+        arrows.add(
+            ArrowPlacementData(
+                id = "a_dest",
+                positionX = lastNode.x,
+                positionY = lastNode.y + heightOffset,
+                positionZ = lastNode.z,
+                forwardDx = if (lastLen > 0) lastDx / lastLen else 0.0,
+                forwardDy = 0.0,
+                forwardDz = if (lastLen > 0) lastDz / lastLen else 1.0,
+                type = ArrowPlacementType.DESTINATION,
+                label = destinationLabel,
+                cumulativeDistance = cumulativeDistance,
+            )
+        )
 
         return arrows
     }

@@ -6,19 +6,13 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class QRPayload(
-    val type: String,
-    val buildingId: String,
-    val entranceId: String,
-    val v: Int,
+    val type: String = "vecturai-building",
+    val token: String,
+    val entranceId: String? = null,
+    val v: Int = 1,
 ) {
     fun validate(against: AndroidReviewedPackageLoader.ReviewedConfig): PayloadError? {
-        if (against.manifest.buildingId != buildingId) {
-            return PayloadError.BuildingMismatch(
-                expected = against.manifest.buildingId,
-                got = buildingId,
-            )
-        }
-        if (against.entranceMarkers.none { it.id == entranceId }) {
+        if (entranceId != null && against.entranceMarkers.none { it.id == entranceId }) {
             return PayloadError.EntranceNotFound(entranceId)
         }
         return null
@@ -37,8 +31,8 @@ data class QRPayload(
     }
 
     companion object {
-        const val EXPECTED_TYPE = "vecturai-entrance"
-        const val CURRENT_VERSION = 1
+        const val EXPECTED_TYPE = "vecturai-building"
+        const val CURRENT_VERSION = 2
 
         private val json = Json {
             ignoreUnknownKeys = true

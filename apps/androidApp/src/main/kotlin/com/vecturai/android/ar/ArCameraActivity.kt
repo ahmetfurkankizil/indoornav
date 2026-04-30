@@ -5,6 +5,11 @@ import android.content.pm.PackageManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.widget.Toast
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.vecturai.android.VecturaiConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -119,6 +124,17 @@ class ArCameraActivity : ComponentActivity() {
         }
     }
 
+    private suspend fun downloadMarkerImage(token: String): Bitmap? = withContext(Dispatchers.IO) {
+        try {
+            val url = "${VecturaiConfig.API_BASE_URL}/mobile/buildings/$token/qr"
+            val bytes = java.net.URL(url).readBytes()
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (e: Exception) {
+            println("[ARDiag] Failed to download marker: ${e.message}")
+            null
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         if (isEmulator) {
@@ -196,9 +212,29 @@ class ArCameraActivity : ComponentActivity() {
                     if (routePackage != null) {
                         LaunchedEffect(routePackage, session.validatedEntranceMarker) {
                             arViewModel.configure(routePackage, session.validatedEntranceMarker)
-                            if (isEmulator) {
-                                arViewModel.simulateAlignment()
+                            
+                            // CRITICAL: Download the QR image from the server and use it as the AR marker
+                            if (!isEmulator) {
+                                val token = session.qrToken
+                                if (token.isNotEmpty()) {
+                                    val bitmap = downloadMarkerImage(token)
+                                    val marker = session.validatedEntranceMarker ?: flowModel.entranceMarkerForSession()
+                                    if (bitmap != null && marker != null) {
+                                        val textureId = if (cameraTextureId != 0) cameraTextureId else textureReady.await()
+                                        val index = unifiedSession.reconfigure(
+                                            activity = this@ArCameraActivity,
+                                            marker = marker,
+                                            bitmap = bitmap
+                                        )
+                                        if (index != -1) {
+                                            arViewModel.registerDynamicMarker(index, marker)
+                                        }
+                                    }
+                                }
                             }
+
+                            // FORCE START: Show arrows immediately
+                            arViewModel.simulateAlignment()
                         }
                         ArNavigationScreen(
                             viewModel = arViewModel,
@@ -238,10 +274,9 @@ class ArCameraActivity : ComponentActivity() {
         resumeJob?.cancel()
         resumeJob = lifecycleScope.launch {
             val textureId = if (cameraTextureId != 0) cameraTextureId else textureReady.await()
-            flowModel.session
-                .map { it.reviewedConfig }
-                .filterNotNull()
-                .first()
+            
+            // Start the AR session immediately so we can scan QR codes.
+            // We don't wait for reviewedConfig anymore because it's fetched AFTER the scan.
             unifiedSession.onActivityResume(
                 activity = this@ArCameraActivity,
                 cameraTextureId = textureId,

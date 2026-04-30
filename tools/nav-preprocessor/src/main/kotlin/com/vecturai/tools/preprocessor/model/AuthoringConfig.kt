@@ -21,6 +21,7 @@ data class AuthoringConfig(
     val nodes: List<AuthoringNode>,
     val edges: List<AuthoringEdge>,
     val rooms: List<AuthoringRoom>,
+    val buildingWidthMeters: Double = 20.0,
     val routeRendering: AuthoringRouteRendering = AuthoringRouteRendering(),
     val graphMetadata: GraphMetadata? = null,
 )

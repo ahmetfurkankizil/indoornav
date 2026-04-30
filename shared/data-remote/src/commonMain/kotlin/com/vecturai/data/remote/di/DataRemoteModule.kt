@@ -5,5 +5,5 @@ import com.vecturai.data.remote.RemoteBuildingDataSource
 import org.koin.dsl.module
 
 val dataRemoteModule = module {
-    single<RemoteBuildingDataSource> { KtorBuildingDataSource() }
+    single<RemoteBuildingDataSource> { (baseUrl: String) -> KtorBuildingDataSource(baseUrl) }
 }

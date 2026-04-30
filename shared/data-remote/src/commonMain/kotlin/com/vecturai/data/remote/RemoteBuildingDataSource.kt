@@ -50,4 +50,11 @@ interface RemoteBuildingDataSource {
      * @return Latest version number, or -1 if unavailable
      */
     suspend fun getLatestVersion(buildingId: String): Int
+    /**
+     * Fetch the complete building package using a QR token.
+     *
+     * @param token The QR token scanned from the entrance
+     * @return Package JSON string, or null if not found
+     */
+    suspend fun fetchBuildingPackageByToken(token: String): String?
 }

@@ -228,8 +228,10 @@ class ArRouteRenderer {
     fun transformToAR(buildingX: Double, buildingY: Double, buildingZ: Double): FloatArray {
         val cosR = cos(rotationYRad)
         val sinR = sin(rotationYRad)
-        val rotatedX = buildingX * cosR + buildingZ * sinR
-        val rotatedZ = -buildingX * sinR + buildingZ * cosR
+        
+        // Standard CCW rotation: x' = x*cos - z*sin, z' = x*sin + z*cos
+        val rotatedX = buildingX * cosR - buildingZ * sinR
+        val rotatedZ = buildingX * sinR + buildingZ * cosR
 
         return floatArrayOf(
             (rotatedX + offsetX).toFloat(),
@@ -242,9 +244,9 @@ class ArRouteRenderer {
         val cosR = cos(rotationYRad)
         val sinR = sin(rotationYRad)
         return floatArrayOf(
-            (dx * cosR + dz * sinR).toFloat(),
+            (dx * cosR - dz * sinR).toFloat(),
             dy.toFloat(),
-            (-dx * sinR + dz * cosR).toFloat(),
+            (dx * sinR + dz * cosR).toFloat(),
         )
     }
 }

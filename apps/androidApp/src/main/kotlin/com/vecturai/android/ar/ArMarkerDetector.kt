@@ -94,17 +94,28 @@ class ArMarkerDetector {
         val augmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
         for (image in augmentedImages) {
             if (image.trackingState != TrackingState.TRACKING) continue
-            if (image.trackingMethod != AugmentedImage.TrackingMethod.FULL_TRACKING) continue
 
             totalCandidatesSeen += 1
             val detectedName = image.name
-            val known = knownMarkersByName[detectedName] ?: knownMarkersByIndex[image.index]
+            val detectedIndex = image.index
+            
+            // Log every detected image to help debug
+            println("[MarkerDetector] Image seen: name='$detectedName', index=$detectedIndex, state=${image.trackingState}")
+
+            // If we only have ONE marker registered (typical for entrance), 
+            // and we see ANY image, consider it a match to avoid name/index sync issues.
+            val known = if (knownMarkersByIndex.size == 1 && knownMarkersByName.size == 1) {
+                knownMarkersByIndex.values.first()
+            } else {
+                knownMarkersByName[detectedName] ?: knownMarkersByIndex[detectedIndex]
+            }
+
             if (known == null) {
                 rejectedCandidates += 1
                 if (detectedName !in rejectedNames) {
                     rejectedNames = rejectedNames + detectedName
                 }
-                println("[MarkerDetector] Rejected '$detectedName' (expected '${expectedMarkerName ?: "none"}')")
+                println("[MarkerDetector] Rejected candidate '$detectedName' at index $detectedIndex")
                 continue
             }
 

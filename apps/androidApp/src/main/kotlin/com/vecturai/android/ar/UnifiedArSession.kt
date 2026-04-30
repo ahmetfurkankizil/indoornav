@@ -32,6 +32,7 @@ class UnifiedArSession {
         activity: Activity,
         cameraTextureId: Int,
         marker: AndroidReviewedPackageLoader.PackageMarker?,
+        markerBitmap: Bitmap? = null,
     ): Boolean {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return false
@@ -46,7 +47,7 @@ class UnifiedArSession {
             return false
         }
 
-        val arSession = session ?: createSession(activity, marker).getOrElse { error ->
+        val arSession = session ?: createSession(activity, marker, markerBitmap).getOrElse { error ->
             finishWithToast(activity, detailFor(error, "AR camera could not start."))
             return false
         }
@@ -102,18 +103,50 @@ class UnifiedArSession {
         }
     }
 
+    /**
+     * Updates the AR session configuration with a new marker image.
+     */
+    fun reconfigure(
+        activity: Activity,
+        marker: AndroidReviewedPackageLoader.PackageMarker,
+        bitmap: Bitmap
+    ): Int {
+        val arSession = session ?: return -1
+        return try {
+            val config = Config(arSession).apply {
+                updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                focusMode = Config.FocusMode.AUTO
+                planeFindingMode = Config.PlaneFindingMode.HORIZONTAL
+            }
+
+            val imageDatabase = AugmentedImageDatabase(arSession)
+            val name = marker.referenceImageName ?: "dynamic_marker"
+            val imageIndex = imageDatabase.addImage(
+                name,
+                bitmap,
+                marker.physicalWidthMeters.toFloat(),
+            )
+            
+            if (imageIndex != -1) {
+                config.augmentedImageDatabase = imageDatabase
+                arSession.configure(config)
+                referenceImageIndex = imageIndex
+                println("[ARDiag] Session reconfigured with dynamic marker '$name' at index $imageIndex")
+                imageIndex
+            } else {
+                -1
+            }
+        } catch (t: Throwable) {
+            println("[ARDiag] Failed to reconfigure session: ${t.message}")
+            -1
+        }
+    }
+
     private fun createSession(
         activity: Activity,
         marker: AndroidReviewedPackageLoader.PackageMarker?,
+        markerBitmap: Bitmap? = null,
     ): Result<Session> {
-        val markerImageName = marker?.referenceImageName ?: DEFAULT_MARKER_IMAGE_NAME
-        val markerWidthMeters = marker?.physicalWidthMeters ?: DEFAULT_MARKER_WIDTH_METERS
-        val markerAssetPath = "ar/$markerImageName.png"
-
-        val bitmap = loadSanitizedBitmap(activity, markerAssetPath).getOrElse {
-            return Result.failure(it)
-        }
-
         return try {
             val arSession = Session(activity)
             val config = Config(arSession).apply {
@@ -123,27 +156,30 @@ class UnifiedArSession {
             }
 
             val imageDatabase = AugmentedImageDatabase(arSession)
-            val imageIndex = imageDatabase.addImage(
-                markerImageName,
-                bitmap,
-                markerWidthMeters.toFloat(),
-            )
-            bitmap.recycle()
+            
+            // Only add an image if we actually have one that is likely to be valid
+            val bitmap = markerBitmap ?: marker?.let { 
+                loadSanitizedBitmap(activity, "ar/${it.referenceImageName}.png").getOrNull()
+            }
 
-            if (imageIndex == -1) {
-                return Result.failure(
-                    IllegalStateException("Entrance poster image is not trackable by ARCore.")
+            if (bitmap != null) {
+                val markerWidthMeters = marker?.physicalWidthMeters ?: DEFAULT_MARKER_WIDTH_METERS
+                val imageIndex = imageDatabase.addImage(
+                    marker?.referenceImageName ?: DEFAULT_MARKER_IMAGE_NAME,
+                    bitmap,
+                    markerWidthMeters.toFloat(),
                 )
+                referenceImageIndex = if (imageIndex != -1) imageIndex else null
+            } else {
+                referenceImageIndex = null
             }
 
             config.augmentedImageDatabase = imageDatabase
             arSession.configure(config)
             session = arSession
-            referenceImageIndex = imageIndex
-            println("[ARDiag] Session created with '$markerImageName' ($markerWidthMeters m)")
+            println("[ARDiag] Session created (database size: ${imageDatabase.numImages})")
             Result.success(arSession)
         } catch (t: Throwable) {
-            bitmap.recycle()
             Result.failure(t)
         }
     }
@@ -194,7 +230,7 @@ class UnifiedArSession {
     }
 
     private companion object {
-        private const val DEFAULT_MARKER_IMAGE_NAME = "entrance_marker_main"
-        private const val DEFAULT_MARKER_WIDTH_METERS = 0.21
+        private const val DEFAULT_MARKER_IMAGE_NAME = "entrance_marker"
+        private const val DEFAULT_MARKER_WIDTH_METERS = 0.15
     }
 }

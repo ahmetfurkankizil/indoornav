@@ -1,16 +1,20 @@
 package com.vecturai.android.navigation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.ar.core.Frame
 import com.vecturai.android.data.AndroidReviewedPackageLoader
 import com.vecturai.android.qr.ArFrameQrScanner
 import com.vecturai.android.qr.QRPayload
+import com.vecturai.data.remote.RemoteBuildingDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AndroidNavigationFlowModel(
     private val packageLoader: AndroidReviewedPackageLoader,
+    private val remoteSource: RemoteBuildingDataSource,
 ) : ViewModel() {
 
     sealed interface HomeState {
@@ -44,6 +48,7 @@ class AndroidNavigationFlowModel(
 
 class ArCameraFlowViewModel(
     private val packageLoader: AndroidReviewedPackageLoader,
+    private val remoteSource: RemoteBuildingDataSource,
 ) : ViewModel() {
 
     sealed interface Phase {
@@ -62,6 +67,7 @@ class ArCameraFlowViewModel(
         val routePackage: AndroidReviewedPackageLoader.LoadedPackage? = null,
         val validatedEntranceMarker: AndroidReviewedPackageLoader.PackageMarker? = null,
         val reviewedConfig: AndroidReviewedPackageLoader.ReviewedConfig? = null,
+        val qrToken: String = "",
     )
 
     data class RouteSummary(
@@ -118,17 +124,30 @@ class ArCameraFlowViewModel(
             return false
         }
 
-        val config = _session.value.reviewedConfig ?: run {
-            _qrError.value = QRPayload.PayloadError.NotJSON.message
-            return false
+        // Token-based dynamic fetch
+        viewModelScope.launch {
+            _phase.value = Phase.Loading
+            val jsonString = remoteSource.fetchBuildingPackageByToken(payload.token)
+            if (jsonString == null) {
+                _qrError.value = "Building data not found on server"
+                _phase.value = Phase.QrScan
+                return@launch
+            }
+
+            packageLoader.parseUnifiedPackage(jsonString)
+                .onSuccess { config ->
+                    _session.value = _session.value.copy(
+                        reviewedConfig = config,
+                        qrToken = payload.token
+                    )
+                    confirmEntrance(payload)
+                }
+                .onFailure { error ->
+                    _qrError.value = "Failed to parse package: ${error.message}"
+                    _phase.value = Phase.QrScan
+                }
         }
 
-        payload.validate(config)?.let { error ->
-            _qrError.value = error.message
-            return false
-        }
-
-        confirmEntrance(payload)
         return true
     }
 
@@ -167,17 +186,8 @@ class ArCameraFlowViewModel(
     }
 
     private fun loadPackageForCameraFlow() {
-        packageLoader.loadReviewedPackage()
-            .onSuccess { config ->
-                _session.value = SessionData(reviewedConfig = config)
-                _phase.value = Phase.QrScan
-            }
-            .onFailure { error ->
-                _session.value = SessionData()
-                _phase.value = Phase.FatalError(
-                    error.message ?: "Unable to load navigation data",
-                )
-            }
+        // Initial state is just scanning, we fetch the package AFTER the scan
+        _phase.value = Phase.QrScan
     }
 
     private fun confirmEntrance(payload: QRPayload) {

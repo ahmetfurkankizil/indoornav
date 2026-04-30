@@ -82,6 +82,7 @@ class AndroidArNavigationViewModel(
     private var alignmentTimeoutJob: Job? = null
     private var lastPoseSampleMs = 0L
     private var lastHapticArrowId: String? = null
+    private var pendingSimulateAlignment = false
 
     fun configure(
         routePackage: AndroidReviewedPackageLoader.LoadedPackage,
@@ -148,26 +149,59 @@ class AndroidArNavigationViewModel(
         startAlignmentTimeout()
     }
 
-    fun simulateAlignment() {
-        val marker = entranceMarker ?: routePackage?.config?.entranceMarkers?.firstOrNull()
+    fun simulateAlignment(frame: Frame? = null) {
+        if (frame == null) {
+            pendingSimulateAlignment = true
+            return
+        }
+        pendingSimulateAlignment = false
+        val pkg = routePackage ?: return
+        val marker = entranceMarker ?: pkg.config.entranceMarkers.firstOrNull()
         _uiState.update { it.copy(isSimulated = true) }
         alignmentTimeoutJob?.cancel()
+
+        // 1. Get first segment direction from nodes to calculate initial path heading
+        val nodes = pkg.routeNodeIds.mapNotNull { id -> pkg.config.nodes.find { it.id == id } }
+        val pathHeadingDeg = if (nodes.size >= 2) {
+            val dx = nodes[1].x - nodes[0].x
+            val dz = nodes[1].z - nodes[0].z
+            Math.toDegrees(Math.atan2(dx, dz)) // Building-space heading
+        } else 0.0
+
+        // 2. Get Camera Forward Vector (ARCore forward is -Z)
+        val cameraPose = frame.camera.pose
+        val camX = cameraPose.tx().toDouble()
+        val camY = cameraPose.ty().toDouble()
+        val camZ = cameraPose.tz().toDouble()
+        
+        // Z-axis from pose points BACKWARD in ARCore. Forward is -Z.
+        val zAxis = cameraPose.zAxis
+        val camForwardX = -zAxis[0].toDouble()
+        val camForwardZ = -zAxis[2].toDouble()
+        val camYaw = Math.toDegrees(Math.atan2(camForwardX, camForwardZ))
+
+        val entranceNode = pkg.config.nodes.find { it.type == "entrance" }
+        val entranceNodeId = entranceNode?.id ?: "n01"
+
+        // 3. Align building path heading to camera yaw
         handleMarkerDetected(
             MarkerDetectionEvent(
                 markerId = marker?.id ?: "marker-main-entrance",
-                entranceNodeId = marker?.startNodeId ?: "n01",
-                markerBuildingX = marker?.position?.x ?: 0.0,
-                markerBuildingY = marker?.position?.y ?: 1.6,
-                markerBuildingZ = marker?.position?.z ?: 0.0,
-                markerArX = 0.0,
-                markerArY = 0.0,
-                markerArZ = -1.0,
-                markerArRotationYDeg = 0.0,
+                entranceNodeId = marker?.startNodeId ?: entranceNodeId,
+                markerBuildingX = marker?.position?.x ?: entranceNode?.x ?: 0.0,
+                markerBuildingY = marker?.position?.y ?: entranceNode?.y ?: 1.6,
+                markerBuildingZ = marker?.position?.z ?: entranceNode?.z ?: 0.0,
+                // Position 0.5m in front of camera
+                markerArX = camX + 0.5 * camForwardX,
+                markerArY = camY - 1.4,
+                markerArZ = camZ + 0.5 * camForwardZ,
+                markerArRotationYDeg = camYaw - pathHeadingDeg, 
                 markerBuildingRotationYDeg = marker?.rotationYDegrees ?: 0.0,
                 confidence = 1.0,
                 role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE,
             )
         )
+        println("[RouteDebug] Alignment: CamForward=($camForwardX, $camForwardZ), Yaw=$camYaw, PathHeading=$pathHeadingDeg")
     }
 
     fun advanceProgress() {
@@ -191,6 +225,9 @@ class AndroidArNavigationViewModel(
     }
 
     fun onFrame(frame: Frame, _width: Int, _height: Int) {
+        if (pendingSimulateAlignment) {
+            simulateAlignment(frame)
+        }
         markerDetector.processFrame(frame)
         updateTrackingStatus(frame)
 
@@ -243,6 +280,23 @@ class AndroidArNavigationViewModel(
         super.onCleared()
     }
 
+    fun registerDynamicMarker(index: Int, marker: AndroidReviewedPackageLoader.PackageMarker) {
+        val name = marker.referenceImageName ?: "dynamic_marker"
+        markerDetector.registerMarker(
+            index = index,
+            name = name,
+            marker = ArMarkerDetector.KnownMarker(
+                markerId = marker.id,
+                role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE,
+                nearestNodeId = marker.startNodeId,
+                buildingX = marker.position.x,
+                buildingY = marker.position.y,
+                buildingZ = marker.position.z,
+                buildingRotationYDeg = marker.rotationYDegrees ?: 0.0,
+            )
+        )
+    }
+
     private fun startAlignmentTimeout() {
         alignmentTimeoutJob?.cancel()
         alignmentTimeoutJob = viewModelScope.launch {
@@ -282,10 +336,13 @@ class AndroidArNavigationViewModel(
     private fun handleMarkerDetected(event: MarkerDetectionEvent) {
         alignmentTimeoutJob?.cancel()
         val rotDeg = event.markerArRotationYDeg - event.markerBuildingRotationYDeg
-        val cosR = cos(Math.toRadians(rotDeg))
-        val sinR = sin(Math.toRadians(rotDeg))
-        val rotatedBuildingX = event.markerBuildingX * cosR + event.markerBuildingZ * sinR
-        val rotatedBuildingZ = -event.markerBuildingX * sinR + event.markerBuildingZ * cosR
+        val rotRad = Math.toRadians(rotDeg)
+        val cosR = cos(rotRad)
+        val sinR = sin(rotRad)
+        
+        // Standard CCW rotation matrix
+        val rotatedBuildingX = event.markerBuildingX * cosR - event.markerBuildingZ * sinR
+        val rotatedBuildingZ = event.markerBuildingX * sinR + event.markerBuildingZ * cosR
 
         alignmentOffsetX = event.markerArX - rotatedBuildingX
         alignmentOffsetY = event.markerArY - event.markerBuildingY

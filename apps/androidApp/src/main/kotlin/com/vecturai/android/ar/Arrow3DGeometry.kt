@@ -184,8 +184,8 @@ internal object Arrow3DGeometry {
             (hex and 0xFF) / 255f,
         )
 
-    private val FOLLOW_COLORS = ArrowColors(rgb(0x3DB9FF), rgb(0x1366C2))
-    private val TURN_COLORS = ArrowColors(rgb(0xFFC355), rgb(0xB57105))
-    private val U_TURN_COLORS = ArrowColors(rgb(0xFB923C), rgb(0x9A3412))
-    private val DESTINATION_COLORS = ArrowColors(rgb(0x34D399), rgb(0x047857))
+    private val FOLLOW_COLORS = ArrowColors(rgb(0x168BFF), rgb(0x0A3A66)) // Vibrant Blue
+    private val TURN_COLORS = ArrowColors(rgb(0xFACC15), rgb(0xA16207))   // Vibrant Yellow (Amber-400)
+    private val U_TURN_COLORS = ArrowColors(rgb(0xFB923C), rgb(0x9A3412)) // Orange
+    private val DESTINATION_COLORS = ArrowColors(rgb(0x24E37A), rgb(0x064E3B)) // Emerald Green
 }

@@ -46,3 +46,8 @@ Pods/
 
 # Nav Preprocessor output
 output/
+
+node_modules/
+android/node_modules/
+.env
+**/.env

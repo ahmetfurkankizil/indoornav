@@ -8,8 +8,12 @@ import com.vecturai.android.ar.ArRouteRenderer
 import com.vecturai.android.data.AndroidReviewedPackageLoader
 import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
+import com.vecturai.android.VecturaiConfig
+import com.vecturai.data.remote.KtorBuildingDataSource
+import com.vecturai.data.remote.RemoteBuildingDataSource
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 /**
@@ -21,11 +25,16 @@ val androidModule = module {
     single { AndroidReviewedPackageLoader(androidContext()) }
     single { AndroidHapticManager(androidContext()) }
 
+    // Use our PC's IP for the remote data source
+    single<RemoteBuildingDataSource> { 
+        KtorBuildingDataSource(VecturaiConfig.API_BASE_URL)
+    }
+
     factory { ArMarkerDetector() }
     factory { ArRouteRenderer() }
 
-    viewModel { AndroidNavigationFlowModel(get()) }
-    viewModel { ArCameraFlowViewModel(get()) }
+    viewModel { AndroidNavigationFlowModel(get(), get()) }
+    viewModel { ArCameraFlowViewModel(get(), get()) }
     viewModel { AndroidArNavigationViewModel(get(), get(), get()) }
 
     // TODO: Provide Android-specific SqlDelight driver

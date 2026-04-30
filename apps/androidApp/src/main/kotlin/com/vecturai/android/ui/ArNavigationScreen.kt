@@ -99,16 +99,26 @@ fun ArNavigationScreen(
                         onRetry = onRetryActivity,
                         onEnd = onEnd,
                     )
-                !uiState.isAligned -> Column(Modifier.fillMaxSize()) {
-                    ArTopBar(uiState = uiState, onEnd = onEnd)
-                    Spacer(Modifier.weight(1f))
-                    AlignmentOverlay(
-                        uiState = uiState,
-                        onRetry = onRetryActivity,
-                        onCancel = onEnd,
-                        onSimulate = viewModel::simulateAlignment,
-                        allowSimulation = isEmulator,
+                !uiState.isAligned -> Box(Modifier.fillMaxSize()) {
+                    // Central Target Frame
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(260.dp)
+                            .border(2.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                     )
+                    
+                    Column(Modifier.fillMaxSize()) {
+                        ArTopBar(uiState = uiState, onEnd = onEnd)
+                        Spacer(Modifier.weight(1f))
+                        AlignmentOverlay(
+                            uiState = uiState,
+                            onRetry = onRetryActivity,
+                            onCancel = onEnd,
+                            onSimulate = viewModel::simulateAlignment,
+                            allowSimulation = isEmulator,
+                        )
+                    }
                 }
                 else -> ActiveNavigationOverlay(
                     uiState = uiState,
@@ -215,17 +225,17 @@ private fun AlignmentOverlay(
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        if (uiState.alignmentTimedOut) uiState.timeoutReasonMessage else "Looking for entrance sign...",
+                        if (uiState.alignmentTimedOut) uiState.timeoutReasonMessage else "Waiting for Alignment",
                         color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 2,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else "Point your camera at the entrance poster",
-                        color = Color(0xFF8A95A8),
-                        fontSize = 13.sp,
+                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else "Point your camera back at the QR code you just scanned.",
+                        color = Color(0xFFB6BFCE),
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         lineHeight = 18.sp,
                         maxLines = 2,

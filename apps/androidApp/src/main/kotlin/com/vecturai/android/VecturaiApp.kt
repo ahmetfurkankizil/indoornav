@@ -20,7 +20,6 @@ class VecturaiApp : Application() {
             modules(
                 coreModule,
                 dataLocalModule,
-                dataRemoteModule,
                 featureSearchModule,
                 featureRoutingModule,
                 featureHistoryModule,
