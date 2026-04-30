@@ -3,7 +3,6 @@ package com.vecturai.android.ar
 import android.Manifest
 import android.content.pm.PackageManager
 import android.opengl.GLSurfaceView
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -56,6 +55,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.Frame
+import com.vecturai.android.DeviceEnvironment
 import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.ui.ArNavigationScreen
 import com.vecturai.android.ui.DestinationSelectScreen
@@ -82,7 +82,7 @@ class ArCameraActivity : ComponentActivity() {
     private var resumeJob: Job? = null
     private var cameraTextureId = 0
     private var askedForPermission = false
-    private val isEmulator by lazy { isLikelyEmulator() }
+    private val isEmulator by lazy { DeviceEnvironment.isLikelyEmulator() }
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -179,7 +179,7 @@ class ArCameraActivity : ComponentActivity() {
                 ArCameraFlowViewModel.Phase.QrScan -> QRScanScreen(
                     flowModel = flowModel,
                     onCancel = ::finishFlow,
-                    onSimulateScan = ::simulateEntranceScan,
+                    onSimulateScan = if (isEmulator) ::simulateEntranceScan else null,
                 )
                 is ArCameraFlowViewModel.Phase.EntranceConfirmed -> EntranceConfirmedSheet(
                     entranceName = currentPhase.entranceName,
@@ -201,6 +201,7 @@ class ArCameraActivity : ComponentActivity() {
                         }
                         ArNavigationScreen(
                             viewModel = arViewModel,
+                            isEmulator = isEmulator,
                             onEnd = ::finishFlow,
                             onRetryActivity = ::recreate,
                         )
@@ -281,39 +282,6 @@ class ArCameraActivity : ComponentActivity() {
 
     private fun hasCameraPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-
-    private fun isLikelyEmulator(): Boolean {
-        val fingerprint = Build.FINGERPRINT.lowercase()
-        val model = Build.MODEL.lowercase()
-        val manufacturer = Build.MANUFACTURER.lowercase()
-        val brand = Build.BRAND.lowercase()
-        val device = Build.DEVICE.lowercase()
-        val product = Build.PRODUCT.lowercase()
-        val hardware = Build.HARDWARE.lowercase()
-        val board = Build.BOARD.lowercase()
-        val bootloader = Build.BOOTLOADER.lowercase()
-        return fingerprint.startsWith("generic") ||
-            fingerprint.contains("emulator") ||
-            fingerprint.contains("sdk_gphone") ||
-            fingerprint.contains("sdk_phone") ||
-            model.contains("google_sdk") ||
-            model.contains("sdk_gphone") ||
-            model.contains("sdk phone") ||
-            model.contains("emulator") ||
-            model.contains("android sdk built for") ||
-            hardware.contains("goldfish") ||
-            hardware.contains("ranchu") ||
-            board.contains("goldfish") ||
-            board.contains("ranchu") ||
-            bootloader.contains("unknown") ||
-            manufacturer.contains("genymotion") ||
-            (brand.startsWith("generic") && device.startsWith("generic")) ||
-            product == "google_sdk" ||
-            product.contains("sdk_gphone") ||
-            product.contains("sdk_phone") ||
-            product.contains("emulator") ||
-            product.contains("vbox")
-    }
 
     private companion object {
         const val DEMO_QR_PAYLOAD =

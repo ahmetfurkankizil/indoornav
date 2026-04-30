@@ -1,6 +1,5 @@
 package com.vecturai.android.ui
 
-import android.os.Build
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
@@ -85,6 +84,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ArNavigationScreen(
     viewModel: AndroidArNavigationViewModel,
+    isEmulator: Boolean,
     onEnd: () -> Unit,
     onRetryActivity: () -> Unit,
 ) {
@@ -114,6 +114,7 @@ fun ArNavigationScreen(
                         onRetry = onRetryActivity,
                         onCancel = onEnd,
                         onSimulate = viewModel::simulateAlignment,
+                        allowSimulation = isEmulator,
                     )
                 }
                 else -> ActiveNavigationOverlay(
@@ -238,6 +239,7 @@ private fun AlignmentOverlay(
     onRetry: () -> Unit,
     onCancel: () -> Unit,
     onSimulate: () -> Unit,
+    allowSimulation: Boolean,
 ) {
     Surface(
         modifier = Modifier
@@ -307,7 +309,7 @@ private fun AlignmentOverlay(
                 }
             }
 
-            if (isLikelyEmulator()) {
+            if (allowSimulation) {
                 Button(
                     onClick = onSimulate,
                     modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -959,20 +961,3 @@ private fun formatEta(seconds: Double): String {
 private fun Double.roundMeters(): String = "%.0f".format(this)
 
 private fun Int.stepLabel(): String = if (this == 1) "Step" else "Steps"
-
-private fun isLikelyEmulator(): Boolean {
-    val fingerprint = Build.FINGERPRINT.lowercase()
-    val model = Build.MODEL.lowercase()
-    val manufacturer = Build.MANUFACTURER.lowercase()
-    val brand = Build.BRAND.lowercase()
-    val device = Build.DEVICE.lowercase()
-    val product = Build.PRODUCT.lowercase()
-    return fingerprint.startsWith("generic") ||
-        fingerprint.contains("emulator") ||
-        model.contains("google_sdk") ||
-        model.contains("emulator") ||
-        model.contains("android sdk built for") ||
-        manufacturer.contains("genymotion") ||
-        (brand.startsWith("generic") && device.startsWith("generic")) ||
-        product == "google_sdk"
-}
