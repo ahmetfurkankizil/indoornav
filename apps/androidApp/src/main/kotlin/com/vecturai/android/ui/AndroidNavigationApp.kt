@@ -30,6 +30,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
@@ -70,6 +71,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -453,6 +456,9 @@ fun DestinationSelectScreen(
     val groupedFilteredRooms = remember(filteredRooms, searchText) {
         if (searchText.isBlank()) groupedRooms(filteredRooms) else emptyList()
     }
+    val routeSummaries = remember(orderedRooms, session.reviewedConfig) {
+        orderedRooms.associate { room -> room.id to flowModel.routeSummaryFor(room) }
+    }
     val recentRooms = remember(rooms) {
         listOfNotNull(
             rooms.firstOrNull { it.id == "cs-lab" },
@@ -557,6 +563,7 @@ fun DestinationSelectScreen(
                         recentRooms.forEach { room ->
                             RecentDestinationCard(
                                 room = room,
+                                routeSummary = routeSummaries[room.id],
                                 modifier = Modifier.weight(1f),
                                 onClick = { flowModel.selectDestination(room) },
                             )
@@ -592,6 +599,7 @@ fun DestinationSelectScreen(
                     items(categoryRooms, key = { it.id }) { room ->
                         DestinationRow(
                             room = room,
+                            routeSummary = routeSummaries[room.id],
                             onClick = { flowModel.selectDestination(room) },
                         )
                     }
@@ -600,6 +608,7 @@ fun DestinationSelectScreen(
                 items(filteredRooms, key = { it.id }) { room ->
                     DestinationRow(
                         room = room,
+                        routeSummary = routeSummaries[room.id],
                         onClick = { flowModel.selectDestination(room) },
                     )
                 }
@@ -638,7 +647,9 @@ private fun SearchField(
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = "Search destinations" },
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier
@@ -736,6 +747,7 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun RecentDestinationCard(
     room: AndroidReviewedPackageLoader.PackageRoom,
+    routeSummary: ArCameraFlowViewModel.RouteSummary?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -749,7 +761,7 @@ private fun RecentDestinationCard(
         border = BorderStroke(1.dp, Color(0xFF233149)),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp),
+            modifier = Modifier.padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
@@ -767,14 +779,24 @@ private fun RecentDestinationCard(
                 )
             }
             Spacer(Modifier.width(11.dp))
-            Text(
-                text = room.prettyDestinationName(),
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = room.prettyDestinationName(),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = routeSummary?.walkTimeText() ?: displayNameForCategory(room.category ?: "other"),
+                    color = Color(0xFF6F7B8E),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
@@ -782,6 +804,7 @@ private fun RecentDestinationCard(
 @Composable
 private fun DestinationRow(
     room: AndroidReviewedPackageLoader.PackageRoom,
+    routeSummary: ArCameraFlowViewModel.RouteSummary?,
     onClick: () -> Unit,
 ) {
     val accent = destinationAccent(room)
@@ -844,7 +867,7 @@ private fun DestinationRow(
                     )
                     Spacer(Modifier.width(3.dp))
                     Text(
-                        text = room.walkTimeLabel(),
+                        text = routeSummary?.walkTimeText() ?: "Route",
                         color = Color(0xFFB5BECC),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -853,10 +876,12 @@ private fun DestinationRow(
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = room.distanceLabel(),
+                text = routeSummary?.distanceText() ?: displayNameForCategory(room.category ?: "other"),
                 color = Color(0xFF657185),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Spacer(Modifier.width(8.dp))
@@ -898,10 +923,13 @@ private fun EmptyRoomsState(searchText: String) {
 @Composable
 fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     val session by flowModel.session.collectAsState()
-    val distance = session.routePackage?.totalDistance ?: 0.0
+    val routePackage = session.routePackage
+    val distance = routePackage?.totalDistance ?: 0.0
+    val routeStepCount = routePackage?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
     val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
     val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
-    val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "41 m"
+    val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
+    val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
 
     Box(
         modifier = Modifier
@@ -928,7 +956,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                         .clip(RoundedCornerShape(13.dp))
                         .background(Color(0xFF121A28))
                         .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
-                        .clickable(onClick = flowModel::goBackToDestinationSelect),
+                        .clickable(role = Role.Button, onClick = flowModel::goBackToDestinationSelect),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -971,13 +999,26 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                 }
             }
 
-            Spacer(Modifier.height(54.dp))
+            Spacer(Modifier.height(32.dp))
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 RouteSummaryCard(
+                    originName = originName,
+                    destinationName = destinationName,
+                    distanceText = distanceText,
+                    walkingTimeText = walkingTimeText,
+                    stepCount = routeStepCount,
+                )
+
+                Spacer(Modifier.height(18.dp))
+
+                RouteStepsCard(
                     originName = originName,
                     destinationName = destinationName,
                     distanceText = distanceText,
@@ -985,14 +1026,9 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
 
                 Spacer(Modifier.height(18.dp))
 
-                RouteStepsCard(destinationName = destinationName)
-
-                Spacer(Modifier.height(18.dp))
-
                 RouteReadyCard()
+                Spacer(Modifier.height(20.dp))
             }
-
-            Spacer(Modifier.weight(1f))
 
             Row(
                 modifier = Modifier
@@ -1000,7 +1036,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                     .height(56.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(Color(0xFF168BFF))
-                    .clickable(onClick = flowModel::startNavigation),
+                    .clickable(role = Role.Button, onClick = flowModel::startNavigation),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -1083,6 +1119,8 @@ private fun RouteSummaryCard(
     originName: String,
     destinationName: String,
     distanceText: String,
+    walkingTimeText: String,
+    stepCount: Int,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -1099,7 +1137,7 @@ private fun RouteSummaryCard(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "< 1 min",
+                        text = walkingTimeText,
                         color = Color.White,
                         fontSize = 31.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -1107,7 +1145,7 @@ private fun RouteSummaryCard(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "$distanceText - 3 steps - Ground Floor",
+                        text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - Ground Floor",
                         color = Color(0xFF6F7B8E),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -1168,12 +1206,13 @@ private fun RouteSummaryCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                Text(
-                    text = "->",
-                    color = Color(0xFF667286),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 14.dp),
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Color(0xFF667286),
+                    modifier = Modifier
+                        .padding(horizontal = 14.dp)
+                        .size(20.dp),
                 )
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                     Text(
@@ -1197,7 +1236,11 @@ private fun RouteSummaryCard(
 }
 
 @Composable
-private fun RouteStepsCard(destinationName: String) {
+private fun RouteStepsCard(
+    originName: String,
+    destinationName: String,
+    distanceText: String,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
@@ -1215,11 +1258,19 @@ private fun RouteStepsCard(destinationName: String) {
                 letterSpacing = 0.sp,
             )
             Spacer(Modifier.height(14.dp))
-            RouteStepRow(number = 1, title = "Walk straight through the main corridor", distance = "25 m")
+            RouteStepRow(number = 1, title = "Start from $originName", distance = "Entrance")
             Spacer(Modifier.height(14.dp))
-            RouteStepRow(number = 2, title = "Turn right at the junction", distance = "10 m")
+            RouteStepRow(
+                number = 2,
+                title = "Follow the highlighted route",
+                distance = "$distanceText total",
+            )
             Spacer(Modifier.height(14.dp))
-            RouteStepRow(number = 3, title = "$destinationName is on your left", distance = "6 m")
+            RouteStepRow(
+                number = 3,
+                title = "Arrive at $destinationName",
+                distance = "Destination",
+            )
         }
     }
 }
@@ -1455,7 +1506,7 @@ fun GradientPrimaryButton(text: String, icon: ImageVector, onClick: () -> Unit, 
                     listOf(Color(0xFF2563EB), Color(0xFF1D4ED8)),
                 )
             )
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -1472,35 +1523,13 @@ private fun AndroidReviewedPackageLoader.PackageRoom.prettyDestinationName(): St
 private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String = when (id) {
     "ea101" -> "Ground Floor - East Wing"
     "ea102" -> "Ground Floor - East Wing"
-    "cs-lab" -> "Ground Floor - Computer Sci..."
+    "cs-lab" -> "Ground Floor - Computer Science"
     "me-lab" -> "First Floor - Northeast Wing"
     "fameo-cafe" -> "Ground Floor - East Corridor"
     "elevators" -> "Ground Floor - Main Core"
     "west-men-wc", "west-women-wc" -> "Ground Floor - West Wing"
     "east-men-wc", "east-women-wc" -> "Ground Floor - East Wing"
     else -> description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(category ?: "other")
-}
-
-private fun AndroidReviewedPackageLoader.PackageRoom.walkTimeLabel(): String = when (id) {
-    "ea101" -> "2 min"
-    "ea102" -> "3 min"
-    "cs-lab" -> "<1 min"
-    "me-lab" -> "4 min"
-    "fameo-cafe" -> "2 min"
-    "elevators" -> "1 min"
-    "west-men-wc", "west-women-wc", "east-men-wc", "east-women-wc" -> "2 min"
-    else -> "2 min"
-}
-
-private fun AndroidReviewedPackageLoader.PackageRoom.distanceLabel(): String = when (id) {
-    "ea101" -> "95 m"
-    "ea102" -> "120 m"
-    "cs-lab" -> "41 m"
-    "me-lab" -> "180 m"
-    "fameo-cafe" -> "70 m"
-    "elevators" -> "35 m"
-    "west-men-wc", "west-women-wc", "east-men-wc", "east-women-wc" -> "65 m"
-    else -> "80 m"
 }
 
 private fun destinationSortIndex(id: String): Int = when (id) {
@@ -1573,5 +1602,13 @@ private fun formatWalkingTime(seconds: Double): String {
     if (seconds < 60.0) return "< 1 min"
     return "~${ceil(seconds / 60.0).toInt()} min"
 }
+
+private fun ArCameraFlowViewModel.RouteSummary.walkTimeText(): String =
+    formatWalkingTime(distanceMeters / 1.2)
+
+private fun ArCameraFlowViewModel.RouteSummary.distanceText(): String =
+    "${distanceMeters.formatMeters()} m"
+
+private fun Int.stepLabel(): String = if (this == 1) "Step" else "Steps"
 
 private fun Double.formatMeters(): String = "%.0f".format(this)

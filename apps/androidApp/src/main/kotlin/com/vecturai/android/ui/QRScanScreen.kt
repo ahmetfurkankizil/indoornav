@@ -55,7 +55,7 @@ fun QRScanScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18).copy(alpha = 0.92f))
+            .background(Color.Black.copy(alpha = 0.4f))
     ) {
         ScanDotBackground()
         QRScanChrome(

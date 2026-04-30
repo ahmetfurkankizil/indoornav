@@ -64,6 +64,11 @@ class ArCameraFlowViewModel(
         val reviewedConfig: AndroidReviewedPackageLoader.ReviewedConfig? = null,
     )
 
+    data class RouteSummary(
+        val distanceMeters: Double,
+        val stepCount: Int,
+    )
+
     private val _phase = MutableStateFlow<Phase>(Phase.Loading)
     val phase: StateFlow<Phase> = _phase.asStateFlow()
 
@@ -79,6 +84,15 @@ class ArCameraFlowViewModel(
 
     val availableRooms: List<AndroidReviewedPackageLoader.PackageRoom>
         get() = _session.value.reviewedConfig?.rooms.orEmpty()
+
+    fun routeSummaryFor(room: AndroidReviewedPackageLoader.PackageRoom): RouteSummary? {
+        val config = _session.value.reviewedConfig ?: return null
+        val routePackage = packageLoader.computeRoute(config, room.id) ?: return null
+        return RouteSummary(
+            distanceMeters = routePackage.totalDistance,
+            stepCount = (routePackage.routeNodeIds.size - 1).coerceAtLeast(1),
+        )
+    }
 
     init {
         loadPackageForCameraFlow()

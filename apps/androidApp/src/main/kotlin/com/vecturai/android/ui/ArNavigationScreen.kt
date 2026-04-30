@@ -96,29 +96,31 @@ fun ArNavigationScreen(
         if (uiState.hasArrived) {
             ArrivalOverlay(uiState, onEnd)
         } else {
-            Column(Modifier.fillMaxSize()) {
-                ArTopBar(uiState = uiState, onEnd = onEnd)
-                Spacer(Modifier.weight(1f))
-                when {
-                    uiState.markerAssetError != null -> ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
-                    uiState.sessionErrorMessage != null -> SessionErrorOverlay(
+            when {
+                uiState.markerAssetError != null ->
+                    ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
+                uiState.sessionErrorMessage != null ->
+                    SessionErrorOverlay(
                         message = uiState.sessionErrorMessage.orEmpty(),
                         isArCoreInstall = uiState.sessionErrorIsArCoreInstall,
                         onRetry = onRetryActivity,
                         onEnd = onEnd,
                     )
-                    !uiState.isAligned -> AlignmentOverlay(
+                !uiState.isAligned -> Column(Modifier.fillMaxSize()) {
+                    ArTopBar(uiState = uiState, onEnd = onEnd)
+                    Spacer(Modifier.weight(1f))
+                    AlignmentOverlay(
                         uiState = uiState,
                         onRetry = onRetryActivity,
                         onCancel = onEnd,
                         onSimulate = viewModel::simulateAlignment,
                     )
-                    else -> ActiveNavigationOverlay(
-                        uiState = uiState,
-                        onEnd = onEnd,
-                        onAdvance = viewModel::advanceProgress,
-                    )
                 }
+                else -> ActiveNavigationOverlay(
+                    uiState = uiState,
+                    onEnd = onEnd,
+                    onAdvance = viewModel::advanceProgress,
+                )
             }
         }
     }
