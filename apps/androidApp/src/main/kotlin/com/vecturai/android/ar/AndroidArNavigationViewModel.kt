@@ -25,10 +25,13 @@ data class ArNavigationUiState(
     val trackingStatusLabel: String = "Tracking",
     val trackingStatusIcon: TrackingStatusIcon = TrackingStatusIcon.Location,
     val destinationLabel: String = "",
+    val arrivalLocationLabel: String = "",
     val arrowCount: Int = 0,
     val isAligned: Boolean = false,
     val hasArrived: Boolean = false,
     val isSimulated: Boolean = false,
+    val totalDistance: Double = 0.0,
+    val routeStepCount: Int = 0,
     val progress: Double = 0.0,
     val remainingDistance: Double = 0.0,
     val distanceToDestination: Double = 0.0,
@@ -119,6 +122,11 @@ class AndroidArNavigationViewModel(
         _uiState.value = ArNavigationUiState(
             sessionStateLabel = "Waiting for Poster",
             destinationLabel = routePackage.destinationName,
+            arrivalLocationLabel = routePackage.config.manifest.run {
+                formatArrivalLocation(buildingName = buildingName, floorId = floorId)
+            },
+            totalDistance = routePackage.totalDistance,
+            routeStepCount = (routePackage.routeNodeIds.size - 1).coerceAtLeast(1),
             remainingDistance = routePackage.totalDistance,
         )
         startAlignmentTimeout()
@@ -228,6 +236,8 @@ class AndroidArNavigationViewModel(
                 isAligned = false,
                 hasArrived = false,
                 isSimulated = false,
+                totalDistance = 0.0,
+                routeStepCount = 0,
                 progress = 0.0,
                 remainingDistance = 0.0,
                 distanceToDestination = 0.0,
@@ -505,5 +515,18 @@ class AndroidArNavigationViewModel(
                 projectedArrows = emptyList(),
             )
         }
+    }
+
+    private fun formatArrivalLocation(buildingName: String, floorId: String): String {
+        val building = buildingName.trim()
+        val floor = floorId.trim()
+        val floorLabel = when {
+            floor.isBlank() -> ""
+            floor.startsWith("floor", ignoreCase = true) -> floor
+            else -> "Floor $floor"
+        }
+        return listOf(building, floorLabel)
+            .filter { it.isNotBlank() }
+            .joinToString(" - ")
     }
 }

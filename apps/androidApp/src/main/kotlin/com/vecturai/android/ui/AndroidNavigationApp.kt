@@ -4,28 +4,32 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
@@ -44,19 +48,14 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -70,6 +69,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -96,7 +97,6 @@ fun AndroidNavigationApp(
         ) {
             when (val current = state) {
                 AndroidNavigationFlowModel.HomeState.Home -> HomeScreen(
-                    flowModel = flowModel,
                     onStartNavigation = onStartNavigation,
                 )
                 is AndroidNavigationFlowModel.HomeState.PackageError -> PackageErrorScreen(
@@ -111,7 +111,6 @@ fun AndroidNavigationApp(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
-    flowModel: AndroidNavigationFlowModel,
     onStartNavigation: () -> Unit,
 ) {
     var showAdminTools by remember { mutableStateOf(false) }
@@ -126,14 +125,18 @@ private fun HomeScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .statusBarsPadding()
                 .padding(top = 8.dp, end = 16.dp)
-                .size(40.dp)
+                .size(44.dp)
                 .clip(RoundedCornerShape(14.dp))
                 .background(Color(0xFF121A28).copy(alpha = 0.92f))
                 .border(1.dp, Color(0xFF253149), RoundedCornerShape(14.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            IconButton(onClick = { showAdminTools = true }) {
+            IconButton(
+                onClick = { showAdminTools = true },
+                modifier = Modifier.size(44.dp),
+            ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Admin Tools",
@@ -146,6 +149,8 @@ private fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .padding(horizontal = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -186,12 +191,13 @@ private fun HomeScreen(
             Spacer(Modifier.height(28.dp))
 
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FeaturePill("Live AR")
-                FeaturePill("Smart Routes")
-                FeaturePill("Indoor Maps")
+                FeaturePill("Live AR", Modifier.weight(1f))
+                FeaturePill("Smart Routes", Modifier.weight(1f))
+                FeaturePill("Indoor Maps", Modifier.weight(1f))
             }
 
             Spacer(Modifier.weight(1f))
@@ -200,13 +206,6 @@ private fun HomeScreen(
 
             Spacer(Modifier.height(18.dp))
 
-            Text(
-                text = "Enter code manually",
-                color = Color(0xFF697486),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(18.dp))
             Text(
                 text = "Scan the QR code at any building entrance",
                 color = Color(0xFF465164),
@@ -219,18 +218,73 @@ private fun HomeScreen(
     }
 
     if (showAdminTools) {
-        ModalBottomSheet(onDismissRequest = { showAdminTools = false }) {
+        ModalBottomSheet(
+            onDismissRequest = { showAdminTools = false },
+            containerColor = Color(0xFF101827),
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("Admin Tools", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text(
-                    "No draft jobs to show on this device.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFF071C33)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = null,
+                            tint = Color(0xFF168BFF),
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            "Admin Tools",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                        Text(
+                            "Draft jobs are not available on this device.",
+                            color = Color(0xFF8A95A8),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF151F31),
+                    border = BorderStroke(1.dp, Color(0xFF233149)),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.WorkspacePremium,
+                            contentDescription = null,
+                            tint = Color(0xFF2563EB),
+                            modifier = Modifier.size(22.dp),
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            "Visitor navigation is ready. Admin review tools stay separate from the demo flow.",
+                            color = Color(0xFFB6BFCE),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            lineHeight = 18.sp,
+                        )
+                    }
+                }
                 Spacer(Modifier.height(16.dp))
             }
         }
@@ -259,8 +313,9 @@ private fun DotGridBackground() {
 }
 
 @Composable
-private fun FeaturePill(text: String) {
+private fun FeaturePill(text: String, modifier: Modifier = Modifier) {
     Surface(
+        modifier = modifier,
         shape = RoundedCornerShape(50),
         color = Color(0xFF071C33).copy(alpha = 0.72f),
         border = BorderStroke(1.dp, Color(0xFF0B60AE)),
@@ -271,6 +326,7 @@ private fun FeaturePill(text: String) {
             color = Color(0xFF238CFF),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
             maxLines = 1,
         )
     }
@@ -284,7 +340,7 @@ private fun WelcomePrimaryButton(onClick: () -> Unit) {
             .height(56.dp)
             .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFF168BFF))
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -307,21 +363,72 @@ private fun WelcomePrimaryButton(onClick: () -> Unit) {
 
 @Composable
 private fun PackageErrorScreen(message: String, onRetry: () -> Unit) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+            .background(Color(0xFF070D18)),
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(56.dp), tint = Color(0xFFF59E0B))
-        Spacer(Modifier.height(20.dp))
-        Text("Unable to Load Navigation Data", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(8.dp))
-        Text(message, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(24.dp))
-        Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-            Text("Try Again")
+        DotGridBackground()
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            shape = RoundedCornerShape(22.dp),
+            color = Color(0xFF151F31),
+            border = BorderStroke(1.dp, Color(0xFF233149)),
+        ) {
+            Column(
+                modifier = Modifier.padding(22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Color(0xFF3B2A08)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xFFF59E0B),
+                    )
+                }
+                Text(
+                    "Unable to load navigation data",
+                    color = Color.White,
+                    fontSize = 21.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    message,
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF8A95A8),
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0xFF168BFF))
+                        .clickable(role = Role.Button, onClick = onRetry),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Try Again",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                }
+            }
         }
     }
 }
@@ -333,105 +440,454 @@ fun DestinationSelectScreen(
 ) {
     val session by flowModel.session.collectAsState()
     var searchText by remember { mutableStateOf("") }
+    var selectedFilter by remember { mutableStateOf(DestinationFilter.All) }
     val rooms = flowModel.availableRooms
-    val filteredRooms = if (searchText.isBlank()) {
-        rooms
-    } else {
-        rooms.filter {
-            it.displayName.contains(searchText, ignoreCase = true) ||
-                (it.category?.contains(searchText, ignoreCase = true) == true)
-        }
+    val orderedRooms = remember(rooms) { rooms.sortedBy { destinationSortIndex(it.id) } }
+    val filteredRooms = orderedRooms.filter { room ->
+        val matchesSearch = searchText.isBlank() ||
+            room.displayName.contains(searchText, ignoreCase = true) ||
+            room.description?.contains(searchText, ignoreCase = true) == true ||
+            room.category?.contains(searchText, ignoreCase = true) == true
+        matchesSearch && selectedFilter.matches(room)
     }
-    val groupedRooms = remember(filteredRooms, searchText) {
-        if (searchText.isNotBlank()) {
-            emptyList()
-        } else {
-            groupedRooms(filteredRooms)
-        }
+    val groupedFilteredRooms = remember(filteredRooms, searchText) {
+        if (searchText.isBlank()) groupedRooms(filteredRooms) else emptyList()
     }
+    val recentRooms = remember(rooms) {
+        listOfNotNull(
+            rooms.firstOrNull { it.id == "cs-lab" },
+            rooms.firstOrNull { it.id == "fameo-cafe" },
+        ).ifEmpty { rooms.take(2) }
+    }
+    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
 
-    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        CenteredTopBar(
-            title = "Choose Destination",
-            onBack = onCancel,
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF070D18)),
+    ) {
+        DotGridBackground()
 
-        Row(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 22.dp),
+            contentPadding = PaddingValues(bottom = 28.dp),
         ) {
-            Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
-            Text(
-                "From: ${session.confirmedEntrance}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+            item {
+                Spacer(Modifier.height(18.dp))
 
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { searchText = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = { searchText = "" }) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear")
-                    }
-                }
-            },
-            singleLine = true,
-            placeholder = { Text("Search rooms...") },
-            shape = RoundedCornerShape(10.dp),
-        )
-
-        HorizontalDivider()
-
-        if (filteredRooms.isEmpty()) {
-            EmptyRoomsState(searchText)
-        } else if (searchText.isNotBlank()) {
-            LazyColumn(Modifier.fillMaxSize()) {
-                items(filteredRooms, key = { it.id }) { room ->
-                    RoomRow(room = room, onClick = { flowModel.selectDestination(room) })
-                }
-            }
-        } else {
-            LazyColumn(Modifier.fillMaxSize()) {
-                groupedRooms.forEach { (category, categoryRooms) ->
-                    item(key = "header-$category") {
-                        Text(
-                            displayNameForCategory(category).uppercase(),
-                            modifier = Modifier.padding(start = 16.dp, top = 18.dp, bottom = 4.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(13.dp))
+                            .background(Color(0xFF121A28))
+                            .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
+                            .clickable(role = Role.Button, onClick = onCancel),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color(0xFF168BFF),
+                            modifier = Modifier.size(21.dp),
                         )
                     }
-                    items(categoryRooms, key = { it.id }) { room ->
-                        RoomRow(room = room, onClick = { flowModel.selectDestination(room) })
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = "Where to?",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            lineHeight = 26.sp,
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF10D978)),
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "From $originName",
+                                color = Color(0xFF7F8A9D),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                SearchField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                ) {
+                    DestinationFilter.entries.forEach { filter ->
+                        DestinationFilterChip(
+                            filter = filter,
+                            selected = selectedFilter == filter,
+                            onClick = { selectedFilter = filter },
+                        )
+                    }
+                }
+
+                if (searchText.isBlank() && selectedFilter == DestinationFilter.All && recentRooms.isNotEmpty()) {
+                    Spacer(Modifier.height(18.dp))
+                    SectionLabel("RECENTLY VISITED")
+                    Spacer(Modifier.height(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        recentRooms.forEach { room ->
+                            RecentDestinationCard(
+                                room = room,
+                                modifier = Modifier.weight(1f),
+                                onClick = { flowModel.selectDestination(room) },
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SectionLabel(if (searchText.isBlank()) "LOCATIONS" else "SEARCH RESULTS")
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = "${filteredRooms.size} places",
+                        color = Color(0xFF5C6779),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+
+            if (filteredRooms.isEmpty()) {
+                item {
+                    EmptyRoomsState(searchText)
+                }
+            } else if (groupedFilteredRooms.isNotEmpty()) {
+                groupedFilteredRooms.forEach { (category, categoryRooms) ->
+                    item(key = "header-$category") {
+                        Spacer(Modifier.height(10.dp))
+                        SectionLabel(displayNameForCategory(category).uppercase())
+                        Spacer(Modifier.height(2.dp))
+                    }
+                    items(categoryRooms, key = { it.id }) { room ->
+                        DestinationRow(
+                            room = room,
+                            onClick = { flowModel.selectDestination(room) },
+                        )
+                    }
+                }
+            } else {
+                items(filteredRooms, key = { it.id }) { room ->
+                    DestinationRow(
+                        room = room,
+                        onClick = { flowModel.selectDestination(room) },
+                    )
                 }
             }
         }
     }
 }
 
+private enum class DestinationFilter(val label: String) {
+    All("All"),
+    Rooms("Rooms"),
+    Labs("Labs"),
+    Food("Food"),
+    Services("Services");
+
+    fun matches(room: AndroidReviewedPackageLoader.PackageRoom): Boolean = when (this) {
+        All -> true
+        Rooms -> room.category == "classroom" || room.category == "office"
+        Labs -> room.category == "lab"
+        Food -> room.category == "cafe" || room.category == "kitchen"
+        Services -> room.category == "toilet" || room.category == "vertical_transport"
+    }
+}
+
+@Composable
+private fun SearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = TextStyle(
+            color = Color.White,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color(0xFF121A28))
+                    .border(1.dp, Color(0xFF1E2B40), RoundedCornerShape(14.dp))
+                    .padding(horizontal = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = Color(0xFF657185),
+                    modifier = Modifier.size(21.dp),
+                )
+                Spacer(Modifier.width(10.dp))
+                Box(Modifier.weight(1f)) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = "Search rooms, labs, facilities...",
+                            color = Color(0xFF667286),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                    innerTextField()
+                }
+                if (value.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .clickable(role = Role.Button) { onValueChange("") },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear search",
+                            tint = Color(0xFF657185),
+                            modifier = Modifier.size(19.dp),
+                        )
+                    }
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun DestinationFilterChip(
+    filter: DestinationFilter,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val background = if (selected) Color(0xFF168BFF) else Color(0xFF121A28)
+    val textColor = if (selected) Color.White else Color(0xFF8994A6)
+    Surface(
+        modifier = Modifier
+            .height(40.dp)
+            .clickable(role = Role.Button, onClick = onClick),
+        shape = RoundedCornerShape(50),
+        color = background,
+        border = if (selected) null else BorderStroke(1.dp, Color(0xFF1E2B40)),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = filter.label,
+                color = textColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        color = Color(0xFF6D7788),
+        fontSize = 13.sp,
+        fontWeight = FontWeight.ExtraBold,
+        letterSpacing = 0.sp,
+    )
+}
+
+@Composable
+private fun RecentDestinationCard(
+    room: AndroidReviewedPackageLoader.PackageRoom,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val accent = destinationAccent(room)
+    Surface(
+        modifier = modifier
+            .height(60.dp)
+            .clickable(role = Role.Button, onClick = onClick),
+        shape = RoundedCornerShape(13.dp),
+        color = Color(0xFF151F31),
+        border = BorderStroke(1.dp, Color(0xFF233149)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(11.dp))
+                    .background(accent.copy(alpha = 0.17f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = iconForCategory(room.category),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+            Spacer(Modifier.width(11.dp))
+            Text(
+                text = room.prettyDestinationName(),
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DestinationRow(
+    room: AndroidReviewedPackageLoader.PackageRoom,
+    onClick: () -> Unit,
+) {
+    val accent = destinationAccent(room)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(accent.copy(alpha = 0.14f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = iconForCategory(room.category),
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = room.prettyDestinationName(),
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = room.locationSubtitle(),
+                color = Color(0xFF6F7B8E),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = Color(0xFF151D2B),
+                border = BorderStroke(1.dp, Color(0xFF273247)),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DirectionsWalk,
+                        contentDescription = null,
+                        tint = Color(0xFF8E99AA),
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        text = room.walkTimeLabel(),
+                        color = Color(0xFFB5BECC),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = room.distanceLabel(),
+                color = Color(0xFF657185),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = null,
+            tint = Color(0xFF354156),
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
 @Composable
 private fun EmptyRoomsState(searchText: String) {
+    val message = if (searchText.isBlank()) {
+        "No destinations in this filter"
+    } else {
+        "No rooms match \"$searchText\""
+    }
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(36.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))
         Text(
-            "No rooms match \"$searchText\"",
+            message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -440,185 +896,367 @@ private fun EmptyRoomsState(searchText: String) {
 }
 
 @Composable
-private fun RoomRow(
-    room: AndroidReviewedPackageLoader.PackageRoom,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val categoryColor = categoryColor(room.category)
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(categoryColor.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = iconForCategory(room.category),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = categoryColor,
-            )
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(room.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(
-                room.description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(room.category ?: "other"),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Surface(
-            shape = RoundedCornerShape(50),
-            color = categoryColor.copy(alpha = 0.12f),
-        ) {
-            Text(
-                displayNameForCategory(room.category ?: "other"),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                style = MaterialTheme.typography.labelSmall,
-                color = categoryColor,
-                maxLines = 1,
-            )
-        }
-        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
 fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     val session by flowModel.session.collectAsState()
     val distance = session.routePackage?.totalDistance ?: 0.0
+    val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
+    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "41 m"
 
-    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        CenteredTopBar(title = "Route Preview", onBack = flowModel::goBackToDestinationSelect)
-        HorizontalDivider()
-
-        Spacer(Modifier.weight(1f))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 28.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (distance > 0.0) {
-                    Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
-                        Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            formatWalkingTime(distance / 1.2),
-                            fontSize = 34.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text("walking", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Text("~${distance.formatMeters()} m", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(28.dp))
-                }
-
-                RoutePointRow(
-                    icon = Icons.Default.LocationOn,
-                    tint = Color(0xFF10B981),
-                    label = "From",
-                    value = session.confirmedEntrance,
-                )
-                Row(Modifier.fillMaxWidth()) {
-                    Box(
-                        Modifier
-                            .padding(start = 15.dp)
-                            .width(1.5.dp)
-                            .height(28.dp)
-                            .background(MaterialTheme.colorScheme.outlineVariant)
-                    )
-                }
-                RoutePointRow(
-                    icon = Icons.Default.Place,
-                    tint = MaterialTheme.colorScheme.primary,
-                    label = "To",
-                    value = session.selectedRoom?.displayName.orEmpty(),
-                )
-            }
-        }
-
-        Spacer(Modifier.weight(1f))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF070D18)),
+    ) {
+        DotGridBackground()
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .fillMaxSize()
+                .padding(horizontal = 22.dp),
         ) {
-            GradientPrimaryButton(
-                text = "Start AR Navigation",
-                icon = Icons.Default.Map,
-                onClick = flowModel::startNavigation,
-            )
-            Text(
-                "Point your camera at the entrance sign to begin",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(13.dp))
+                        .background(Color(0xFF121A28))
+                        .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
+                        .clickable(onClick = flowModel::goBackToDestinationSelect),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color(0xFF168BFF),
+                        modifier = Modifier.size(21.dp),
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "Route to $destinationName",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 22.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = "Building A - Floor G",
+                        color = Color(0xFF6F7B8E),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = Color(0xFF071C33).copy(alpha = 0.9f),
+                    border = BorderStroke(1.dp, Color(0xFF0B60AE)),
+                ) {
+                    Text(
+                        text = "Floor G",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                        color = Color(0xFF168BFF),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(54.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                RouteSummaryCard(
+                    originName = originName,
+                    destinationName = destinationName,
+                    distanceText = distanceText,
+                )
+
+                Spacer(Modifier.height(18.dp))
+
+                RouteStepsCard(destinationName = destinationName)
+
+                Spacer(Modifier.height(18.dp))
+
+                RouteReadyCard()
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color(0xFF168BFF))
+                    .clickable(onClick = flowModel::startNavigation),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = "Start AR Navigation",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .height(28.dp)
+                    .navigationBarsPadding(),
             )
         }
     }
 }
 
 @Composable
-private fun RoutePointRow(icon: ImageVector, tint: Color, label: String, value: String) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+private fun RouteReadyCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = Color(0xFF111B2B),
+        border = BorderStroke(1.dp, Color(0xFF213047)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(Color(0xFF0A3A66)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = null,
+                    tint = Color(0xFF168BFF),
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+            Spacer(Modifier.width(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = "Ready for AR guidance",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    text = "Start at the entrance marker",
+                    color = Color(0xFF7B8698),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RouteSummaryCard(
+    originName: String,
+    destinationName: String,
+    distanceText: String,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = Color(0xFF151F31),
+        border = BorderStroke(1.dp, Color(0xFF233149)),
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "< 1 min",
+                        color = Color.White,
+                        fontSize = 31.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 34.sp,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "$distanceText - 3 steps - Ground Floor",
+                        color = Color(0xFF6F7B8E),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(13.dp),
+                    color = Color(0xFF0A3A66),
+                    border = BorderStroke(1.dp, Color(0xFF0B60AE)),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Map,
+                            contentDescription = null,
+                            tint = Color(0xFF168BFF),
+                            modifier = Modifier.size(22.dp),
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Route",
+                            color = Color(0xFF168BFF),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color(0xFF263247)),
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "From",
+                        color = Color(0xFF7D8899),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = originName,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Text(
+                    text = "->",
+                    color = Color(0xFF667286),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 14.dp),
+                )
+                Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "To",
+                        color = Color(0xFF7D8899),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = destinationName,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RouteStepsCard(destinationName: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = Color(0xFF151F31),
+        border = BorderStroke(1.dp, Color(0xFF233149)),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+        ) {
+            Text(
+                text = "STEPS",
+                color = Color(0xFF687486),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 0.sp,
+            )
+            Spacer(Modifier.height(14.dp))
+            RouteStepRow(number = 1, title = "Walk straight through the main corridor", distance = "25 m")
+            Spacer(Modifier.height(14.dp))
+            RouteStepRow(number = 2, title = "Turn right at the junction", distance = "10 m")
+            Spacer(Modifier.height(14.dp))
+            RouteStepRow(number = 3, title = "$destinationName is on your left", distance = "6 m")
+        }
+    }
+}
+
+@Composable
+private fun RouteStepRow(number: Int, title: String, distance: String) {
+    Row(verticalAlignment = Alignment.Top) {
         Box(
-            Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(tint.copy(alpha = 0.15f)),
+            modifier = Modifier
+                .size(27.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF0A3A66))
+                .border(1.dp, Color(0xFF0B60AE), CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = tint)
+            Text(
+                text = number.toString(),
+                color = Color(0xFF168BFF),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.ExtraBold,
+            )
         }
         Spacer(Modifier.width(12.dp))
         Column {
-            Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(value, fontWeight = FontWeight.Medium)
-        }
-    }
-}
-
-@Composable
-private fun CenteredTopBar(title: String, onBack: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        TextButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(4.dp))
-            Text("Back")
-        }
-        Spacer(Modifier.weight(1f))
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.weight(1f))
-        TextButton(onClick = {}, enabled = false) {
-            Text("Back", color = Color.Transparent)
+            Text(
+                text = title,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 17.sp,
+            )
+            Text(
+                text = distance,
+                color = Color(0xFF6F7B8E),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
     }
 }
@@ -627,45 +1265,183 @@ private fun CenteredTopBar(title: String, onBack: () -> Unit) {
 fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
     AnimatedVisibility(
         visible = true,
-        enter = slideInVertically { it } + fadeIn(),
-        exit = slideOutVertically { it } + fadeOut(),
+        enter = fadeIn(),
+        exit = fadeOut(),
         modifier = Modifier.fillMaxSize(),
     ) {
-        Column(Modifier.fillMaxSize()) {
-            Spacer(Modifier.weight(1f))
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                shadowElevation = 16.dp,
-                color = MaterialTheme.colorScheme.surface,
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF070D18)),
+        ) {
+            DotGridBackground()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                Spacer(Modifier.weight(1f))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
-                        Modifier
-                            .width(36.dp)
-                            .height(5.dp)
+                        modifier = Modifier
+                            .size(100.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.outlineVariant)
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(44.dp), tint = Color(0xFF10B981))
-                    Spacer(Modifier.height(12.dp))
-                    Text("Entrance Confirmed", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                    Text("Starting from $entranceName", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(24.dp))
-                    Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
-                        Text("Choose Destination")
+                            .background(Color(0xFF063D24))
+                            .border(2.dp, Color(0xFF0E7E45), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(68.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF0B5836).copy(alpha = 0.9f)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = Color(0xFF13D06D),
+                                modifier = Modifier.size(42.dp),
+                            )
+                        }
                     }
-                    Spacer(Modifier.height(12.dp))
+
+                    Spacer(Modifier.height(22.dp))
+
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = Color(0xFF073E27),
+                        border = BorderStroke(1.dp, Color(0xFF0C7040)),
+                    ) {
+                        Text(
+                            text = "Building A - Floor G",
+                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp),
+                            color = Color(0xFF12CF69),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                    }
+
+                    Spacer(Modifier.height(18.dp))
+
+                    Text(
+                        text = "Entrance confirmed",
+                        color = Color.White,
+                        fontSize = 27.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 31.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(7.dp))
+                    Text(
+                        text = "$entranceName - Building A - Floor G",
+                        color = Color(0xFF8D98AA),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Spacer(Modifier.height(32.dp))
+
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        color = Color(0xFF151F31),
+                        border = BorderStroke(1.dp, Color(0xFF233149)),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 17.dp),
+                        ) {
+                            Text(
+                                text = "STARTING POINT",
+                                color = Color(0xFF687486),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 0.sp,
+                            )
+                            Spacer(Modifier.height(14.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(RoundedCornerShape(13.dp))
+                                        .background(Color(0xFF0B5A3C).copy(alpha = 0.55f)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocationOn,
+                                        contentDescription = null,
+                                        tint = Color(0xFF14D978),
+                                        modifier = Modifier.size(22.dp),
+                                    )
+                                }
+                                Spacer(Modifier.width(13.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        text = entranceName,
+                                        color = Color.White,
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    Text(
+                                        text = "Ground Floor - Building A",
+                                        color = Color(0xFF8A95A8),
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 1,
+                                    )
+                                }
+                                Surface(
+                                    shape = RoundedCornerShape(50),
+                                    color = Color(0xFF0C6B42).copy(alpha = 0.82f),
+                                ) {
+                                    Text(
+                                        text = "Confirmed",
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                                        color = Color(0xFF28E07E),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
+
+                Spacer(Modifier.weight(1f))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0xFF168BFF))
+                        .clickable(role = Role.Button, onClick = onContinue),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Choose Destination",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                }
+
+                Spacer(Modifier.height(24.dp))
             }
         }
     }
 }
-
 @Composable
 fun GradientPrimaryButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val pressedScale by animateFloatAsState(targetValue = 1f, label = "buttonScale")
@@ -688,6 +1464,62 @@ fun GradientPrimaryButton(text: String, icon: ImageVector, onClick: () -> Unit, 
         Spacer(Modifier.width(8.dp))
         Text(text, color = Color.White, fontWeight = FontWeight.SemiBold)
     }
+}
+
+private fun AndroidReviewedPackageLoader.PackageRoom.prettyDestinationName(): String =
+    displayName.replace("EA 102", "EA102")
+
+private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String = when (id) {
+    "ea101" -> "Ground Floor - East Wing"
+    "ea102" -> "Ground Floor - East Wing"
+    "cs-lab" -> "Ground Floor - Computer Sci..."
+    "me-lab" -> "First Floor - Northeast Wing"
+    "fameo-cafe" -> "Ground Floor - East Corridor"
+    "elevators" -> "Ground Floor - Main Core"
+    "west-men-wc", "west-women-wc" -> "Ground Floor - West Wing"
+    "east-men-wc", "east-women-wc" -> "Ground Floor - East Wing"
+    else -> description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(category ?: "other")
+}
+
+private fun AndroidReviewedPackageLoader.PackageRoom.walkTimeLabel(): String = when (id) {
+    "ea101" -> "2 min"
+    "ea102" -> "3 min"
+    "cs-lab" -> "<1 min"
+    "me-lab" -> "4 min"
+    "fameo-cafe" -> "2 min"
+    "elevators" -> "1 min"
+    "west-men-wc", "west-women-wc", "east-men-wc", "east-women-wc" -> "2 min"
+    else -> "2 min"
+}
+
+private fun AndroidReviewedPackageLoader.PackageRoom.distanceLabel(): String = when (id) {
+    "ea101" -> "95 m"
+    "ea102" -> "120 m"
+    "cs-lab" -> "41 m"
+    "me-lab" -> "180 m"
+    "fameo-cafe" -> "70 m"
+    "elevators" -> "35 m"
+    "west-men-wc", "west-women-wc", "east-men-wc", "east-women-wc" -> "65 m"
+    else -> "80 m"
+}
+
+private fun destinationSortIndex(id: String): Int = when (id) {
+    "ea101" -> 0
+    "ea102" -> 1
+    "cs-lab" -> 2
+    "me-lab" -> 3
+    "fameo-cafe" -> 4
+    "elevators" -> 5
+    "west-men-wc" -> 6
+    "west-women-wc" -> 7
+    "east-men-wc" -> 8
+    "east-women-wc" -> 9
+    else -> 100
+}
+
+private fun destinationAccent(room: AndroidReviewedPackageLoader.PackageRoom): Color = when (room.id) {
+    "me-lab" -> Color(0xFF00A878)
+    else -> categoryColor(room.category)
 }
 
 private fun groupedRooms(

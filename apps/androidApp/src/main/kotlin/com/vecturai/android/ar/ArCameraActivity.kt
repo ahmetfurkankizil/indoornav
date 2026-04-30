@@ -9,27 +9,34 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,10 +44,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -316,10 +326,28 @@ private fun LoadingOverlay() {
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.45f)),
+            .background(Color(0xFF070D18).copy(alpha = 0.82f)),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(color = Color.White)
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            color = Color(0xFF151F31),
+            border = BorderStroke(1.dp, Color(0xFF233149)),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CircularProgressIndicator(color = Color(0xFF168BFF), modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    "Preparing camera...",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+            }
+        }
     }
 }
 
@@ -331,31 +359,69 @@ private fun CameraPermissionOverlay(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.82f)),
+            .background(Color(0xFF070D18).copy(alpha = 0.94f))
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            modifier = Modifier.padding(32.dp),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(22.dp),
+            color = Color(0xFF151F31),
+            border = BorderStroke(1.dp, Color(0xFF233149)),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Icon(Icons.Default.QrCodeScanner, contentDescription = null, modifier = Modifier.size(48.dp))
-                Text("Camera Access Needed", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Color(0xFF071C33))
+                        .border(1.dp, Color(0xFF0B60AE), RoundedCornerShape(18.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Default.QrCodeScanner, contentDescription = null, modifier = Modifier.size(32.dp), tint = Color(0xFF168BFF))
+                }
+                Text(
+                    "Camera access needed",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                )
                 Text(
                     "Camera access lets VecturAI scan the entrance code and show AR guidance.",
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color(0xFFB6BFCE),
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
                 )
-                Button(onClick = onGrant, modifier = Modifier.fillMaxWidth()) {
-                    Text("Grant")
+                Button(
+                    onClick = onGrant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
+                ) {
+                    Text("Grant Access", fontWeight = FontWeight.ExtraBold)
                 }
-                TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-                    Text("Cancel")
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clickable(role = Role.Button, onClick = onCancel),
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF121A28),
+                    border = BorderStroke(1.dp, Color(0xFF2B3952)),
+                ) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Cancel", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
+                    }
                 }
             }
         }
@@ -371,32 +437,69 @@ private fun FatalErrorOverlay(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.82f)),
+            .background(Color(0xFF070D18).copy(alpha = 0.94f))
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            modifier = Modifier.padding(32.dp),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(22.dp),
+            color = Color(0xFF151F31),
+            border = BorderStroke(1.dp, Color(0xFF233149)),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color(0xFFF59E0B))
-                Text("Unable to Start", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF3B2A08)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(32.dp), tint = Color(0xFFF59E0B))
+                }
+                Text(
+                    "Unable to start",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                )
                 Text(
                     message,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color(0xFFB6BFCE),
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
                 )
                 Spacer(Modifier.height(4.dp))
-                Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-                    Text("Retry")
+                Button(
+                    onClick = onRetry,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
+                ) {
+                    Text("Retry", fontWeight = FontWeight.ExtraBold)
                 }
-                TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) {
-                    Text("Go Back")
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clickable(role = Role.Button, onClick = onClose),
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF121A28),
+                    border = BorderStroke(1.dp, Color(0xFF2B3952)),
+                ) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Go Back", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
+                    }
                 }
             }
         }
