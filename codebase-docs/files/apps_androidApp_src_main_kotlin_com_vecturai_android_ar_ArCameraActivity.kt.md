@@ -26,7 +26,7 @@ Dedicated Activity for the full post-home visitor flow. It owns one long-lived A
 - `ArCameraContent`: Hosts the GL view and phase-specific Compose overlays.
 - `resumeCameraWhenReady()`: Waits for camera permission, reviewed package load, and GL texture creation before resuming ARCore.
 - `onArFrame(frame, width, height, rotationDegrees)`: Dispatches frames to QR scanning or AR navigation based on `ArCameraFlowViewModel.Phase`.
-- `isEmulator()`: Detects if the app is running on an Android emulator.
+- `isLikelyEmulator()`: Detects if the app is running on an Android emulator (moved inline from DeviceEnvironment).
 
 ## Important Logic
 - Emulator detection: provides a "Simulate Entrance Scan" button in QR scan and a manual alignment option in AR navigation for development.

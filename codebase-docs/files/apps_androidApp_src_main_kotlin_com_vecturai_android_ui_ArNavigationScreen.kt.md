@@ -34,6 +34,7 @@ Passive AR navigation overlay that draws projected route arrows, alignment guida
 - Navigation guidance: derived from `AndroidArNavigationViewModel.ArNavigationUiState`, ensuring zero-latency UI updates.
 - Visual consistency: uses the same glassmorphic design tokens (blur, borders, vibrant accents) as the home screen.
 - ETA calculation: distance-based estimate matching the iOS client logic for platform parity.
+- Emulator detection: `isLikelyEmulator()` is now implemented inline to conditionally show simulation controls during development.
 
 ## Uses
 - `AndroidArNavigationViewModel`
