@@ -3,9 +3,7 @@ package com.example.vecturai.ar
 import com.example.vecturai.graph.MapNode
 import com.google.ar.core.Pose
 import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.sqrt
-import kotlin.math.sin
 
 data class Vec3(
     val x: Float,
@@ -22,15 +20,22 @@ data class Vec3(
 
     fun normalized(): Vec3 {
         val len = length()
-        return if (len == 0f) Vec3(0f, 0f, -1f) else Vec3(x / len, y / len, z / len)
+        return if (len < 1e-6f) Vec3(0f, 0f, 0f) else Vec3(x / len, y / len, z / len)
     }
 }
 
 fun Pose.translationVec(): Vec3 = Vec3(tx(), ty(), tz())
 
-fun Pose.forwardVec(): Vec3 {
+fun Pose.forwardVec(): Vec3? {
     val zAxis = getZAxis()
-    return Vec3(-zAxis[0], -zAxis[1], -zAxis[2]).normalized()
+    val raw = Vec3(-zAxis[0], -zAxis[1], -zAxis[2])
+    val len = raw.length()
+    return if (len < 1e-4f) null else raw * (1f / len)
+}
+
+private fun Pose.topVec(): Vec3 {
+    val yAxis = getYAxis()
+    return Vec3(yAxis[0], yAxis[1], yAxis[2])
 }
 
 fun distanceMeters(a: Pose, b: Pose): Float = distanceMeters(a.translationVec(), b.translationVec())
@@ -79,20 +84,25 @@ fun yawDegreesToward(from: Vec3, to: Vec3): Float? {
 
 fun poseAt(position: Vec3): Pose = Pose.makeTranslation(position.x, position.y, position.z)
 
-fun positionInFrontOfCamera(cameraPose: Pose, meters: Float): Vec3 {
+fun positionInFrontOfCamera(cameraPose: Pose, meters: Float): Vec3? {
     val camera = cameraPose.translationVec()
-    val forward = cameraPose.forwardVec()
-    val flatForward = Vec3(forward.x, 0f, forward.z).normalized()
+    val forward = cameraPose.forwardVec() ?: return null
+    var flatX = forward.x
+    var flatZ = forward.z
+    var flatLen = sqrt(flatX * flatX + flatZ * flatZ)
+    if (flatLen < 0.1f) {
+        val top = cameraPose.topVec()
+        flatX = top.x
+        flatZ = top.z
+        flatLen = sqrt(flatX * flatX + flatZ * flatZ)
+        if (flatLen < 1e-4f) return null
+    }
+    val scale = meters / flatLen
     return Vec3(
-        x = camera.x + flatForward.x * meters,
-        y = camera.y,
-        z = camera.z + flatForward.z * meters
+        x = camera.x + flatX * scale,
+        y = camera.y + ARROW_VERTICAL_OFFSET_M,
+        z = camera.z + flatZ * scale
     )
 }
 
-fun Vec3.rotateY(radians: Float): Vec3 =
-    Vec3(
-        x = x * cos(radians) + z * sin(radians),
-        y = y,
-        z = -x * sin(radians) + z * cos(radians)
-    )
+const val ARROW_VERTICAL_OFFSET_M = -0.4f

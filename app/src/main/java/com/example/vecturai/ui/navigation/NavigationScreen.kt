@@ -16,10 +16,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,17 +36,25 @@ import com.example.vecturai.ar.ArrowRenderer
 import com.example.vecturai.persistence.GraphRepository
 import com.example.vecturai.ui.CameraPermissionGate
 import com.example.vecturai.ui.hasValidGlbAsset
+import com.google.android.filament.MaterialInstance
 import com.google.ar.core.Pose
+import com.google.ar.core.TrackingState
 import dev.romainguy.kotlin.math.Float3
 import dev.romainguy.kotlin.math.Quaternion
 import io.github.sceneview.ar.ARSceneView
 import io.github.sceneview.ar.rememberARCameraStream
+import io.github.sceneview.material.setColor
+import io.github.sceneview.material.setRoughness
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
 import io.github.sceneview.math.Size
+import io.github.sceneview.model.ModelInstance
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.math.pow
 
 @Composable
 fun NavigationRoute(
@@ -127,23 +138,42 @@ private fun NavigationArScene(
     val modelLoader = rememberModelLoader(engine)
     val materialLoader = rememberMaterialLoader(engine)
     val cameraStream = rememberARCameraStream(materialLoader)
-    SideEffect {
-        cameraStream.isDepthOcclusionEnabled = true
+    LaunchedEffect(cameraStream) {
+        cameraStream.isDepthOcclusionEnabled = false
     }
 
-    val hasArrowAsset = remember(context) { hasValidGlbAsset(context, "arrow.glb") }
-    val arrowModelInstance = remember(modelLoader, hasArrowAsset) {
-        if (hasArrowAsset) {
+    val arrowModelInstance = remember { mutableStateOf<ModelInstance?>(null) }
+    val arrowMaterial = remember { mutableStateOf<MaterialInstance?>(null) }
+    LaunchedEffect(modelLoader, materialLoader, context) {
+        val valid = withContext(Dispatchers.IO) {
+            hasValidGlbAsset(context, "arrow.glb")
+        }
+        val model = if (valid) {
             runCatching { modelLoader.createModelInstance("arrow.glb") }.getOrNull()
         } else {
             null
         }
-    }
-    val arrowMaterial = remember(materialLoader, arrowModelInstance) {
-        if (arrowModelInstance == null) {
-            materialLoader.createColorInstance(Color(0xFFFF5722), roughness = 0.45f)
+        arrowModelInstance.value = model
+        arrowMaterial.value = if (model == null) {
+            materialLoader.createColorInstance(Color(0xFFFF5722), roughness = 1.0f)
         } else {
             null
+        }
+    }
+    val currentArrowModelInstance = arrowModelInstance.value
+    DisposableEffect(currentArrowModelInstance) {
+        onDispose {
+            currentArrowModelInstance?.let { modelInstance ->
+                runCatching { modelLoader.destroyModel(modelInstance.asset) }
+            }
+        }
+    }
+    val currentArrowMaterial = arrowMaterial.value
+    DisposableEffect(currentArrowMaterial) {
+        onDispose {
+            currentArrowMaterial?.let { material ->
+                runCatching { materialLoader.destroyMaterialInstance(material) }
+            }
         }
     }
 
@@ -162,15 +192,24 @@ private fun NavigationArScene(
         nodePoses.forEach { nodePose ->
             key(nodePose.nodeId) {
                 val confidence = nodePose.confidence.coerceIn(0f, 1f)
-                val material = remember(materialLoader, confidence) {
+                val material = remember(materialLoader, nodePose.nodeId) {
                     materialLoader.createColorInstance(
                         confidenceColor(confidence),
-                        roughness = 0.75f - 0.25f * confidence
+                        roughness = 0.6f
                     )
+                }
+                DisposableEffect(material) {
+                    onDispose {
+                        runCatching { materialLoader.destroyMaterialInstance(material) }
+                    }
+                }
+                SideEffect {
+                    material.setColor(confidenceColor(confidence))
+                    material.setRoughness(0.75f - 0.25f * confidence)
                 }
                 PoseNode(pose = nodePose.pose) {
                     SphereNode(
-                        radius = 0.07f + 0.03f * confidence,
+                        radius = 0.085f,
                         center = Position(y = 0.08f),
                         materialInstance = material
                     )
@@ -179,29 +218,40 @@ private fun NavigationArScene(
         }
 
         key("nav-arrow") {
-            arrowPose?.let { pose ->
+            val displayedPose = remember { mutableStateOf<Pose?>(null) }
+            val visible = arrowPose != null
+            arrowPose?.let { displayedPose.value = it.toArPose() }
+            displayedPose.value?.let { pose ->
                 PoseNode(
-                    pose = pose.toArPose(),
+                    pose = pose,
+                    visibleCameraTrackingStates = if (visible) {
+                        setOf(TrackingState.TRACKING)
+                    } else {
+                        emptySet()
+                    },
                     apply = {
                         isSmoothTransformEnabled = false
                     }
                 ) {
-                    if (arrowModelInstance != null) {
+                    val modelInstance = arrowModelInstance.value
+                    val material = arrowMaterial.value
+                    if (modelInstance != null) {
                         ModelNode(
-                            modelInstance = arrowModelInstance,
-                            autoAnimate = true,
+                            modelInstance = modelInstance,
+                            autoAnimate = false,
+                            position = Position(z = -ARROW_HALF_LENGTH_LOCAL_M),
                             scale = Scale(ARROW_MODEL_SCALE)
                         )
-                    } else if (arrowMaterial != null) {
+                    } else if (material != null) {
                         CubeNode(
-                            size = Size(x = 0.08f, y = 0.05f, z = 0.46f),
-                            center = Position(z = 0.18f),
-                            materialInstance = arrowMaterial
+                            size = Size(x = 0.08f, y = 0.05f, z = 0.30f),
+                            center = Position(z = 0.15f - ARROW_HALF_LENGTH_LOCAL_M),
+                            materialInstance = material
                         )
                         SphereNode(
-                            radius = 0.09f,
-                            center = Position(z = 0.50f),
-                            materialInstance = arrowMaterial
+                            radius = 0.06f,
+                            center = Position(z = 0.36f - ARROW_HALF_LENGTH_LOCAL_M),
+                            materialInstance = material
                         )
                     }
                 }
@@ -212,24 +262,44 @@ private fun NavigationArScene(
 
 // arrow.glb is authored in meter-like units with roughly 0.92m length on +Z.
 private const val ARROW_MODEL_SCALE = 0.45f
+private const val ARROW_HALF_LENGTH_LOCAL_M = 0.21f
 
 private fun confidenceColor(confidence: Float): Color {
+    val clamped = confidence.coerceIn(0f, 1f)
+    fun toLinear(value: Float): Float =
+        if (value <= 0.04045f) value / 12.92f
+        else ((value + 0.055f) / 1.055f).toDouble().pow(2.4).toFloat()
+    fun toSrgb(value: Float): Float =
+        if (value <= 0.0031308f) value * 12.92f
+        else 1.055f * value.toDouble().pow(1.0 / 2.4).toFloat() - 0.055f
     val low = Color(0xFFFFC107)
     val high = Color(0xFF00BCD4)
+    fun lerpChannel(start: Float, end: Float): Float =
+        toSrgb(toLinear(start) + (toLinear(end) - toLinear(start)) * clamped)
     return Color(
-        red = low.red + (high.red - low.red) * confidence,
-        green = low.green + (high.green - low.green) * confidence,
-        blue = low.blue + (high.blue - low.blue) * confidence,
+        red = lerpChannel(low.red, high.red),
+        green = lerpChannel(low.green, high.green),
+        blue = lerpChannel(low.blue, high.blue),
         alpha = 1f
     )
 }
 
 private fun ArrowPose.toArPose(): Pose {
     val yawDegrees = yawDegrees + ArrowRenderer.ARROW_MODEL_YAW_OFFSET_DEG
-    val quaternion = Quaternion.fromAxisAngle(Float3(0f, 1f, 0f), yawDegrees)
+    val yaw = Quaternion.fromAxisAngle(Float3(0f, 1f, 0f), yawDegrees)
+    val pitch = Quaternion.fromAxisAngle(Float3(1f, 0f, 0f), -pitchDegrees)
+    val rotationPose = Pose(
+        floatArrayOf(0f, 0f, 0f),
+        floatArrayOf(yaw.x, yaw.y, yaw.z, yaw.w)
+    ).compose(
+        Pose(
+            floatArrayOf(0f, 0f, 0f),
+            floatArrayOf(pitch.x, pitch.y, pitch.z, pitch.w)
+        )
+    )
     return Pose(
         floatArrayOf(position.x, position.y, position.z),
-        floatArrayOf(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+        floatArrayOf(rotationPose.qx(), rotationPose.qy(), rotationPose.qz(), rotationPose.qw())
     )
 }
 

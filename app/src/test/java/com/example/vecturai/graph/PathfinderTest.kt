@@ -76,6 +76,27 @@ class PathfinderTest {
         assertEquals(listOf("a", "b", "c"), Pathfinder(graph).shortestPath("a", "c")?.map { it.id })
     }
 
+    @Test
+    fun smoothingKeepsCornerWithoutDirectEdge() {
+        val graph = MapGraph(
+            buildingName = "test",
+            createdAtEpochMs = 0L,
+            nodes = listOf(
+                node("a", x = 0f, z = 0f),
+                node("b", x = 1f, z = 0.2f),
+                node("c", x = 2f, z = 0f),
+                node("d", x = 3f, z = 0.2f)
+            ),
+            edges = listOf(
+                MapEdge("a", "b", 1f),
+                MapEdge("b", "c", 1f),
+                MapEdge("c", "d", 1f)
+            )
+        )
+
+        assertEquals(listOf("a", "b", "c", "d"), Pathfinder(graph).shortestPath("a", "d")?.map { it.id })
+    }
+
     private fun node(
         id: String,
         label: String? = null,

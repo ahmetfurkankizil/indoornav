@@ -130,8 +130,12 @@ class Pathfinder(private val graph: MapGraph) {
         if (a.floor != b.floor || b.floor != c.floor) return false
         val ac = c.point() - a.point()
         if (ac.length() < 1e-3f) return false
+        if (!hasDirectEdge(a.id, c.id)) return false
         return distancePointToSegment(b.point(), a.point(), c.point()) <= SMOOTHING_MAX_DEVIATION_M
     }
+
+    private fun hasDirectEdge(fromId: String, toId: String): Boolean =
+        adjacentEdges[fromId].orEmpty().any { it.toNodeId == toId }
 
     private fun distancePointToSegment(point: GraphPoint, start: GraphPoint, end: GraphPoint): Float {
         val segment = end - start

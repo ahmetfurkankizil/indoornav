@@ -4,20 +4,23 @@ import android.content.Context
 
 fun hasValidGlbAsset(context: Context, assetPath: String): Boolean = runCatching {
     context.assets.open(assetPath).use { input ->
-        val bytes = input.readBytes()
-        if (bytes.size < GLB_HEADER_LENGTH_BYTES) return@runCatching false
+        val header = ByteArray(GLB_HEADER_LENGTH_BYTES)
+        if (input.read(header) != GLB_HEADER_LENGTH_BYTES) return@runCatching false
 
-        val magicOk = bytes[0] == 0x67.toByte() &&
-            bytes[1] == 0x6C.toByte() &&
-            bytes[2] == 0x54.toByte() &&
-            bytes[3] == 0x46.toByte()
-        val version = readLittleEndianUInt(bytes, 4)
-        val declaredLength = readLittleEndianUInt(bytes, 8)
+        val magicOk = header[0] == 0x67.toByte() &&
+            header[1] == 0x6C.toByte() &&
+            header[2] == 0x54.toByte() &&
+            header[3] == 0x46.toByte()
+        val version = readLittleEndianUInt(header, 4)
+        val declaredLength = readLittleEndianUInt(header, 8)
+        val assetSize = runCatching {
+            context.assets.openFd(assetPath).use { it.length }
+        }.getOrNull()
 
         magicOk &&
             version == GLB_VERSION_2 &&
             declaredLength >= GLB_HEADER_LENGTH_BYTES.toLong() &&
-            declaredLength <= bytes.size.toLong()
+            (assetSize == null || declaredLength <= assetSize)
     }
 }.getOrDefault(false)
 

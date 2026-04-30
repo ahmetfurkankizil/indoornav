@@ -1,7 +1,9 @@
 package com.example.vecturai.ar
 
 import com.google.ar.core.Pose
-import kotlin.math.sqrt
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 data class Correspondence(
     val graphPose: Pose,
@@ -37,15 +39,31 @@ object Relocalizer {
             sz += c.sessionPose.tz() * w
         }
 
-        val rotation = averageDirectRotation(correspondences, totalWeight)
-        val rotatedGraphCentroid = Pose(floatArrayOf(0f, 0f, 0f), rotation)
-            .compose(Pose.makeTranslation(gx, gy, gz))
-            .translationVec()
+        var sxx = 0f
+        var sxz = 0f
+        var szx = 0f
+        var szz = 0f
+        correspondences.forEach { c ->
+            val w = c.weight.coerceAtLeast(0f) / totalWeight
+            val px = c.graphPose.tx() - gx
+            val pz = c.graphPose.tz() - gz
+            val qx = c.sessionPose.tx() - sx
+            val qz = c.sessionPose.tz() - sz
+            sxx += px * qx * w
+            sxz += px * qz * w
+            szx += pz * qx * w
+            szz += pz * qz * w
+        }
+
+        val theta = atan2((szx - sxz).toDouble(), (sxx + szz).toDouble()).toFloat()
+        val c = cos(theta)
+        val s = sin(theta)
         val translation = floatArrayOf(
-            sx - rotatedGraphCentroid.x,
-            sy - rotatedGraphCentroid.y,
-            sz - rotatedGraphCentroid.z
+            sx - (c * gx + s * gz),
+            sy - gy,
+            sz - (-s * gx + c * gz)
         )
+        val rotation = floatArrayOf(0f, sin(theta * 0.5f), 0f, cos(theta * 0.5f))
         return Pose(translation, rotation)
     }
 
@@ -58,41 +76,6 @@ object Relocalizer {
             val predicted = fit.compose(c.graphPose)
             distanceMeters(predicted, c.sessionPose) <= maxResidualMeters
         }
-    }
-
-    private fun averageDirectRotation(
-        correspondences: List<Correspondence>,
-        totalWeight: Float
-    ): FloatArray {
-        var qw = 0f
-        var qx = 0f
-        var qy = 0f
-        var qz = 0f
-        val reference = correspondences.first()
-            .let { it.sessionPose.compose(it.graphPose.inverse()) }
-
-        correspondences.forEach { c ->
-            val w = c.weight.coerceAtLeast(0f) / totalWeight
-            val transform = c.sessionPose.compose(c.graphPose.inverse())
-            val dot = transform.qx() * reference.qx() +
-                transform.qy() * reference.qy() +
-                transform.qz() * reference.qz() +
-                transform.qw() * reference.qw()
-            val sign = if (dot < 0f) -1f else 1f
-            qx += transform.qx() * sign * w
-            qy += transform.qy() * sign * w
-            qz += transform.qz() * sign * w
-            qw += transform.qw() * sign * w
-        }
-
-        val normalized = normalizeQuaternion(floatArrayOf(qw, qx, qy, qz))
-        return floatArrayOf(normalized[1], normalized[2], normalized[3], normalized[0])
-    }
-
-    private fun normalizeQuaternion(q: FloatArray): FloatArray {
-        val length = sqrt(q.sumOf { (it * it).toDouble() }).toFloat()
-        if (length < EPSILON) return floatArrayOf(1f, 0f, 0f, 0f)
-        return floatArrayOf(q[0] / length, q[1] / length, q[2] / length, q[3] / length)
     }
 
     private const val EPSILON = 1e-6f
