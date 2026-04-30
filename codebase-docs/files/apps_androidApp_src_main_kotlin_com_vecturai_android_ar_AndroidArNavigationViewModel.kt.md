@@ -7,7 +7,7 @@
 Authored Source (Android AR Navigation State)
 
 ## Role
-Android ViewModel for route configuration, entrance-poster alignment, progress projection, next-action guidance, tracking labels, haptic events, and arrival state. It no longer owns ARCore session lifecycle.
+Android ViewModel for route configuration, entrance-poster alignment, next-action guidance, tracking labels, haptic events, and arrival state. It no longer owns ARCore session lifecycle.
 
 ## Imports / Includes
 - `androidx.lifecycle.ViewModel`, `viewModelScope`
@@ -26,10 +26,10 @@ Android ViewModel for route configuration, entrance-poster alignment, progress p
 ## Main Symbols
 - `ArNavigationUiState`: State object containing route info, next-action guidance, tracking labels, and arrival status.
 - `configure(routePackage, entranceMarker)`: Resets route/alignment state, configures marker detection, and starts the alignment timeout.
-- `onFrame(frame, width, height)`: Per-frame marker detection, tracking status, camera pose sampling, arrow projection, and progress updates.
+- `onFrame(frame, width, height)`: Per-frame marker detection, tracking status, camera pose sampling, and progress updates.
 - `simulateAlignment()`: Development fallback for emulator/non-marker testing.
 - `advanceProgress()`: Simulated progress advance for demo mode.
-- `endNavigation()`: Clears route, marker, projection, timeout, and haptic-related state.
+- `endNavigation()`: Clears route, marker, timeout, and haptic-related state.
 - `computeNextAction(distance)`: Derives user-friendly guidance ("Turn left ahead", etc.) from route arrows.
 
 ## Important Logic

@@ -7,7 +7,6 @@
     "generated_from_range": "1107758a431e6e9c1c2a07c0281223b9b60830bf..d268813baba577afb4495dae08de6e11f737f4eb",
     "coverage_verdict": "COMPLETE",
     "last_incremental_update": "2026-04-30T11:23:08+03:00"
-
   },
   "folders": [
     {
@@ -876,7 +875,6 @@
     },
     {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArBridge.kt",
-
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1767,7 +1765,6 @@
     },
     {
       "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArBridge.kt.md",
-
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -7111,6 +7108,29 @@
         "preprocessing"
       ],
       "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_vecturai_tools_preprocessor_ZoneSuggesterTest.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\ArArrow3DRenderer.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": "Rendered 3D arrows",
+      "feature_tags": [
+        "ar",
+        "rendering"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArArrow3DRenderer.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ar\\Arrow3DGeometry.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": "3D Arrow geometry",
+      "feature_tags": [
+        "ar",
+        "rendering"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_Arrow3DGeometry.kt.md"
     }
-  ]
+  ],
+  "generated_from_commit": "d43c184651b8efe8bb7e2a3aa358d0f44b63bb96"
 }

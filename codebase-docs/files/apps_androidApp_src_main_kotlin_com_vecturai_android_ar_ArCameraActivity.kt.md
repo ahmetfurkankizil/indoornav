@@ -22,7 +22,7 @@ Dedicated Activity for the full post-home visitor flow. It owns one long-lived A
 
 ## Main Symbols
 - `unifiedSession`: Activity-owned `UnifiedArSession`.
-- `renderer`: Single `UnifiedArRenderer` instance for camera background and frame dispatch.
+- `renderer`: Single `UnifiedArRenderer` instance for camera background and frame dispatch. It also passes `ArRouteRenderer` for 3D arrow rendering.
 - `ArCameraContent`: Hosts the GL view and phase-specific Compose overlays.
 - `resumeCameraWhenReady()`: Waits for camera permission, reviewed package load, and GL texture creation before resuming ARCore.
 - `onArFrame(frame, width, height, rotationDegrees)`: Dispatches frames to QR scanning or AR navigation based on `ArCameraFlowViewModel.Phase`.
@@ -38,6 +38,7 @@ Dedicated Activity for the full post-home visitor flow. It owns one long-lived A
 ## Uses
 - `UnifiedArSession`
 - `UnifiedArRenderer`
+- `ArRouteRenderer`
 - `ArCameraFlowViewModel`
 - `AndroidArNavigationViewModel`
 - `QRScanScreen`

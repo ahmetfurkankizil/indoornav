@@ -7,7 +7,7 @@
 Authored Source (Android Compose AR Overlay)
 
 ## Role
-Passive AR navigation overlay that draws projected route arrows, alignment guidance, next-action cards, tracking badge, ETA HUD, and arrival card over `ArCameraActivity`'s Activity-owned ARCore camera view.
+Passive AR navigation overlay that draws alignment guidance, next-action cards, tracking badge, ETA HUD, and arrival card over `ArCameraActivity`'s Activity-owned ARCore camera view.
 
 ## Imports / Includes
 - Jetpack Compose animation/foundation/material/icons/runtime APIs.
@@ -22,7 +22,6 @@ Passive AR navigation overlay that draws projected route arrows, alignment guida
 
 ## Main Symbols
 - `ArNavigationScreen`: Renders UI state only; it does not create or own a `GLSurfaceView`.
-- `ProjectedArrowLayer`: Draws projected 3D arrow icons pinned to building-local coordinates.
 - `AlignmentOverlay`: Premium pre-alignment guidance with actionable hints (No poster detected, Hold steady).
 - `ActiveNavigationOverlay`: Hosts the `NextActionCard`, `TrackingBadge`, and `ProgressStrip`.
 - `NextActionCard`: Prominent guidance card ("Turn left ahead", etc.) with dynamic icons and distance lookahead.

@@ -7,7 +7,7 @@
 Authored Source (AR Visuals)
 
 ## Role
-Manages Android AR route arrow state after alignment. Converts building-local arrow placements into AR-world coordinates, applies the rolling lookahead/fade-behind window, and projects visible arrows into screen coordinates for the Compose overlay.
+Manages Android AR route arrow state after alignment. Converts building-local arrow placements into AR-world coordinates, applies the rolling lookahead/fade-behind window, and provides a snapshot of visible arrows in 3D AR space.
 
 ## Imports / Includes
 - `android.opengl.Matrix`
@@ -18,15 +18,14 @@ Manages Android AR route arrow state after alignment. Converts building-local ar
 ## Exports / Public Surface
 - `ArRouteRenderer`: Main rendering coordinator.
 - `ArrowState`: `HIDDEN`, `ACTIVE`, or `FADING`.
-- `VisibleArrow`: AR-world arrow projection state.
-- `ProjectedArrow`: screen-space arrow used by Compose.
+- `RenderableArrow3D`: AR-world arrow projection state for 3D rendering.
 
 ## Main Symbols
 - `configureRendering(...)`: Sets the lookahead and fade distances.
 - `setAlignmentTransform(...)`: Sets the global offset and rotation for world mapping.
 - `placeAllArrows(...)` / `updateArrows(...)`: Stores full route arrow list after alignment.
 - `updateVisibility(userCumulativeDistance)`: Applies active lookahead and fade-behind state.
-- `projectVisibleArrows(...)`: Projects visible AR-world arrows through ARCore view/projection matrices.
+- `snapshot()`: Provides the latest `RenderableArrow3D` states.
 - `transformToAR(...)`: Projects building coords into AR space using the alignment matrix.
 - `hideAllArrows()` / `clearArrows()`: Used on arrival/end navigation.
 
@@ -34,7 +33,7 @@ Manages Android AR route arrow state after alignment. Converts building-local ar
 - Rolling lookahead shows arrows from current route progress to `current + lookaheadDistance`.
 - Fade-behind keeps recently passed arrows visible with reduced alpha/scale for `fadeDistance`.
 - `transformToAR` applies the yaw-only alignment transform established by the AR ViewModel.
-- `projectVisibleArrows` emits only arrows in/near normalized device coordinates.
+- `snapshot()` provides world coordinates and heading for `ArArrow3DRenderer` instead of 2D screen projections.
 
 ## Uses
 - `android.opengl.Matrix`: For view/projection transforms.
@@ -42,7 +41,7 @@ Manages Android AR route arrow state after alignment. Converts building-local ar
 
 ## Used By
 - `AndroidArNavigationViewModel.kt`: Owns alignment and visibility updates.
-- `ArNavigationScreen.kt`: Reads `ProjectedArrow` values through UI state.
+- `UnifiedArRenderer`: Reads `snapshot()` to render 3D arrows.
 
 ## Config / Constants / Protocol Details
 - Lookahead distance is configured from `route_rendering.json`.
@@ -52,4 +51,4 @@ Manages Android AR route arrow state after alignment. Converts building-local ar
 - None.
 
 ## Notes / Risks
-- This renderer does not draw 3D meshes directly; it projects AR positions for the Compose arrow overlay on top of the ARCore camera feed.
+- This renderer provides world positions for `ArArrow3DRenderer` to draw 3D meshes in `UnifiedArRenderer`.

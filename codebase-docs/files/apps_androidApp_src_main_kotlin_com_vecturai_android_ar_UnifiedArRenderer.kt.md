@@ -7,7 +7,7 @@
 Authored Source (ARCore Camera Rendering)
 
 ## Role
-`GLSurfaceView.Renderer` that creates the external OES camera texture, draws the ARCore camera background each frame, and forwards frames to the Activity-scoped flow.
+`GLSurfaceView.Renderer` that creates the external OES camera texture, draws the ARCore camera background, renders 3D navigation arrows, and forwards frames to the Activity-scoped flow.
 
 ## Imports / Includes
 - Android OpenGL: `GLES11Ext`, `GLES20`, `GLSurfaceView`
@@ -21,7 +21,7 @@ Authored Source (ARCore Camera Rendering)
 ## Main Symbols
 - `onSurfaceCreated(...)`: Initializes GL state, creates camera texture, compiles shaders, and reports the texture id to `ArCameraActivity`.
 - `onSurfaceChanged(...)`: Updates viewport and ARCore display geometry.
-- `onDrawFrame(...)`: Calls `Session.update()`, draws the camera background, and forwards the frame with viewport and rotation metadata.
+- `onDrawFrame(...)`: Calls `Session.update()`, draws the camera background, draws 3D arrows via `ArArrow3DRenderer`, and forwards the frame with viewport and rotation metadata.
 
 ## Important Logic
 - This renderer has no camera recovery or session rebuild logic.
@@ -31,6 +31,8 @@ Authored Source (ARCore Camera Rendering)
 ## Uses
 - `UnifiedArSession`
 - ARCore `Session` and `Frame`
+- `ArArrow3DRenderer`
+- `ArRouteRenderer`
 
 ## Used By
 - `ArCameraActivity.kt`
