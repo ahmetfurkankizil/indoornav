@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -84,6 +85,7 @@ import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
 import com.vecturai.designsystem.VecturaiTheme
 import kotlin.math.ceil
+import kotlin.math.min
 
 @Composable
 fun AndroidNavigationApp(
@@ -444,6 +446,7 @@ fun DestinationSelectScreen(
     val session by flowModel.session.collectAsState()
     var searchText by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf(DestinationFilter.All) }
+    var isSelectingOrigin by remember { mutableStateOf(false) }
     val rooms = flowModel.availableRooms
     val orderedRooms = remember(rooms) { rooms.sortedBy { destinationSortIndex(it.id) } }
     val filteredRooms = orderedRooms.filter { room ->
@@ -465,7 +468,8 @@ fun DestinationSelectScreen(
             rooms.firstOrNull { it.id == "fameo-cafe" },
         ).ifEmpty { rooms.take(2) }
     }
-    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val originName = session.selectedOriginRoom?.displayName 
+        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
 
     Box(
         modifier = Modifier
@@ -505,27 +509,39 @@ fun DestinationSelectScreen(
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = "Where to?",
+                            text = if (isSelectingOrigin) "Select Start" else "Where to?",
                             color = Color.White,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
                             lineHeight = 26.sp,
                         )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .clickable { isSelectingOrigin = !isSelectingOrigin }
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF10D978)),
+                                    .background(if (isSelectingOrigin) Color(0xFFFFB01A) else Color(0xFF10D978)),
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
                                 text = "From $originName",
-                                color = Color(0xFF7F8A9D),
+                                color = if (isSelectingOrigin) Color(0xFFFFB01A) else Color(0xFF7F8A9D),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = if (isSelectingOrigin) "(Cancel)" else "(Change)",
+                                color = Color(0xFF168BFF),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
                             )
                         }
                     }
@@ -565,7 +581,14 @@ fun DestinationSelectScreen(
                                 room = room,
                                 routeSummary = routeSummaries[room.id],
                                 modifier = Modifier.weight(1f),
-                                onClick = { flowModel.selectDestination(room) },
+                                onClick = { 
+                                    if (isSelectingOrigin) {
+                                        flowModel.selectOrigin(room)
+                                        isSelectingOrigin = false
+                                    } else {
+                                        flowModel.selectDestination(room)
+                                    }
+                                },
                             )
                         }
                     }
@@ -600,7 +623,14 @@ fun DestinationSelectScreen(
                         DestinationRow(
                             room = room,
                             routeSummary = routeSummaries[room.id],
-                            onClick = { flowModel.selectDestination(room) },
+                            onClick = { 
+                                if (isSelectingOrigin) {
+                                    flowModel.selectOrigin(room)
+                                    isSelectingOrigin = false
+                                } else {
+                                    flowModel.selectDestination(room)
+                                }
+                            },
                         )
                     }
                 }
@@ -609,7 +639,14 @@ fun DestinationSelectScreen(
                     DestinationRow(
                         room = room,
                         routeSummary = routeSummaries[room.id],
-                        onClick = { flowModel.selectDestination(room) },
+                        onClick = { 
+                            if (isSelectingOrigin) {
+                                flowModel.selectOrigin(room)
+                                isSelectingOrigin = false
+                            } else {
+                                flowModel.selectDestination(room)
+                            }
+                        },
                     )
                 }
             }
@@ -927,7 +964,8 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     val distance = routePackage?.totalDistance ?: 0.0
     val routeStepCount = routePackage?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
     val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
-    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val originName = session.selectedOriginRoom?.displayName 
+        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
     val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
     val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
 
@@ -969,45 +1007,83 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Route to $destinationName",
+                        text = "Route Preview",
                         color = Color.White,
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 22.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = "Building A - Floor G",
-                        color = Color(0xFF6F7B8E),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = Color(0xFF071C33).copy(alpha = 0.9f),
-                    border = BorderStroke(1.dp, Color(0xFF0B60AE)),
-                ) {
-                    Text(
-                        text = "Floor G",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                        color = Color(0xFF168BFF),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(18.dp))
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // 2D MAP PREVIEW
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(320.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color(0xFF0C1420))
+                        .border(1.dp, Color(0xFF253149), RoundedCornerShape(24.dp)),
+                    color = Color.Transparent
+                ) {
+                    RouteMapPreview(
+                        config = session.reviewedConfig,
+                        routePoints = routePackage?.routePoints ?: emptyList(),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // INFO CARD
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xFF151F31),
+                    border = BorderStroke(1.dp, Color(0xFF233149)),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Route to $destinationName",
+                                color = Color.White,
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = "Building A - Ground Floor",
+                                color = Color(0xFF6F7B8E),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = Color(0xFF071C33).copy(alpha = 0.9f),
+                            border = BorderStroke(1.dp, Color(0xFF0B60AE)),
+                        ) {
+                            Text(
+                                text = "Floor G",
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                color = Color(0xFF168BFF),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                }
+
                 RouteSummaryCard(
                     originName = originName,
                     destinationName = destinationName,
@@ -1016,50 +1092,55 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                     stepCount = routeStepCount,
                 )
 
-                Spacer(Modifier.height(18.dp))
-
                 RouteStepsCard(
                     originName = originName,
                     destinationName = destinationName,
                     distanceText = distanceText,
                 )
 
-                Spacer(Modifier.height(18.dp))
+                Spacer(Modifier.height(120.dp)) // Extra space to scroll past the floating button
+            } // End of inner Column
+        } // End of outer Column
 
-                RouteReadyCard()
-                Spacer(Modifier.height(20.dp))
-            }
-
-            Row(
+        // FLOATING START BUTTON (Always visible at the bottom)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(22.dp)
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Surface(
+                onClick = flowModel::startNavigation,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF168BFF))
-                    .clickable(role = Role.Button, onClick = flowModel::startNavigation),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+                    .height(60.dp),
+                shape = RoundedCornerShape(18.dp),
+                color = Color(0xFF168BFF),
+                shadowElevation = 12.dp,
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
             ) {
-                Icon(
-                    imageVector = Icons.Default.Place,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp),
-                )
-                Spacer(Modifier.width(10.dp))
-                Text(
-                    text = "Start AR Navigation",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Navigation,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = "START AR NAVIGATION",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 1.sp
+                    )
+                }
             }
-
-            Spacer(
-                modifier = Modifier
-                    .height(28.dp)
-                    .navigationBarsPadding(),
-            )
         }
     }
 }
@@ -1582,6 +1663,147 @@ private fun categoryColor(category: String?): Color = when (category) {
     "toilet" -> Color(0xFF94A3B8)
     "office" -> Color(0xFF10B981)
     else -> Color(0xFF64748B)
+}
+
+@Composable
+private fun RouteMapPreview(
+    config: AndroidReviewedPackageLoader.ReviewedConfig?,
+    routePoints: List<Pair<Double, Double>>,
+    modifier: Modifier = Modifier,
+) {
+    if (config == null || config.nodes.isEmpty()) return
+
+    val nodes = config.nodes
+    val minX = nodes.minOf { it.x }
+    val maxX = nodes.maxOf { it.x }
+    val minZ = nodes.minOf { it.z }
+    val maxZ = nodes.maxOf { it.z }
+
+    val width = (maxX - minX).coerceAtLeast(1.0)
+    val height = (maxZ - minZ).coerceAtLeast(1.0)
+
+    Canvas(modifier = modifier.padding(16.dp)) {
+        val scale = (min(size.width / width, size.height / height) * 0.9).toFloat()
+        val offsetX = (size.width - width.toFloat() * scale) / 2f - minX.toFloat() * scale
+        val offsetZ = (size.height - height.toFloat() * scale) / 2f - minZ.toFloat() * scale
+
+        // 1. FLOOR GRID (Blueprint style)
+        val gridSize = 20.dp.toPx()
+        for (x in 0..(size.width / gridSize).toInt()) {
+            drawLine(
+                color = Color(0xFF1A2637),
+                start = Offset(x * gridSize, 0f),
+                end = Offset(x * gridSize, size.height),
+                strokeWidth = 0.5.dp.toPx()
+            )
+        }
+        for (y in 0..(size.height / gridSize).toInt()) {
+            drawLine(
+                color = Color(0xFF1A2637),
+                start = Offset(0f, y * gridSize),
+                end = Offset(size.width, y * gridSize),
+                strokeWidth = 0.5.dp.toPx()
+            )
+        }
+
+        // 2. ROOM ENCLOSURES (The "Walls")
+        config.rooms.forEach { room ->
+            val node = nodes.find { it.id == room.destinationNodeId }
+            if (node != null) {
+                val cx = node.x.toFloat() * scale + offsetX
+                val cz = node.z.toFloat() * scale + offsetZ
+                val roomSize = 40.dp.toPx()
+                
+                // Room Fill
+                drawRoundRect(
+                    color = categoryColor(room.category).copy(alpha = 0.1f),
+                    topLeft = Offset(cx - roomSize / 2, cz - roomSize / 2),
+                    size = androidx.compose.ui.geometry.Size(roomSize, roomSize),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx())
+                )
+                
+                // Room Outline (Thick Walls)
+                drawRoundRect(
+                    color = Color(0xFF324562),
+                    topLeft = Offset(cx - roomSize / 2, cz - roomSize / 2),
+                    size = androidx.compose.ui.geometry.Size(roomSize, roomSize),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx()),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())
+                )
+            }
+        }
+
+        // 3. ARCHITECTURAL SKELETON (Corridors/Connections)
+        config.edges.forEach { edge ->
+            val from = nodes.find { it.id == edge.from }
+            val to = nodes.find { it.id == edge.to }
+            if (from != null && to != null) {
+                // Draw corridor "bounds"
+                drawLine(
+                    color = Color(0xFF253149),
+                    start = Offset((from.x.toFloat() * scale + offsetX), (from.z.toFloat() * scale + offsetZ)),
+                    end = Offset((to.x.toFloat() * scale + offsetX), (to.z.toFloat() * scale + offsetZ)),
+                    strokeWidth = 10.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+                // Center line
+                drawLine(
+                    color = Color(0xFF1A2637),
+                    start = Offset((from.x.toFloat() * scale + offsetX), (from.z.toFloat() * scale + offsetZ)),
+                    end = Offset((to.x.toFloat() * scale + offsetX), (to.z.toFloat() * scale + offsetZ)),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+        }
+
+        // 4. ROUTE (Glowing blue path)
+        if (routePoints.size >= 2) {
+            for (i in 0 until routePoints.size - 1) {
+                val start = routePoints[i]
+                val end = routePoints[i + 1]
+                
+                // Shadow
+                drawLine(
+                    color = Color(0xFF168BFF).copy(alpha = 0.3f),
+                    start = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ)),
+                    end = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
+                    strokeWidth = 12.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+                
+                // Active path
+                drawLine(
+                    color = Color(0xFF168BFF),
+                    start = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ)),
+                    end = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
+                    strokeWidth = 5.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+            }
+
+            // Start/End Icons
+            val start = routePoints.first()
+            val end = routePoints.last()
+            
+            drawCircle(
+                color = Color(0xFF10D978),
+                radius = 7.dp.toPx(),
+                center = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ))
+            )
+            
+            drawCircle(
+                color = Color(0xFF168BFF),
+                radius = 9.dp.toPx(),
+                center = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ))
+            )
+            drawCircle(
+                color = Color.White,
+                radius = 11.dp.toPx(),
+                center = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())
+            )
+        }
+    }
 }
 
 private fun displayNameForCategory(category: String): String = when (category) {

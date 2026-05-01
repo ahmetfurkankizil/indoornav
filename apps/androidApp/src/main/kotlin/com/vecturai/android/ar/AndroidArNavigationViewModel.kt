@@ -32,6 +32,7 @@ data class ArNavigationUiState(
     val isAligned: Boolean = false,
     val hasArrived: Boolean = false,
     val isSimulated: Boolean = false,
+    val isAnyToAny: Boolean = false,
     val totalDistance: Double = 0.0,
     val routeStepCount: Int = 0,
     val progress: Double = 0.0,
@@ -47,6 +48,8 @@ data class ArNavigationUiState(
     val nextActionIcon: NavigationActionIcon = NavigationActionIcon.Straight,
     val nextActionText: String = "Follow the path",
     val nextActionDistance: Double? = null,
+    val isOffPath: Boolean = false,
+    val isWrongWay: Boolean = false,
 )
 
 enum class NavigationActionIcon {
@@ -68,13 +71,15 @@ enum class TrackingStatusIcon {
 class AndroidArNavigationViewModel(
     private val markerDetector: ArMarkerDetector,
     internal val routeRenderer: ArRouteRenderer,
-    private val haptics: AndroidHapticManager,
+    private val hapticManager: AndroidHapticManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ArNavigationUiState())
     val uiState: StateFlow<ArNavigationUiState> = _uiState.asStateFlow()
 
     private var routePackage: AndroidReviewedPackageLoader.LoadedPackage? = null
     private var entranceMarker: AndroidReviewedPackageLoader.PackageMarker? = null
+    private var originRoom: AndroidReviewedPackageLoader.PackageRoom? = null
+    private var buildingId: String? = null
     private var userCumulativeDistance = 0.0
     private var destinationThreshold = 1.5
     private var alignmentOffsetX = 0.0
@@ -83,25 +88,62 @@ class AndroidArNavigationViewModel(
     private var alignmentRotYDeg = 0.0
     private var alignmentTimeoutJob: Job? = null
     private var lastPoseSampleMs = 0L
+    private var lastAlignmentMs = 0L
     private var lastHapticArrowId: String? = null
     private var pendingSimulateAlignment = false
 
     fun configure(
         routePackage: AndroidReviewedPackageLoader.LoadedPackage,
         entranceMarker: AndroidReviewedPackageLoader.PackageMarker?,
+        originRoom: AndroidReviewedPackageLoader.PackageRoom? = null
     ) {
         alignmentTimeoutJob?.cancel()
         routeRenderer.clearArrows()
         markerDetector.fullReset()
 
+        val isSameBuilding = buildingId == routePackage.config.manifest.buildingId
         this.routePackage = routePackage
         this.entranceMarker = entranceMarker
-        userCumulativeDistance = 0.0
-        alignmentOffsetX = 0.0
-        alignmentOffsetY = 0.0
-        alignmentOffsetZ = 0.0
-        alignmentRotYDeg = 0.0
+        this.originRoom = originRoom
+        this.buildingId = routePackage.config.manifest.buildingId
+        
+        // STABILITY: Don't reset alignment if we are already aligned in the same building
+        // UNLESS we have a custom origin room which requires a re-anchor
+        if (!_uiState.value.isAligned || !isSameBuilding || originRoom != null) {
+            if (originRoom != null) {
+                // ANY-TO-ANY: Anchor to the selected starting room immediately
+                val startNode = routePackage.config.nodes.find { it.id == originRoom.destinationNodeId }
+                if (startNode != null) {
+                    alignmentOffsetX = -startNode.x
+                    alignmentOffsetY = -startNode.y
+                    alignmentOffsetZ = -startNode.z
+                    alignmentRotYDeg = 0.0 // Default forward
+                }
+            } else {
+                alignmentOffsetX = 0.0
+                alignmentOffsetY = 0.0
+                alignmentOffsetZ = 0.0
+                alignmentRotYDeg = 0.0
+            }
+            userCumulativeDistance = 0.0
+            pendingSimulateAlignment = true
+            
+            println("[AR] FORCING INSTANT START. originRoom: ${originRoom?.id ?: "Entrance (Default)"}")
+            
+            // FORCE alignment state immediately for ALL modes so the "Waiting for Poster" UI never shows up
+            _uiState.update {
+                it.copy(
+                    isAligned = true,
+                    isSimulated = true,
+                    isAnyToAny = true,
+                    sessionStateLabel = "Initializing AR...",
+                    trackingStatusLabel = "Calibrating position..."
+                )
+            }
+        }
+        
         lastPoseSampleMs = 0L
+        lastAlignmentMs = 0L
         lastHapticArrowId = null
         destinationThreshold = routePackage.config.routeRendering.destinationThresholdMeters
         routeRenderer.configureRendering(
@@ -135,75 +177,79 @@ class AndroidArNavigationViewModel(
         startAlignmentTimeout()
     }
 
+    fun isPendingSimulatedAlignment(): Boolean = pendingSimulateAlignment
+
     fun retryAlignment() {
         alignmentTimeoutJob?.cancel()
         markerDetector.reset()
         _uiState.update {
             it.copy(
                 alignmentTimedOut = false,
-                sessionStateLabel = "Waiting for Poster",
+                sessionStateLabel = if (originRoom != null) "Initializing..." else "Waiting for Poster",
                 markerAssetError = null,
                 sessionErrorMessage = null,
-                timeoutReasonMessage = "No matching entrance poster detected",
-                timeoutHintMessage = "",
+                timeoutReasonMessage = if (originRoom != null) "Still initializing AR..." else "No matching entrance poster detected",
+                timeoutHintMessage = if (originRoom != null) "Hold steady for a moment." else "Point at the entrance poster.",
             )
         }
         startAlignmentTimeout()
     }
 
-    fun simulateAlignment(frame: Frame? = null) {
-        if (frame == null) {
-            pendingSimulateAlignment = true
-            return
-        }
+    fun requestSimulatedAlignment() {
+        pendingSimulateAlignment = true
+    }
+
+    fun simulateAlignment(frame: Frame) {
         pendingSimulateAlignment = false
         val pkg = routePackage ?: return
         val marker = entranceMarker ?: pkg.config.entranceMarkers.firstOrNull()
-        _uiState.update { it.copy(isSimulated = true) }
+        _uiState.update { it.copy(isSimulated = true, isAligned = true, isAnyToAny = true) }
         alignmentTimeoutJob?.cancel()
 
-        // 1. Get first segment direction from nodes to calculate initial path heading
-        val nodes = pkg.routeNodeIds.mapNotNull { id -> pkg.config.nodes.find { it.id == id } }
-        val pathHeadingDeg = if (nodes.size >= 2) {
-            val dx = nodes[1].x - nodes[0].x
-            val dz = nodes[1].z - nodes[0].z
-            Math.toDegrees(Math.atan2(dx, dz)) // Building-space heading
-        } else 0.0
-
-        // 2. Get Camera Forward Vector (ARCore forward is -Z)
         val cameraPose = frame.camera.pose
-        val camX = cameraPose.tx().toDouble()
-        val camY = cameraPose.ty().toDouble()
-        val camZ = cameraPose.tz().toDouble()
         
-        // Z-axis from pose points BACKWARD in ARCore. Forward is -Z.
-        val zAxis = cameraPose.zAxis
-        val camForwardX = -zAxis[0].toDouble()
-        val camForwardZ = -zAxis[2].toDouble()
-        val camYaw = Math.toDegrees(Math.atan2(camForwardX, camForwardZ))
+        // Offset the start point 2.0 meters forward from the camera 
+        // so the arrows appear clearly in front of the user.
+        val offsetPose = cameraPose.compose(Pose.makeTranslation(0f, 0f, -2.0f))
+        
+        val arX = offsetPose.tx().toDouble()
+        val arY = offsetPose.ty().toDouble()
+        val arZ = offsetPose.tz().toDouble()
+        
+        val fwdVec = offsetPose.rotateVector(floatArrayOf(0f, 0f, -1f))
+        val arYawDeg = Math.toDegrees(Math.atan2(fwdVec[0].toDouble(), fwdVec[2].toDouble()))
 
-        val entranceNode = pkg.config.nodes.find { it.type == "entrance" }
-        val entranceNodeId = entranceNode?.id ?: "n01"
-
-        // 3. Align building path heading to camera yaw
+        val room = originRoom
+        val startNodeId = room?.destinationNodeId 
+            ?: marker?.startNodeId 
+            ?: pkg.config.nodes.find { it.type == "entrance" }?.id 
+            ?: "n01"
+            
+        val startNode = pkg.config.nodes.find { it.id == startNodeId }
+        
         handleMarkerDetected(
             MarkerDetectionEvent(
-                markerId = marker?.id ?: "marker-main-entrance",
-                entranceNodeId = marker?.startNodeId ?: entranceNodeId,
-                markerBuildingX = marker?.position?.x ?: entranceNode?.x ?: 0.0,
-                markerBuildingY = marker?.position?.y ?: entranceNode?.y ?: 1.6,
-                markerBuildingZ = marker?.position?.z ?: entranceNode?.z ?: 0.0,
-                // Position 0.5m in front of camera
-                markerArX = camX + 0.5 * camForwardX,
-                markerArY = camY - 1.4,
-                markerArZ = camZ + 0.5 * camForwardZ,
-                markerArRotationYDeg = camYaw - pathHeadingDeg, 
-                markerBuildingRotationYDeg = marker?.rotationYDegrees ?: 0.0,
+                markerId = if (room != null) "simulated-start-${room.id}" else (marker?.id ?: "marker-main-entrance"),
+                entranceNodeId = startNodeId,
+                markerArX = arX,
+                markerArY = arY,
+                markerArZ = arZ,
+                markerArRotationYDeg = arYawDeg,
+                markerBuildingX = startNode?.x ?: 0.0,
+                markerBuildingY = startNode?.y ?: 0.0,
+                markerBuildingZ = startNode?.z ?: 0.0,
+                markerBuildingRotationYDeg = 0.0,
                 confidence = 1.0,
-                role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE,
+                role = ArMarkerDetector.MarkerDetectionRole.ENTRANCE
             )
         )
-        println("[RouteDebug] Alignment: CamForward=($camForwardX, $camForwardZ), Yaw=$camYaw, PathHeading=$pathHeadingDeg")
+        
+        // FORCE progress to absolute zero so no arrows are "behind" on start
+        userCumulativeDistance = 0.0
+        
+        // Refresh arrows immediately
+        routeRenderer.placeAllArrows(pkg.arrows)
+        updateUiState(pkg.totalDistance)
     }
 
     fun advanceProgress() {
@@ -239,7 +285,6 @@ class AndroidArNavigationViewModel(
             simulateAlignment(frame)
         }
 
-        // AUTO-PROGRESS: Track user's position along the path automatically
         if (_uiState.value.isAligned) {
             updateAutoProgress(pose)
         }
@@ -248,7 +293,6 @@ class AndroidArNavigationViewModel(
     private fun updateAutoProgress(pose: Pose) {
         val pkg = routePackage ?: return
         
-        // 1. Convert AR position back to Building Space
         val worldX = pose.tx().toDouble()
         val worldZ = pose.tz().toDouble()
         
@@ -259,11 +303,9 @@ class AndroidArNavigationViewModel(
         val cosR = kotlin.math.cos(rotRad)
         val sinR = kotlin.math.sin(rotRad)
         
-        // Inverse CCW rotation to get building coordinates
         val buildingX = relX * cosR + relZ * sinR
         val buildingZ = -relX * sinR + relZ * cosR
         
-        // 2. Find the closest point on the path segments to determine distance
         var bestDistanceOnPath = userCumulativeDistance
         val nodes = pkg.routeNodeIds.mapNotNull { id -> pkg.config.nodes.find { it.id == id } }
         
@@ -278,7 +320,6 @@ class AndroidArNavigationViewModel(
             val segLenSq = dx * dx + dz * dz
             if (segLenSq < 0.001) continue
             
-            // Project point onto segment: t = [(p-a) . (b-a)] / |b-a|^2
             var t = ((buildingX - a.x) * dx + (buildingZ - a.z) * dz) / segLenSq
             t = t.coerceIn(0.0, 1.0)
             
@@ -287,35 +328,61 @@ class AndroidArNavigationViewModel(
             
             val distSq = (buildingX - projX) * (buildingX - projX) + (buildingZ - projZ) * (buildingZ - projZ)
             
-            // Only update if this segment is very close to user (prevents jumping to wrong floors/rooms)
-            if (distSq < minDistanceToSegmentSq && distSq < 16.0) { // 4m radius threshold
+            if (distSq < minDistanceToSegmentSq && distSq < 16.0) { 
                 minDistanceToSegmentSq = distSq
                 bestDistanceOnPath = tempCumulative + t * kotlin.math.sqrt(segLenSq)
             }
             tempCumulative += kotlin.math.sqrt(segLenSq)
         }
         
-        // Only progress forward (or slightly backward to handle jitter, but mostly forward)
-        if (bestDistanceOnPath > userCumulativeDistance - 0.5) {
-            userCumulativeDistance = max(userCumulativeDistance, bestDistanceOnPath)
+        val isGoingBackwards = bestDistanceOnPath < userCumulativeDistance - 1.5
+        val isFarFromPath = minDistanceToSegmentSq > 16.0 
+        
+        if (System.currentTimeMillis() % 1000 < 50) {
+            println("[RouteDebug] Pos: (${buildingX.format(2)}, ${buildingZ.format(2)}) Dist: ${bestDistanceOnPath.format(2)}m Offset: ${sqrt(minDistanceToSegmentSq).format(2)}m")
+        }
+
+        if (isFarFromPath || isGoingBackwards) {
+            if (!_uiState.value.isOffPath && !_uiState.value.isWrongWay) {
+                hapticManager.warning()
+            }
+        }
+
+        _uiState.update { 
+            it.copy(
+                isOffPath = isFarFromPath,
+                isWrongWay = isGoingBackwards
+            )
+        }
+
+        val maxJump = 1.5
+        val safeNextDistance = min(userCumulativeDistance + maxJump, bestDistanceOnPath)
+
+        if (!isFarFromPath && safeNextDistance > userCumulativeDistance - 0.1) {
+            userCumulativeDistance = max(userCumulativeDistance, safeNextDistance)
             
-            // CRITICAL: Trigger UI updates after distance change
             val remaining = max(0.0, pkg.totalDistance - userCumulativeDistance)
             updateUiState(remaining)
             checkArrival(remaining)
         }
     }
 
+    private fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
     fun onFrame(frame: Frame, _width: Int, _height: Int) {
         updateCameraPose(frame)
         markerDetector.processFrame(frame)
         updateTrackingStatus(frame)
 
+        if (pendingSimulateAlignment) {
+            simulateAlignment(frame)
+        }
+
         if (_uiState.value.isAligned && !_uiState.value.hasArrived) {
             val now = System.currentTimeMillis()
             if (!_uiState.value.isSimulated && now - lastPoseSampleMs >= 500L) {
                 lastPoseSampleMs = now
-                sampleCameraPose(frame)
+                // sampleCameraPose removed in favor of updateAutoProgress
             }
         }
     }
@@ -331,6 +398,7 @@ class AndroidArNavigationViewModel(
         alignmentOffsetZ = 0.0
         alignmentRotYDeg = 0.0
         lastPoseSampleMs = 0L
+        lastAlignmentMs = 0L
         lastHapticArrowId = null
         _uiState.update {
             it.copy(
@@ -414,26 +482,53 @@ class AndroidArNavigationViewModel(
     }
 
     private fun handleMarkerDetected(event: MarkerDetectionEvent) {
+        val now = System.currentTimeMillis()
+        
+        // If we see a different marker than before, it might be a localization correction
+        val isNewMarker = event.markerId != entranceMarker?.id
+        
+        if (_uiState.value.isAligned && (now - lastAlignmentMs < 5000) && !isNewMarker) {
+            return
+        }
+
         alignmentTimeoutJob?.cancel()
+        
+        // Dynamic re-routing: If we scan a localization marker, we should update our start point
+        if (isNewMarker && event.role == ArMarkerDetector.MarkerDetectionRole.CHECKPOINT) {
+            // Future: Request server or loader to re-compute path from this specific node
+            println("[RouteDebug] Re-localizing at marker: ${event.markerId}")
+        }
         val rotDeg = event.markerArRotationYDeg - event.markerBuildingRotationYDeg
         val rotRad = Math.toRadians(rotDeg)
         val cosR = cos(rotRad)
         val sinR = sin(rotRad)
         
-        // Standard CCW rotation matrix
         val rotatedBuildingX = event.markerBuildingX * cosR - event.markerBuildingZ * sinR
         val rotatedBuildingZ = event.markerBuildingX * sinR + event.markerBuildingZ * cosR
 
-        alignmentOffsetX = event.markerArX - rotatedBuildingX
-        alignmentOffsetY = event.markerArY - event.markerBuildingY
-        alignmentOffsetZ = event.markerArZ - rotatedBuildingZ
-        alignmentRotYDeg = rotDeg
+        val newOffsetX = event.markerArX - rotatedBuildingX
+        val newOffsetY = event.markerArY - event.markerBuildingY
+        val newOffsetZ = event.markerArZ - rotatedBuildingZ
+        val newRotY = rotDeg
 
-        val pkg = routePackage ?: return
-        if (!_uiState.value.isSimulated) {
-            userCumulativeDistance = 0.0
+        if (_uiState.value.isAligned) {
+            alignmentOffsetX = alignmentOffsetX * 0.9 + newOffsetX * 0.1
+            alignmentOffsetY = alignmentOffsetY * 0.9 + newOffsetY * 0.1
+            alignmentOffsetZ = alignmentOffsetZ * 0.9 + newOffsetZ * 0.1
+            alignmentRotYDeg = alignmentRotYDeg * 0.9 + newRotY * 0.1
+        } else {
+            alignmentOffsetX = newOffsetX
+            alignmentOffsetY = newOffsetY
+            alignmentOffsetZ = newOffsetZ
+            alignmentRotYDeg = newRotY
+            if (!_uiState.value.isSimulated) {
+                userCumulativeDistance = 0.0
+            }
         }
 
+        lastAlignmentMs = now
+        val pkg = routePackage ?: return
+        
         routeRenderer.setAlignmentTransform(
             offsetX = alignmentOffsetX,
             offsetY = alignmentOffsetY,
@@ -442,14 +537,18 @@ class AndroidArNavigationViewModel(
         )
         routeRenderer.placeAllArrows(pkg.arrows)
         routeRenderer.updateVisibility(userCumulativeDistance)
-        haptics.routeStarted()
+        
+        if (!_uiState.value.isAligned) {
+            hapticManager.routeStarted()
+        }
 
         val next = computeNextAction(pkg.totalDistance)
         _uiState.update {
             it.copy(
                 isAligned = true,
                 alignmentTimedOut = false,
-                sessionStateLabel = "Navigating",
+                sessionStateLabel = "Navigation Active",
+                trackingStatusLabel = "Follow the arrows",
                 remainingDistance = pkg.totalDistance,
                 isLowConfidence = false,
                 arrowCount = routeRenderer.renderedArrowCount,
@@ -458,85 +557,6 @@ class AndroidArNavigationViewModel(
                 nextActionDistance = next.distance,
             )
         }
-    }
-
-    private fun sampleCameraPose(frame: Frame) {
-        if (frame.camera.trackingState != TrackingState.TRACKING) return
-        val pkg = routePackage ?: return
-        val pose = frame.camera.pose
-        val radians = -alignmentRotYDeg * Math.PI / 180.0
-        val cosR = cos(radians)
-        val sinR = sin(radians)
-        val tx = pose.tx().toDouble() - alignmentOffsetX
-        val tz = pose.tz().toDouble() - alignmentOffsetZ
-        val bx = tx * cosR + tz * sinR
-        val bz = -tx * sinR + tz * cosR
-
-        val routePoints = pkg.routePoints
-        if (routePoints.size < 2) return
-
-        val segmentLengths = routePoints.zipWithNext { a, b ->
-            val dx = b.first - a.first
-            val dz = b.second - a.second
-            sqrt(dx * dx + dz * dz)
-        }
-
-        var bestDistance = Double.MAX_VALUE
-        var bestCumulative = 0.0
-        var cumulative = 0.0
-
-        for (i in 0 until routePoints.lastIndex) {
-            val a = routePoints[i]
-            val b = routePoints[i + 1]
-            val dx = b.first - a.first
-            val dz = b.second - a.second
-            val denom = dx * dx + dz * dz
-            if (denom <= 0.0001) {
-                cumulative += segmentLengths[i]
-                continue
-            }
-            val t = (((bx - a.first) * dx + (bz - a.second) * dz) / denom).coerceIn(0.0, 1.0)
-            val px = a.first + t * dx
-            val pz = a.second + t * dz
-            val distance = sqrt((bx - px) * (bx - px) + (bz - pz) * (bz - pz))
-            if (distance < bestDistance) {
-                bestDistance = distance
-                bestCumulative = cumulative + t * segmentLengths[i]
-            }
-            cumulative += segmentLengths[i]
-        }
-
-        val dxDest = bx - pkg.destinationPosition.first
-        val dzDest = bz - pkg.destinationPosition.second
-        val destinationDistance = sqrt(dxDest * dxDest + dzDest * dzDest)
-
-        if (bestCumulative > userCumulativeDistance) {
-            userCumulativeDistance = bestCumulative
-        }
-        val progress = if (pkg.totalDistance > 0) {
-            (userCumulativeDistance / pkg.totalDistance).coerceIn(0.0, 1.0)
-        } else {
-            1.0
-        }
-        val remaining = max(0.0, pkg.totalDistance - userCumulativeDistance)
-        val lowConfidence = bestDistance > 3.0 || frame.camera.trackingState != TrackingState.TRACKING
-
-        routeRenderer.updateVisibility(userCumulativeDistance)
-        val next = computeNextAction(destinationDistance)
-        _uiState.update {
-            it.copy(
-                progress = progress,
-                remainingDistance = remaining,
-                distanceToDestination = destinationDistance,
-                isLowConfidence = lowConfidence,
-                arrowCount = routeRenderer.renderedArrowCount,
-                nextActionIcon = next.icon,
-                nextActionText = next.text,
-                nextActionDistance = next.distance,
-            )
-        }
-
-        checkArrival(destinationDistance)
     }
 
     private fun updateTrackingStatus(frame: Frame) {
@@ -556,13 +576,13 @@ class AndroidArNavigationViewModel(
         val wasLow = _uiState.value.isLowConfidence
         _uiState.update {
             it.copy(
-                trackingStatusLabel = label,
+                trackingStatusLabel = if (it.isAligned) "Follow the arrows" else label,
                 trackingStatusIcon = icon,
                 isLowConfidence = if (it.isAligned) it.isLowConfidence || low else it.isLowConfidence,
             )
         }
         if (_uiState.value.isAligned && low && !wasLow) {
-            haptics.recentering()
+            hapticManager.recentering()
         }
     }
 
@@ -583,7 +603,7 @@ class AndroidArNavigationViewModel(
                 next.type in setOf(ArrowPlacementType.TURN_LEFT, ArrowPlacementType.TURN_RIGHT, ArrowPlacementType.U_TURN)
             ) {
                 lastHapticArrowId = next.id
-                haptics.turnImminent()
+                hapticManager.turnImminent()
             }
             when (next.type) {
                 ArrowPlacementType.TURN_LEFT -> NextAction(
@@ -623,16 +643,18 @@ class AndroidArNavigationViewModel(
 
     private fun checkArrival(distanceToDestination: Double) {
         if (_uiState.value.hasArrived || distanceToDestination > destinationThreshold) return
-        alignmentTimeoutJob?.cancel()
-        routeRenderer.hideAllArrows()
-        haptics.arrived()
+        
+        // STABILITY: Don't cancel everything on arrival. Keep the alignment!
+        // routeRenderer.hideAllArrows() // We might want to keep arrows visible or clear them
+        hapticManager.arrived()
+        
         _uiState.update {
             it.copy(
                 hasArrived = true,
                 sessionStateLabel = "Arrived",
                 nextActionIcon = NavigationActionIcon.Destination,
                 nextActionText = "You've reached ${it.destinationLabel}",
-                arrowCount = 0,
+                // We keep isAligned = true so user can pick a new destination immediately
             )
         }
     }

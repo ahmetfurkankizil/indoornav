@@ -209,9 +209,11 @@ class ArCameraActivity : ComponentActivity() {
                 ArCameraFlowViewModel.Phase.RoutePreview -> RoutePreviewScreen(flowModel)
                 ArCameraFlowViewModel.Phase.ArNavigation -> {
                     val routePackage = session.routePackage
+                    println("[ArActivity] Phase.ArNavigation: routePackage=${routePackage != null}, originRoom=${session.selectedOriginRoom?.id ?: "null"}")
                     if (routePackage != null) {
-                        LaunchedEffect(routePackage, session.validatedEntranceMarker) {
-                            arViewModel.configure(routePackage, session.validatedEntranceMarker)
+                        LaunchedEffect(routePackage, session.validatedEntranceMarker, session.selectedOriginRoom) {
+                            println("[ArActivity] LaunchedEffect configure: originRoom=${session.selectedOriginRoom?.id ?: "null"}")
+                            arViewModel.configure(routePackage, session.validatedEntranceMarker, session.selectedOriginRoom)
                             
                             // CRITICAL: Download the QR image from the server and use it as the AR marker
                             if (!isEmulator) {
@@ -233,20 +235,19 @@ class ArCameraActivity : ComponentActivity() {
                                 }
                             }
 
-                            // FORCE START: Show arrows immediately
-                            arViewModel.simulateAlignment()
+                            // Alignment is now handled automatically in ViewModel.onFrame when TRACKING is ready
                         }
                         ArNavigationScreen(
                             viewModel = arViewModel,
                             isEmulator = isEmulator,
-                            onEnd = ::finishFlow,
+                            onEnd = flowModel::goBackToDestinationSelect,
                             onRetryActivity = ::recreate,
                         )
                     }
                 }
                 is ArCameraFlowViewModel.Phase.FatalError -> FatalErrorOverlay(
                     message = currentPhase.message,
-                    onClose = ::finishFlow,
+                    onClose = flowModel::goBackToDestinationSelect,
                     onRetry = ::recreate,
                 )
             }

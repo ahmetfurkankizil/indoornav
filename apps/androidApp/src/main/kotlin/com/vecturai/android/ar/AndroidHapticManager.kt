@@ -20,6 +20,7 @@ class AndroidHapticManager(context: Context) {
     fun turnImminent() = vibrate(90, 180)
     fun recentering() = vibrate(25, 90)
     fun arrived() = vibrate(140, VibrationEffect.DEFAULT_AMPLITUDE)
+    fun warning() = vibrate(100, 150)
 
     private fun vibrate(durationMs: Long, amplitude: Int) {
         if (!isEnabled) return

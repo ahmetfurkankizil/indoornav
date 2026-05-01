@@ -249,12 +249,15 @@ class AndroidReviewedPackageLoader(
         Result.failure(e)
     }
 
-    fun computeRoute(config: ReviewedConfig, destinationRoomId: String): LoadedPackage? {
+    fun computeRoute(
+        config: ReviewedConfig,
+        destinationRoomId: String,
+        startNodeIdOverride: String? = null
+    ): LoadedPackage? {
         val nodeMap = config.nodes.associateBy { it.id }
         val adjacency = mutableMapOf<String, MutableList<Pair<String, Double>>>()
         println("[RouteDebug] --- LOADING EDGES ---")
         for (edge in config.edges) {
-            println("[RouteDebug] Edge in package: ${edge.from} -> ${edge.to} (cost: ${edge.cost})")
             adjacency.getOrPut(edge.from) { mutableListOf() }.add(edge.to to edge.cost)
             if (edge.bidirectional) {
                 adjacency.getOrPut(edge.to) { mutableListOf() }.add(edge.from to edge.cost)
@@ -262,7 +265,8 @@ class AndroidReviewedPackageLoader(
         }
         println("[RouteDebug] --- END EDGES ---")
 
-        val startNodeId = config.entranceMarkers.firstOrNull()?.startNodeId
+        val startNodeId = startNodeIdOverride
+            ?: config.entranceMarkers.firstOrNull()?.startNodeId
             ?: config.nodes.find { it.type == "entrance" }?.id
             ?: config.nodes.firstOrNull()?.id
             ?: return null

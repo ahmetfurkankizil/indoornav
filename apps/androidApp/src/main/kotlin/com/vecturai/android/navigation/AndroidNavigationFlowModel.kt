@@ -63,6 +63,7 @@ class ArCameraFlowViewModel(
 
     data class SessionData(
         val confirmedEntrance: String = "",
+        val selectedOriginRoom: AndroidReviewedPackageLoader.PackageRoom? = null,
         val selectedRoom: AndroidReviewedPackageLoader.PackageRoom? = null,
         val routePackage: AndroidReviewedPackageLoader.LoadedPackage? = null,
         val validatedEntranceMarker: AndroidReviewedPackageLoader.PackageMarker? = null,
@@ -93,7 +94,8 @@ class ArCameraFlowViewModel(
 
     fun routeSummaryFor(room: AndroidReviewedPackageLoader.PackageRoom): RouteSummary? {
         val config = _session.value.reviewedConfig ?: return null
-        val routePackage = packageLoader.computeRoute(config, room.id) ?: return null
+        val originNodeId = _session.value.selectedOriginRoom?.destinationNodeId
+        val routePackage = packageLoader.computeRoute(config, room.id, originNodeId) ?: return null
         return RouteSummary(
             distanceMeters = routePackage.totalDistance,
             stepCount = (routePackage.routeNodeIds.size - 1).coerceAtLeast(1),
@@ -155,18 +157,27 @@ class ArCameraFlowViewModel(
         _phase.value = Phase.DestinationSelect
     }
 
+    fun selectOrigin(room: AndroidReviewedPackageLoader.PackageRoom?) {
+        println("[FlowModel] selectOrigin: ${room?.id ?: "null"}")
+        _session.value = _session.value.copy(selectedOriginRoom = room)
+    }
+
     fun selectDestination(room: AndroidReviewedPackageLoader.PackageRoom) {
         val config = _session.value.reviewedConfig ?: return
-        val routePackage = packageLoader.computeRoute(config, room.id) ?: return
+        val originNodeId = _session.value.selectedOriginRoom?.destinationNodeId
+        println("[FlowModel] selectDestination: ${room.id}, originNodeId: $originNodeId")
+        val routePackage = packageLoader.computeRoute(config, room.id, originNodeId) ?: return
         _session.value = _session.value.copy(
             selectedRoom = room,
             routePackage = routePackage,
+            selectedOriginRoom = _session.value.selectedOriginRoom // Explicitly preserve
         )
         _phase.value = Phase.RoutePreview
     }
 
     fun startNavigation() {
         val session = _session.value
+        println("[FlowModel] startNavigation: originRoom=${session.selectedOriginRoom?.id ?: "null"}")
         if (session.selectedRoom != null && session.routePackage != null) {
             _phase.value = Phase.ArNavigation
         }

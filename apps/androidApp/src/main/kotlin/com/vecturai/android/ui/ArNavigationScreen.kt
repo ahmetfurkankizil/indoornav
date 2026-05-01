@@ -99,7 +99,7 @@ fun ArNavigationScreen(
                         onRetry = onRetryActivity,
                         onEnd = onEnd,
                     )
-                !uiState.isAligned -> Box(Modifier.fillMaxSize()) {
+                !uiState.isAligned && !uiState.isAnyToAny -> Box(Modifier.fillMaxSize()) {
                     // Central Target Frame
                     Box(
                         modifier = Modifier
@@ -111,13 +111,32 @@ fun ArNavigationScreen(
                     Column(Modifier.fillMaxSize()) {
                         ArTopBar(uiState = uiState, onEnd = onEnd)
                         Spacer(Modifier.weight(1f))
-                        AlignmentOverlay(
-                            uiState = uiState,
-                            onRetry = onRetryActivity,
-                            onCancel = onEnd,
-                            onSimulate = viewModel::simulateAlignment,
-                            allowSimulation = isEmulator,
-                        )
+                        if (!viewModel.isPendingSimulatedAlignment()) {
+                            AlignmentOverlay(
+                                uiState = uiState,
+                                onRetry = onRetryActivity,
+                                onCancel = onEnd,
+                                onSimulate = viewModel::requestSimulatedAlignment,
+                                allowSimulation = isEmulator,
+                            )
+                        } else {
+                            // Minimal "Initializing" UI while we wait for the first frame
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color.Black.copy(alpha = 0.4f))
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.White)
+                                    Spacer(Modifier.width(12.dp))
+                                    Text("Initializing AR...", color = Color.White, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                     }
                 }
                 else -> ActiveNavigationOverlay(
@@ -232,7 +251,7 @@ private fun AlignmentOverlay(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else "Point your camera back at the QR code you just scanned.",
+                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else (uiState.timeoutHintMessage.ifBlank { "Point your camera at a known marker to align." }),
                         color = Color(0xFFB6BFCE),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -299,6 +318,50 @@ private fun ActiveNavigationOverlay(
                 .statusBarsPadding()
                 .padding(start = 12.dp, top = 8.dp, end = 12.dp),
         )
+        
+        // DEVIATION WARNING OVERLAY
+        androidx.compose.animation.AnimatedVisibility(
+            visible = uiState.isOffPath || uiState.isWrongWay,
+            enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+            exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically(),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                color = Color(0xFF7F1D1D).copy(alpha = 0.94f), // Dark red
+                border = BorderStroke(1.5.dp, Color(0xFFEF4444))
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = if (uiState.isWrongWay) "WRONG DIRECTION" else "OFF ROUTE",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
+                        )
+                        Text(
+                            text = if (uiState.isWrongWay) "Please turn around and follow the arrows." else "Please return to the highlighted path.",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+        }
+        
         Spacer(Modifier.weight(1f))
         BottomHud(uiState = uiState, onEnd = onEnd)
     }
