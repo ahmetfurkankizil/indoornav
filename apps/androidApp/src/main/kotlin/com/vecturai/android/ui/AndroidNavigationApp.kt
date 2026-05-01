@@ -958,16 +958,20 @@ private fun EmptyRoomsState(searchText: String) {
 }
 
 @Composable
-fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
-    val session by flowModel.session.collectAsState()
-    val routePackage = session.routePackage
-    val distance = routePackage?.totalDistance ?: 0.0
-    val routeStepCount = routePackage?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
-    val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
-    val originName = session.selectedOriginRoom?.displayName 
-        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
+fun RoutePreviewContent(
+    config: AndroidReviewedPackageLoader.ReviewedConfig?,
+    routeLeg: AndroidReviewedPackageLoader.RouteLeg?,
+    originName: String,
+    onBack: () -> Unit,
+    onStart: () -> Unit,
+    buttonText: String = "START AR NAVIGATION"
+) {
+    val distance = routeLeg?.totalDistance ?: 0.0
+    val routeStepCount = routeLeg?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
+    val destinationName = routeLeg?.destinationName ?: "Destination"
     val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
     val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
+    val floorName = routeLeg?.floorName ?: ""
 
     Box(
         modifier = Modifier
@@ -994,7 +998,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                         .clip(RoundedCornerShape(13.dp))
                         .background(Color(0xFF121A28))
                         .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
-                        .clickable(role = Role.Button, onClick = flowModel::goBackToDestinationSelect),
+                        .clickable(role = Role.Button, onClick = onBack),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -1035,8 +1039,8 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                     color = Color.Transparent
                 ) {
                     RouteMapPreview(
-                        config = session.reviewedConfig,
-                        routePoints = routePackage?.routePoints ?: emptyList(),
+                        config = config,
+                        routePoints = routeLeg?.routePoints ?: emptyList(),
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -1062,7 +1066,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
-                                text = "Building A - Ground Floor",
+                                text = "Building A - Ground Floor", // We could dynamically fetch building name, but sticking to existing pattern
                                 color = Color(0xFF6F7B8E),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -1074,7 +1078,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                             border = BorderStroke(1.dp, Color(0xFF0B60AE)),
                         ) {
                             Text(
-                                text = "Floor G",
+                                text = floorName,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                                 color = Color(0xFF168BFF),
                                 fontSize = 11.sp,
@@ -1111,7 +1115,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
             contentAlignment = Alignment.BottomCenter
         ) {
             Surface(
-                onClick = flowModel::startNavigation,
+                onClick = onStart,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp),
@@ -1133,7 +1137,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                     )
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        text = "START AR NAVIGATION",
+                        text = buttonText,
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -1143,6 +1147,23 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
             }
         }
     }
+}
+
+@Composable
+fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
+    val session by flowModel.session.collectAsState()
+    val routePackage = session.routePackage
+    val firstLeg = routePackage?.legs?.firstOrNull()
+    val originName = session.selectedOriginRoom?.displayName 
+        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
+
+    RoutePreviewContent(
+        config = session.reviewedConfig,
+        routeLeg = firstLeg,
+        originName = originName,
+        onBack = flowModel::goBackToDestinationSelect,
+        onStart = flowModel::startNavigation
+    )
 }
 
 @Composable
@@ -1601,16 +1622,16 @@ fun GradientPrimaryButton(text: String, icon: ImageVector, onClick: () -> Unit, 
 private fun AndroidReviewedPackageLoader.PackageRoom.prettyDestinationName(): String =
     displayName.replace("EA 102", "EA102")
 
-private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String = when (id) {
-    "ea101" -> "Ground Floor - East Wing"
-    "ea102" -> "Ground Floor - East Wing"
-    "cs-lab" -> "Ground Floor - Computer Science"
-    "me-lab" -> "First Floor - Northeast Wing"
-    "fameo-cafe" -> "Ground Floor - East Corridor"
-    "elevators" -> "Ground Floor - Main Core"
-    "west-men-wc", "west-women-wc" -> "Ground Floor - West Wing"
-    "east-men-wc", "east-women-wc" -> "Ground Floor - East Wing"
-    else -> description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(category ?: "other")
+private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String {
+    val floorText = floorName ?: "Unknown Floor"
+    val descText = description?.takeIf { it.isNotBlank() }
+    
+    // If we have a custom description from the backend, append the floor
+    if (descText != null) {
+        return "$floorText - $descText"
+    }
+    
+    return floorText
 }
 
 private fun destinationSortIndex(id: String): Int = when (id) {

@@ -23,6 +23,7 @@ class AndroidReviewedPackageLoader(
         val z: Double,
         val type: String,
         val label: String? = null,
+        val floorId: String? = null,
     )
 
     @Serializable
@@ -62,6 +63,8 @@ class AndroidReviewedPackageLoader(
         val destinationNodeId: String,
         val category: String? = null,
         val description: String? = null,
+        val floorId: String? = null,
+        val floorName: String? = null,
     )
 
     @Serializable
@@ -102,6 +105,15 @@ class AndroidReviewedPackageLoader(
     )
 
     @Serializable
+    data class CrossFloorConnection(
+        val id: String,
+        val fromNodeId: String,
+        val toNodeId: String,
+        val type: String = "stairs",
+        val bidirectional: Boolean = true,
+    )
+
+    @Serializable
     data class UnifiedPackage(
         val buildingId: String,
         val buildingName: String,
@@ -110,6 +122,7 @@ class AndroidReviewedPackageLoader(
         val entranceMarkers: List<PackageMarker>,
         val buildingWidthMeters: Double = 25.0,
         val routeRendering: RouteRenderingConfig,
+        val crossFloorConnections: List<CrossFloorConnection> = emptyList(),
     )
 
     @Serializable
@@ -133,16 +146,38 @@ class AndroidReviewedPackageLoader(
         val routeRendering: RouteRenderingConfig,
     )
 
-    data class LoadedPackage(
-        val config: ReviewedConfig,
+    data class FloorTransition(
+        val fromFloorName: String,
+        val toFloorName: String,
+        val isUp: Boolean,
+        val floorDiff: Int,
+    )
+
+    data class RouteLeg(
+        val floorId: String,
+        val floorName: String,
+        val startNodeId: String,
+        val endNodeId: String,
         val routeNodeIds: List<String>,
         val arrows: List<ArrowPlacementData>,
         val routePoints: List<Pair<Double, Double>>,
         val totalDistance: Double,
-        val entranceMarker: PackageMarker?,
         val destinationName: String,
         val destinationPosition: Pair<Double, Double>,
+        val transition: FloorTransition? = null,
     )
+
+    data class LoadedPackage(
+        val config: ReviewedConfig,
+        val entranceMarker: PackageMarker?,
+        val destinationName: String,
+        val legs: List<RouteLeg>,
+    ) {
+        val totalDistance: Double get() = legs.sumOf { it.totalDistance }
+        val routePoints: List<Pair<Double, Double>> get() = legs.flatMap { it.routePoints }
+        val routeNodeIds: List<String> get() = legs.flatMap { it.routeNodeIds }
+        val arrows: List<ArrowPlacementData> get() = legs.flatMap { it.arrows }
+    }
 
     sealed class PackageError(
         override val message: String,
@@ -192,29 +227,65 @@ class AndroidReviewedPackageLoader(
 
     fun parseUnifiedPackage(jsonString: String): Result<ReviewedConfig> = try {
         val unified = json.decodeFromString<UnifiedPackage>(jsonString)
-        
+
         // SMART SCALE DETECTOR: Calculate the actual width of the map in units
         val allNodesRaw = unified.floors.flatMap { it.nodes }
         val minX = allNodesRaw.minOfOrNull { it.x } ?: 0.0
         val maxX = allNodesRaw.maxOfOrNull { it.x } ?: 1.0
         val mapUnitWidth = maxX - minX
-        
+
         // Scale factor: Real Meters / Map Units
         val scaleFactor = if (mapUnitWidth > 0.1) unified.buildingWidthMeters / mapUnitWidth else 1.0
-        
+
         println("[PackageLoader] Map unit width: $mapUnitWidth, Target width: ${unified.buildingWidthMeters}m, Scale factor: $scaleFactor")
 
-        val allNodes = allNodesRaw.map { n ->
-            n.copy(x = n.x * scaleFactor, y = n.y * scaleFactor, z = n.z * scaleFactor)
+        // Build a floor-id -> floor info map for tagging nodes/rooms
+        val floorInfoMap = unified.floors.associate { it.floorId to it }
+
+        val allNodes = unified.floors.flatMap { floor ->
+            floor.nodes.map { n ->
+                n.copy(
+                    x = n.x * scaleFactor,
+                    y = n.y * scaleFactor,
+                    z = n.z * scaleFactor,
+                    floorId = floor.floorId,
+                )
+            }
         }
-        val allEdges = unified.floors.flatMap { it.edges }
-        
+        val allNodeMap = allNodes.associateBy { it.id }
+
+        // Intra-floor edges
+        val intraFloorEdges = unified.floors.flatMap { it.edges }
+
+        // Cross-floor connections become extra edges (a cost is estimated as 5m per floor level)
+        val crossFloorEdges = unified.crossFloorConnections.map { c ->
+            val fromNode = allNodeMap[c.fromNodeId]
+            val toNode = allNodeMap[c.toNodeId]
+            val fromFloor = fromNode?.floorId?.let { floorInfoMap[it] }
+            val toFloor = toNode?.floorId?.let { floorInfoMap[it] }
+            val floorDiff = if (fromFloor != null && toFloor != null) {
+                kotlin.math.abs(fromFloor.floorNumber - toFloor.floorNumber)
+            } else 1
+            PackageEdge(
+                id = c.id,
+                from = c.fromNodeId,
+                to = c.toNodeId,
+                cost = floorDiff * 5.0, // 5 meters cost per floor
+                bidirectional = c.bidirectional,
+            )
+        }
+        val allEdges = intraFloorEdges + crossFloorEdges
+
+        // Rooms: all nodes with type "room" — tagged with their floor
         val rooms = allNodes.filter { it.type == "room" }.map { n ->
+            val floor = n.floorId?.let { floorInfoMap[it] }
             PackageRoom(
                 id = n.id,
                 displayName = n.label ?: "Room ${n.id.take(4)}",
                 destinationNodeId = n.id,
-                category = "room"
+                category = "room",
+                floorId = n.floorId,
+                floorName = floor?.floorName,
             )
         }
 
@@ -279,25 +350,72 @@ class AndroidReviewedPackageLoader(
         val routeNodes = routeNodeIds.mapNotNull { nodeMap[it] }
         if (routeNodes.size < 2) return null
 
-        val arrows = generateArrows(
-            nodes = routeNodes,
-            destinationLabel = room.displayName,
-            spacing = config.routeRendering.arrowSpacingMeters,
-            heightOffset = config.routeRendering.arrowHeightOffsetMeters,
-        )
-        val points = routeNodes.map { it.x to it.z }
-        val distance = totalDistance(points)
-        val destinationNode = routeNodes.last()
+        val legs = mutableListOf<RouteLeg>()
+        var legStartIndex = 0
+        
+        while (legStartIndex < routeNodes.size - 1) {
+            val startNode = routeNodes[legStartIndex]
+            val currentFloorId = startNode.floorId
+            
+            // Find the boundary of this leg
+            var legEndIndex = legStartIndex + 1
+            while (legEndIndex < routeNodes.size && routeNodes[legEndIndex].floorId == currentFloorId) {
+                legEndIndex++
+            }
+            
+            // The segment for this leg is [legStartIndex, legEndIndex - 1]
+            val segmentNodes = routeNodes.subList(legStartIndex, legEndIndex)
+            val segmentNodeIds = routeNodeIds.subList(legStartIndex, legEndIndex)
+            
+            val isFinalLeg = legEndIndex == routeNodes.size
+            val legDestName = if (isFinalLeg) room.displayName else segmentNodes.last().label ?: "Elevator"
+            
+            val arrows = generateArrows(
+                nodes = segmentNodes,
+                destinationLabel = legDestName,
+                spacing = config.routeRendering.arrowSpacingMeters,
+                heightOffset = config.routeRendering.arrowHeightOffsetMeters,
+            )
+            val points = segmentNodes.map { it.x to it.z }
+            val distance = totalDistance(points)
+            val destNode = segmentNodes.last()
+            
+            var transition: FloorTransition? = null
+            if (!isFinalLeg) {
+                val nextNode = routeNodes[legEndIndex]
+                val currentFloorName = config.rooms.firstOrNull { it.floorId == currentFloorId }?.floorName ?: currentFloorId ?: "Current Floor"
+                val nextFloorName = config.rooms.firstOrNull { it.floorId == nextNode.floorId }?.floorName ?: nextNode.floorId ?: "Next Floor"
+                
+                transition = FloorTransition(
+                    fromFloorName = currentFloorName,
+                    toFloorName = nextFloorName,
+                    isUp = true, // Simplified; could be enhanced with floor parsing
+                    floorDiff = 1 
+                )
+            }
+            
+            legs.add(RouteLeg(
+                floorId = currentFloorId ?: "",
+                floorName = config.rooms.firstOrNull { it.floorId == currentFloorId }?.floorName ?: currentFloorId ?: "",
+                startNodeId = startNode.id,
+                endNodeId = destNode.id,
+                routeNodeIds = segmentNodeIds,
+                arrows = arrows,
+                routePoints = points,
+                totalDistance = distance,
+                destinationName = legDestName,
+                destinationPosition = destNode.x to destNode.z,
+                transition = transition
+            ))
+            
+            legStartIndex = legEndIndex
+        }
 
         return LoadedPackage(
             config = config,
-            routeNodeIds = routeNodeIds,
-            arrows = arrows,
-            routePoints = points,
-            totalDistance = distance,
             entranceMarker = config.entranceMarkers.firstOrNull(),
             destinationName = room.displayName,
-            destinationPosition = destinationNode.x to destinationNode.z,
+            legs = legs
         )
     }
 

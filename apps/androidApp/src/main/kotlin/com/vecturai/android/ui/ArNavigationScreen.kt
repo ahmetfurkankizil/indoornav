@@ -25,6 +25,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -64,6 +67,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -84,10 +89,31 @@ fun ArNavigationScreen(
     onRetryActivity: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var pendingLegPreview by remember { mutableStateOf<com.vecturai.android.data.AndroidReviewedPackageLoader.RouteLeg?>(null) }
 
     Box(Modifier.fillMaxSize()) {
+        val transition = uiState.pendingTransition
+        val previewLeg = pendingLegPreview
+
         if (uiState.hasArrived) {
             ArrivalOverlay(uiState, onEnd)
+        } else if (transition != null) {
+            FloorTransitionOverlay(transition) {
+                val pkg = viewModel.getRoutePackage()
+                val nextIndex = viewModel.currentLegIndex + 1
+                pendingLegPreview = pkg?.legs?.getOrNull(nextIndex)
+                viewModel.advanceToNextLeg()
+            }
+        } else if (previewLeg != null) {
+            val pkg = viewModel.getRoutePackage()
+            RoutePreviewContent(
+                config = pkg?.config,
+                routeLeg = previewLeg,
+                originName = "Elevator/Stairs",
+                onBack = { pendingLegPreview = null },
+                onStart = { pendingLegPreview = null },
+                buttonText = "CONTINUE NAVIGATION"
+            )
         } else {
             when {
                 uiState.markerAssetError != null ->
@@ -139,10 +165,33 @@ fun ArNavigationScreen(
                         }
                     }
                 }
-                else -> ActiveNavigationOverlay(
-                    uiState = uiState,
-                    onEnd = onEnd,
-                )
+                else -> {
+                    ActiveNavigationOverlay(
+                        uiState = uiState,
+                        onEnd = onEnd,
+                    )
+                    
+                    // FIX 7: AR Minimap Overlay (Top-Right)
+                    val pkg = viewModel.getRoutePackage()
+                    if (pkg != null) {
+                        val currentLeg = pkg.legs.getOrNull(viewModel.currentLegIndex)
+                        if (currentLeg != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .statusBarsPadding()
+                                    .padding(top = 70.dp, end = 16.dp),
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                ArMinimapOverlay(
+                                    uiState = uiState,
+                                    config = pkg.config,
+                                    routePoints = currentLeg.routePoints
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -364,6 +413,110 @@ private fun ActiveNavigationOverlay(
         
         Spacer(Modifier.weight(1f))
         BottomHud(uiState = uiState, onEnd = onEnd)
+    }
+}
+
+@Composable
+private fun ArMinimapOverlay(
+    uiState: ArNavigationUiState,
+    config: com.vecturai.android.data.AndroidReviewedPackageLoader.ReviewedConfig,
+    routePoints: List<Pair<Double, Double>>
+) {
+    Surface(
+        modifier = Modifier.size(110.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFF0F172A).copy(alpha = 0.85f),
+        border = BorderStroke(1.dp, Color(0xFF1E293B)),
+    ) {
+        if (config.nodes.isEmpty()) return@Surface
+
+        // Calculate map bounds
+        var minX = Double.MAX_VALUE
+        var minZ = Double.MAX_VALUE
+        var maxX = -Double.MAX_VALUE
+        var maxZ = -Double.MAX_VALUE
+
+        for (node in config.nodes) {
+            minX = minOf(minX, node.x)
+            minZ = minOf(minZ, node.z)
+            maxX = maxOf(maxX, node.x)
+            maxZ = maxOf(maxZ, node.z)
+        }
+
+        // Add padding
+        val pad = 2.0
+        minX -= pad
+        minZ -= pad
+        maxX += pad
+        maxZ += pad
+
+        val width = maxX - minX
+        val depth = maxZ - minZ
+
+        Canvas(modifier = Modifier.fillMaxSize().padding(6.dp)) {
+            val canvasW = size.width
+            val canvasH = size.height
+            val centerX = canvasW / 2f
+            val centerY = canvasH / 2f
+            val scale = 12f 
+
+            val userHeadingDeg = Math.toDegrees(uiState.userHeadingRad).toFloat()
+
+            fun bToCanvas(bx: Double, bz: Double): Offset {
+                val dx = (bx - uiState.userStableBuildingX).toFloat()
+                val dz = (bz - uiState.userStableBuildingZ).toFloat()
+                return Offset(centerX + dx * scale, centerY + dz * scale)
+            }
+
+            withTransform({
+                rotate(degrees = -userHeadingDeg, pivot = Offset(centerX, centerY))
+            }) {
+                val nodeMap = config.nodes.associateBy { it.id }
+                for (edge in config.edges) {
+                    val from = nodeMap[edge.from]
+                    val to = nodeMap[edge.to]
+                    if (from != null && to != null) {
+                        drawLine(
+                            color = Color(0xFF334155),
+                            start = bToCanvas(from.x, from.z),
+                            end = bToCanvas(to.x, to.z),
+                            strokeWidth = 2.5f
+                        )
+                    }
+                }
+
+                if (routePoints.size > 1) {
+                    for (i in 0 until routePoints.size - 1) {
+                        val a = routePoints[i]
+                        val b = routePoints[i + 1]
+                        drawLine(
+                            color = Color(0xFF3B82F6),
+                            start = bToCanvas(a.first, a.second),
+                            end = bToCanvas(b.first, b.second),
+                            strokeWidth = 6f
+                        )
+                    }
+                }
+            }
+
+            drawCircle(
+                color = Color(0xFF3B82F6).copy(alpha = 0.3f),
+                radius = 10f,
+                center = Offset(centerX, centerY)
+            )
+            drawCircle(
+                color = Color.White,
+                radius = 4f,
+                center = Offset(centerX, centerY)
+            )
+            val cursorPath = androidx.compose.ui.graphics.Path().apply {
+                moveTo(centerX, centerY - 8f)
+                lineTo(centerX - 5f, centerY - 2f)
+                lineTo(centerX + 5f, centerY - 2f)
+                close()
+            }
+            drawPath(cursorPath, Color(0xFF60A5FA))
+        }
     }
 }
 
@@ -965,3 +1118,88 @@ private fun formatEta(seconds: Double): String {
 private fun Double.roundMeters(): String = "%.0f".format(this)
 
 private fun Int.stepLabel(): String = if (this == 1) "Step" else "Steps"
+
+@Composable
+fun FloorTransitionOverlay(
+    transition: com.vecturai.android.data.AndroidReviewedPackageLoader.FloorTransition,
+    onConfirm: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF070D18))
+    ) {
+        ArrivalDotBackground()
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = if (transition.isUp) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                contentDescription = null,
+                tint = Color(0xFF6B8AFF),
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(Color(0xFF6B8AFF).copy(alpha = 0.1f), CircleShape)
+                    .padding(20.dp),
+            )
+            Spacer(Modifier.height(32.dp))
+            Text(
+                text = "Floor Transition",
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Black,
+            )
+            Spacer(Modifier.height(16.dp))
+            
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFF151F31),
+                border = BorderStroke(1.dp, Color(0xFF233149)),
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val directionText = if (transition.isUp) "UP" else "DOWN"
+                    val floorDiffText = if (transition.floorDiff > 1) "${transition.floorDiff} floors" else "1 floor"
+                    
+                    Text(
+                        text = "Please go $directionText $floorDiffText to",
+                        color = Color(0xFFB6BFCE),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = transition.toFloorName,
+                        color = Color(0xFFF4A515),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                }
+            }
+            
+            Spacer(Modifier.height(48.dp))
+            
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F63DF)),
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                Text("I am on ${transition.toFloorName}", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}

@@ -95,9 +95,16 @@ class ArRouteRenderer {
         placeAllArrows(arrows)
     }
 
-    fun updateVisibility(userCumulativeDistance: Double): List<VisibleArrow> {
+    fun updateVisibility(
+        userCumulativeDistance: Double,
+        cameraWorldX: Float = Float.NaN,
+        cameraWorldZ: Float = Float.NaN,
+        cameraForwardX: Float = 0f,
+        cameraForwardZ: Float = -1f,
+    ): List<VisibleArrow> {
         val aheadLimit = userCumulativeDistance + lookaheadDistance
         val behindLimit = userCumulativeDistance - fadeDistance
+        val hasCameraData = !cameraWorldX.isNaN()
         val nextStates = mutableMapOf<String, ArrowState>()
         val visible = mutableListOf<VisibleArrow>()
 
@@ -119,6 +126,16 @@ class ArRouteRenderer {
             val alpha = (1.0 - fadeT * 0.8).toFloat()
             val scale = (1.0 - fadeT * 0.3).toFloat()
             val pos = transformToAR(arrow.positionX, arrow.positionY, arrow.positionZ)
+
+            // FIX 5: Cull arrows that are behind the camera (negative dot product)
+            if (hasCameraData) {
+                val toArrowX = pos[0] - cameraWorldX
+                val toArrowZ = pos[2] - cameraWorldZ
+                val dot = toArrowX * cameraForwardX + toArrowZ * cameraForwardZ
+                // Allow arrows up to 0.5m behind the camera (avoids flickering at camera plane)
+                if (dot < -0.5f) continue
+            }
+
             visible.add(
                 VisibleArrow(
                     arrow = arrow,

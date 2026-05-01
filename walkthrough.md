@@ -1,6 +1,32 @@
-# VecturAI Web Admin — Running Guide
+# Android AR Navigation Fixes (Fix 1-7)
 
-## Overview
+This walkthrough covers the 7 critical fixes applied to the `VecturAI` Android AR navigation experience:
+
+## What Was Fixed
+
+1. **AR Rendering Stuck (Fix 1 & Fix 2)** 
+   - *Problem*: The app would get stuck on "Waiting for poster" during a second navigation due to stale alignment states and an unnecessary poster-scan loop.
+   - *Solution*: Modified `AndroidArNavigationViewModel.configure()` to force-initialize the AR session with aligned status (`isAligned=true`) immediately, bypassing the poster scan screens for Any-To-Any navigation. Fixed state reset ordering to correctly clear stale poses.
+
+2. **Route Preview Minimap (Fix 3 & Fix 4)**
+   - *Problem*: The minimap only showed routes and the app could not select rooms on other floors.
+   - *Solution*: Updated `AndroidReviewedPackageLoader` to parse `crossFloorConnections` and `floorName` tags into the unified nodes. Updated the Dijkstra pathfinder to respect floor transitions. The `DestinationSelectScreen` now shows the appropriate floor names, and the route preview map renders full building floorplans.
+
+3. **Arrow Placements & Culling (Fix 5 & Fix 6)**
+   - *Problem*: Arrows would flicker behind the user or spawn right on top of the camera upon start.
+   - *Solution*: Computed an initial `userCumulativeDistance` using the first arrow *in front* of the camera to avoid overlapping. Implemented a dot-product check in `ArRouteRenderer.updateVisibility` against the camera's forward vector to aggressively cull arrows behind the user, stopping flicker.
+
+4. **Minimap Overlay (Fix 7)**
+   - *Problem*: Missing top-right minimap overlay during active navigation.
+   - *Solution*: Exposed real-time AR coordinates converted to building coordinates (`userBuildingX`, `userBuildingZ`, and `userHeadingRad`). Built and wired a new `ArMinimapOverlay` composable in `ArNavigationScreen` to show a real-time HUD map with the user's position and orientation.
+
+## Verification
+- Code has been updated and compiled locally.
+- A gradle check (`./gradlew :apps:androidApp:assembleDebug -Pkotlin.jvm.target.validation.mode=warning`) was verified to pass excluding independent JVM-target warnings.
+
+---
+
+# VecturAI Web Admin — Running Guide
 
 The system has **two servers** that must both be running:
 
