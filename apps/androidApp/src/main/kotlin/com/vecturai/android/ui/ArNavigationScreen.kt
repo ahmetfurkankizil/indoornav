@@ -458,7 +458,7 @@ private fun ArMinimapOverlay(
             val canvasH = size.height
             val centerX = canvasW / 2f
             val centerY = canvasH / 2f
-            val scale = 12f 
+            val scale = 15f 
 
             val userHeadingDeg = Math.toDegrees(uiState.userHeadingRad).toFloat()
 
