@@ -5,6 +5,7 @@ import com.vecturai.tools.admin.Env
 import com.vecturai.tools.admin.model.CreateBuildingRequest
 import com.vecturai.tools.admin.model.UpdateBuildingRequest
 import com.vecturai.tools.admin.service.BuildingService
+import com.vecturai.tools.admin.service.NodeService
 import com.vecturai.tools.admin.service.NavPackageGenerator
 import io.ktor.http.*
 import io.ktor.server.auth.*
@@ -13,7 +14,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.buildingRoutes(service: BuildingService, navGen: NavPackageGenerator) {
+fun Route.buildingRoutes(service: BuildingService, nodeService: NodeService, navGen: NavPackageGenerator) {
     authenticate("manager-auth") {
         route("/api/manager/buildings") {
 
@@ -89,6 +90,15 @@ fun Route.buildingRoutes(service: BuildingService, navGen: NavPackageGenerator) 
                 navGen.generate(buildingId)
                 service.publish(buildingId, managerId)
                 call.respond(mapOf("status" to "published"))
+            }
+
+            get("{id}/nodes") {
+                val managerId  = managerId() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+                val buildingId = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing id"))
+
+                val nodes = nodeService.listByBuilding(buildingId, managerId)
+                    ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("Building not found"))
+                call.respond(nodes)
             }
         }
     }

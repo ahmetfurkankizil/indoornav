@@ -1,4 +1,5 @@
 import { api } from './client'
+import type { Node } from './mapEditor'
 
 export interface Floor {
   id: string; buildingId: string; floorNumber: number; floorName: string
@@ -31,6 +32,9 @@ export const publishBuilding = (id: string) =>
 
 export const getQrUrl = (id: string) =>
   `/api/manager/buildings/${id}/qr`
+
+export const listBuildingNodes = (id: string) =>
+  api.get<Node[]>(`/api/manager/buildings/${id}/nodes`).then(r => r.data)
 
 // ── Floors ────────────────────────────────────────────────────────────────────
 

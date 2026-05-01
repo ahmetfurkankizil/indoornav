@@ -132,7 +132,7 @@ fun Application.configureApp(
     routing {
         managerAuthRoutes(authService)
         dbAdminAuthRoutes(authService)
-        buildingRoutes(buildingService, navGen)
+        buildingRoutes(buildingService, nodeService, navGen)
         floorRoutes(floorService)
         nodeRoutes(nodeService)
         edgeRoutes(edgeService, aiSuggester)

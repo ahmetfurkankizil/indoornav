@@ -5,11 +5,11 @@ import { Layout } from '../../components/Layout'
 import {
   getBuilding, updateBuilding, createFloor, deleteFloor, publishBuilding,
   listConnections, createConnection, deleteConnection,
-  getQrUrl, replaceFloor,
+  getQrUrl, replaceFloor, listBuildingNodes,
   type Floor, type FloorConnection,
 } from '../../api/buildings'
 import { api } from '../../api/client'
-import { listNodes } from '../../api/mapEditor'
+import { listNodes, type Node } from '../../api/mapEditor'
 
 export function BuildingDetailPage() {
   const { id: buildingId } = useParams<{ id: string }>()
@@ -37,6 +37,12 @@ export function BuildingDetailPage() {
   const { data: connections = [] } = useQuery({
     queryKey: ['connections', buildingId],
     queryFn: () => listConnections(buildingId!),
+    enabled: !!buildingId,
+  })
+  
+  const { data: nodes = [] } = useQuery<Node[]>({
+    queryKey: ['buildingNodes', buildingId],
+    queryFn: () => listBuildingNodes(buildingId!),
     enabled: !!buildingId,
   })
 
@@ -196,21 +202,43 @@ export function BuildingDetailPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">Cross-floor Connections</h2>
           <div className="bg-white border rounded-lg p-4 mb-3">
-            <div className="flex gap-2 flex-wrap items-end">
-              <div>
-                <label className="block text-xs font-medium mb-1">From Node ID</label>
-                <input value={connFrom} onChange={e => setConnFrom(e.target.value)}
-                  placeholder="node UUID" className="border rounded px-2 py-1 text-sm w-64" />
+            <div className="flex gap-4 flex-wrap items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-medium mb-1 text-gray-600">From Node</label>
+                <input 
+                  list="nodes-list"
+                  value={connFrom} 
+                  onChange={e => setConnFrom(e.target.value)}
+                  placeholder="Search or paste UUID..." 
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
+                />
               </div>
-              <div>
-                <label className="block text-xs font-medium mb-1">To Node ID</label>
-                <input value={connTo} onChange={e => setConnTo(e.target.value)}
-                  placeholder="node UUID" className="border rounded px-2 py-1 text-sm w-64" />
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-medium mb-1 text-gray-600">To Node</label>
+                <input 
+                  list="nodes-list"
+                  value={connTo} 
+                  onChange={e => setConnTo(e.target.value)}
+                  placeholder="Search or paste UUID..." 
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
+                />
               </div>
+              
+              <datalist id="nodes-list">
+                {nodes.map(n => {
+                  const floor = building.floors?.find(f => f.id === n.floorId)
+                  return (
+                    <option key={n.id} value={n.id}>
+                      {floor ? `${floor.floorName} - ` : ''}{n.label || 'Unnamed Node'}
+                    </option>
+                  )
+                })}
+              </datalist>
+
               <div>
-                <label className="block text-xs font-medium mb-1">Type</label>
+                <label className="block text-xs font-medium mb-1 text-gray-600">Type</label>
                 <select value={connType} onChange={e => setConnType(e.target.value)}
-                  className="border rounded px-2 py-1 text-sm">
+                  className="border rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
                   <option value="elevator">Elevator</option>
                   <option value="stairs">Stairs</option>
                   <option value="escalator">Escalator</option>
@@ -219,23 +247,47 @@ export function BuildingDetailPage() {
               </div>
               <button onClick={() => addConnMut.mutate()}
                 disabled={!connFrom || !connTo || addConnMut.isPending}
-                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50">
-                Add
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                Add Connection
               </button>
             </div>
           </div>
+
           {connections.length > 0 && (
-            <div className="space-y-1">
-              {connections.map((c) => (
-                <div key={c.id} className="flex items-center justify-between bg-white border rounded px-4 py-2 text-sm">
-                  <span className="font-mono text-xs">{c.fromNodeId.slice(0,8)}…</span>
-                  <span className="mx-2 text-gray-400">→</span>
-                  <span className="font-mono text-xs">{c.toNodeId.slice(0,8)}…</span>
-                  <span className="ml-4 text-gray-500">{c.connectionType}</span>
-                  <button onClick={() => delConnMut.mutate(c.id)}
-                    className="ml-auto text-red-500 hover:text-red-700 text-xs">Remove</button>
-                </div>
-              ))}
+            <div className="grid gap-2">
+              {connections.map((c) => {
+                const fromNode = nodes.find(n => n.id === c.fromNodeId)
+                const toNode = nodes.find(n => n.id === c.toNodeId)
+                const fromFloor = building.floors?.find(f => f.id === fromNode?.floorId)
+                const toFloor = building.floors?.find(f => f.id === toNode?.floorId)
+
+                return (
+                  <div key={c.id} className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-5 py-3 text-sm shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex-1 grid grid-cols-[1fr,auto,1fr] items-center gap-4">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-900">{fromNode?.label || 'Unknown'}</span>
+                        <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">{fromFloor?.floorName || 'Unknown Floor'}</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center">
+                        <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded mt-1">{c.connectionType}</span>
+                      </div>
+
+                      <div className="flex flex-col text-right">
+                        <span className="font-semibold text-gray-900">{toNode?.label || 'Unknown'}</span>
+                        <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">{toFloor?.floorName || 'Unknown Floor'}</span>
+                      </div>
+                    </div>
+
+                    <button onClick={() => delConnMut.mutate(c.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Remove connection">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                )
+              })}
             </div>
           )}
         </section>

@@ -56,6 +56,22 @@ class NodeService {
         }
     }
 
+    suspend fun listByBuilding(buildingId: String, managerId: String): List<NodeResponse>? =
+        withContext(Dispatchers.IO) {
+            transaction {
+                val exists = Buildings.selectAll()
+                    .where {
+                        (Buildings.id eq UUID.fromString(buildingId)) and
+                            (Buildings.managerId eq UUID.fromString(managerId))
+                    }
+                    .singleOrNull() ?: return@transaction null
+
+                Nodes.selectAll()
+                    .where { Nodes.buildingId eq UUID.fromString(buildingId) }
+                    .map { rowToResponse(it) }
+            }
+        }
+
     suspend fun list(floorId: String, managerId: String): List<NodeResponse>? =
         withContext(Dispatchers.IO) {
             transaction {
