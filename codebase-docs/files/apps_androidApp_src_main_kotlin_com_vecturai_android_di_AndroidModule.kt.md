@@ -26,7 +26,7 @@ Defines the Koin module for Android-specific dependencies, haptics, reviewed-pac
 ## Logic
 - Registers `ArBridge`, `AndroidReviewedPackageLoader`, and `AndroidHapticManager` as singletons.
 - Registers marker detector and route renderer as factories.
-- Registers `AndroidNavigationFlowModel`, `ArCameraFlowViewModel`, and `AndroidArNavigationViewModel` as Koin ViewModels.
+- Registers `AndroidNavigationFlowModel`, `ArCameraFlowViewModel`, and `AndroidArNavigationViewModel` as Koin ViewModels, providing necessary dependencies like haptics and package loaders.
 - `UnifiedArSession` is intentionally Activity-owned by `ArCameraActivity`, not a Koin singleton.
 
 ## Uses

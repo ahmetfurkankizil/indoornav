@@ -30,6 +30,8 @@ Dedicated Activity for the full post-home visitor flow. It owns one long-lived A
 
 ## Important Logic
 - Emulator detection: provides a "Simulate Entrance Scan" button in QR scan and a manual alignment option in AR navigation for development.
+- UI Components: Uses `VecturaiDesignSystem` components (`VecturaiPrimaryButton`, `VecturaiSecondaryButton`, `VecturaiCard`) for overlays, replacing generic Compose buttons and surfaces.
+- Styling: Implements `VecturaiColors`, `Spacing`, and `Typography` for consistent branding and visual parity with the iOS experience.
 - Camera permission denial is handled inside this Activity; canceling finishes the Activity.
 - ARCore setup/resume fatal failures end the Activity with a toast instead of retrying in-place.
 - Destination select and route preview are opaque overlays above a still-resumed ARCore session.
