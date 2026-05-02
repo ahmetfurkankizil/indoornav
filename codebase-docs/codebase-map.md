@@ -76,6 +76,6 @@ Vecturai follows a **Local-First AR architecture**.
 
 ## Coverage Summary
 - **Folders**: 172 / 172 (100%)
-- **Mapped Files**: 294 (Authored behavior-relevant source)
-- **Total Files Indexed**: 634 (Including artifacts and minimal assets)
+- **Mapped Files**: 297 (Authored behavior-relevant source)
+- **Total Files Indexed**: 637 (Including artifacts and minimal assets)
 - **Status**: COMPLETE

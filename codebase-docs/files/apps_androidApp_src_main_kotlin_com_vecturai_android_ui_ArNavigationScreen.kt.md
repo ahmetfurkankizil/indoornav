@@ -18,26 +18,27 @@ Passive AR navigation overlay that draws alignment guidance, next-action cards, 
 - `ArrowPlacementType`
 
 ## Exports / Public Surface
-- `ArNavigationScreen(viewModel, onEnd, onRetryActivity)`
+- `ArNavigationScreen`: Root overlay orchestrator for the AR session lifecycle.
 
 ## Main Symbols
-- `ArNavigationScreen`: Renders UI state only; it does not create or own a `GLSurfaceView`.
-- `AlignmentOverlay`: Premium pre-alignment guidance with actionable hints (No poster detected, Hold steady).
-- `ActiveNavigationOverlay`: Hosts the `NextActionCard`, `TrackingBadge`, and `ProgressStrip`.
-- `NextActionCard`: Prominent guidance card ("Turn left ahead", etc.) with dynamic icons and distance lookahead.
-- `TrackingBadge`: Context-aware status label ("Tracking", "Hold steady", "Re-centering...").
-- `ProgressStrip`: Compact bottom HUD with remaining distance, ETA, and end-route action.
-- `ArrivalOverlay`: Spring-animated success card with "You've reached [Destination]".
+- `ArNavigationScreen`: Switches between alignment, active navigation, and arrival states using `AnimatedContent`.
+- `AlignmentOverlay`: Provides scan guidance with `RadarSweep` animation and diagnostic stats (frames, candidates).
+- `InstructionBanner`: Glassmorphic banner at the top showing the next turn action (`TurnGlyph`), distance, and `TrackingBadge`.
+- `BottomHud`: Contains a circular `ProgressEtaCluster` and the `SwipeToEndRoute` safety action.
+- `ArrivalOverlay`: Celebratory full-screen state with `ConfettiBurst`, `AnimatedCheckMark`, and journey statistics.
+- `TrackingBadge`: Contextual `StatPill` (Tracking, Hold steady, Re-centering) with color-coded confidence levels.
 
 ## Important Logic
-- Navigation guidance: derived from `AndroidArNavigationViewModel.ArNavigationUiState`, ensuring zero-latency UI updates.
-- Visual consistency: uses the same glassmorphic design tokens (blur, borders, vibrant accents) as the home screen.
-- ETA calculation: distance-based estimate matching the iOS client logic for platform parity.
-- Emulator detection: `isLikelyEmulator()` is now implemented inline to conditionally show simulation controls during development.
+- **State Transitioning**: Uses `AnimatedContent` for smooth cross-fades between session states (aligning → active → arrival).
+- **Circular Progress**: `ProgressEtaCluster` draws a custom `Canvas` arc based on `remainingDistance / totalDistance`.
+- **Swipe Action**: `SwipeToEndRoute` uses `Modifier.draggable` to prevent accidental navigation cancellation.
+- **Glassmorphism**: Banners and HUDs use `glass = true` cards to maintain visibility of the AR feed while providing high text contrast.
+- **Micro-animations**: Includes `RadarSweep` for scanning and `ConfettiBurst` for arrival to enhance user delight.
 
 ## Uses
-- `AndroidArNavigationViewModel`
-- `ArNavigationUiState`
+- `VecturaiColors`, `VecturaiShapes`, `Spacing`, `VecturaiTypography`, `VecturaiBrush`
+- `StatPill`, `IconChip`, `VecturaiCard`, `VecturaiPrimaryButton`, `VecturaiSecondaryButton`, `AnimatedNumber`, `GradientText`, `vecturaiTap`
+- `AndroidArNavigationViewModel`, `ArNavigationUiState`
 
 ## Used By
 - `ArCameraActivity.kt`: Rendered for `Phase.ArNavigation`.

@@ -14,21 +14,25 @@ Passive QR scan chrome rendered over the `ArCameraActivity` ARCore camera previe
 - `ArCameraFlowViewModel`.
 
 ## Exports / Public Surface
-- `QRScanScreen(flowModel, onCancel)`: Composable QR overlay entrypoint.
+- `QRScanScreen`: Overlay entry point for the QR/Entrance poster scanning phase.
 
 ## Main Symbols
-- `QRScanScreen`: Applies a 40% black dim overlay and renders `ScanDotBackground` and `QRScanChrome`.
-- `QRScanChrome`: Header, scan reticle, scanning status, validation error, and retry button.
-- `ScanDotBackground`: Dotted grid Canvas drawing consistent with the app's dark theme.
+- `QRScanScreen`: Orchestrates the `ScanVignette` and `QRScanChrome`.
+- `QRScanChrome`: Top-level container for the scan UI; handles the state transition between scanning, success, and error.
+- `AnimatedScanReticle`: Custom `Canvas` drawing that renders "breathing" brackets and a horizontal laser-sweep line.
+- `QRStatusPanel`: Glassmorphic status card at the bottom; shows loading, success, or error messages with actionable buttons.
+- `ScanVignette`: A dark radial gradient overlay that centers the user's attention on the scan area.
 
 ## Important Logic
-- This file no longer owns camera permission, CameraX, `PreviewView`, `ImageAnalysis`, `ProcessCameraProvider`, or any ARCore session.
-- QR decoding happens in `ArFrameQrScanner` from frames supplied by `UnifiedArRenderer`.
-- Simulation support: if `onSimulateScan` is provided (e.g., when running on an emulator), a "Simulate Entrance Scan" button is shown.
-- Retry clears the ViewModel QR error and unlocks the scanner; it does not touch camera/session lifecycle.
-- Background rendering: uses the same `DotGridBackground` pattern as the home screen for visual consistency.
+- **Visual Feedback**: The reticle changes color based on state: Cyan (searching), Green (detected), Amber (error).
+- **Scanning Success**: Triggers a "success ripple" animation (`repeat(3)` with `drawCircle`) to provide positive reinforcement.
+- **Vignette Strategy**: Uses a `Canvas` to draw a dark vertical gradient with a circular cutout (via `drawCircle` with a thick stroke) to frame the camera feed.
+- **Glassmorphism**: The status panel uses `glass = true` to maintain a premium feel while ensuring legibility over the camera preview.
+- **Simulation**: Provides a "Simulate Entrance Scan" button when `onSimulateScan` is non-null (typically on emulators).
 
 ## Uses
+- `VecturaiColors`, `VecturaiShapes`, `Spacing`, `VecturaiBrush`
+- `IconChip`, `VecturaiCard`, `VecturaiPrimaryButton`, `VecturaiSecondaryButton`
 - `ArCameraFlowViewModel`
 
 ## Used By

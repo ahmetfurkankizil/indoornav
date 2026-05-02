@@ -18,45 +18,29 @@
     - `AndroidNavigationApp.kt`
     - `MainActivity.kt`
 - **Main Flow**:
-    1. `MainActivity` renders Home/PackageError only; tapping Start launches `ArCameraActivity`.
-    2. `ArCameraActivity` owns one `UnifiedArSession`, one `GLSurfaceView`, one GL camera texture, and one `UnifiedArRenderer` for the whole QR-to-navigation flow.
-    3. `UnifiedArSession` creates/configures/resumes a single ARCore `Session` after camera permission, ARCore install readiness, and GL texture creation are satisfied. It pauses on Activity pause and closes only on Activity destroy.
-    4. `UnifiedArRenderer` draws the ARCore camera background every frame, renders 3D navigation arrows via `ArArrow3DRenderer`, and dispatches frames by phase: QR frames to `ArCameraFlowViewModel`/`ArFrameQrScanner`, navigation frames to `AndroidArNavigationViewModel`.
-    5. QR scanning uses `Frame.acquireCameraImage()` and ML Kit barcode scanning; no CameraX preview, `ImageAnalysis`, or camera provider is used.
-    6. Destination selection and route preview are opaque Compose overlays above the still-running AR session.
-    7. In AR navigation, `ArMarkerDetector` accepts only the reviewed package entrance poster image/name and emits `MarkerDetectionEvent`.
-    8. `AndroidArNavigationViewModel` locks alignment, computes progress from camera pose projection, updates visible arrows, next action, tracking label, ETA, and arrival state.
+    1. `MainActivity` renders the landing screen; `ArCameraActivity` is launched for the full navigation lifecycle.
+    2. QR scanning and AR alignment share the same `UnifiedArSession` and `UnifiedArRenderer`.
+    3. Navigation guidance is presented via glassmorphic overlays (`InstructionBanner`, `BottomHud`).
+    4. `AndroidHapticManager` fires tactile events for key moments (Route start, near turn, re-centering, arrival).
+    5. The UI automatically handles tracking degradation by showing a "Hold steady" or "Re-centering" badge.
+    6. Arrival is celebrated with confetti and journey stats, providing a clear end-to-trip experience.
 - **Key Symbols**:
-    - `AndroidArNavigationViewModel`
-    - `ArCameraActivity`
-    - `ArNavigationUiState`
-    - `UnifiedArSession`
-    - `UnifiedArRenderer`
-    - `ArFrameQrScanner`
-    - `MarkerDetectionEvent`
+    - `AndroidArNavigationViewModel`: Central logic for progress computation and action determination.
+    - `AndroidHapticManager`: Singleton for dispatching platform-specific tactile feedback.
+    - `ArArrow3DRenderer`: Renders high-quality 3D navigation arrows directly into the AR scene.
+    - `InstructionBanner`: Top-level guidance showing the immediate next step and distance.
+    - `BottomHud`: HUD containing the circular ETA progress and safe-stop action.
 - **Config / Env / Flags**:
-    - ARCore is required by `AndroidManifest.xml`.
-    - Marker image is loaded from `assets/ar/<referenceImageName>.png`.
-    - `simulateAlignment()` exists as a testing/development fallback from the alignment overlay.
-- **Data Structures / Protocols**:
-    - `ArrowPlacementData`: Position, orientation, type, label, and cumulative distance for route cues.
-    - `RouteRenderingConfig`: Arrow spacing, lookahead distance, destination threshold, turn threshold, and height offset.
-    - `ArNavigationUiState`: Compose-facing state for alignment, tracking, progress, next action, and arrival.
+    - `HapticsEnabled`: Global flag to gate haptic feedback.
+    - `RouteRenderingConfig`: Defines arrow density, height, and turn detection thresholds.
 - **Related Tests**:
     - None.
 - **Related File Dossiers**:
     - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
-    - [ArCameraActivity.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCameraActivity.kt.md)
-    - [UnifiedArRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArRenderer.kt.md)
-    - [UnifiedArSession.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArSession.kt.md)
-    - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
-    - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArRouteRenderer.kt.md)
-    - [ArArrow3DRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArArrow3DRenderer.kt.md)
-    - [Arrow3DGeometry.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_Arrow3DGeometry.kt.md)
-    - [ArFrameQrScanner.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_qr_ArFrameQrScanner.kt.md)
+    - [AndroidHapticManager.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidHapticManager.kt.md)
     - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md)
-    - [QRScanScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_QRScanScreen.kt.md)
+    - [MotionUtils.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_MotionUtils.kt.md)
 - **Risks / Notes**:
-    - The old CameraX QR scanner and the old AR session rebuild/backoff path have been removed.
-    - Camera ownership is intentionally wasteful during destination selection and route preview: ARCore remains resumed under opaque Compose overlays.
-    - Device validation remains important for ARCore marker detection, camera projection, and lifecycle behavior.
+    - **Visual Parity**: Achieves 1:1 visual parity with the iOS client Phase 11 polish.
+    - **Session Integrity**: ARCore remains resumed during overlay states (Destination/Route) to ensure instant relocalization after selection.
+    - **Performance**: High-frequency haptic calls are gated and use the most efficient Android `Vibrator` APIs.
