@@ -116,8 +116,6 @@ fun ArNavigationScreen(
             )
         } else {
             when {
-                uiState.markerAssetError != null ->
-                    ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
                 uiState.sessionErrorMessage != null ->
                     SessionErrorOverlay(
                         message = uiState.sessionErrorMessage.orEmpty(),
@@ -220,7 +218,7 @@ private fun ArTopBar(uiState: ArNavigationUiState, onEnd: () -> Unit) {
                         Modifier
                             .size(7.dp)
                             .clip(CircleShape)
-                            .background(if (uiState.markerAssetError == null) Color(0xFFF59E0B) else Color(0xFFEF4444))
+                            .background(Color(0xFFF59E0B))
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
@@ -469,7 +467,8 @@ private fun ArMinimapOverlay(
             }
 
             withTransform({
-                rotate(degrees = -userHeadingDeg, pivot = Offset(centerX, centerY))
+                // Flip by 180 degrees to match AR arrow orientation
+                rotate(degrees = -userHeadingDeg + 180f, pivot = Offset(centerX, centerY))
             }) {
                 val nodeMap = config.nodes.associateBy { it.id }
                 for (edge in config.edges) {
@@ -974,62 +973,6 @@ private fun ArrivalDestinationCard(destination: String, location: String) {
     }
 }
 
-@Composable
-private fun ConfigErrorOverlay(message: String, onEnd: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF070D18))
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
-            Column(
-                modifier = Modifier.padding(22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Icon(
-                    Icons.Default.Warning,
-                    contentDescription = null,
-                    modifier = Modifier.size(56.dp),
-                    tint = Color(0xFFEF4444),
-                )
-                Text(
-                    "Setup needed",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-                Text(
-                    message,
-                    color = Color(0xFFB6BFCE),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp,
-                )
-                Button(
-                    onClick = onEnd,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                ) {
-                    Text("Go Back", fontWeight = FontWeight.ExtraBold)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun SessionErrorOverlay(

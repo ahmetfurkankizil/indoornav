@@ -215,26 +215,6 @@ class ArCameraActivity : ComponentActivity() {
                             println("[ArActivity] LaunchedEffect configure: originRoom=${session.selectedOriginRoom?.id ?: "null"}")
                             arViewModel.configure(routePackage, session.validatedEntranceMarker, session.selectedOriginRoom)
                             
-                            // CRITICAL: Download the QR image from the server and use it as the AR marker
-                            if (!isEmulator) {
-                                val token = session.qrToken
-                                if (token.isNotEmpty()) {
-                                    val bitmap = downloadMarkerImage(token)
-                                    val marker = session.validatedEntranceMarker ?: flowModel.entranceMarkerForSession()
-                                    if (bitmap != null && marker != null) {
-                                        val textureId = if (cameraTextureId != 0) cameraTextureId else textureReady.await()
-                                        val index = unifiedSession.reconfigure(
-                                            activity = this@ArCameraActivity,
-                                            marker = marker,
-                                            bitmap = bitmap
-                                        )
-                                        if (index != -1) {
-                                            arViewModel.registerDynamicMarker(index, marker)
-                                        }
-                                    }
-                                }
-                            }
-
                             // Alignment is now handled automatically in ViewModel.onFrame when TRACKING is ready
                         }
                         ArNavigationScreen(
@@ -281,7 +261,6 @@ class ArCameraActivity : ComponentActivity() {
             unifiedSession.onActivityResume(
                 activity = this@ArCameraActivity,
                 cameraTextureId = textureId,
-                marker = flowModel.entranceMarkerForSession(),
             )
         }
     }
