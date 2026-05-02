@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Stage, Layer, Image as KonvaImage, Circle, Line, Text } from 'react-konva'
 import { useQuery } from '@tanstack/react-query'
 import { useEditorStore, type EditorMode } from '../../stores/editorStore'
-import { renderGlbTopDown } from '../../three/GlbRenderer'
+import { renderMapFile } from '../../three/MapRenderer'
 import {
   listNodes, listEdges, createNode, updateNode, deleteNode,
   createEdge, updateEdge, deleteEdge, aiSuggestEdges,
   type Node, type Edge, type SuggestedEdge,
 } from '../../api/mapEditor'
-import { getBuilding, updateFloorBounds, getGlbUrl } from '../../api/buildings'
+import { getBuilding, updateFloorBounds, getMapFileUrl } from '../../api/buildings'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -114,7 +114,6 @@ export function MapEditorPage() {
   const [toast, setToast]             = useState('')
   const [pendingFrom, setPendingFrom] = useState<string | null>(null)
   const [dragPreview, setDragPreview] = useState<{ fromId: string; toX: number; toY: number } | null>(null)
-  const [errorPopup, setErrorPopup] = useState<string | null>(null)
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 2800) }
 
@@ -146,14 +145,14 @@ export function MapEditorPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // Render GLB
+  // Render floor plan (GLB, SVG, PNG, or DXF) — format detected from Content-Type
   useEffect(() => {
     if (!buildingId || !floorId) return
     setGlbLoading(true); setGlbError('')
-    const glbPath = getGlbUrl(buildingId, floorId)
-    const glbUrl  = glbPath.startsWith('http') ? glbPath : `${window.location.origin}${glbPath}`
+    const mapPath = getMapFileUrl(buildingId, floorId)
+    const mapUrl  = mapPath.startsWith('http') ? mapPath : `${window.location.origin}${mapPath}`
     const token   = localStorage.getItem('manager_token') ?? undefined
-    renderGlbTopDown(glbUrl, token)
+    renderMapFile(mapUrl, token)
       .then(({ imageDataUrl, bounds }) => {
         store.setFloorPlan(imageDataUrl, bounds)
         updateFloorBounds(buildingId, floorId, bounds).catch(() => {})
@@ -161,7 +160,7 @@ export function MapEditorPage() {
         img.src = imageDataUrl
         img.onload = () => setFloorImage(img)
       })
-      .catch(() => setGlbError('Could not render GLB. Check that the floor has a GLB uploaded.'))
+      .catch(() => setGlbError('Could not render floor plan. Check that a map file is uploaded.'))
       .finally(() => setGlbLoading(false))
   }, [buildingId, floorId])
 
@@ -178,22 +177,6 @@ export function MapEditorPage() {
     return () => window.removeEventListener('keydown', handler)
   }, [store.selectedNodeId, store.selectedEdgeId])
 
-  // ── Validation ──────────────────────────────────────────────────────────────
-
-  const validateNodeEdgeCount = (nodeId: string): { ok: boolean; reason?: string } => {
-    const node = store.nodes.find(n => n.id === nodeId)
-    if (!node) return { ok: true }
-    if (node.nodeType === 'turning point') return { ok: true }
-
-    const count = store.edges.filter(e => e.fromNodeId === nodeId || e.toNodeId === nodeId).length
-    if (count >= 1) {
-      return {
-        ok: false,
-        reason: `Node "${node.label}" is a "${node.nodeType}". Only "turning point" nodes can have more than one connection. This helps keep the navigation graph clean.`
-      }
-    }
-    return { ok: true }
-  }
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
@@ -244,11 +227,6 @@ export function MapEditorPage() {
     const cy = pos.y / CANVAS_SIZE
 
     if (targetNodeId && targetNodeId !== dragPreview.fromId) {
-      // Validation
-      const fromVal = validateNodeEdgeCount(dragPreview.fromId)
-      if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setDragPreview(null); return }
-      const toVal = validateNodeEdgeCount(targetNodeId)
-      if (!toVal.ok) { setErrorPopup(toVal.reason!); setDragPreview(null); return }
 
       // Connect to existing node
       try {
@@ -257,9 +235,6 @@ export function MapEditorPage() {
         showToast('Edge created')
       } catch { showToast('Failed to create edge') }
     } else if (!targetNodeId) {
-      // Validation
-      const fromVal = validateNodeEdgeCount(dragPreview.fromId)
-      if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setDragPreview(null); return }
 
       // Create new node and connect
       // Create new node and connect
@@ -279,16 +254,8 @@ export function MapEditorPage() {
   const handleNodeClick = async (nodeId: string) => {
     if (store.mode === 'addEdge') {
       if (!pendingFrom) {
-        // First node: check if it can even have an edge
-        const val = validateNodeEdgeCount(nodeId)
-        if (!val.ok) { setErrorPopup(val.reason!); return }
         setPendingFrom(nodeId)
       } else if (pendingFrom !== nodeId && floorId) {
-        // Second node: check both ends
-        const fromVal = validateNodeEdgeCount(pendingFrom)
-        if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setPendingFrom(null); return }
-        const toVal = validateNodeEdgeCount(nodeId)
-        if (!toVal.ok) { setErrorPopup(toVal.reason!); return }
 
         try {
           const edge = await createEdge(floorId, { fromNodeId: pendingFrom, toNodeId: nodeId })
@@ -674,26 +641,6 @@ export function MapEditorPage() {
         </div>
       )}
 
-      {/* Error Popup */}
-      {errorPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center gap-3 text-red-600 mb-4">
-              <span className="text-2xl">⚠️</span>
-              <h3 className="text-lg font-bold">Action Restricted</h3>
-            </div>
-            <p className="text-gray-600 text-sm mb-6 leading-relaxed text-gray-700">
-              {errorPopup}
-            </p>
-            <button
-              onClick={() => setErrorPopup(null)}
-              className="w-full bg-gray-900 text-white py-2.5 rounded-md font-medium hover:bg-gray-800 transition-colors shadow-sm"
-            >
-              Understand
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -20,7 +20,7 @@ export function BuildingDetailPage() {
   const [showAddFloor, setShowAddFloor] = useState(false)
   const [floorName, setFloorName]       = useState('')
   const [floorNumber, setFloorNumber]   = useState(0)
-  const [glbFile, setGlbFile]           = useState<File | null>(null)
+  const [mapFile, setMapFile]           = useState<File | null>(null)
   const [replaceFloorId, setReplaceFloorId] = useState<string | null>(null)
   const [replaceFile, setReplaceFile]   = useState<File | null>(null)
   const [showQr, setShowQr]             = useState(false)
@@ -61,19 +61,19 @@ export function BuildingDetailPage() {
       const form = new FormData()
       form.append('floorNumber', String(floorNumber))
       form.append('floorName', floorName)
-      form.append('glbFile', glbFile!)
+      form.append('mapFile', mapFile!)
       return createFloor(buildingId!, form)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['building', buildingId] })
-      setShowAddFloor(false); setFloorName(''); setGlbFile(null)
+      setShowAddFloor(false); setFloorName(''); setMapFile(null)
     },
   })
 
   const replaceFloorMut = useMutation({
     mutationFn: () => {
       const form = new FormData()
-      form.append('glbFile', replaceFile!)
+      form.append('mapFile', replaceFile!)
       return replaceFloor(buildingId!, replaceFloorId!, form)
     },
     onSuccess: () => {
@@ -214,7 +214,7 @@ export function BuildingDetailPage() {
           </div>
 
           {floors.length === 0 && (
-            <p className="text-gray-400 text-sm py-4">No floors yet. Upload a GLB file to get started.</p>
+            <p className="text-gray-400 text-sm py-4">No floors yet. Upload a map file (GLB, DXF, SVG, or PNG) to get started.</p>
           )}
 
           <div className="space-y-2">
@@ -354,13 +354,14 @@ export function BuildingDetailPage() {
                 placeholder="e.g. Ground Floor" className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">GLB File</label>
-              <input type="file" accept=".glb" required onChange={e => setGlbFile(e.target.files?.[0] ?? null)}
+              <label className="block text-sm font-medium mb-1">Map File</label>
+              <input type="file" accept=".glb,.dxf,.svg,.png" required onChange={e => setMapFile(e.target.files?.[0] ?? null)}
                 className="w-full text-sm" />
+              <p className="text-xs text-gray-400 mt-1">Supported formats: GLB (3D scan), DXF, SVG, PNG</p>
             </div>
             <div className="flex gap-2 justify-end">
               <button type="button" onClick={() => setShowAddFloor(false)} className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
-              <button type="submit" disabled={addFloorMut.isPending || !glbFile}
+              <button type="submit" disabled={addFloorMut.isPending || !mapFile}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
                 {addFloorMut.isPending ? 'Uploading...' : 'Upload'}
               </button>
@@ -369,11 +370,12 @@ export function BuildingDetailPage() {
         </Modal>
       )}
 
-      {/* Replace GLB modal */}
+      {/* Replace map modal */}
       {replaceFloorId && (
-        <Modal title="Replace GLB File" onClose={() => setReplaceFloorId(null)}>
-          <p className="text-sm text-gray-600 mb-4">Uploading a new GLB will reset the floor bounds. You will need to re-open the map editor to re-extract them.</p>
-          <input type="file" accept=".glb" onChange={e => setReplaceFile(e.target.files?.[0] ?? null)} className="w-full text-sm mb-4" />
+        <Modal title="Replace Map File" onClose={() => setReplaceFloorId(null)}>
+          <p className="text-sm text-gray-600 mb-4">Uploading a new map file will reset the floor bounds. You will need to re-open the map editor to re-extract them.</p>
+          <input type="file" accept=".glb,.dxf,.svg,.png" onChange={e => setReplaceFile(e.target.files?.[0] ?? null)} className="w-full text-sm mb-2" />
+          <p className="text-xs text-gray-400 mb-4">Supported formats: GLB (3D scan), DXF, SVG, PNG</p>
           <div className="flex gap-2 justify-end">
             <button onClick={() => setReplaceFloorId(null)} className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
             <button onClick={() => replaceFloorMut.mutate()} disabled={!replaceFile || replaceFloorMut.isPending}
@@ -482,7 +484,7 @@ function FloorRow({ floor, onEdit, onReplace, onDelete }: {
         </button>
         <button onClick={onReplace}
           className="text-sm px-3 py-1.5 border rounded hover:bg-gray-50">
-          Replace GLB
+          Replace Map
         </button>
         <button onClick={onDelete}
           className="text-sm px-3 py-1.5 border border-red-200 text-red-600 rounded hover:bg-red-50">

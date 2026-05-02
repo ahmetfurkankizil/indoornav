@@ -45,6 +45,7 @@ data class FloorResponse(
     val boundsMaxZ: Double? = null,
     val floorY: Double? = null,
     val uploadStatus: String,
+    val mapFileType: String = "glb",
     val createdAt: String,
     val updatedAt: String,
 )

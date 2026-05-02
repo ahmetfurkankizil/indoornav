@@ -4,7 +4,7 @@ import type { Node } from './mapEditor'
 export interface Floor {
   id: string; buildingId: string; floorNumber: number; floorName: string
   boundsMinX?: number; boundsMaxX?: number; boundsMinZ?: number; boundsMaxZ?: number
-  floorY?: number; uploadStatus: string; createdAt: string; updatedAt: string
+  floorY?: number; uploadStatus: string; mapFileType: string; createdAt: string; updatedAt: string
 }
 
 export interface Building {
@@ -63,6 +63,8 @@ export const updateFloorBounds = (
 
 export const getGlbUrl = (buildingId: string, floorId: string) =>
   `/api/manager/buildings/${buildingId}/floors/${floorId}/glb`
+
+export const getMapFileUrl = getGlbUrl
 
 // ── Floor connections ─────────────────────────────────────────────────────────
 

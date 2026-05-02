@@ -21,6 +21,7 @@ class FloorService(private val uploadsDir: String) {
         floorNumber: Int,
         floorName: String,
         glbBytes: ByteArray,
+        fileExtension: String = "glb",
     ): FloorResponse? = withContext(Dispatchers.IO) {
         transaction {
             // Verify manager owns this building
@@ -42,7 +43,7 @@ class FloorService(private val uploadsDir: String) {
                 it[Floors.updatedAt]    = now
             }
 
-            val path = saveGlbFile(buildingId, id.value.toString(), glbBytes)
+            val path = saveMapFile(buildingId, id.value.toString(), fileExtension, glbBytes)
             Floors.update({ Floors.id eq id }) {
                 it[Floors.glbFilePath] = path
             }
@@ -86,6 +87,7 @@ class FloorService(private val uploadsDir: String) {
         floorId: String,
         managerId: String,
         glbBytes: ByteArray,
+        fileExtension: String = "glb",
         floorName: String?,
         floorNumber: Int?,
     ): FloorResponse? = withContext(Dispatchers.IO) {
@@ -99,7 +101,7 @@ class FloorService(private val uploadsDir: String) {
                 .singleOrNull() ?: return@transaction null
 
             val buildingId = row[Floors.buildingId].value.toString()
-            val path = saveGlbFile(buildingId, floorId, glbBytes)
+            val path = saveMapFile(buildingId, floorId, fileExtension, glbBytes)
 
             Floors.update({ Floors.id eq UUID.fromString(floorId) }) {
                 it[Floors.glbFilePath]  = path
@@ -163,34 +165,49 @@ class FloorService(private val uploadsDir: String) {
             }
         }
 
-    fun getGlbBytes(floorId: String): ByteArray? {
+    fun getGlbBytes(floorId: String): ByteArray? = getMapFile(floorId)?.first
+
+    fun getMapFile(floorId: String): Pair<ByteArray, String>? {
         val dir = Path.of(uploadsDir, "glb").toFile()
-        // Try exact match by scanning sub-dirs
+        val extensions = listOf("glb", "svg", "png", "dxf")
         dir.listFiles()?.forEach { buildingDir ->
-            val file = buildingDir.resolve("$floorId.glb")
-            if (file.exists()) return file.readBytes()
+            for (ext in extensions) {
+                val file = buildingDir.resolve("$floorId.$ext")
+                if (file.exists()) return Pair(file.readBytes(), ext)
+            }
         }
         return null
     }
 
-    private fun saveGlbFile(buildingId: String, floorId: String, bytes: ByteArray): String {
+    private fun saveMapFile(buildingId: String, floorId: String, extension: String, bytes: ByteArray): String {
         val dir = Path.of(uploadsDir, "glb", buildingId).toFile().also { it.mkdirs() }
-        dir.resolve("$floorId.glb").writeBytes(bytes)
-        return "uploads/glb/$buildingId/$floorId.glb"
+        // Remove any previously stored file with a different extension before saving
+        listOf("glb", "svg", "png", "dxf").forEach { ext ->
+            dir.resolve("$floorId.$ext").takeIf { it.exists() }?.delete()
+        }
+        dir.resolve("$floorId.$extension").writeBytes(bytes)
+        return "uploads/glb/$buildingId/$floorId.$extension"
     }
 
-    private fun rowToResponse(row: ResultRow): FloorResponse = FloorResponse(
-        id           = row[Floors.id].value.toString(),
-        buildingId   = row[Floors.buildingId].value.toString(),
-        floorNumber  = row[Floors.floorNumber],
-        floorName    = row[Floors.floorName],
-        boundsMinX   = row[Floors.boundsMinX],
-        boundsMaxX   = row[Floors.boundsMaxX],
-        boundsMinZ   = row[Floors.boundsMinZ],
-        boundsMaxZ   = row[Floors.boundsMaxZ],
-        floorY       = row[Floors.floorY],
-        uploadStatus = row[Floors.uploadStatus],
-        createdAt    = row[Floors.createdAt].toString(),
-        updatedAt    = row[Floors.updatedAt].toString(),
-    )
+    private fun rowToResponse(row: ResultRow): FloorResponse {
+        val storedPath = row[Floors.glbFilePath]
+        val mapFileType = storedPath.substringAfterLast('.', "glb")
+            .lowercase()
+            .let { if (it in setOf("glb", "svg", "png", "dxf")) it else "glb" }
+        return FloorResponse(
+            id           = row[Floors.id].value.toString(),
+            buildingId   = row[Floors.buildingId].value.toString(),
+            floorNumber  = row[Floors.floorNumber],
+            floorName    = row[Floors.floorName],
+            boundsMinX   = row[Floors.boundsMinX],
+            boundsMaxX   = row[Floors.boundsMaxX],
+            boundsMinZ   = row[Floors.boundsMinZ],
+            boundsMaxZ   = row[Floors.boundsMaxZ],
+            floorY       = row[Floors.floorY],
+            uploadStatus = row[Floors.uploadStatus],
+            mapFileType  = mapFileType,
+            createdAt    = row[Floors.createdAt].toString(),
+            updatedAt    = row[Floors.updatedAt].toString(),
+        )
+    }
 }

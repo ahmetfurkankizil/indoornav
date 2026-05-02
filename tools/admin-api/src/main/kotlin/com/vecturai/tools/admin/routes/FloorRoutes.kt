@@ -29,7 +29,8 @@ fun Route.floorRoutes(service: FloorService) {
 
                 var floorNumber: Int? = null
                 var floorName: String? = null
-                var glbBytes: ByteArray? = null
+                var mapBytes: ByteArray? = null
+                var mapFileName = "floor.glb"
 
                 call.receiveMultipart().forEachPart { part ->
                     when {
@@ -37,17 +38,20 @@ fun Route.floorRoutes(service: FloorService) {
                             floorNumber = part.value.toIntOrNull()
                         part is PartData.FormItem && part.name == "floorName" ->
                             floorName = part.value
-                        part is PartData.FileItem && part.name == "glbFile" ->
-                            glbBytes = part.provider().toByteArray()
+                        part is PartData.FileItem && (part.name == "mapFile" || part.name == "glbFile") -> {
+                            mapFileName = part.originalFileName ?: "floor.glb"
+                            mapBytes = part.provider().toByteArray()
+                        }
                     }
                     part.dispose()
                 }
 
                 val fn = floorNumber ?: return@post call.respond(HttpStatusCode.BadRequest, ErrorResponse("floorNumber required"))
                 val name = floorName?.takeIf { it.isNotBlank() } ?: return@post call.respond(HttpStatusCode.BadRequest, ErrorResponse("floorName required"))
-                val bytes = glbBytes?.takeIf { it.isNotEmpty() } ?: return@post call.respond(HttpStatusCode.BadRequest, ErrorResponse("glbFile required"))
+                val bytes = mapBytes?.takeIf { it.isNotEmpty() } ?: return@post call.respond(HttpStatusCode.BadRequest, ErrorResponse("mapFile required"))
+                val ext = resolveExtension(mapFileName)
 
-                val floor = service.create(buildingId, managerId, fn, name, bytes)
+                val floor = service.create(buildingId, managerId, fn, name, bytes, ext)
                     ?: return@post call.respond(HttpStatusCode.NotFound, ErrorResponse("Building not found"))
                 call.respond(HttpStatusCode.Created, floor)
             }
@@ -66,21 +70,26 @@ fun Route.floorRoutes(service: FloorService) {
 
                 var floorName: String? = null
                 var floorNumber: Int? = null
-                var glbBytes: ByteArray? = null
+                var mapBytes: ByteArray? = null
+                var mapFileName = "floor.glb"
 
                 call.receiveMultipart().forEachPart { part ->
                     when {
                         part is PartData.FormItem && part.name == "floorName"   -> floorName   = part.value
                         part is PartData.FormItem && part.name == "floorNumber" -> floorNumber = part.value.toIntOrNull()
-                        part is PartData.FileItem && part.name == "glbFile"     -> glbBytes   = part.provider().toByteArray()
+                        part is PartData.FileItem && (part.name == "mapFile" || part.name == "glbFile") -> {
+                            mapFileName = part.originalFileName ?: "floor.glb"
+                            mapBytes = part.provider().toByteArray()
+                        }
                     }
                     part.dispose()
                 }
 
-                val bytes = glbBytes?.takeIf { it.isNotEmpty() }
-                    ?: return@put call.respond(HttpStatusCode.BadRequest, ErrorResponse("glbFile required"))
+                val bytes = mapBytes?.takeIf { it.isNotEmpty() }
+                    ?: return@put call.respond(HttpStatusCode.BadRequest, ErrorResponse("mapFile required"))
+                val ext = resolveExtension(mapFileName)
 
-                val floor = service.replaceGlb(floorId, managerId, bytes, floorName, floorNumber)
+                val floor = service.replaceGlb(floorId, managerId, bytes, ext, floorName, floorNumber)
                     ?: return@put call.respond(HttpStatusCode.NotFound, ErrorResponse("Floor not found"))
                 call.respond(floor)
             }
@@ -100,10 +109,16 @@ fun Route.floorRoutes(service: FloorService) {
                 val floorId   = call.parameters["floorId"] ?: return@get badRequest("floorId")
                 service.getById(floorId, managerId)
                     ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("Floor not found"))
-                val bytes = service.getGlbBytes(floorId)
-                    ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("GLB file not found"))
-                call.response.headers.append("Content-Disposition", "inline; filename=\"floor-$floorId.glb\"")
-                call.respondBytes(bytes, ContentType.Application.OctetStream)
+                val (bytes, ext) = service.getMapFile(floorId)
+                    ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("Map file not found"))
+                val contentType = when (ext) {
+                    "svg" -> ContentType.parse("image/svg+xml")
+                    "png" -> ContentType.Image.PNG
+                    "dxf" -> ContentType.parse("application/dxf")
+                    else  -> ContentType.Application.OctetStream
+                }
+                call.response.headers.append("Content-Disposition", "inline; filename=\"floor-$floorId.$ext\"")
+                call.respondBytes(bytes, contentType)
             }
 
             put("{floorId}/bounds") {
@@ -123,3 +138,10 @@ private fun RoutingContext.managerId(): String? =
 
 private suspend fun RoutingContext.badRequest(param: String) =
     call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing $param"))
+
+private val ALLOWED_EXTENSIONS = setOf("glb", "svg", "png", "dxf")
+
+private fun resolveExtension(fileName: String): String =
+    fileName.substringAfterLast('.', "glb").lowercase().let {
+        if (it in ALLOWED_EXTENSIONS) it else "glb"
+    }

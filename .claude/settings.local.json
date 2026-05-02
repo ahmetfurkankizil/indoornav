@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(grep -E '\\\\.swift$')",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

@@ -58,8 +58,7 @@ class AiEdgeSuggester {
                - 'elevator'/'stairs': At vertical transport points.
                - 'turning point': Every time a corridor bends or branches.
             3. Connect nodes:
-               - ONLY 'turning point' nodes can have >1 connection. 
-               - Rooms MUST connect to the nearest 'turning point' in the hallway.
+               - Create logical paths between rooms and hallways.
             
             CONSTRAINTS:
             - Respond ONLY with the JSON object.
