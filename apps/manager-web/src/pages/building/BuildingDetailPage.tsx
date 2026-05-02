@@ -27,6 +27,7 @@ export function BuildingDetailPage() {
   const [connFrom, setConnFrom]         = useState('')
   const [connTo, setConnTo]             = useState('')
   const [connType, setConnType]         = useState('elevator')
+  const [errorPopup, setErrorPopup]     = useState<string | null>(null)
 
   const { data: building, isLoading } = useQuery({
     queryKey: ['building', buildingId],
@@ -45,6 +46,15 @@ export function BuildingDetailPage() {
     queryFn: () => listBuildingNodes(buildingId!),
     enabled: !!buildingId,
   })
+
+  // Auto-detect connection type
+  useEffect(() => {
+    const fromNode = nodes.find(n => n.id === connFrom)
+    const toNode = nodes.find(n => n.id === connTo)
+    if (fromNode && toNode && fromNode.nodeType === toNode.nodeType) {
+      setConnType(fromNode.nodeType)
+    }
+  }, [connFrom, connTo, nodes])
 
   const addFloorMut = useMutation({
     mutationFn: () => {
@@ -88,7 +98,29 @@ export function BuildingDetailPage() {
   })
 
   const addConnMut = useMutation({
-    mutationFn: () => createConnection(buildingId!, { fromNodeId: connFrom, toNodeId: connTo, connectionType: connType }),
+    mutationFn: () => {
+      const fromNode = nodes.find(n => n.id === connFrom)
+      const toNode = nodes.find(n => n.id === connTo)
+      
+      if (!fromNode || !toNode) throw new Error("Nodes not found")
+      
+      if (connFrom === connTo) {
+        setErrorPopup("You cannot connect a node to itself. Please select two different nodes, typically on different floors.")
+        return Promise.reject("Same node")
+      }
+      
+      if (fromNode.nodeType !== toNode.nodeType) {
+        setErrorPopup(`You cannot connect different types of nodes: "${fromNode.label}" is a ${fromNode.nodeType}, while "${toNode.label}" is a ${toNode.nodeType}.`)
+        return Promise.reject("Type mismatch")
+      }
+      
+      if (connType !== fromNode.nodeType) {
+        setErrorPopup(`Selected connection type (${connType}) does not match the nodes' type (${fromNode.nodeType}). Please select the correct type.`)
+        return Promise.reject("Type mismatch with connection")
+      }
+
+      return createConnection(buildingId!, { fromNodeId: connFrom, toNodeId: connTo, connectionType: connType })
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['connections', buildingId] }); setConnFrom(''); setConnTo('') },
   })
 
@@ -205,44 +237,57 @@ export function BuildingDetailPage() {
             <div className="flex gap-4 flex-wrap items-end">
               <div className="flex-1 min-w-[200px]">
                 <label className="block text-xs font-medium mb-1 text-gray-600">From Node</label>
-                <input 
-                  list="nodes-list"
+                <select 
                   value={connFrom} 
                   onChange={e => setConnFrom(e.target.value)}
-                  placeholder="Search or paste UUID..." 
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
-                />
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                >
+                  <option value="">Select From Node...</option>
+                  {nodes.filter(n => n.nodeType === 'elevator' || n.nodeType === 'stairs').sort((a, b) => {
+                    const fA = building.floors?.find(f => f.id === a.floorId)
+                    const fB = building.floors?.find(f => f.id === b.floorId)
+                    if (fA?.floorNumber !== fB?.floorNumber) return (fA?.floorNumber ?? 0) - (fB?.floorNumber ?? 0)
+                    return (a.label || "").localeCompare(b.label || "")
+                  }).map(n => {
+                    const floor = building.floors?.find(f => f.id === n.floorId)
+                    return (
+                      <option key={n.id} value={n.id}>
+                        {n.label || 'Unnamed Node'} ({floor?.floorName || 'Unknown Floor'})
+                      </option>
+                    )
+                  })}
+                </select>
               </div>
               <div className="flex-1 min-w-[200px]">
                 <label className="block text-xs font-medium mb-1 text-gray-600">To Node</label>
-                <input 
-                  list="nodes-list"
+                <select 
                   value={connTo} 
                   onChange={e => setConnTo(e.target.value)}
-                  placeholder="Search or paste UUID..." 
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
-                />
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                >
+                  <option value="">Select To Node...</option>
+                  {nodes.filter(n => n.nodeType === 'elevator' || n.nodeType === 'stairs').sort((a, b) => {
+                    const fA = building.floors?.find(f => f.id === a.floorId)
+                    const fB = building.floors?.find(f => f.id === b.floorId)
+                    if (fA?.floorNumber !== fB?.floorNumber) return (fA?.floorNumber ?? 0) - (fB?.floorNumber ?? 0)
+                    return (a.label || "").localeCompare(b.label || "")
+                  }).map(n => {
+                    const floor = building.floors?.find(f => f.id === n.floorId)
+                    return (
+                      <option key={n.id} value={n.id}>
+                        {n.label || 'Unnamed Node'} ({floor?.floorName || 'Unknown Floor'})
+                      </option>
+                    )
+                  })}
+                </select>
               </div>
               
-              <datalist id="nodes-list">
-                {nodes.map(n => {
-                  const floor = building.floors?.find(f => f.id === n.floorId)
-                  return (
-                    <option key={n.id} value={n.id}>
-                      {floor ? `${floor.floorName} - ` : ''}{n.label || 'Unnamed Node'}
-                    </option>
-                  )
-                })}
-              </datalist>
-
               <div>
                 <label className="block text-xs font-medium mb-1 text-gray-600">Type</label>
                 <select value={connType} onChange={e => setConnType(e.target.value)}
                   className="border rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
                   <option value="elevator">Elevator</option>
                   <option value="stairs">Stairs</option>
-                  <option value="escalator">Escalator</option>
-                  <option value="ramp">Ramp</option>
                 </select>
               </div>
               <button onClick={() => addConnMut.mutate()}
@@ -342,6 +387,27 @@ export function BuildingDetailPage() {
       {/* QR modal */}
       {showQr && (
         <QrModal buildingId={buildingId!} onClose={() => setShowQr(false)} />
+      )}
+
+      {/* Error Popup */}
+      {errorPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <h3 className="text-lg font-bold">Invalid Connection</h3>
+            </div>
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+              {errorPopup}
+            </p>
+            <button
+              onClick={() => setErrorPopup(null)}
+              className="w-full bg-red-600 text-white py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-sm"
+            >
+              Understood
+            </button>
+          </div>
+        </div>
       )}
     </Layout>
   )

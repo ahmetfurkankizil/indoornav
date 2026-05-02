@@ -17,10 +17,15 @@ import kotlinx.serialization.json.*
 
 class AiEdgeSuggester {
     private val apiKey = Env.get("ANTHROPIC_API_KEY") ?: ""
-    private val model  = "claude-haiku-4-5"
+    private val model  = "claude-3-5-sonnet-20241022"
+
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        coerceInputValues = true
+    }
 
     private val httpClient = HttpClient(Java) {
-        install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        install(ContentNegotiation) { json(json) }
     }
 
     suspend fun suggest(
@@ -42,34 +47,48 @@ class AiEdgeSuggester {
             })
         )
 
-        val prompt = """
-You are an indoor navigation path planner. You are given:
-1. A 2D top-down floor plan image of a building floor
-2. A list of labeled nodes with their normalized positions (0.0=left/top, 1.0=right/bottom)
-
-Your task: suggest walkable edges connecting these nodes.
-
-Rules:
-- Edges must follow visible corridors and open floor space — never pass through walls
-- Prefer paths a person would naturally walk (corridors, not diagonal room-cuts)
-- Add waypoints where the path curves around an obstacle or wall corner
-- Every 'room' node must be reachable from an 'entrance' or 'corridor' node
-- Do not connect nodes separated by a solid wall with no visible door
-
-Respond ONLY with valid JSON, no explanation or markdown:
-{"edges":[{"fromNodeId":"...","toNodeId":"...","waypoints":[{"x":0.0,"y":0.0}],"confidence":0.85}]}
-
-Nodes:
-$nodeListJson
-""".trimIndent()
+        val systemPrompt = """
+            You are a professional indoor navigation architect. Your task is to analyze a floor plan image and suggest a logical navigation graph (nodes and edges).
+            
+            WORKFLOW:
+            1. First, analyze the image to find all rooms, hallways, and entrance/exit points.
+            2. Place nodes:
+               - 'room': At the entrance of every room (just inside the door).
+               - 'entrance': At the main entry point to the floor.
+               - 'elevator'/'stairs': At vertical transport points.
+               - 'turning point': Every time a corridor bends or branches.
+            3. Connect nodes:
+               - ONLY 'turning point' nodes can have >1 connection. 
+               - Rooms MUST connect to the nearest 'turning point' in the hallway.
+            
+            CONSTRAINTS:
+            - Respond ONLY with the JSON object.
+            - Do not be lazy. Suggest at least one node for every visible room.
+            
+            Response Format:
+            {
+              "nodes": [
+                { "id": "new_1", "label": "Room 101", "nodeType": "room", "canvasX": 0.5, "canvasY": 0.5 }
+              ],
+              "edges": [
+                { "fromNodeId": "new_1", "toNodeId": "new_2", "waypoints": [], "confidence": 0.9 }
+              ]
+            }
+        """.trimIndent()
 
         val requestBody = buildJsonObject {
             put("model", model)
-            put("max_tokens", 2048)
+            put("max_tokens", 4096)
+            put("system", systemPrompt)
             putJsonArray("messages") {
                 addJsonObject {
                     put("role", "user")
                     putJsonArray("content") {
+                        addJsonObject {
+                            put("type", "text")
+                            put("text", "Please analyze this floor plan and suggest a complete navigation graph. " + 
+                                       (if (nodes.isNotEmpty()) "I have provided some existing nodes to start with." else "Start from scratch."))
+                        }
                         addJsonObject {
                             put("type", "image")
                             putJsonObject("source") {
@@ -78,21 +97,24 @@ $nodeListJson
                                 put("data", floorPlanImageBase64)
                             }
                         }
-                        addJsonObject {
-                            put("type", "text")
-                            put("text", prompt)
-                        }
                     }
                 }
             }
         }
 
         return try {
+            println("AI Suggest: Sending request (model=$model, nodes=${nodes.size}, imgLen=${floorPlanImageBase64.length}, hasKey=${apiKey.isNotBlank()})")
             val response = httpClient.post("https://api.anthropic.com/v1/messages") {
                 header("x-api-key", apiKey)
                 header("anthropic-version", "2023-06-01")
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
+            }
+
+            if (response.status != HttpStatusCode.OK) {
+                val errorBody = response.body<String>()
+                println("AI Suggest: Anthropic API Error (${response.status}): $errorBody")
+                return AiSuggestResponse(emptyList())
             }
 
             val responseJson = response.body<JsonObject>()
@@ -103,15 +125,24 @@ $nodeListJson
                 ?.get("text")
                 ?.jsonPrimitive
                 ?.content
-                ?: return AiSuggestResponse(emptyList())
+                ?: run {
+                    println("AI Suggest: No text content in response: $responseJson")
+                    return AiSuggestResponse(emptyList())
+                }
+
+            println("AI Suggest: Raw response text: $text")
 
             // Strip markdown code fences if present
             val cleaned = text.trim()
                 .removePrefix("```json").removePrefix("```")
                 .removeSuffix("```").trim()
 
-            Json.decodeFromString<AiSuggestResponse>(cleaned)
-        } catch (_: Exception) {
+            val result = json.decodeFromString<AiSuggestResponse>(cleaned)
+            println("AI Suggest: Parsed ${result.edges.size} edges")
+            result
+        } catch (e: Exception) {
+            println("AI Suggest: Execution Error: ${e.message}")
+            e.printStackTrace()
             AiSuggestResponse(emptyList())
         }
     }

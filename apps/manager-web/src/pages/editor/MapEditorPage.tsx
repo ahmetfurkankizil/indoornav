@@ -15,7 +15,6 @@ import { getBuilding, updateFloorBounds, getGlbUrl } from '../../api/buildings'
 
 const NODE_COLORS: Record<string, string> = {
   room:        '#3b82f6',
-  corridor:    '#6b7280',
   entrance:    '#22c55e',
   elevator:    '#a855f7',
   stairs:         '#f97316',
@@ -114,6 +113,8 @@ export function MapEditorPage() {
   const [glbError, setGlbError]       = useState('')
   const [toast, setToast]             = useState('')
   const [pendingFrom, setPendingFrom] = useState<string | null>(null)
+  const [dragPreview, setDragPreview] = useState<{ fromId: string; toX: number; toY: number } | null>(null)
+  const [errorPopup, setErrorPopup] = useState<string | null>(null)
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 2800) }
 
@@ -177,6 +178,23 @@ export function MapEditorPage() {
     return () => window.removeEventListener('keydown', handler)
   }, [store.selectedNodeId, store.selectedEdgeId])
 
+  // ── Validation ──────────────────────────────────────────────────────────────
+
+  const validateNodeEdgeCount = (nodeId: string): { ok: boolean; reason?: string } => {
+    const node = store.nodes.find(n => n.id === nodeId)
+    if (!node) return { ok: true }
+    if (node.nodeType === 'turning point') return { ok: true }
+
+    const count = store.edges.filter(e => e.fromNodeId === nodeId || e.toNodeId === nodeId).length
+    if (count >= 1) {
+      return {
+        ok: false,
+        reason: `Node "${node.label}" is a "${node.nodeType}". Only "turning point" nodes can have more than one connection. This helps keep the navigation graph clean.`
+      }
+    }
+    return { ok: true }
+  }
+
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   const handleStageClick = async (e: any) => {
@@ -203,11 +221,75 @@ export function MapEditorPage() {
     }
   }
 
+  const handleStageMouseMove = (e: any) => {
+    if (!dragPreview) return
+    const stage = e.target.getStage()
+    const pos = stage.getPointerPosition()
+    if (!pos) return
+    setDragPreview({ ...dragPreview, toX: pos.x, toY: pos.y })
+  }
+
+  const handleStageMouseUp = async (e: any) => {
+    if (!dragPreview || !floorId) return
+    const stage = e.target.getStage()
+    const pos = stage.getPointerPosition()
+    if (!pos) { setDragPreview(null); return }
+
+    // Check if we dropped on a node
+    const intersection = stage.getIntersection(pos)
+    const targetNodeCircle = intersection?.name() === 'node-circle' ? intersection : intersection?.findAncestor('.node-circle')
+    const targetNodeId = targetNodeCircle?.id()
+
+    const cx = pos.x / CANVAS_SIZE
+    const cy = pos.y / CANVAS_SIZE
+
+    if (targetNodeId && targetNodeId !== dragPreview.fromId) {
+      // Validation
+      const fromVal = validateNodeEdgeCount(dragPreview.fromId)
+      if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setDragPreview(null); return }
+      const toVal = validateNodeEdgeCount(targetNodeId)
+      if (!toVal.ok) { setErrorPopup(toVal.reason!); setDragPreview(null); return }
+
+      // Connect to existing node
+      try {
+        const edge = await createEdge(floorId, { fromNodeId: dragPreview.fromId, toNodeId: targetNodeId })
+        store.addEdge(edge)
+        showToast('Edge created')
+      } catch { showToast('Failed to create edge') }
+    } else if (!targetNodeId) {
+      // Validation
+      const fromVal = validateNodeEdgeCount(dragPreview.fromId)
+      if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setDragPreview(null); return }
+
+      // Create new node and connect
+      // Create new node and connect
+      try {
+        const node = await createNode(floorId, { label: 'New Node', nodeType: 'turning point', canvasX: cx, canvasY: cy })
+        store.addNode(node)
+        const edge = await createEdge(floorId, { fromNodeId: dragPreview.fromId, toNodeId: node.id })
+        store.addEdge(edge)
+        showToast('Node & Edge created')
+      } catch { showToast('Failed to extend edge') }
+    }
+
+    setDragPreview(null)
+    store.setMode('select')
+  }
+
   const handleNodeClick = async (nodeId: string) => {
     if (store.mode === 'addEdge') {
       if (!pendingFrom) {
+        // First node: check if it can even have an edge
+        const val = validateNodeEdgeCount(nodeId)
+        if (!val.ok) { setErrorPopup(val.reason!); return }
         setPendingFrom(nodeId)
       } else if (pendingFrom !== nodeId && floorId) {
+        // Second node: check both ends
+        const fromVal = validateNodeEdgeCount(pendingFrom)
+        if (!fromVal.ok) { setErrorPopup(fromVal.reason!); setPendingFrom(null); return }
+        const toVal = validateNodeEdgeCount(nodeId)
+        if (!toVal.ok) { setErrorPopup(toVal.reason!); return }
+
         try {
           const edge = await createEdge(floorId, { fromNodeId: pendingFrom, toNodeId: nodeId })
           store.addEdge(edge)
@@ -221,6 +303,34 @@ export function MapEditorPage() {
     if (store.mode === 'select') {
       store.setSelectedNode(nodeId)
     }
+  }
+
+  const handleNodeMouseDown = (e: any, nodeId: string) => {
+    if (store.mode === 'addEdge') {
+      e.cancelBubble = true
+      const stage = e.target.getStage()
+      const pos = stage.getPointerPosition()
+      if (pos) {
+        setDragPreview({ fromId: nodeId, toX: pos.x, toY: pos.y })
+      }
+    }
+  }
+
+  const handleNodeDragMove = (e: any, nodeId: string) => {
+    const node = store.nodes.find(n => n.id === nodeId)
+    if (!node) return
+    const newNode = {
+      ...node,
+      canvasX: e.target.x() / CANVAS_SIZE,
+      canvasY: e.target.y() / CANVAS_SIZE,
+    }
+    store.updateNodeInStore(newNode)
+  }
+
+  const handleNodeDragEnd = async (e: any, nodeId: string) => {
+    const cx = e.target.x() / CANVAS_SIZE
+    const cy = e.target.y() / CANVAS_SIZE
+    await handleUpdateNode(nodeId, { canvasX: cx, canvasY: cy })
   }
 
   const handleDeleteNode = async (nodeId: string) => {
@@ -253,25 +363,44 @@ export function MapEditorPage() {
     try {
       const b64 = store.floorPlanDataUrl.split(',')[1]
       const result = await aiSuggestEdges(floorId, b64, store.nodes)
-      store.setSuggestedEdges(result.edges)
-      showToast(`${result.edges.length} edge${result.edges.length !== 1 ? 's' : ''} suggested`)
+      store.setSuggestions(result.nodes || [], result.edges)
+      const nLen = result.nodes?.length || 0
+      const eLen = result.edges.length
+      showToast(`AI suggested ${nLen} node${nLen !== 1 ? 's' : ''} and ${eLen} edge${eLen !== 1 ? 's' : ''}`)
     } catch { showToast('AI suggestion failed') }
     finally { store.setAiLoading(false) }
   }
 
-  const handleAcceptSuggestion = async (s: SuggestedEdge) => {
-    if (!floorId) return
-    try {
-      const edge = await createEdge(floorId, { fromNodeId: s.fromNodeId, toNodeId: s.toNodeId, waypoints: s.waypoints, createdBy: 'ai' })
-      store.addEdge(edge)
-      store.setSuggestedEdges(store.suggestedEdges.filter(x => !(x.fromNodeId === s.fromNodeId && x.toNodeId === s.toNodeId)))
-    } catch { showToast('Failed to accept edge') }
-  }
-
   const handleAcceptAll = async () => {
-    for (const s of [...store.suggestedEdges]) await handleAcceptSuggestion(s)
+    if (!floorId) return
+    const idMap: Record<string, string> = {}
+
+    // 1. Create all suggested nodes
+    for (const sn of store.suggestedNodes) {
+      try {
+        const n = await createNode(floorId, { label: sn.label, nodeType: sn.nodeType, canvasX: sn.canvasX, canvasY: sn.canvasY })
+        store.addNode(n)
+        idMap[sn.id] = n.id
+      } catch { /* skip failed node */ }
+    }
+
+    // 2. Create all suggested edges
+    for (const se of store.suggestedEdges) {
+      const fromId = idMap[se.fromNodeId] || se.fromNodeId
+      const toId   = idMap[se.toNodeId] || se.toNodeId
+      
+      // Basic check: do these nodes exist?
+      if (!store.nodes.find(n => n.id === fromId) && !idMap[se.fromNodeId]) continue
+      if (!store.nodes.find(n => n.id === toId) && !idMap[se.toNodeId]) continue
+
+      try {
+        const edge = await createEdge(floorId, { fromNodeId: fromId, toNodeId: toId, waypoints: se.waypoints, createdBy: 'ai' })
+        store.addEdge(edge)
+      } catch { /* skip failed edge */ }
+    }
+
     store.clearSuggestions()
-    showToast('All suggestions accepted')
+    showToast('Auto-map complete')
   }
 
   const selectedNode = store.nodes.find(n => n.id === store.selectedNodeId) ?? null
@@ -335,11 +464,10 @@ export function MapEditorPage() {
       )}
 
       {/* AI suggestion bar */}
-      {store.suggestedEdges.length > 0 && (
+      {(store.suggestedEdges.length > 0 || store.suggestedNodes.length > 0) && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center gap-4 text-sm flex-shrink-0">
-          <span className="text-amber-800 font-medium">✨ {store.suggestedEdges.length} AI edges suggested (shown as dashed yellow)</span>
-          <button onClick={handleAcceptAll} className="px-3 py-1 bg-amber-500 text-white rounded text-xs font-medium hover:bg-amber-600">Accept All</button>
-          <span className="text-amber-700 text-xs">or click individual edges to accept below</span>
+          <span className="text-amber-800 font-medium">✨ AI suggested {store.suggestedNodes.length} nodes and {store.suggestedEdges.length} edges</span>
+          <button onClick={handleAcceptAll} className="px-3 py-1 bg-amber-500 text-white rounded text-xs font-medium hover:bg-amber-600">Accept Auto-Map</button>
           <button onClick={() => store.clearSuggestions()} className="ml-auto px-3 py-1 border border-amber-400 text-amber-700 rounded text-xs hover:bg-amber-100">Dismiss</button>
         </div>
       )}
@@ -368,7 +496,9 @@ export function MapEditorPage() {
 
             <Stage width={CANVAS_SIZE} height={CANVAS_SIZE}
               onClick={handleStageClick}
-              style={{ cursor: store.mode === 'addNode' ? 'crosshair' : 'default' }}
+              onMouseMove={handleStageMouseMove}
+              onMouseUp={handleStageMouseUp}
+              style={{ cursor: store.mode === 'addNode' || store.mode === 'addEdge' ? 'crosshair' : 'default' }}
             >
               {/* Background */}
               <Layer>
@@ -405,18 +535,33 @@ export function MapEditorPage() {
 
                 {/* AI suggestions */}
                 {store.suggestedEdges.map((s, i) => {
-                  const from = store.nodes.find(n => n.id === s.fromNodeId)
-                  const to   = store.nodes.find(n => n.id === s.toNodeId)
+                  const from = store.nodes.find(n => n.id === s.fromNodeId) || store.suggestedNodes.find(n => n.id === s.fromNodeId)
+                  const to   = store.nodes.find(n => n.id === s.toNodeId) || store.suggestedNodes.find(n => n.id === s.toNodeId)
                   if (!from || !to) return null
                   return (
                     <Line key={`sugg-${i}`}
                       points={[norm2px(from.canvasX), norm2px(from.canvasY), norm2px(to.canvasX), norm2px(to.canvasY)]}
-                      stroke="#eab308" strokeWidth={2} dash={[9, 4]} opacity={0.85}
-                      onClick={(e) => { e.cancelBubble = true; handleAcceptSuggestion(s) }}
-                      hitStrokeWidth={14}
+                      stroke="#eab308" strokeWidth={2} dash={[9, 4]} opacity={0.65}
+                      listening={false}
                     />
                   )
                 })}
+
+                {/* Drag Preview Edge */}
+                {dragPreview && (
+                  <Line
+                    points={[
+                      norm2px(store.nodes.find(n => n.id === dragPreview.fromId)!.canvasX),
+                      norm2px(store.nodes.find(n => n.id === dragPreview.fromId)!.canvasY),
+                      dragPreview.toX,
+                      dragPreview.toY
+                    ]}
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dash={[5, 5]}
+                    opacity={0.6}
+                  />
+                )}
               </Layer>
 
               {/* Nodes */}
@@ -436,7 +581,13 @@ export function MapEditorPage() {
                         stroke={isSelected ? '#fff' : isPending ? '#fbbf24' : 'rgba(0,0,0,0.25)'}
                         strokeWidth={isSelected ? 3 : isPending ? 3 : 1}
                         onClick={(e) => { e.cancelBubble = true; handleNodeClick(node.id) }}
-                        style={{ cursor: 'pointer' }}
+                        onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
+                        draggable={store.mode === 'select'}
+                        onDragMove={(e) => handleNodeDragMove(e, node.id)}
+                        onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
+                        name="node-circle"
+                        id={node.id}
+                        style={{ cursor: store.mode === 'select' ? 'grab' : 'pointer' }}
                       />
                       <Text
                         x={x + 12} y={y - 7}
@@ -451,6 +602,21 @@ export function MapEditorPage() {
                     </React.Fragment>
                   )
                 })}
+
+                {/* Suggested Nodes */}
+                {store.suggestedNodes.map(sn => (
+                  <Circle
+                    key={sn.id}
+                    x={norm2px(sn.canvasX)} y={norm2px(sn.canvasY)}
+                    radius={6}
+                    fill={NODE_COLORS[sn.nodeType] || '#6b7280'}
+                    stroke="#eab308"
+                    strokeWidth={2}
+                    dash={[2, 2]}
+                    opacity={0.6}
+                    listening={false}
+                  />
+                ))}
               </Layer>
             </Stage>
           </div>
@@ -505,6 +671,27 @@ export function MapEditorPage() {
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg z-50">
           {toast}
+        </div>
+      )}
+
+      {/* Error Popup */}
+      {errorPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <span className="text-2xl">⚠️</span>
+              <h3 className="text-lg font-bold">Action Restricted</h3>
+            </div>
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed text-gray-700">
+              {errorPopup}
+            </p>
+            <button
+              onClick={() => setErrorPopup(null)}
+              className="w-full bg-gray-900 text-white py-2.5 rounded-md font-medium hover:bg-gray-800 transition-colors shadow-sm"
+            >
+              Understand
+            </button>
+          </div>
         </div>
       )}
     </div>

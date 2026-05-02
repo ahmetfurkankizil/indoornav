@@ -103,7 +103,10 @@ data class SuggestedEdge(
 )
 
 @Serializable
-data class AiSuggestResponse(val edges: List<SuggestedEdge>)
+data class AiSuggestResponse(
+    val nodes: List<AiNodeInput> = emptyList(),
+    val edges: List<SuggestedEdge> = emptyList()
+)
 
 // ── Floor connections ──────────────────────────────────────────────────
 

@@ -23,6 +23,11 @@ export interface SuggestedEdge {
   waypoints: Waypoint[]; confidence: number
 }
 
+export interface SuggestedNode {
+  id: string; label: string; nodeType: string
+  canvasX: number; canvasY: number
+}
+
 // ── Nodes ──────────────────────────────────────────────────────────────────────
 
 export const listNodes = (floorId: string) =>
@@ -62,7 +67,7 @@ export const deleteEdge = (floorId: string, edgeId: string) =>
   api.delete(`/api/manager/floors/${floorId}/edges/${edgeId}`)
 
 export const aiSuggestEdges = (floorId: string, floorPlanImageBase64: string, nodes: Node[]) =>
-  api.post<{ edges: SuggestedEdge[] }>(`/api/manager/floors/${floorId}/edges/ai-suggest`, {
+  api.post<{ nodes?: SuggestedNode[], edges: SuggestedEdge[] }>(`/api/manager/floors/${floorId}/edges/ai-suggest`, {
     floorPlanImageBase64,
     nodes: nodes.map(n => ({
       id: n.id, label: n.label, nodeType: n.nodeType,

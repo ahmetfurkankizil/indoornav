@@ -57,11 +57,19 @@ fun Route.edgeRoutes(service: EdgeService, aiSuggester: AiEdgeSuggester) {
             }
 
             post("ai-suggest") {
-                val managerId = managerId() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+                println("API: Received ai-suggest request")
+                val managerId = managerId() ?: return@post println("API: Unauthorized manager").run { call.respond(HttpStatusCode.Unauthorized) }
                 val floorId   = call.parameters["floorId"] ?: return@post badRequest("floorId")
-                val req = call.receive<AiSuggestRequest>()
-                val result = aiSuggester.suggest(req.floorPlanImageBase64, req.nodes)
-                call.respond(result)
+                try {
+                    val req = call.receive<AiSuggestRequest>()
+                    println("API: Received ${req.nodes.size} nodes, img length ${req.floorPlanImageBase64.length}")
+                    val result = aiSuggester.suggest(req.floorPlanImageBase64, req.nodes)
+                    call.respond(result)
+                } catch (e: Exception) {
+                    println("API Error: ${e.message}")
+                    e.printStackTrace()
+                    call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "AI suggest failed"))
+                }
             }
         }
     }

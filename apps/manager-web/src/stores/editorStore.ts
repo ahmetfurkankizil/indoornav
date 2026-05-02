@@ -7,6 +7,7 @@ export interface EditorState {
   mode: EditorMode
   nodes: Node[]
   edges: Edge[]
+  suggestedNodes: SuggestedNode[]
   suggestedEdges: SuggestedEdge[]
   selectedNodeId: string | null
   selectedEdgeId: string | null
@@ -25,6 +26,7 @@ export interface EditorState {
   addEdge: (edge: Edge) => void
   updateEdgeInStore: (edge: Edge) => void
   removeEdge: (edgeId: string) => void
+  setSuggestions: (nodes: SuggestedNode[], edges: SuggestedEdge[]) => void
   setSuggestedEdges: (edges: SuggestedEdge[]) => void
   clearSuggestions: () => void
   setSelectedNode: (id: string | null) => void
@@ -39,6 +41,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   mode: 'select',
   nodes: [],
   edges: [],
+  suggestedNodes: [],
   suggestedEdges: [],
   selectedNodeId: null,
   selectedEdgeId: null,
@@ -61,8 +64,9 @@ export const useEditorStore = create<EditorState>((set) => ({
   addEdge: (edge) => set((s) => ({ edges: [...s.edges, edge], isDirty: true })),
   updateEdgeInStore: (edge) => set((s) => ({ edges: s.edges.map(e => e.id === edge.id ? edge : e) })),
   removeEdge: (id) => set((s) => ({ edges: s.edges.filter(e => e.id !== id), isDirty: true })),
+  setSuggestions: (nodes, edges) => set({ suggestedNodes: nodes, suggestedEdges: edges }),
   setSuggestedEdges: (edges) => set({ suggestedEdges: edges }),
-  clearSuggestions: () => set({ suggestedEdges: [] }),
+  clearSuggestions: () => set({ suggestedNodes: [], suggestedEdges: [] }),
   setSelectedNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
   setSelectedEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
   setPendingEdgeFrom: (id) => set({ pendingEdgeFromId: id }),

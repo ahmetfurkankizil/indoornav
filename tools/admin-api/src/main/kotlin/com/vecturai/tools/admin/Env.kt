@@ -5,6 +5,7 @@ import io.github.cdimascio.dotenv.dotenv
 
 object Env {
     private val dotenv: Dotenv = dotenv {
+        directory = "." // The server runs from tools/admin-api, so .env is right here
         ignoreIfMalformed = true
         ignoreIfMissing = true
     }

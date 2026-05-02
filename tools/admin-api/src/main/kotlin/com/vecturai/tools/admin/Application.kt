@@ -140,6 +140,17 @@ fun Application.configureApp(
         mobileApiRoutes()
         dbAdminRoutes(navGen)
 
+        // Diagnostic route
+        get("/api/admin/test-env") {
+            val key = Env.get("ANTHROPIC_API_KEY")
+            call.respond(buildJsonObject {
+                put("hasKey", key != null)
+                put("keyLength", key?.length ?: 0)
+                put("keyPrefix", key?.take(7) ?: "none")
+                put("workingDir", System.getProperty("user.dir"))
+            })
+        }
+
         // Legacy draft-job pipeline — preserved for backward compatibility
         draftJobRoutes(draftService)
     }
