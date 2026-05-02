@@ -25,7 +25,7 @@ val androidModule = module {
     factory { ArRouteRenderer() }
 
     viewModel { AndroidNavigationFlowModel(get()) }
-    viewModel { ArCameraFlowViewModel(get()) }
+    viewModel { ArCameraFlowViewModel(get(), get()) }
     viewModel { AndroidArNavigationViewModel(get(), get(), get()) }
 
     // TODO: Provide Android-specific SqlDelight driver

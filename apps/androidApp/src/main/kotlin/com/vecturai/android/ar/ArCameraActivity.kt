@@ -8,10 +8,17 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,14 +33,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,11 +50,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -62,6 +64,13 @@ import com.vecturai.android.ui.DestinationSelectScreen
 import com.vecturai.android.ui.EntranceConfirmedSheet
 import com.vecturai.android.ui.QRScanScreen
 import com.vecturai.android.ui.RoutePreviewScreen
+import com.vecturai.designsystem.Spacing
+import com.vecturai.designsystem.VecturaiCard
+import com.vecturai.designsystem.VecturaiColors
+import com.vecturai.designsystem.VecturaiHapticsGate
+import com.vecturai.designsystem.VecturaiPrimaryButton
+import com.vecturai.designsystem.VecturaiSecondaryButton
+import com.vecturai.designsystem.VecturaiShapes
 import com.vecturai.designsystem.VecturaiTheme
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
@@ -114,7 +123,9 @@ class ArCameraActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             VecturaiTheme {
-                ArCameraContent()
+                VecturaiHapticsGate(enabled = AndroidHapticManager.HapticsEnabled) {
+                    ArCameraContent()
+                }
             }
         }
     }
@@ -175,44 +186,58 @@ class ArCameraActivity : ComponentActivity() {
                 )
             }
 
-            when (val currentPhase = phase) {
-                ArCameraFlowViewModel.Phase.Loading -> LoadingOverlay()
-                ArCameraFlowViewModel.Phase.QrScan -> QRScanScreen(
-                    flowModel = flowModel,
-                    onCancel = ::finishFlow,
-                    onSimulateScan = if (isEmulator) ::simulateEntranceScan else null,
-                )
-                is ArCameraFlowViewModel.Phase.EntranceConfirmed -> EntranceConfirmedSheet(
-                    entranceName = currentPhase.entranceName,
-                    onContinue = flowModel::proceedToDestinationSelect,
-                )
-                ArCameraFlowViewModel.Phase.DestinationSelect -> DestinationSelectScreen(
-                    flowModel = flowModel,
-                    onCancel = ::finishFlow,
-                )
-                ArCameraFlowViewModel.Phase.RoutePreview -> RoutePreviewScreen(flowModel)
-                ArCameraFlowViewModel.Phase.ArNavigation -> {
-                    val routePackage = session.routePackage
-                    if (routePackage != null) {
-                        LaunchedEffect(routePackage, session.validatedEntranceMarker) {
-                            arViewModel.configure(routePackage, session.validatedEntranceMarker)
-                            if (isEmulator) {
-                                arViewModel.simulateAlignment()
+            AnimatedContent(
+                targetState = phase,
+                transitionSpec = {
+                    slideInVertically(
+                        animationSpec = tween(220, easing = FastOutSlowInEasing),
+                    ) { it / 12 } + fadeIn(tween(220, easing = FastOutSlowInEasing)) togetherWith
+                        slideOutVertically(
+                            animationSpec = tween(220, easing = FastOutSlowInEasing),
+                        ) { -it / 12 } + fadeOut(tween(220, easing = FastOutSlowInEasing))
+                },
+                label = "cameraFlowPhase",
+            ) { currentPhase ->
+                when (currentPhase) {
+                    ArCameraFlowViewModel.Phase.Loading -> LoadingOverlay()
+                    ArCameraFlowViewModel.Phase.QrScan -> QRScanScreen(
+                        flowModel = flowModel,
+                        onCancel = ::finishFlow,
+                        onSimulateScan = if (isEmulator) ::simulateEntranceScan else null,
+                    )
+                    is ArCameraFlowViewModel.Phase.EntranceConfirmed -> EntranceConfirmedSheet(
+                        entranceName = currentPhase.entranceName,
+                        onContinue = flowModel::proceedToDestinationSelect,
+                    )
+                    ArCameraFlowViewModel.Phase.DestinationSelect -> DestinationSelectScreen(
+                        flowModel = flowModel,
+                        onCancel = ::finishFlow,
+                    )
+                    ArCameraFlowViewModel.Phase.RoutePreview -> RoutePreviewScreen(flowModel)
+                    ArCameraFlowViewModel.Phase.ArNavigation -> {
+                        val routePackage = session.routePackage
+                        if (routePackage != null) {
+                            LaunchedEffect(routePackage, session.validatedEntranceMarker) {
+                                arViewModel.configure(routePackage, session.validatedEntranceMarker)
+                                if (isEmulator) {
+                                    arViewModel.simulateAlignment()
+                                }
                             }
+                            ArNavigationScreen(
+                                viewModel = arViewModel,
+                                isEmulator = isEmulator,
+                                onEnd = ::finishFlow,
+                                onRetryActivity = ::recreate,
+                                onNavigateElsewhere = ::navigateElsewhere,
+                            )
                         }
-                        ArNavigationScreen(
-                            viewModel = arViewModel,
-                            isEmulator = isEmulator,
-                            onEnd = ::finishFlow,
-                            onRetryActivity = ::recreate,
-                        )
                     }
+                    is ArCameraFlowViewModel.Phase.FatalError -> FatalErrorOverlay(
+                        message = currentPhase.message,
+                        onClose = ::finishFlow,
+                        onRetry = ::recreate,
+                    )
                 }
-                is ArCameraFlowViewModel.Phase.FatalError -> FatalErrorOverlay(
-                    message = currentPhase.message,
-                    onClose = ::finishFlow,
-                    onRetry = ::recreate,
-                )
             }
 
             if (needsPermission) {
@@ -267,6 +292,11 @@ class ArCameraActivity : ComponentActivity() {
         finish()
     }
 
+    private fun navigateElsewhere() {
+        arViewModel.endNavigation()
+        flowModel.goBackToDestinationSelect()
+    }
+
     private fun finishWithCameraError(error: Throwable) {
         val type = error::class.java.simpleName.ifBlank { error::class.java.name }
         val message = error.message
@@ -295,25 +325,19 @@ private fun LoadingOverlay() {
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18).copy(alpha = 0.82f)),
+            .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.82f)),
         contentAlignment = Alignment.Center,
     ) {
-        Surface(
-            shape = RoundedCornerShape(18.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
+        VecturaiCard(modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.xl)) {
             Row(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                CircularProgressIndicator(color = Color(0xFF168BFF), modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
-                Spacer(Modifier.width(12.dp))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
+                Spacer(Modifier.width(Spacing.sm))
                 Text(
                     "Preparing camera...",
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         }
@@ -328,70 +352,46 @@ private fun CameraPermissionOverlay(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18).copy(alpha = 0.94f))
+            .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.94f))
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(24.dp),
+            .padding(Spacing.xl),
         contentAlignment = Alignment.Center,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
+        VecturaiCard {
             Column(
-                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color(0xFF071C33))
-                        .border(1.dp, Color(0xFF0B60AE), RoundedCornerShape(18.dp)),
+                        .clip(VecturaiShapes.Large)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.38f), VecturaiShapes.Large),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.QrCodeScanner, contentDescription = null, modifier = Modifier.size(32.dp), tint = Color(0xFF168BFF))
+                    Icon(
+                        Icons.Default.QrCodeScanner,
+                        contentDescription = "Camera permission",
+                        modifier = Modifier.size(32.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
                 Text(
                     "Camera access needed",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                 )
                 Text(
                     "Camera access lets VecturAI scan the entrance code and show AR guidance.",
                     textAlign = TextAlign.Center,
-                    color = Color(0xFFB6BFCE),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    color = VecturaiColors.TextSecondary,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
-                Button(
-                    onClick = onGrant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                ) {
-                    Text("Grant Access", fontWeight = FontWeight.ExtraBold)
-                }
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clickable(role = Role.Button, onClick = onCancel),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFF121A28),
-                    border = BorderStroke(1.dp, Color(0xFF2B3952)),
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Cancel", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
-                    }
-                }
+                VecturaiPrimaryButton(text = "Grant Access", onClick = onGrant)
+                VecturaiSecondaryButton(text = "Cancel", onClick = onCancel)
             }
         }
     }
@@ -406,70 +406,46 @@ private fun FatalErrorOverlay(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18).copy(alpha = 0.94f))
+            .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.94f))
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(24.dp),
+            .padding(Spacing.xl),
         contentAlignment = Alignment.Center,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
+        VecturaiCard {
             Column(
-                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF3B2A08)),
+                        .background(VecturaiColors.AccentAmber.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(32.dp), tint = Color(0xFFF59E0B))
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = "Unable to start",
+                        modifier = Modifier.size(32.dp),
+                        tint = VecturaiColors.AccentAmber,
+                    )
                 }
                 Text(
                     "Unable to start",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                 )
                 Text(
                     message,
                     textAlign = TextAlign.Center,
-                    color = Color(0xFFB6BFCE),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    color = VecturaiColors.TextSecondary,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
-                Spacer(Modifier.height(4.dp))
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                ) {
-                    Text("Retry", fontWeight = FontWeight.ExtraBold)
-                }
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clickable(role = Role.Button, onClick = onClose),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFF121A28),
-                    border = BorderStroke(1.dp, Color(0xFF2B3952)),
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Go Back", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
-                    }
-                }
+                Spacer(Modifier.height(Spacing.xxs))
+                VecturaiPrimaryButton(text = "Retry", onClick = onRetry)
+                VecturaiSecondaryButton(text = "Go Back", onClick = onClose)
             }
         }
     }

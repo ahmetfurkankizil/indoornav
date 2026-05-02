@@ -45,6 +45,9 @@ data class ArNavigationUiState(
     val nextActionIcon: NavigationActionIcon = NavigationActionIcon.Straight,
     val nextActionText: String = "Follow the path",
     val nextActionDistance: Double? = null,
+    val markerFramesAnalyzed: Int = 0,
+    val markerCandidatesDetected: Int = 0,
+    val relativeBearingDegrees: Float = 0f,
 )
 
 enum class NavigationActionIcon {
@@ -193,6 +196,14 @@ class AndroidArNavigationViewModel(
     fun onFrame(frame: Frame, _width: Int, _height: Int) {
         markerDetector.processFrame(frame)
         updateTrackingStatus(frame)
+        if (!_uiState.value.isAligned) {
+            _uiState.update {
+                it.copy(
+                    markerFramesAnalyzed = markerDetector.framesAnalyzed,
+                    markerCandidatesDetected = markerDetector.totalCandidatesSeen,
+                )
+            }
+        }
 
         if (_uiState.value.isAligned && !_uiState.value.hasArrived) {
             val now = System.currentTimeMillis()
@@ -234,6 +245,9 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = NavigationActionIcon.Straight,
                 nextActionText = "Follow the path",
                 nextActionDistance = null,
+                markerFramesAnalyzed = 0,
+                markerCandidatesDetected = 0,
+                relativeBearingDegrees = 0f,
             )
         }
     }
@@ -327,6 +341,13 @@ class AndroidArNavigationViewModel(
         if (frame.camera.trackingState != TrackingState.TRACKING) return
         val pkg = routePackage ?: return
         val pose = frame.camera.pose
+        val qx = pose.qx().toDouble()
+        val qy = pose.qy().toDouble()
+        val qz = pose.qz().toDouble()
+        val qw = pose.qw().toDouble()
+        val cameraYawDeg = Math.toDegrees(
+            kotlin.math.atan2(2.0 * (qw * qy + qx * qz), 1.0 - 2.0 * (qy * qy + qz * qz))
+        )
         val radians = -alignmentRotYDeg * Math.PI / 180.0
         val cosR = cos(radians)
         val sinR = sin(radians)
@@ -372,6 +393,11 @@ class AndroidArNavigationViewModel(
         val dxDest = bx - pkg.destinationPosition.first
         val dzDest = bz - pkg.destinationPosition.second
         val destinationDistance = sqrt(dxDest * dxDest + dzDest * dzDest)
+        val bearingToDestination = Math.toDegrees(kotlin.math.atan2(
+            pkg.destinationPosition.first - bx,
+            pkg.destinationPosition.second - bz,
+        ))
+        val relativeBearing = normalizeDegrees(bearingToDestination - cameraYawDeg)
 
         if (bestCumulative > userCumulativeDistance) {
             userCumulativeDistance = bestCumulative
@@ -396,6 +422,7 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = next.icon,
                 nextActionText = next.text,
                 nextActionDistance = next.distance,
+                relativeBearingDegrees = relativeBearing.toFloat(),
             )
         }
 
@@ -425,7 +452,7 @@ class AndroidArNavigationViewModel(
             )
         }
         if (_uiState.value.isAligned && low && !wasLow) {
-            haptics.recentering()
+            haptics.warning()
         }
     }
 
@@ -511,5 +538,12 @@ class AndroidArNavigationViewModel(
         return listOf(building, floorLabel)
             .filter { it.isNotBlank() }
             .joinToString(" - ")
+    }
+
+    private fun normalizeDegrees(value: Double): Double {
+        var degrees = value
+        while (degrees > 180.0) degrees -= 360.0
+        while (degrees < -180.0) degrees += 360.0
+        return degrees
     }
 }

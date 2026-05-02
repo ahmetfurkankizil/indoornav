@@ -1,79 +1,116 @@
 package com.vecturai.designsystem
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.vecturai.designsystem.generated.resources.Res
+import com.vecturai.designsystem.generated.resources.inter_variable
+import org.jetbrains.compose.resources.Font
 
-/**
- * VecturAI typography scale.
- *
- * Uses the system default font family (which maps to Roboto on Android
- * and SF Pro on iOS) for a native feel on each platform.
- *
- * TODO: Consider loading Inter or custom brand font via Compose Resources
- */
-val VecturaiTypography = Typography(
-    displayLarge = TextStyle(
-        fontSize = 34.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 40.sp,
-        letterSpacing = (-0.25).sp,
-    ),
-    displayMedium = TextStyle(
+private fun TextStyle.withFont(fontFamily: FontFamily): TextStyle = copy(fontFamily = fontFamily)
+
+@Composable
+private fun interFamily(): FontFamily = FontFamily(Font(Res.font.inter_variable))
+
+object VecturaiTypography {
+    val NumericDisplay = TextStyle(
+        fontSize = 64.sp,
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 64.sp,
+        fontFeatureSettings = "tnum",
+    )
+
+    val NumericLarge = TextStyle(
         fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 34.sp,
-    ),
-    headlineLarge = TextStyle(
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 30.sp,
-    ),
-    headlineMedium = TextStyle(
-        fontSize = 20.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 26.sp,
-    ),
-    titleLarge = TextStyle(
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 24.sp,
-    ),
-    titleMedium = TextStyle(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 22.sp,
-    ),
-    bodyLarge = TextStyle(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 24.sp,
-    ),
-    bodyMedium = TextStyle(
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 20.sp,
-    ),
-    bodySmall = TextStyle(
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 16.sp,
-    ),
-    labelLarge = TextStyle(
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 20.sp,
-    ),
-    labelMedium = TextStyle(
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 16.sp,
-    ),
-    labelSmall = TextStyle(
-        fontSize = 10.sp,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 32.sp,
+        fontFeatureSettings = "tnum",
+    )
+
+    val Overline = TextStyle(
+        fontSize = 11.sp,
+        fontWeight = FontWeight.ExtraBold,
         lineHeight = 14.sp,
-        letterSpacing = 0.5.sp,
-    ),
-)
+        letterSpacing = 1.4.sp,
+    )
+
+    @Composable
+    fun material(): Typography {
+        val inter = interFamily()
+        return Typography(
+            displayLarge = TextStyle(
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 40.sp,
+            ).withFont(inter),
+            displayMedium = TextStyle(
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 34.sp,
+            ).withFont(inter),
+            headlineLarge = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 30.sp,
+            ).withFont(inter),
+            headlineMedium = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 26.sp,
+            ).withFont(inter),
+            titleLarge = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 24.sp,
+            ).withFont(inter),
+            titleMedium = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 22.sp,
+            ).withFont(inter),
+            bodyLarge = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 24.sp,
+            ).withFont(inter),
+            bodyMedium = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 20.sp,
+            ).withFont(inter),
+            bodySmall = TextStyle(
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 16.sp,
+            ).withFont(inter),
+            labelLarge = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 20.sp,
+            ).withFont(inter),
+            labelMedium = TextStyle(
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 16.sp,
+            ).withFont(inter),
+            labelSmall = TextStyle(
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 14.sp,
+                letterSpacing = 0.5.sp,
+            ).withFont(inter),
+        )
+    }
+
+    @Composable
+    fun numericDisplay(): TextStyle = NumericDisplay.withFont(interFamily())
+
+    @Composable
+    fun numericLarge(): TextStyle = NumericLarge.withFont(interFamily())
+
+    @Composable
+    fun overline(): TextStyle = Overline.withFont(interFamily())
+}

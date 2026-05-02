@@ -39,6 +39,9 @@ class ArMarkerDetector {
     var totalCandidatesSeen: Int = 0
         private set
 
+    var framesAnalyzed: Int = 0
+        private set
+
     var rejectedCandidates: Int = 0
         private set
 
@@ -66,6 +69,7 @@ class ArMarkerDetector {
     ) {
         expectedMarkerName = markerName
         hasDetectedMarker = false
+        framesAnalyzed = 0
         totalCandidatesSeen = 0
         rejectedCandidates = 0
         rejectedNames = emptyList()
@@ -91,6 +95,7 @@ class ArMarkerDetector {
     }
 
     fun processFrame(frame: Frame) {
+        framesAnalyzed += 1
         val augmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
         for (image in augmentedImages) {
             if (image.trackingState != TrackingState.TRACKING) continue
@@ -150,6 +155,7 @@ class ArMarkerDetector {
 
     fun reset() {
         hasDetectedMarker = false
+        framesAnalyzed = 0
         totalCandidatesSeen = 0
         rejectedCandidates = 0
         rejectedNames = emptyList()
