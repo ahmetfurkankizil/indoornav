@@ -97,6 +97,8 @@ class AndroidArNavigationViewModel(
     private var lastHapticArrowId: String? = null
     private var pendingSimulateAlignment = false
     private var simulateAlignmentRequestedMs = 0L
+    private val yawSamples = mutableListOf<Double>()
+    private var lastYawSampleMs = 0L
     // Current camera pose, updated every frame for behind-camera arrow culling
     private var currentCameraPose: Pose? = null
     
@@ -206,6 +208,8 @@ class AndroidArNavigationViewModel(
         // markerDetector.fullReset() // Purged
         pendingSimulateAlignment = false
         simulateAlignmentRequestedMs = 0L
+        yawSamples.clear()
+        lastYawSampleMs = 0L
     }
 
     fun requestSimulatedAlignment() {
@@ -218,10 +222,18 @@ class AndroidArNavigationViewModel(
         if (frame.camera.trackingState != com.google.ar.core.TrackingState.TRACKING) return
         val now = System.currentTimeMillis()
         if (trackingStartTime == 0L) trackingStartTime = now
-        // Wait for 1.5s of stable tracking before snapping to prevent random initial orientations
-        if (now - trackingStartTime < 1500) {
+
+        val elapsed = now - trackingStartTime
+
+        // Collect yaw samples every 80ms during the stabilization window for a stable average
+        if (elapsed < 1500) {
+            if (now - lastYawSampleMs >= 80) {
+                val sampleFwd = frame.camera.pose.rotateVector(floatArrayOf(0f, 0f, -1f))
+                yawSamples.add(Math.toDegrees(Math.atan2(sampleFwd[0].toDouble(), sampleFwd[2].toDouble())))
+                lastYawSampleMs = now
+            }
             _uiState.update { it.copy(sessionStateLabel = "Stabilizing AR...") }
-            return 
+            return
         }
 
         pendingSimulateAlignment = false
@@ -233,11 +245,14 @@ class AndroidArNavigationViewModel(
         val camX = cameraPose.tx().toDouble()
         val camY = cameraPose.ty().toDouble()
         val camZ = cameraPose.tz().toDouble()
-        
-        // Camera forward direction in AR world
-        val camFwd = cameraPose.rotateVector(floatArrayOf(0f, 0f, -1f))
-        // AR Forward (-Z) is 0 deg. -X is 90 deg (CCW).
-        val arYawDeg = Math.toDegrees(Math.atan2(-camFwd[0].toDouble(), -camFwd[2].toDouble()))
+
+        // Use circular mean of samples collected during stabilization window; fall back to current
+        // frame if no samples collected (e.g. tracking only just started).
+        val arYawDeg = if (yawSamples.isNotEmpty()) {
+            circularMean(yawSamples).also { yawSamples.clear() }
+        } else {
+            Math.toDegrees(Math.atan2(cameraPose.rotateVector(floatArrayOf(0f, 0f, -1f))[0].toDouble(), cameraPose.rotateVector(floatArrayOf(0f, 0f, -1f))[2].toDouble()))
+        }
 
         val currentLeg = pkg.legs.getOrNull(currentLegIndex) ?: return
         val startNodeId = currentLeg.routeNodeIds.firstOrNull() ?: "n01"
@@ -249,12 +264,12 @@ class AndroidArNavigationViewModel(
         // Building forward direction (from start to next node)
         val dx = (nextNode?.x ?: startNode.x) - startNode.x
         val dz = (nextNode?.z ?: (startNode.z + 1.0)) - startNode.z
-        // Building Forward (+Z) is 0 deg. -X is 90 deg (CCW).
-        val buildYawDeg = Math.toDegrees(Math.atan2(-dx, dz))
+        // Building Forward (+Z) is 0 deg. +X is 90 deg.
+        val buildYawDeg = Math.toDegrees(Math.atan2(dx, dz))
 
         // Alignment rotation: Map Building Forward to Camera Forward
-        // Standard mapping where Building +Z (0 deg) aligns with Camera -Z (0 deg in our arYawDeg)
-        val rotDeg = arYawDeg - buildYawDeg
+        // Using convention where Building +Z aligns with Camera Forward.
+        val rotDeg = buildYawDeg - arYawDeg
 
         val rotRad = Math.toRadians(rotDeg)
         val cosR = cos(rotRad)
@@ -383,8 +398,8 @@ class AndroidArNavigationViewModel(
         val buildingFwdX = arFwdX * cosR + arFwdZ * sinR
         val buildingFwdZ = -arFwdX * sinR + arFwdZ * cosR
         
-        // Consistent heading: CCW from +Z (matching buildYawDeg and arYawDeg)
-        val userHeadingRad = Math.atan2(-buildingFwdX, buildingFwdZ)
+        // Consistent heading: Angle from +Z (matching buildYawDeg and arYawDeg)
+        val userHeadingRad = Math.atan2(buildingFwdX, buildingFwdZ)
 
         var bestDistanceOnPath = userCumulativeDistance
         val currentLeg = pkg.legs[currentLegIndex]
@@ -688,6 +703,12 @@ class AndroidArNavigationViewModel(
         trackingStartTime = 0L // Reset stabilization timer for the new floor
         // Re-anchor to the elevator/stair of the new floor
         requestSimulatedAlignment()
+    }
+
+    private fun circularMean(angles: List<Double>): Double {
+        val sinSum = angles.sumOf { Math.sin(Math.toRadians(it)) }
+        val cosSum = angles.sumOf { Math.cos(Math.toRadians(it)) }
+        return Math.toDegrees(Math.atan2(sinSum, cosSum))
     }
 
     private fun formatArrivalLocation(buildingName: String, floorId: String): String {

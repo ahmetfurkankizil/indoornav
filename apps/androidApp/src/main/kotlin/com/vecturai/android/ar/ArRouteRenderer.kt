@@ -58,6 +58,12 @@ class ArRouteRenderer {
     private var arrowStates: Map<String, ArrowState> = emptyMap()
     private var visibleArrows: List<VisibleArrow> = emptyList()
     private val snapshotRef = AtomicReference<List<RenderableArrow3D>>(emptyList())
+    // Per-arrow fade-in progress: 0 = just appeared, FADE_IN_FRAMES = fully opaque
+    private val arrowFadeInProgress: MutableMap<String, Float> = mutableMapOf()
+
+    companion object {
+        private const val FADE_IN_FRAMES = 10f  // ~330ms at 30fps
+    }
 
     val renderedArrowCount: Int get() = visibleArrows.size
     fun snapshot(): List<RenderableArrow3D> = snapshotRef.get()
@@ -87,6 +93,7 @@ class ArRouteRenderer {
     fun placeAllArrows(arrows: List<ArrowPlacementData>) {
         allArrows = arrows
         arrowStates = arrows.associate { it.id to ArrowState.HIDDEN }
+        arrowFadeInProgress.clear()
         visibleArrows = emptyList()
         snapshotRef.set(emptyList())
     }
@@ -117,22 +124,37 @@ class ArRouteRenderer {
             }
             nextStates[arrow.id] = state
 
+            // Advance fade-in counter; reset when arrow is hidden
+            val prevState = arrowStates[arrow.id] ?: ArrowState.HIDDEN
+            if (state != ArrowState.HIDDEN) {
+                val current = arrowFadeInProgress[arrow.id]
+                if (current == null) {
+                    // Arrow just became visible — start fade-in from scratch
+                    arrowFadeInProgress[arrow.id] = 1f
+                } else {
+                    arrowFadeInProgress[arrow.id] = minOf(FADE_IN_FRAMES, current + 1f)
+                }
+            } else {
+                if (prevState != ArrowState.HIDDEN) arrowFadeInProgress.remove(arrow.id)
+            }
+
             if (state == ArrowState.HIDDEN) continue
             val fadeT = if (state == ArrowState.FADING) {
                 ((userCumulativeDistance - distance) / fadeDistance).coerceIn(0.0, 1.0)
             } else {
                 0.0
             }
-            val alpha = (1.0 - fadeT * 0.8).toFloat()
-            val scale = (1.0 - fadeT * 0.3).toFloat()
+            val fadeInFactor = (arrowFadeInProgress[arrow.id] ?: FADE_IN_FRAMES) / FADE_IN_FRAMES
+            val alpha = ((1.0 - fadeT * 0.8) * fadeInFactor).toFloat()
+            val scale = ((1.0 - fadeT * 0.3) * fadeInFactor).toFloat()
             val pos = transformToAR(arrow.positionX, arrow.positionY, arrow.positionZ)
 
-            // FIX 5: Cull arrows that are behind the camera (negative dot product)
+            // Cull arrows behind the camera (negative dot product)
             if (hasCameraData) {
                 val toArrowX = pos[0] - cameraWorldX
                 val toArrowZ = pos[2] - cameraWorldZ
                 val dot = toArrowX * cameraForwardX + toArrowZ * cameraForwardZ
-                // Allow arrows up to 0.5m behind the camera (avoids flickering at camera plane)
+                // Allow arrows up to 0.5m behind the camera to avoid flickering at the camera plane
                 if (dot < -0.5f) continue
             }
 
@@ -163,6 +185,7 @@ class ArRouteRenderer {
     fun clearArrows() {
         allArrows = emptyList()
         arrowStates = emptyMap()
+        arrowFadeInProgress.clear()
         visibleArrows = emptyList()
         snapshotRef.set(emptyList())
     }
