@@ -405,45 +405,47 @@ fun DestinationSelectScreen(
     ) {
         AuroraBackground(intensity = rememberAuroraIntensity())
 
-        LazyColumn(
-            state = listState,
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
                 .padding(horizontal = Spacing.xl),
-            contentPadding = PaddingValues(bottom = Spacing.xxl),
         ) {
-            stickyHeader {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.96f))
-                        .padding(bottom = Spacing.sm),
-                ) {
-                    Spacer(Modifier.height(Spacing.md))
-                    FlowProgressStrip(activeStep = 1)
-                    Spacer(Modifier.height(Spacing.lg))
-                    DestinationHeader(
-                        originName = originName,
-                        collapse = collapse,
-                        onCancel = onCancel,
-                    )
-                    Spacer(Modifier.height(Spacing.md))
-                    SearchField(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        height = searchHeight,
-                    )
-                    Spacer(Modifier.height(Spacing.sm))
-                    DestinationFilterRow(
-                        selectedFilter = selectedFilter,
-                        onSelect = { selectedFilter = it },
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Spacing.sm),
+            ) {
+                Spacer(Modifier.height(Spacing.md))
+                FlowProgressStrip(activeStep = 1)
+                Spacer(Modifier.height(Spacing.lg))
+                DestinationHeader(
+                    originName = originName,
+                    collapse = collapse,
+                    onCancel = onCancel,
+                )
+                Spacer(Modifier.height(Spacing.md))
+                SearchField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    height = searchHeight,
+                )
+                Spacer(Modifier.height(Spacing.sm))
+                DestinationFilterRow(
+                    selectedFilter = selectedFilter,
+                    onSelect = { selectedFilter = it },
+                )
             }
 
-            item {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentPadding = PaddingValues(bottom = Spacing.xxl),
+            ) {
+                item {
                 if (rooms.isEmpty()) {
                     Spacer(Modifier.height(Spacing.xl))
                     SkeletonDestinationRows()
@@ -502,6 +504,7 @@ fun DestinationSelectScreen(
             }
         }
     }
+}
 }
 
 @Composable
