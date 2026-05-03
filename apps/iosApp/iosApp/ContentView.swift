@@ -3,7 +3,7 @@ import SwiftUI
 /// Root content view for the VecturAI iOS app.
 ///
 /// Drives the full user flow via NavigationFlowModel:
-///   home → qrScan → entranceConfirmed → destinationSelect → routePreview → arNavigation
+///   home -> qrScan -> entranceConfirmed -> destinationSelect -> routePreview -> arNavigation
 ///
 /// AR never launches without an explicit destination selection.
 struct ContentView: View {
@@ -11,8 +11,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            // Anchors ZStack to full screen including safe areas.
-            Color(.systemBackground).ignoresSafeArea()
+            VecturBackground()
 
             switch flow.state {
             case .home:
@@ -21,8 +20,11 @@ struct ContentView: View {
             case .qrScan:
                 QRScanView(flow: flow)
 
-            case .entranceConfirmed:
-                DestinationSelectView(flow: flow)
+            case .entranceConfirmed(let entrance):
+                EntranceConfirmedView(
+                    entranceName: entrance,
+                    onContinue: { flow.proceedToDestinationSelect() }
+                )
 
             case .destinationSelect:
                 DestinationSelectView(flow: flow)
@@ -41,21 +43,15 @@ struct ContentView: View {
                         routePackage: pkg,
                         entranceMarker: flow.validatedEntranceMarker
                     )
-                    .ignoresSafeArea()
                 }
 
             case .packageError(let message):
                 PackageErrorView(message: message, onRetry: { flow.retryPackageLoad() })
             }
 
-            // Entrance confirmed bottom sheet
-            if case .entranceConfirmed(let entrance) = flow.state {
-                EntranceConfirmedSheet(
-                    entranceName: entrance,
-                    onContinue: { flow.proceedToDestinationSelect() }
-                )
-            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(VecturTheme.canvas)
         .animation(.easeInOut(duration: 0.2), value: flowStateKey)
     }
 
@@ -79,35 +75,34 @@ private struct PackageErrorView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
-            Spacer()
+        ZStack {
+            VecturBackground()
 
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(.orange)
-                .symbolRenderingMode(.hierarchical)
+            VecturCard {
+                VStack(spacing: 18) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 48, weight: .semibold))
+                        .foregroundStyle(VecturTheme.amber)
 
-            VStack(spacing: 8) {
-                Text("Unable to Load Navigation Data")
-                    .font(.title3).fontWeight(.semibold)
-                Text(message)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                    Text("Unable to load navigation data")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(VecturTheme.textPrimary)
+                        .multilineTextAlignment(.center)
+
+                    Text(message)
+                        .font(.subheadline)
+                        .foregroundStyle(VecturTheme.textMuted)
+                        .multilineTextAlignment(.center)
+
+                    Button(action: onRetry) {
+                        Label("Try Again", systemImage: "arrow.clockwise")
+                            .vecturPrimaryButton()
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(maxWidth: .infinity)
             }
-
-            Button(action: onRetry) {
-                Label("Try Again", systemImage: "arrow.clockwise")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .padding(.horizontal, 32)
-
-            Spacer()
+            .padding(.horizontal, 24)
         }
     }
 }
@@ -116,105 +111,208 @@ private struct PackageErrorView: View {
 
 private struct HomeView: View {
     @ObservedObject var flow: NavigationFlowModel
+    @State private var activePill = 0
+
+    private let pills = ["Live AR", "Smart Routes", "Indoor Maps"]
+
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        ZStack {
+            VecturBackground()
 
-            // App identity
-            VStack(spacing: 16) {
-                Image(systemName: "mappin.and.ellipse")
-                    .font(.system(size: 72))
-                    .foregroundStyle(.blue)
-                    .symbolRenderingMode(.hierarchical)
+            VStack(spacing: 0) {
+                Spacer(minLength: 48)
 
-                VStack(spacing: 4) {
-                    Text("VecturAI")
-                        .font(.largeTitle).fontWeight(.bold)
-                    Text("Indoor AR Navigation")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                VecturBrandMark(size: 88, pulsing: true)
+                    .padding(.bottom, 20)
+
+                Text("VecturAI")
+                    .font(.system(size: 42, weight: .heavy, design: .rounded))
+                    .foregroundStyle(VecturTheme.primaryGradient)
+
+                Text("Find your way indoors")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(VecturTheme.textMuted)
+                    .padding(.top, 4)
+
+                HStack(spacing: 8) {
+                    ForEach(pills.indices, id: \.self) { index in
+                        FeaturePill(text: pills[index], active: activePill == index)
+                    }
                 }
-            }
+                .padding(.top, 40)
 
-            Spacer()
-            Spacer()
+                Spacer(minLength: 40)
 
-            // Primary action
-            VStack(spacing: 12) {
                 Button(action: { flow.startQRScan() }) {
                     Label("Scan Entrance Code", systemImage: "qrcode.viewfinder")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                        .vecturPrimaryButton()
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .padding(.horizontal, 24)
+                .buttonStyle(.plain)
 
-                Text("Scan the QR code at the building entrance to begin")
-                    .font(.footnote)
-                    .foregroundStyle(Color(.tertiaryLabel))
+                Text("Scan the entrance poster to begin")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(VecturTheme.textDisabled)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
+                    .padding(.top, 14)
 
-            Spacer()
+                DemoBuildingStatus()
+                    .padding(.top, 12)
+
+                Spacer(minLength: 34)
+            }
+            .padding(.horizontal, 24)
+            .safeAreaPadding(.top)
+            .safeAreaPadding(.bottom)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            activePill = 0
+        }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                withAnimation(.easeInOut(duration: 0.22)) {
+                    activePill = (activePill + 1) % pills.count
+                }
+            }
+        }
     }
 }
 
-// MARK: - Entrance Confirmed Bottom Sheet
-
-private struct EntranceConfirmedSheet: View {
-    let entranceName: String
-    let onContinue: () -> Void
+private struct FeaturePill: View {
+    let text: String
+    let active: Bool
 
     var body: some View {
-        VStack {
-            Spacer()
+        Text(text)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(active ? VecturTheme.cyan : VecturTheme.textMuted)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(active ? VecturTheme.cyan.opacity(0.16) : VecturTheme.elevated.opacity(0.72))
+            .overlay(
+                Capsule().stroke(active ? VecturTheme.cyan.opacity(0.58) : VecturTheme.borderSubtle, lineWidth: 1)
+            )
+            .clipShape(Capsule())
+    }
+}
+
+private struct DemoBuildingStatus: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(VecturTheme.green)
+                .frame(width: 7, height: 7)
+            Text("Demo building ready")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(VecturTheme.textMuted)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(VecturTheme.elevated.opacity(0.75))
+        .overlay(Capsule().stroke(VecturTheme.borderSubtle, lineWidth: 1))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Entrance Confirmed View
+
+private struct EntranceConfirmedView: View {
+    let entranceName: String
+    let onContinue: () -> Void
+    @State private var appeared = false
+
+    var body: some View {
+        ZStack {
+            VecturBackground()
 
             VStack(spacing: 0) {
-                // Drag handle
-                Capsule()
-                    .fill(Color(.systemGray4))
-                    .frame(width: 36, height: 5)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
+                Spacer(minLength: 40)
 
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 44))
-                    .foregroundStyle(.green)
-                    .symbolRenderingMode(.hierarchical)
-                    .padding(.bottom, 12)
+                VStack(spacing: 22) {
+                    ZStack {
+                        Circle()
+                            .fill(VecturTheme.green.opacity(0.14))
+                            .frame(width: 132, height: 132)
+                        Circle()
+                            .stroke(VecturTheme.green.opacity(0.34), lineWidth: 1)
+                            .frame(width: 132, height: 132)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 56, weight: .heavy))
+                            .foregroundStyle(.white)
+                            .frame(width: 78, height: 78)
+                            .background(VecturTheme.green)
+                            .clipShape(Circle())
+                    }
+                    .scaleEffect(appeared ? 1 : 0.72)
+                    .opacity(appeared ? 1 : 0)
 
-                Text("Entrance Confirmed")
-                    .font(.title3).fontWeight(.semibold)
-                    .padding(.bottom, 4)
+                    VStack(spacing: 5) {
+                        Text("Entrance confirmed")
+                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                            .foregroundStyle(VecturTheme.textPrimary)
+                        Text("Starting from \(entranceName)")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(VecturTheme.textMuted)
+                            .multilineTextAlignment(.center)
+                    }
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 10)
 
-                Text("Starting from \(entranceName)")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(.bottom, 24)
+                    VecturCard {
+                        HStack(spacing: 12) {
+                            Image(systemName: "location.circle.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(VecturTheme.green)
+                                .frame(width: 46, height: 46)
+                                .background(VecturTheme.green.opacity(0.16))
+                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Entrance")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .tracking(1.2)
+                                    .foregroundStyle(VecturTheme.textMuted)
+                                    .textCase(.uppercase)
+                                Text(entranceName)
+                                    .font(.headline)
+                                    .foregroundStyle(VecturTheme.textPrimary)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer()
+                            VecturStatPill(text: "Ready", color: VecturTheme.green)
+                        }
+                    }
+                    .opacity(appeared ? 1 : 0)
+                }
+                .padding(.horizontal, 24)
+
+                Spacer(minLength: 48)
 
                 Button(action: onContinue) {
-                    Text("Choose Destination")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                    Label("Choose Destination", systemImage: "location.fill")
+                        .vecturPrimaryButton()
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+                .buttonStyle(.plain)
                 .padding(.horizontal, 24)
-                .padding(.bottom, 12)
+
+                Text("Next, pick where you want to go.")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(VecturTheme.textDisabled)
+                    .padding(.top, 14)
+
+                Spacer(minLength: 24)
             }
-            .frame(maxWidth: .infinity)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.1), radius: 16, y: -4)
+            .safeAreaPadding(.top)
+            .safeAreaPadding(.bottom)
         }
-        .transition(.move(edge: .bottom))
-        .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            withAnimation(.spring(response: 0.48, dampingFraction: 0.72)) {
+                appeared = true
+            }
+        }
     }
 }
 

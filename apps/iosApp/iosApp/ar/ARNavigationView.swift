@@ -38,19 +38,17 @@ struct ARNavigationView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                topBar
-                Spacer()
-
-                if let assetError = viewModel.markerAssetError {
-                    configErrorOverlay(message: assetError)
-                } else if viewModel.hasArrived {
-                    arrivalOverlay
-                } else if !viewModel.isAligned {
+            if let assetError = viewModel.markerAssetError {
+                configErrorOverlay(message: assetError)
+            } else if viewModel.hasArrived {
+                arrivalOverlay
+            } else if !viewModel.isAligned {
+                VStack(spacing: 0) {
+                    topBar
                     alignmentOverlay
-                } else {
-                    activeNavigationOverlay
                 }
+            } else {
+                activeNavigationOverlay
             }
         }
         .onAppear {
@@ -64,31 +62,12 @@ struct ARNavigationView: View {
 
     private var topBar: some View {
         HStack {
-            // State indicator (minimal — only when not navigating)
             if !viewModel.isAligned {
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(viewModel.stateColor)
-                        .frame(width: 7, height: 7)
-                    Text(viewModel.sessionStateLabel)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(.ultraThinMaterial)
-                .clipShape(Capsule())
+                VecturStatPill(text: viewModel.sessionStateLabel, color: viewModel.stateColor)
             }
 
             if viewModel.isSimulated {
-                Text("DEMO")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.orange)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.orange.opacity(0.2))
-                    .clipShape(Capsule())
+                VecturStatPill(text: "Demo", color: VecturTheme.amber)
             }
 
             Spacer()
@@ -97,14 +76,18 @@ struct ARNavigationView: View {
                 viewModel.endNavigation()
                 isPresented = false
             }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .symbolRenderingMode(.hierarchical)
+                Image(systemName: "xmark")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(VecturTheme.textSecondary)
+                    .frame(width: 48, height: 48)
+                    .background(VecturTheme.elevated.opacity(0.72))
+                    .overlay(Circle().stroke(VecturTheme.borderSubtle, lineWidth: 1))
+                    .clipShape(Circle())
             }
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
+        .safeAreaPadding(.top)
     }
 
     // MARK: - Pre-Alignment Overlay
@@ -113,73 +96,66 @@ struct ARNavigationView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Scanning card — sits at the bottom
-            VStack(spacing: 16) {
+            VecturCard(glass: true) {
+                VStack(spacing: 16) {
                 HStack(spacing: 14) {
                     if viewModel.alignmentTimedOut {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.orange)
-                            .symbolRenderingMode(.hierarchical)
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(VecturTheme.amber)
                     } else {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .frame(width: 28, height: 28)
+                        RadarSweep()
+                            .frame(width: 48, height: 48)
                     }
 
                     VStack(alignment: .leading, spacing: 3) {
                         Text(viewModel.alignmentTimedOut ? viewModel.timeoutReasonMessage : "Looking for entrance sign…")
                             .font(.headline)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(VecturTheme.textPrimary)
                             .lineLimit(2)
                         Text(viewModel.alignmentTimedOut ? viewModel.timeoutHintMessage : "Point your camera at the entrance poster")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(VecturTheme.textMuted)
                             .lineLimit(2)
                     }
 
                     Spacer(minLength: 0)
                 }
 
+                AlignmentMiniIllustration()
+
+                Text("Frames analyzed: \(viewModel.detectionCandidateCount + viewModel.detectionRejectedCount) - Markers detected: \(viewModel.detectionCandidateCount)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(VecturTheme.textMuted)
+
                 if viewModel.alignmentTimedOut {
                     HStack(spacing: 12) {
                         Button(action: { viewModel.retryAlignment() }) {
-                            Text("Retry")
-                                .font(.subheadline).fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 4)
+                            Label("Retry", systemImage: "arrow.clockwise")
+                                .vecturPrimaryButton()
                         }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.regular)
+                        .buttonStyle(.plain)
 
                         Button(action: {
                             viewModel.endNavigation()
                             isPresented = false
                         }) {
                             Text("Cancel")
-                                .font(.subheadline).fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 4)
+                                .vecturSecondaryButton()
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.regular)
+                        .buttonStyle(.plain)
                     }
                 }
 
                 #if targetEnvironment(simulator)
                 Button(action: { viewModel.simulateAlignment() }) {
                     Label("Simulate Scan", systemImage: "qrcode.viewfinder")
-                        .font(.subheadline).fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                        .vecturPrimaryButton()
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.regular)
-                .tint(.indigo)
+                .buttonStyle(.plain)
                 #endif
             }
-            .padding(20)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+            }
             .padding(.horizontal, 12)
             .padding(.bottom, 32)
         }
@@ -193,81 +169,100 @@ struct ARNavigationView: View {
 
     private var activeNavigationOverlay: some View {
         VStack(spacing: 0) {
-            // ── Top instruction banner ──────────────────────────────────
             instructionBanner
                 .padding(.horizontal, 12)
+                .safeAreaPadding(.top)
+
+            CompassStrip(progress: viewModel.progress)
+                .padding(.horizontal, 18)
+                .padding(.top, 8)
 
             Spacer()
 
-            // ── Bottom HUD ──────────────────────────────────────────────
             bottomHUD
         }
         .padding(.bottom, 32)
     }
 
     private var instructionBanner: some View {
-        HStack(spacing: 16) {
-            // Large direction icon — matches Apple Maps "maneuver icon" treatment
+        let urgent = (viewModel.nextActionDistance ?? .greatestFiniteMagnitude) < 5.0
+        return HStack(spacing: 16) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemBackground))
+                    .fill((urgent ? VecturTheme.amber : VecturTheme.cyan).opacity(0.16))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke((urgent ? VecturTheme.amber : VecturTheme.cyan).opacity(0.36), lineWidth: 1)
+                    )
                     .frame(width: 56, height: 56)
                 Image(systemName: viewModel.nextActionIcon)
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(urgent ? VecturTheme.amber : VecturTheme.cyan)
             }
 
-            // Instruction text + distance
             VStack(alignment: .leading, spacing: 2) {
                 Text(viewModel.nextActionText)
                     .font(.title3).fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(VecturTheme.textPrimary)
                     .lineLimit(1)
                 if let dist = viewModel.nextActionDistance, dist < 30 {
-                    Text("in \(String(format: "%.0f", dist)) m")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text("in")
+                            .foregroundStyle(VecturTheme.textMuted)
+                        Text("\(String(format: "%.0f", dist)) m")
+                            .foregroundStyle(VecturTheme.primaryGradient)
+                    }
+                    .font(.subheadline.weight(.bold))
                 }
             }
 
             Spacer()
 
-            // Tracking confidence — only shown when degraded
-            if viewModel.isLowConfidence {
+            VStack(spacing: 5) {
                 Image(systemName: viewModel.trackingStatusIcon)
-                    .font(.body)
-                    .foregroundStyle(.yellow)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(trackingColor)
+                Text(viewModel.trackingStatusLabel)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(trackingColor)
+                    .lineLimit(1)
             }
+            .padding(.horizontal, 9)
+            .padding(.vertical, 8)
+            .background(trackingColor.opacity(0.14))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(trackingColor.opacity(0.38), lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+        .background(VecturTheme.card.opacity(0.64), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(VecturTheme.borderStrong, lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
     }
 
     private var bottomHUD: some View {
         HStack(alignment: .center, spacing: 0) {
-            // ETA + distance
-            VStack(alignment: .leading, spacing: 2) {
-                if viewModel.remainingDistance > 0 {
-                    let etaSeconds = viewModel.remainingDistance / 1.2
-                    Text(formatETA(etaSeconds))
-                        .font(.title2).fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                    Text("\(String(format: "%.0f", viewModel.remainingDistance)) m · \(viewModel.destinationLabel)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                } else {
-                    Text(viewModel.destinationLabel)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
+            ProgressRing(
+                progress: viewModel.totalDistance > 0 ? 1.0 - (viewModel.remainingDistance / viewModel.totalDistance) : viewModel.progress,
+                etaText: viewModel.remainingDistance > 0 ? formatETA(viewModel.remainingDistance / 1.2) : "Done",
+                distanceText: viewModel.remainingDistance > 0 ? "\(String(format: "%.0f", viewModel.remainingDistance)) m" : ""
+            )
+            .padding(.trailing, 12)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(viewModel.destinationLabel)
+                    .font(.headline)
+                    .foregroundStyle(VecturTheme.textPrimary)
+                    .lineLimit(1)
+                Text("Follow the path")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(VecturTheme.textMuted)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, 20)
 
-            // Simulator advance button
             #if targetEnvironment(simulator)
             Button(action: { viewModel.advanceProgress() }) {
                 Image(systemName: "forward.fill")
@@ -280,24 +275,31 @@ struct ARNavigationView: View {
             .padding(.trailing, 10)
             #endif
 
-            // End Route
             Button(action: {
                 viewModel.endNavigation()
                 isPresented = false
             }) {
-                Text("End Route")
-                    .font(.subheadline).fontWeight(.semibold)
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 12)
-                    .background(Color(.systemRed))
-                    .clipShape(Capsule())
+                    .frame(width: 46, height: 46)
+                    .background(VecturTheme.red)
+                    .clipShape(Circle())
             }
-            .padding(.trailing, 16)
         }
-        .padding(.vertical, 14)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .padding(14)
+        .background(VecturTheme.card.opacity(0.64), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(VecturTheme.borderStrong, lineWidth: 1)
+        )
         .padding(.horizontal, 12)
+    }
+
+    private var trackingColor: Color {
+        if !viewModel.isLowConfidence { return VecturTheme.green }
+        if viewModel.trackingStatusLabel == "Hold steady" { return VecturTheme.amber }
+        return VecturTheme.red
     }
 
     private func formatETA(_ seconds: Double) -> String {
@@ -310,99 +312,303 @@ struct ARNavigationView: View {
     @State private var arrivalScale: CGFloat = 0.5
 
     private var arrivalOverlay: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        ZStack(alignment: .topTrailing) {
+            VecturBackground()
 
-            // Arrival card — sits at the bottom like Apple Maps arrival banner
-            VStack(spacing: 16) {
-                HStack(spacing: 14) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.green)
-                        .symbolRenderingMode(.hierarchical)
-                        .scaleEffect(arrivalScale)
-                        .onAppear {
-                            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
-                                arrivalScale = 1.0
-                            }
+            VStack(spacing: 20) {
+                Spacer()
+
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 104, weight: .semibold))
+                    .foregroundStyle(VecturTheme.green)
+                    .scaleEffect(arrivalScale)
+                    .onAppear {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                            arrivalScale = 1.0
                         }
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("You've Arrived")
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                        Text(viewModel.destinationLabel)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
                     }
 
-                    Spacer()
+                VStack(spacing: 8) {
+                    Text("Arrival confirmed")
+                        .font(.system(size: 11, weight: .bold))
+                        .tracking(1.4)
+                        .foregroundStyle(VecturTheme.green)
+                        .textCase(.uppercase)
+                    Text("You've arrived")
+                        .font(.system(size: 34, weight: .heavy, design: .rounded))
+                        .foregroundStyle(VecturTheme.textPrimary)
+                    Text(viewModel.destinationLabel)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(VecturTheme.textSecondary)
+                        .lineLimit(1)
                 }
+
+                HStack(spacing: 10) {
+                    ArrivalStat(value: "\(String(format: "%.0f", viewModel.totalDistance)) m", label: "Distance")
+                    ArrivalStat(value: formatETA(viewModel.totalDistance / 1.2), label: "Time")
+                    ArrivalStat(value: "\(viewModel.routeStepCount)", label: viewModel.routeStepCount == 1 ? "Step" : "Steps")
+                }
+
+                VecturCard {
+                    HStack(spacing: 12) {
+                        Image(systemName: "flag.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(VecturTheme.amber)
+                            .frame(width: 44, height: 44)
+                            .background(VecturTheme.amber.opacity(0.16))
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(viewModel.destinationLabel)
+                                .font(.headline)
+                                .foregroundStyle(VecturTheme.textPrimary)
+                                .lineLimit(1)
+                            Text("Route complete")
+                                .font(.subheadline)
+                                .foregroundStyle(VecturTheme.textMuted)
+                        }
+                        Spacer()
+                        VecturStatPill(text: "Arrived", color: VecturTheme.green)
+                    }
+                }
+
+                Spacer()
 
                 Button(action: {
                     viewModel.endNavigation()
                     isPresented = false
                 }) {
-                    Text("Done")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                    Label("Done", systemImage: "checkmark")
+                        .vecturPrimaryButton()
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+                .buttonStyle(.plain)
             }
-            .padding(20)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
-            .padding(.horizontal, 12)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 18)
+            .safeAreaPadding(.top)
+            .safeAreaPadding(.bottom)
+
+            Button(action: {
+                viewModel.endNavigation()
+                isPresented = false
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(VecturTheme.textSecondary)
+                    .frame(width: 48, height: 48)
+                    .background(VecturTheme.elevated.opacity(0.94))
+                    .overlay(Circle().stroke(VecturTheme.borderSubtle, lineWidth: 1))
+                    .clipShape(Circle())
+            }
+            .padding(.top, 10)
+            .padding(.trailing, 18)
+            .safeAreaPadding(.top)
         }
     }
 
     // MARK: - Configuration Error Overlay
 
     private func configErrorOverlay(message: String) -> some View {
-        VStack(spacing: 20) {
-            Spacer()
+        ZStack {
+            VecturBackground()
 
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(.red)
+            VecturCard {
+                VStack(spacing: 18) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 52, weight: .semibold))
+                        .foregroundStyle(VecturTheme.red)
 
-            Text("Setup needed")
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
+                    Text("Setup needed")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(VecturTheme.textPrimary)
 
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                    Text(message)
+                        .font(.subheadline)
+                        .foregroundStyle(VecturTheme.textSecondary)
+                        .multilineTextAlignment(.center)
 
-            Text("The entrance sign image needs to be added to this app.")
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.5))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                    Text("The entrance sign image needs to be added to this app.")
+                        .font(.caption)
+                        .foregroundStyle(VecturTheme.textMuted)
+                        .multilineTextAlignment(.center)
 
-            Button(action: {
-                viewModel.endNavigation()
-                isPresented = false
-            }) {
-                Label("Go Back", systemImage: "arrow.left")
-                    .font(.callout).fontWeight(.medium)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20).padding(.vertical, 12)
-                    .background(.blue.opacity(0.85))
-                    .clipShape(Capsule())
+                    Button(action: {
+                        viewModel.endNavigation()
+                        isPresented = false
+                    }) {
+                        Label("Go Back", systemImage: "arrow.left")
+                            .vecturPrimaryButton()
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(maxWidth: .infinity)
             }
-
-            Spacer()
+            .padding(.horizontal, 24)
         }
-        .background(Color.black.opacity(0.8))
     }
 
+}
+
+private struct ProgressRing: View {
+    let progress: Double
+    let etaText: String
+    let distanceText: String
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(VecturTheme.borderStrong, lineWidth: 4)
+            Circle()
+                .trim(from: 0, to: CGFloat(progress).clamped(to: 0...1))
+                .stroke(VecturTheme.cyan, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: 1) {
+                Text(etaText)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(VecturTheme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Text(distanceText)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(VecturTheme.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+        }
+        .frame(width: 78, height: 78)
+    }
+}
+
+private struct CompassStrip: View {
+    let progress: Double
+
+    var body: some View {
+        Canvas { context, size in
+            let centerY = size.height / 2
+            let offset = CGFloat(progress) * 42
+
+            for index in -6...6 {
+                let x = size.width / 2 + CGFloat(index) * 28 - offset
+                let active = index == 0
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: centerY - 5))
+                path.addLine(to: CGPoint(x: x, y: centerY + 5))
+                context.stroke(
+                    path,
+                    with: .color(active ? VecturTheme.cyan : VecturTheme.textDisabled),
+                    style: StrokeStyle(lineWidth: active ? 2 : 1, lineCap: .round)
+                )
+            }
+
+            context.fill(
+                Path(ellipseIn: CGRect(x: size.width / 2 - 3, y: centerY - 3, width: 6, height: 6)),
+                with: .color(VecturTheme.cyan)
+            )
+        }
+        .frame(height: 24)
+        .background(VecturTheme.card.opacity(0.58))
+        .overlay(Capsule().stroke(VecturTheme.borderSubtle.opacity(0.7), lineWidth: 1))
+        .clipShape(Capsule())
+    }
+}
+
+private struct RadarSweep: View {
+    @State private var rotation: Double = 0
+
+    var body: some View {
+        Canvas { context, size in
+            let rect = CGRect(origin: .zero, size: size)
+            context.fill(Path(ellipseIn: rect), with: .color(VecturTheme.cyan.opacity(0.12)))
+            context.stroke(Path(ellipseIn: rect.insetBy(dx: 4, dy: 4)), with: .color(VecturTheme.cyan.opacity(0.42)), lineWidth: 2)
+
+            var arc = Path()
+            arc.addArc(
+                center: CGPoint(x: size.width / 2, y: size.height / 2),
+                radius: min(size.width, size.height) / 2 - 4,
+                startAngle: .degrees(rotation),
+                endAngle: .degrees(rotation + 72),
+                clockwise: false
+            )
+            context.stroke(arc, with: .color(VecturTheme.cyan), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
+                rotation = 360
+            }
+        }
+    }
+}
+
+private struct AlignmentMiniIllustration: View {
+    @State private var phase: CGFloat = 0
+
+    var body: some View {
+        Canvas { context, size in
+            let phoneX = size.width * 0.2 + sin(phase * CGFloat.pi * 2) * 14
+            let posterX = size.width * 0.7
+
+            context.fill(
+                Path(roundedRect: CGRect(x: posterX, y: 16, width: 54, height: 44), cornerRadius: 8),
+                with: .color(VecturTheme.borderStrong)
+            )
+            context.fill(
+                Path(roundedRect: CGRect(x: posterX + 8, y: 24, width: 38, height: 28), cornerRadius: 6),
+                with: .linearGradient(
+                    Gradient(colors: [VecturTheme.blue, VecturTheme.cyan]),
+                    startPoint: CGPoint(x: posterX + 8, y: 24),
+                    endPoint: CGPoint(x: posterX + 46, y: 52)
+                )
+            )
+            context.fill(
+                Path(roundedRect: CGRect(x: phoneX, y: 22, width: 34, height: 46), cornerRadius: 10),
+                with: .color(VecturTheme.overlay)
+            )
+            context.stroke(
+                Path(ellipseIn: CGRect(x: phoneX - 11, y: 17, width: 56, height: 56)),
+                with: .color(VecturTheme.cyan.opacity(0.28)),
+                lineWidth: 2
+            )
+        }
+        .frame(height: 76)
+        .background(VecturTheme.elevated.opacity(0.72))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.4).repeatForever(autoreverses: false)) {
+                phase = 1
+            }
+        }
+    }
+}
+
+private struct ArrivalStat: View {
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(VecturTheme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(VecturTheme.textMuted)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, minHeight: 72)
+        .background(VecturTheme.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(VecturTheme.borderSubtle, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private extension CGFloat {
+    func clamped(to range: ClosedRange<CGFloat>) -> CGFloat {
+        Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
+    }
 }
 
 // MARK: - ARView Container
@@ -451,6 +657,8 @@ class ARNavigationViewModel: ObservableObject {
     @Published var progress: Double = 0.0
     @Published var remainingDistance: Double = 0.0
     @Published var distanceToDestination: Double = 0.0
+    @Published var totalDistance: Double = 0.0
+    @Published var routeStepCount: Int = 1
     @Published var isLowConfidence: Bool = false
     @Published var stateColor: Color = .orange
     @Published var alignmentTimedOut: Bool = false
@@ -521,6 +729,10 @@ class ARNavigationViewModel: ObservableObject {
         self.entranceMarker = entranceMarker ?? package.entranceMarker
 
         let renderConfig = package.config.routeRendering
+        totalDistance = package.totalDistance
+        remainingDistance = package.totalDistance
+        distanceToDestination = package.totalDistance
+        routeStepCount = max(1, package.arrows.filter { $0.type != .follow }.count)
         self.destinationThreshold = renderConfig.destinationThresholdMeters
         routeRenderer.configureRendering(
             lookaheadDistanceMeters: renderConfig.lookaheadDistanceMeters,
