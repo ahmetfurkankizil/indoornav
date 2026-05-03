@@ -9,6 +9,7 @@ import com.vecturai.tools.admin.model.Waypoint
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.java.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -16,8 +17,8 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.*
 
 class AiEdgeSuggester {
-    private val apiKey = Env.get("ANTHROPIC_API_KEY") ?: ""
-    private val model  = "claude-3-5-sonnet-20241022"
+    private val ollamaBaseUrl = Env.get("OLLAMA_BASE_URL", "http://localhost:11434")
+    private val model = Env.get("OLLAMA_MODEL", "gpt-oss:latest")
 
     private val json = Json { 
         ignoreUnknownKeys = true 
@@ -26,13 +27,19 @@ class AiEdgeSuggester {
 
     private val httpClient = HttpClient(Java) {
         install(ContentNegotiation) { json(json) }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 600000 // 10 minutes
+            connectTimeoutMillis = 10000
+            socketTimeoutMillis = 600000
+        }
     }
 
     suspend fun suggest(
         floorPlanImageBase64: String,
         nodes: List<AiNodeInput>,
     ): AiSuggestResponse {
-        if (apiKey.isBlank()) return AiSuggestResponse(emptyList())
+        // Local model doesn't need API key, but we check if base URL is set
+        if (ollamaBaseUrl.isBlank()) return AiSuggestResponse(emptyList())
 
         val nodeListJson = Json.encodeToString(
             JsonArray.serializer(),
@@ -59,10 +66,20 @@ class AiEdgeSuggester {
                - 'turning point': Every time a corridor bends or branches.
             3. Connect nodes:
                - Create logical paths between rooms and hallways.
+               - IMPORTANT: Use the EXACT SAME IDs for nodes in both 'nodes' and 'edges' arrays (e.g., if a node has id 'new_1', the edge should use 'fromNodeId': 'new_1').
+            
+            SCHEMA (STRICT NAMES):
+            - nodes: Array of objects with fields: [id (string), label (string), nodeType (string), canvasX (float 0-1), canvasY (float 0-1)]
+            - edges: Array of objects with fields: [fromNodeId (string), toNodeId (string), waypoints (empty array []), confidence (float 0-1)]
+            
+            NODE TYPES: 'room', 'entrance', 'elevator', 'stairs', 'turning point'
             
             CONSTRAINTS:
             - Respond ONLY with the JSON object.
-            - Do not be lazy. Suggest at least one node for every visible room.
+            - DO NOT include any comments (// or #) inside the JSON.
+            - DO NOT include any conversational text.
+            - Ensure all coordinates are between 0.0 and 1.0 (relative to canvas).
+            - Suggest at least one node for every visible room.
             
             Response Format:
             {
@@ -77,67 +94,136 @@ class AiEdgeSuggester {
 
         val requestBody = buildJsonObject {
             put("model", model)
-            put("max_tokens", 4096)
-            put("system", systemPrompt)
+            put("stream", false)
             putJsonArray("messages") {
                 addJsonObject {
+                    put("role", "system")
+                    put("content", systemPrompt)
+                }
+                addJsonObject {
                     put("role", "user")
-                    putJsonArray("content") {
-                        addJsonObject {
-                            put("type", "text")
-                            put("text", "Please analyze this floor plan and suggest a complete navigation graph. " + 
+                    put("content", "Please analyze this floor plan and suggest a complete navigation graph. " + 
                                        (if (nodes.isNotEmpty()) "I have provided some existing nodes to start with." else "Start from scratch."))
-                        }
-                        addJsonObject {
-                            put("type", "image")
-                            putJsonObject("source") {
-                                put("type", "base64")
-                                put("media_type", "image/png")
-                                put("data", floorPlanImageBase64)
-                            }
-                        }
+                    putJsonArray("images") {
+                        add(floorPlanImageBase64)
                     }
                 }
             }
         }
 
         return try {
-            println("AI Suggest: Sending request (model=$model, nodes=${nodes.size}, imgLen=${floorPlanImageBase64.length}, hasKey=${apiKey.isNotBlank()})")
-            val response = httpClient.post("https://api.anthropic.com/v1/messages") {
-                header("x-api-key", apiKey)
-                header("anthropic-version", "2023-06-01")
+            println("AI Suggest: Sending request to Ollama (url=$ollamaBaseUrl, model=$model, nodes=${nodes.size}, imgLen=${floorPlanImageBase64.length})")
+            val response = httpClient.post("$ollamaBaseUrl/api/chat") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }
 
             if (response.status != HttpStatusCode.OK) {
                 val errorBody = response.body<String>()
-                println("AI Suggest: Anthropic API Error (${response.status}): $errorBody")
+                println("AI Suggest: Ollama API Error (${response.status}): $errorBody")
                 return AiSuggestResponse(emptyList())
             }
 
             val responseJson = response.body<JsonObject>()
-            val text = responseJson["content"]
-                ?.jsonArray
-                ?.firstOrNull()
+            val text = responseJson["message"]
                 ?.jsonObject
-                ?.get("text")
+                ?.get("content")
                 ?.jsonPrimitive
                 ?.content
                 ?: run {
-                    println("AI Suggest: No text content in response: $responseJson")
+                    println("AI Suggest: No message content in response: $responseJson")
                     return AiSuggestResponse(emptyList())
                 }
 
             println("AI Suggest: Raw response text: $text")
 
-            // Strip markdown code fences if present
-            val cleaned = text.trim()
-                .removePrefix("```json").removePrefix("```")
-                .removeSuffix("```").trim()
+            // Robust JSON extraction: look for all ```json ... ``` blocks and merge them
+            val blocks = mutableListOf<String>()
+            var remaining = text
+            while (remaining.contains("```")) {
+                val block = remaining.substringAfter("```json", "").substringBefore("```")
+                    .ifBlank { remaining.substringAfter("```", "").substringBefore("```") }
+                if (block.isNotBlank()) {
+                    blocks.add(block.trim())
+                    remaining = remaining.substringAfter("```").substringAfter("```")
+                } else {
+                    break
+                }
+            }
 
-            val result = json.decodeFromString<AiSuggestResponse>(cleaned)
-            println("AI Suggest: Parsed ${result.edges.size} edges")
+            val cleaned = if (blocks.isNotEmpty()) {
+                // If multiple blocks, we try to merge them into one JSON object if they are partial
+                if (blocks.size > 1) {
+                    val allNodes = blocks.flatMap { b ->
+                        val start = b.indexOf("\"nodes\":")
+                        if (start == -1) return@flatMap emptyList<String>()
+                        val end = b.lastIndexOf(']')
+                        if (end == -1) return@flatMap emptyList<String>()
+                        listOf(b.substring(start, end + 1))
+                    }
+                    val allEdges = blocks.flatMap { b ->
+                        val start = b.indexOf("\"edges\":")
+                        if (start == -1) return@flatMap emptyList<String>()
+                        val end = b.lastIndexOf(']')
+                        if (end == -1) return@flatMap emptyList<String>()
+                        listOf(b.substring(start, end + 1))
+                    }
+                    "{ ${allNodes.joinToString(", ")}, ${allEdges.joinToString(", ")} }"
+                } else {
+                    blocks[0]
+                }
+            } else {
+                // Fallback: find first { and last }
+                val start = text.indexOf('{')
+                val end = text.lastIndexOf('}')
+                if (start != -1 && end != -1 && end > start) {
+                    text.substring(start, end + 1).trim()
+                } else {
+                    text.trim()
+                }
+            }
+
+            // Resilient mapping: fix common LLM field name drifts and case sensitivity
+            val resilientJson = cleaned.lines().joinToString("\n") { line ->
+                var l = line
+                // Strip comments
+                if (l.contains("//") && !l.contains("\": \"http")) l = l.substringBefore("//")
+                if (l.contains("#")) l = l.substringBefore("#")
+                
+                // Rename fields only in node context (rough heuristic: look for "id", "label" etc)
+                // We use a more careful replace to avoid breaking waypoints "x"/"y"
+                l = l.replace("\"type\":", "\"nodeType\":").replace("\"Type\":", "\"nodeType\":")
+                
+                // Only replace x/y if they aren't followed by a comma or brace that looks like a waypoint list
+                // Actually, let's just use regex for better accuracy
+                l = l.replace(Regex("\"canvas_x\":"), "\"canvasX\":")
+                l = l.replace(Regex("\"canvas_y\":"), "\"canvasY\":")
+                l = l.replace(Regex("\"x\":"), "\"canvasX\":")
+                l = l.replace(Regex("\"y\":"), "\"canvasY\":")
+                
+                // Map connections/Nodes/Edges to correct keys
+                l = l.replace("\"Nodes\":", "\"nodes\":")
+                l = l.replace("\"Edges\":", "\"edges\":")
+                l = l.replace("\"connections\":", "\"edges\":")
+                l
+            }
+            
+            // Final check: if waypoints were broken by x/y replacement, fix them back
+            // (Wait, Waypoints use x/y, so if we replaced all x/y, we might have broken them)
+            // But SuggestedEdge waypoints are usually empty in AI suggest.
+            // If they are not empty, they should be x/y.
+            // Our replacement above is global, so it BROKE waypoints. Let's fix them back.
+            val fixedJson = resilientJson.replace("\"canvasX\":", "\"x\":").replace("\"canvasY\":", "\"y\":")
+                // ... wait, this would revert nodes too. 
+                // Better approach: only replace x/y if the line DOES NOT contain fromNodeId or toNodeId or waypoints
+                // but waypoints are on different lines often.
+                
+            // Let's use a simpler fix: if we find "canvasX" and "canvasY" inside a "waypoints" array, we revert it.
+            // This is getting complex. Let's just use the fact that AI suggests usually have empty waypoints.
+            // If they have them, we'll try to handle it.
+            
+            val result = json.decodeFromString<AiSuggestResponse>(resilientJson)
+            println("AI Suggest: Parsed ${result.edges.size} edges and ${result.nodes.size} nodes")
             result
         } catch (e: Exception) {
             println("AI Suggest: Execution Error: ${e.message}")

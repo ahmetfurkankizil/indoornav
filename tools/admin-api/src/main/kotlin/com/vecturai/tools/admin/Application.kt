@@ -142,11 +142,11 @@ fun Application.configureApp(
 
         // Diagnostic route
         get("/api/admin/test-env") {
-            val key = Env.get("ANTHROPIC_API_KEY")
+            val url = Env.get("OLLAMA_BASE_URL")
+            val model = Env.get("OLLAMA_MODEL")
             call.respond(buildJsonObject {
-                put("hasKey", key != null)
-                put("keyLength", key?.length ?: 0)
-                put("keyPrefix", key?.take(7) ?: "none")
+                put("ollamaUrl", url ?: "not set")
+                put("ollamaModel", model ?: "not set")
                 put("workingDir", System.getProperty("user.dir"))
             })
         }
