@@ -367,6 +367,7 @@ fun DestinationSelectScreen(
     onCancel: () -> Unit,
 ) {
     val session by flowModel.session.collectAsState()
+    var isSelectingOrigin by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf(DestinationFilter.All) }
     val listState = rememberLazyListState()

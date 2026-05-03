@@ -146,17 +146,6 @@ class ArCameraActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun downloadMarkerImage(token: String): Bitmap? = withContext(Dispatchers.IO) {
-        try {
-            val url = "${VecturaiConfig.API_BASE_URL}/mobile/buildings/$token/qr"
-            val bytes = java.net.URL(url).readBytes()
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        } catch (e: Exception) {
-            println("[ARDiag] Failed to download marker: ${e.message}")
-            null
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         if (isEmulator) {
@@ -244,13 +233,9 @@ class ArCameraActivity : ComponentActivity() {
                             isEmulator = isEmulator,
                             onEnd = flowModel::goBackToDestinationSelect,
                             onRetryActivity = ::recreate,
+                            onNavigateElsewhere = ::navigateElsewhere,
                         )
                     }
-                    is ArCameraFlowViewModel.Phase.FatalError -> FatalErrorOverlay(
-                        message = currentPhase.message,
-                        onClose = ::finishFlow,
-                        onRetry = ::recreate,
-                    )
                 }
                 is ArCameraFlowViewModel.Phase.FatalError -> FatalErrorOverlay(
                     message = currentPhase.message,

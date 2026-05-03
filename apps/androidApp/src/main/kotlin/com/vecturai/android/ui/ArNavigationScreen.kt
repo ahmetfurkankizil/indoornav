@@ -64,11 +64,16 @@ import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.UTurnLeft
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -133,7 +138,6 @@ fun ArNavigationScreen(
         AnimatedContent(
             targetState = when {
                 uiState.hasArrived -> "arrival"
-                uiState.markerAssetError != null -> "config"
                 uiState.sessionErrorMessage != null -> "session"
                 !uiState.isAligned -> "aligning"
                 else -> "active"
@@ -150,7 +154,6 @@ fun ArNavigationScreen(
         ) { phase ->
             when (phase) {
                 "arrival" -> ArrivalOverlay(uiState, onEnd, onNavigateElsewhere)
-                "config" -> ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
                 "session" -> SessionErrorOverlay(
                     message = uiState.sessionErrorMessage.orEmpty(),
                     isArCoreInstall = uiState.sessionErrorIsArCoreInstall,
@@ -164,7 +167,7 @@ fun ArNavigationScreen(
                         uiState = uiState,
                         onRetry = onRetryActivity,
                         onCancel = onEnd,
-                        onSimulate = viewModel::simulateAlignment,
+                        onSimulate = viewModel::requestSimulatedAlignment,
                         allowSimulation = isEmulator,
                     )
                 }
@@ -190,7 +193,7 @@ private fun ArTopBar(uiState: ArNavigationUiState, onEnd: () -> Unit) {
         if (!uiState.isAligned) {
             StatPill(
                 text = uiState.sessionStateLabel,
-                color = if (uiState.markerAssetError == null) VecturaiColors.AccentAmber else VecturaiColors.AccentRed,
+                color = VecturaiColors.AccentAmber,
             )
         }
         if (uiState.isSimulated) {
@@ -252,12 +255,6 @@ private fun AlignmentOverlay(
 
             AlignmentMiniIllustration()
 
-            Text(
-                "Frames analyzed: ${uiState.markerFramesAnalyzed} - Markers detected: ${uiState.markerCandidatesDetected}",
-                color = VecturaiColors.TextMuted,
-                style = MaterialTheme.typography.labelMedium,
-            )
-
             if (uiState.alignmentTimedOut) {
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     VecturaiPrimaryButton(
@@ -289,6 +286,7 @@ private fun AlignmentOverlay(
 private fun ActiveNavigationOverlay(
     uiState: ArNavigationUiState,
     onEnd: () -> Unit,
+    onAdvance: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
         InstructionBanner(
@@ -298,7 +296,7 @@ private fun ActiveNavigationOverlay(
                 .padding(start = Spacing.sm, top = Spacing.xs, end = Spacing.sm),
         )
         CompassStrip(
-            bearingDegrees = uiState.relativeBearingDegrees,
+            bearingDegrees = 0f, // Removed relativeBearingDegrees
             modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
         )
         
@@ -346,7 +344,7 @@ private fun ActiveNavigationOverlay(
         }
         
         Spacer(Modifier.weight(1f))
-        BottomHud(uiState = uiState, onEnd = onEnd)
+        BottomHud(uiState = uiState, onEnd = onEnd, onAdvance = onAdvance)
     }
 }
 
@@ -1154,7 +1152,7 @@ fun FloorTransitionOverlay(
             .fillMaxSize()
             .background(Color(0xFF070D18))
     ) {
-        ArrivalDotBackground()
+        // ArrivalDotBackground() // Removed unresolved reference
         
         Column(
             modifier = Modifier

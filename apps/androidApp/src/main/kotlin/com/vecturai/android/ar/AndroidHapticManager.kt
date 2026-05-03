@@ -21,6 +21,8 @@ class AndroidHapticManager(context: Context) {
     fun recentering() = vibrate(25, 90)
     fun arrived() = vibrate(140, VibrationEffect.DEFAULT_AMPLITUDE)
     fun warning() = vibrate(100, 150)
+    fun error() = vibrate(120, 200)
+    fun success() = vibrate(60, VibrationEffect.DEFAULT_AMPLITUDE)
 
     private fun vibrate(durationMs: Long, amplitude: Int) {
         if (!isEnabled || !HapticsEnabled) return

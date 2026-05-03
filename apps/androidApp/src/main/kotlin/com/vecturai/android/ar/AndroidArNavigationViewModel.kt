@@ -545,9 +545,6 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = NavigationActionIcon.Straight,
                 nextActionText = "Follow the path",
                 nextActionDistance = null,
-                markerFramesAnalyzed = 0,
-                markerCandidatesDetected = 0,
-                relativeBearingDegrees = 0f,
             )
         }
     }
