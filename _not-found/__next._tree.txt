@@ -1,2 +1,2 @@
-:HL["/vecturai/_next/static/chunks/14xh1j-uq7jvy.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"ky5xQZkCA-dm_G5d0gthf"}
+:HL["/vecturai/_next/static/chunks/0pau.w3.hnvot.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"HN05sFoS2BGZtyYFxtof-"}
