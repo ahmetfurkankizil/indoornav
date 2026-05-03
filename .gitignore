@@ -1,0 +1,10 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Source project for the deployed site lives here for convenience but
+# is tracked in its own repo and must NOT be committed to the pages
+# branch — only the built static output should be published.
+new-website/
