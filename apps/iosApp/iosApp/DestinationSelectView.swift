@@ -7,7 +7,7 @@ struct DestinationSelectView: View {
     @ObservedObject var flow: NavigationFlowModel
     @StateObject private var assistantViewModel: AiAssistantViewModel
     @State private var searchText = ""
-    @State private var selectedFilter: DestinationFilter = .all
+    @State private var selectedCategory: String = "all"
     @FocusState private var searchFocused: Bool
 
     init(flow: NavigationFlowModel) {
@@ -19,24 +19,44 @@ struct DestinationSelectView: View {
         flow.availableRooms.sorted { destinationSortIndex($0.id) < destinationSortIndex($1.id) }
     }
 
+    /// Rooms eligible for this picker pass — excludes the room currently used as the
+    /// other endpoint so the user can't pick the same room as both origin and destination.
+    private var eligibleRooms: [BuildingPackageLoader.PackageRoom] {
+        let excludedId = flow.selectingOrigin
+            ? flow.selectedRoom?.id
+            : flow.selectedOriginRoom?.id
+        guard let excludedId else { return orderedRooms }
+        return orderedRooms.filter { $0.id != excludedId }
+    }
+
+    /// Distinct categories present in the loaded rooms, sorted by frequency then name.
+    private var dynamicCategories: [String] {
+        let counts = Dictionary(grouping: eligibleRooms) { $0.category ?? "other" }
+            .mapValues(\.count)
+        return counts
+            .sorted { lhs, rhs in
+                if lhs.value != rhs.value { return lhs.value > rhs.value }
+                return lhs.key < rhs.key
+            }
+            .map(\.key)
+    }
+
     private var filteredRooms: [BuildingPackageLoader.PackageRoom] {
-        orderedRooms.filter { room in
+        eligibleRooms.filter { room in
             let matchesSearch = searchText.isEmpty ||
                 room.displayName.localizedCaseInsensitiveContains(searchText) ||
                 (room.description?.localizedCaseInsensitiveContains(searchText) ?? false) ||
                 (room.category?.localizedCaseInsensitiveContains(searchText) ?? false)
-            return matchesSearch && selectedFilter.matches(room)
+            let matchesCategory = selectedCategory == "all" ||
+                (room.category ?? "other") == selectedCategory
+            return matchesSearch && matchesCategory
         }
     }
 
     private var groupedRooms: [(String, [BuildingPackageLoader.PackageRoom])] {
         let grouped = Dictionary(grouping: filteredRooms) { $0.category ?? "other" }
-        let preferred = ["classroom", "lab", "cafe", "vertical_transport", "toilet",
-                         "kitchen", "living_room", "bedroom", "bathroom", "office", "other"]
-        let ordered = preferred.filter { grouped[$0] != nil } +
-            grouped.keys.sorted().filter { !preferred.contains($0) }
-
-        return ordered.compactMap { category in
+        // Order matches the dynamicCategories order (frequency-based).
+        return dynamicCategories.compactMap { category in
             guard let rooms = grouped[category], !rooms.isEmpty else { return nil }
             return (category, rooms)
         }
@@ -47,7 +67,7 @@ struct DestinationSelectView: View {
             VecturBackground()
 
             VStack(spacing: 0) {
-                DestinationTopBar(onBack: { flow.endNavigation() })
+                DestinationTopBar(onBack: { flow.goHome() })
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
 
@@ -58,10 +78,12 @@ struct DestinationSelectView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Choose destination")
+                            Text(flow.selectingOrigin ? "Choose starting point" : "Choose destination")
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(VecturTheme.textPrimary)
-                            Text("From \(flow.confirmedEntrance.isEmpty ? "Main Entrance" : flow.confirmedEntrance)")
+                            Text(flow.selectingOrigin
+                                 ? "Pick where you're starting from"
+                                 : "From \(originDisplayName)")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(VecturTheme.textMuted)
                         }
@@ -69,15 +91,29 @@ struct DestinationSelectView: View {
                         VecturStatPill(text: "\(filteredRooms.count) Places", color: VecturTheme.cyan)
                     }
 
+                    OriginDestinationHeader(
+                        originName: originDisplayName,
+                        destinationName: flow.selectedRoom?.displayName,
+                        selectingOrigin: flow.selectingOrigin,
+                        onChangeOrigin: { flow.beginSelectingOrigin() },
+                        onResetOrigin: flow.selectedOriginRoom != nil
+                            ? { flow.clearSelectedOrigin() } : nil
+                    )
+
                     SearchField(searchText: $searchText, focused: $searchFocused)
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            ForEach(DestinationFilter.allCases, id: \.self) { filter in
+                            FilterChip(
+                                text: "All",
+                                selected: selectedCategory == "all",
+                                action: { selectedCategory = "all" }
+                            )
+                            ForEach(dynamicCategories, id: \.self) { category in
                                 FilterChip(
-                                    text: filter.title,
-                                    selected: selectedFilter == filter,
-                                    action: { selectedFilter = filter }
+                                    text: VecturTheme.categoryName(category),
+                                    selected: selectedCategory == category,
+                                    action: { selectedCategory = category }
                                 )
                             }
                         }
@@ -119,7 +155,7 @@ struct DestinationSelectView: View {
                     AiAssistantView(viewModel: assistantViewModel)
                 }
 
-                if searchText.isEmpty && selectedFilter == .all && !recentRooms.isEmpty {
+                if searchText.isEmpty && selectedCategory == "all" && !recentRooms.isEmpty {
                     VecturSectionHeader(title: "Recently Visited")
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
@@ -127,7 +163,7 @@ struct DestinationSelectView: View {
                                 RecentDestinationCard(
                                     room: room,
                                     routeSummary: routeSummary(for: room),
-                                    action: { flow.selectDestination(room) }
+                                    action: { flow.handleRoomSelection(room) }
                                 )
                             }
                         }
@@ -150,7 +186,7 @@ struct DestinationSelectView: View {
                                 DestinationRoomCard(
                                     room: room,
                                     routeSummary: routeSummary(for: room),
-                                    action: { flow.selectDestination(room) }
+                                    action: { flow.handleRoomSelection(room) }
                                 )
                             }
                         }
@@ -160,7 +196,7 @@ struct DestinationSelectView: View {
                         DestinationRoomCard(
                             room: room,
                             routeSummary: routeSummary(for: room),
-                            action: { flow.selectDestination(room) }
+                            action: { flow.handleRoomSelection(room) }
                         )
                     }
                 }
@@ -191,15 +227,38 @@ struct DestinationSelectView: View {
 
     private var recentRooms: [BuildingPackageLoader.PackageRoom] {
         let preferred = ["cs-lab", "fameo-cafe"]
-        let rooms = preferred.compactMap { id in orderedRooms.first { $0.id == id } }
-        return rooms.isEmpty ? Array(orderedRooms.prefix(2)) : rooms
+        let rooms = preferred.compactMap { id in eligibleRooms.first { $0.id == id } }
+        return rooms.isEmpty ? Array(eligibleRooms.prefix(2)) : rooms
+    }
+
+    private var originDisplayName: String {
+        if let origin = flow.selectedOriginRoom { return origin.displayName }
+        return flow.confirmedEntrance.isEmpty ? "Main Entrance" : flow.confirmedEntrance
     }
 
     private func routeSummary(for room: BuildingPackageLoader.PackageRoom) -> RouteSummary? {
-        guard let config = flow.reviewedConfig,
-              let package = BuildingPackageLoader.computeRoute(config: config, destinationRoomId: room.id) else {
-            return nil
+        guard let config = flow.reviewedConfig else { return nil }
+        // Preview the route using the user's chosen origin (or entrance fallback).
+        // When the user is selecting an origin, treat each candidate as the origin
+        // and the already-chosen destination as the endpoint, so distances make sense.
+        let originId: String?
+        let destinationNodeId: String
+        let destinationLabel: String
+        if flow.selectingOrigin, let dest = flow.selectedRoom {
+            originId = room.destinationNodeId
+            destinationNodeId = dest.destinationNodeId
+            destinationLabel = dest.displayName
+        } else {
+            originId = flow.selectedOriginRoom?.destinationNodeId
+            destinationNodeId = room.destinationNodeId
+            destinationLabel = room.displayName
         }
+        guard let package = BuildingPackageLoader.computeRoute(
+            config: config,
+            destinationNodeId: destinationNodeId,
+            destinationLabel: destinationLabel,
+            originNodeId: originId
+        ) else { return nil }
         return RouteSummary(
             distance: package.totalDistance,
             stepCount: max(1, package.arrows.filter { $0.type != .follow }.count)
@@ -400,32 +459,102 @@ private struct RouteSummary {
     let stepCount: Int
 }
 
-private enum DestinationFilter: CaseIterable {
-    case all
-    case classes
-    case labs
-    case amenities
+/// Endpoint header: shows the chosen origin and destination, with a Change button on the
+/// origin slot so the user can swap the starting point. While the picker is in
+/// origin-selection mode, the origin slot is highlighted and the destination is dimmed.
+private struct OriginDestinationHeader: View {
+    let originName: String
+    let destinationName: String?
+    let selectingOrigin: Bool
+    let onChangeOrigin: () -> Void
+    let onResetOrigin: (() -> Void)?
 
-    var title: String {
-        switch self {
-        case .all: return "All"
-        case .classes: return "Classes"
-        case .labs: return "Labs"
-        case .amenities: return "Amenities"
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            endpointPill(
+                label: "From",
+                value: originName,
+                icon: "location.circle.fill",
+                tint: VecturTheme.green,
+                highlighted: selectingOrigin
+            )
+
+            Image(systemName: "arrow.right")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(VecturTheme.textDisabled)
+
+            endpointPill(
+                label: "To",
+                value: destinationName ?? "Pick destination",
+                icon: "mappin.and.ellipse",
+                tint: VecturTheme.amber,
+                highlighted: !selectingOrigin && destinationName != nil,
+                dimmed: destinationName == nil
+            )
+
+            HStack(spacing: 6) {
+                if let onResetOrigin {
+                    Button(action: onResetOrigin) {
+                        Image(systemName: "arrow.uturn.backward")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(VecturTheme.textSecondary)
+                            .frame(width: 32, height: 32)
+                            .background(VecturTheme.elevated)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                if !selectingOrigin {
+                    Button(action: onChangeOrigin) {
+                        Text("Change")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 12)
+                            .frame(height: 32)
+                            .background(VecturTheme.primaryGradient)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
     }
 
-    func matches(_ room: BuildingPackageLoader.PackageRoom) -> Bool {
-        switch self {
-        case .all:
-            return true
-        case .classes:
-            return room.category == "classroom"
-        case .labs:
-            return room.category == "lab"
-        case .amenities:
-            return ["cafe", "vertical_transport", "toilet", "kitchen", "bathroom"].contains(room.category ?? "")
+    private func endpointPill(
+        label: String,
+        value: String,
+        icon: String,
+        tint: Color,
+        highlighted: Bool,
+        dimmed: Bool = false
+    ) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(tint)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(label)
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(1.0)
+                    .textCase(.uppercase)
+                    .foregroundStyle(VecturTheme.textMuted)
+                Text(value)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(dimmed ? VecturTheme.textMuted : VecturTheme.textPrimary)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
         }
+        .padding(.horizontal, 10)
+        .frame(height: 44)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(highlighted ? tint.opacity(0.16) : VecturTheme.elevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(highlighted ? tint.opacity(0.55) : VecturTheme.borderSubtle, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

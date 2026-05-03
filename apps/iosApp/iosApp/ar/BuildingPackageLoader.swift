@@ -352,8 +352,14 @@ struct BuildingPackageLoader {
 
     // MARK: - Route Computation
 
-    /// Compute a route from the entrance to a specific room.
-    static func computeRoute(config: ReviewedConfig, destinationRoomId: String) -> LoadedPackage? {
+    /// Compute a route to a specific room.
+    /// - Parameter originNodeId: Optional override for the route start node. When nil,
+    ///   a graph node with type == "entrance" is preferred over marker metadata.
+    static func computeRoute(
+        config: ReviewedConfig,
+        destinationRoomId: String,
+        originNodeId: String? = nil
+    ) -> LoadedPackage? {
         guard let room = config.rooms.first(where: { $0.id == destinationRoomId }) else {
             print("[PackageLoader] Room \(destinationRoomId) not found in config")
             return nil
@@ -361,17 +367,19 @@ struct BuildingPackageLoader {
         return computeRoute(
             config: config,
             destinationNodeId: room.destinationNodeId,
-            destinationLabel: room.displayName
+            destinationLabel: room.displayName,
+            originNodeId: originNodeId
         )
     }
 
-    /// Compute a route from the entrance to a specific graph node.
+    /// Compute a route to a specific graph node.
     /// This variant lets the AI assistant route to semantic POIs that are not
     /// listed as rooms in `rooms.json` but still map to a valid nav-graph node.
     static func computeRoute(
         config: ReviewedConfig,
         destinationNodeId: String,
-        destinationLabel: String
+        destinationLabel: String,
+        originNodeId: String? = nil
     ) -> LoadedPackage? {
         let nodeMap = Dictionary(uniqueKeysWithValues: config.nodes.map { ($0.id, $0) })
         var adjacency: [String: [(String, Double)]] = [:]
@@ -382,7 +390,13 @@ struct BuildingPackageLoader {
             }
         }
 
-        let startNodeId = config.entranceMarkers.first?.startNodeId ?? config.nodes.first?.id ?? ""
+        let entranceStart = defaultEntranceStartNodeId(config: config, nodeMap: nodeMap)
+        let startNodeId = originNodeId ?? entranceStart
+
+        guard nodeMap[startNodeId] != nil else {
+            print("[PackageLoader] Start node \(startNodeId) not found in graph")
+            return nil
+        }
 
         guard nodeMap[destinationNodeId] != nil else {
             print("[PackageLoader] Destination node \(destinationNodeId) not found in graph")
@@ -430,6 +444,36 @@ struct BuildingPackageLoader {
             entranceMarker: config.entranceMarkers.first, destinationName: destName,
             destinationPosition: destPos
         )
+    }
+
+    private static func defaultEntranceStartNodeId(
+        config: ReviewedConfig,
+        nodeMap: [String: PackageNode]
+    ) -> String {
+        let entranceNodes = config.nodes.filter { $0.type.lowercased() == "entrance" }
+        let marker = config.entranceMarkers.first
+
+        if entranceNodes.count == 1 {
+            return entranceNodes[0].id
+        }
+
+        if let marker, let closestEntrance = entranceNodes.min(by: {
+            distanceSquared($0, to: marker.position) < distanceSquared($1, to: marker.position)
+        }) {
+            return closestEntrance.id
+        }
+
+        if let marker, nodeMap[marker.startNodeId] != nil {
+            return marker.startNodeId
+        }
+
+        return config.nodes.first?.id ?? ""
+    }
+
+    private static func distanceSquared(_ node: PackageNode, to position: Position3D) -> Double {
+        let dx = node.x - position.x
+        let dz = node.z - position.z
+        return dx * dx + dz * dz
     }
 
     // MARK: - Dijkstra

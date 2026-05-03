@@ -27,6 +27,8 @@ struct ARNavigationView: View {
     let routePackage: BuildingPackageLoader.LoadedPackage
     /// Validated entrance marker from the reviewed package (may be nil for legacy flows).
     let entranceMarker: BuildingPackageLoader.PackageMarker?
+    /// Entrance poster alignment is only for default entrance-start routes.
+    let usesEntranceAlignment: Bool
 
     var body: some View {
         ZStack {
@@ -34,7 +36,8 @@ struct ARNavigationView: View {
                 viewModel: viewModel,
                 destinationName: destinationName,
                 routePackage: routePackage,
-                entranceMarker: entranceMarker
+                entranceMarker: entranceMarker,
+                usesEntranceAlignment: usesEntranceAlignment
             )
             .ignoresSafeArea()
 
@@ -168,20 +171,37 @@ struct ARNavigationView: View {
     //   bottom → ETA strip + End Route button
 
     private var activeNavigationOverlay: some View {
-        VStack(spacing: 0) {
-            instructionBanner
-                .padding(.horizontal, 12)
-                .safeAreaPadding(.top)
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                instructionBanner
+                    .padding(.horizontal, 12)
+                    .safeAreaPadding(.top)
 
-            CompassStrip(headingDegrees: viewModel.cameraHeadingDegrees)
-                .padding(.horizontal, 18)
-                .padding(.top, 8)
+                CompassStrip(headingDegrees: viewModel.cameraHeadingDegrees)
+                    .padding(.horizontal, 18)
+                    .padding(.top, 8)
 
-            Spacer()
+                Spacer()
 
-            bottomHUD
+                bottomHUD
+            }
+            .padding(.bottom, 32)
+
+            // In-AR minimap (top-right corner). Stays out of the way of the instruction
+            // banner by sitting below it. Always rotated so the user faces "up".
+            NavigationMinimap(
+                nodes: routePackage.config.nodes,
+                edges: routePackage.config.edges,
+                routeNodeIds: routePackage.routeNodeIds,
+                userX: viewModel.userBuildingX,
+                userZ: viewModel.userBuildingZ,
+                userHeadingDegrees: viewModel.userBuildingHeadingDegrees,
+                destinationPosition: routePackage.destinationPosition
+            )
+            .padding(.top, 124)
+            .padding(.trailing, 14)
+            .safeAreaPadding(.top)
         }
-        .padding(.bottom, 32)
     }
 
     private var instructionBanner: some View {
@@ -763,6 +783,7 @@ struct ARViewContainer: UIViewRepresentable {
     let destinationName: String
     let routePackage: BuildingPackageLoader.LoadedPackage
     let entranceMarker: BuildingPackageLoader.PackageMarker?
+    let usesEntranceAlignment: Bool
 
     func makeUIView(context: Context) -> ARView {
         let arView = ARView(frame: .zero)
@@ -775,9 +796,14 @@ struct ARViewContainer: UIViewRepresentable {
         let dest = destinationName
         let pkg = routePackage
         let marker = entranceMarker
+        let useEntranceAlignment = usesEntranceAlignment
         DispatchQueue.main.async {
             vm.destinationLabel = dest
-            vm.configure(with: pkg, entranceMarker: marker)
+            vm.configure(
+                with: pkg,
+                entranceMarker: marker,
+                usesEntranceAlignment: useEntranceAlignment
+            )
             vm.setupARView(arView)
             vm.startSession()
         }
@@ -825,6 +851,15 @@ class ARNavigationViewModel: ObservableObject {
     @Published var timeoutReasonMessage: String = "No matching entrance poster detected"
     @Published var timeoutHintMessage: String = ""
 
+    /// User's most recent position in building-local coords. Published so the minimap
+    /// overlay can render the user marker. Updated each pose sample (~2 Hz).
+    @Published var userBuildingX: Double = 0.0
+    @Published var userBuildingZ: Double = 0.0
+
+    /// User's facing direction in building-local coords (degrees, 0=+Z forward, CW positive).
+    /// Used to rotate the in-AR minimap so the user's heading faces "up".
+    @Published var userBuildingHeadingDegrees: Double = 0.0
+
     private let sessionManager = ARSessionManager()
     private let markerDetector = ARMarkerDetector()
     private let routeRenderer = ARRouteRenderer()
@@ -837,6 +872,7 @@ class ARNavigationViewModel: ObservableObject {
 
     /// Entrance marker from the reviewed package.
     private var entranceMarker: BuildingPackageLoader.PackageMarker?
+    private var usesEntranceAlignment: Bool = true
 
     /// User's cumulative distance along the route (building-local).
     private var userCumulativeDistance: Double = 0.0
@@ -875,9 +911,14 @@ class ARNavigationViewModel: ObservableObject {
     }
 
     /// Configure with a precomputed route package and entrance marker.
-    func configure(with package: BuildingPackageLoader.LoadedPackage, entranceMarker: BuildingPackageLoader.PackageMarker?) {
+    func configure(
+        with package: BuildingPackageLoader.LoadedPackage,
+        entranceMarker: BuildingPackageLoader.PackageMarker?,
+        usesEntranceAlignment: Bool = true
+    ) {
         self.routePackage = package
         self.entranceMarker = entranceMarker ?? package.entranceMarker
+        self.usesEntranceAlignment = usesEntranceAlignment
 
         let renderConfig = package.config.routeRendering
         totalDistance = package.totalDistance
@@ -967,6 +1008,13 @@ class ARNavigationViewModel: ObservableObject {
         // Pre-start validation: verify asset chain
         print("[ARNav] --- Pre-Start Validation ---")
         print("[ARNav] Entrance marker from package: id=\(marker?.id ?? "nil"), refImage=\(marker?.referenceImageName ?? "nil"), width=\(marker?.physicalWidthMeters ?? -1)m")
+
+        guard usesEntranceAlignment else {
+            print("[ARNav] Custom route origin selected; starting from current position instead of entrance marker")
+            sessionManager.startWorldTrackingSession(arView: arView)
+            alignToCurrentPosition()
+            return
+        }
 
         guard let markerImageName = configuredReferenceImageName else {
             print("[ARNav] No reference image configured; starting markerless world tracking")
@@ -1060,6 +1108,12 @@ class ARNavigationViewModel: ObservableObject {
         // Restart the session to reset tracking
         guard let arView = arView else { return }
         let marker = self.entranceMarker
+
+        guard usesEntranceAlignment else {
+            sessionManager.startWorldTrackingSession(arView: arView)
+            alignToCurrentPosition()
+            return
+        }
 
         guard let markerImageName = configuredReferenceImageName else {
             sessionManager.startWorldTrackingSession(arView: arView)
@@ -1193,11 +1247,60 @@ class ARNavigationViewModel: ObservableObject {
         // Approximate: use remaining route distance as proxy in simulation
         distanceToDestination = remainingDistance
 
+        // Simulated user position: interpolate along the route polyline so the minimap moves.
+        if let (px, pz) = positionAlongRoute(cumDist: userCumulativeDistance, points: pkg.routePoints) {
+            userBuildingX = px
+            userBuildingZ = pz
+            // Heading along the active segment so the minimap rotates with simulated motion.
+            if let heading = headingAlongRoute(cumDist: userCumulativeDistance, points: pkg.routePoints) {
+                userBuildingHeadingDegrees = heading
+            }
+        }
+
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
 
         updateNextAction()
         checkArrival(distToDest: distanceToDestination)
+    }
+
+    /// Project a cumulative distance back to an (x, z) point on the route polyline.
+    private func positionAlongRoute(cumDist: Double, points: [(Double, Double)]) -> (Double, Double)? {
+        guard points.count >= 2 else { return points.first }
+        var traveled = 0.0
+        for i in 0..<(points.count - 1) {
+            let (ax, az) = points[i]
+            let (bx, bz) = points[i+1]
+            let dx = bx - ax
+            let dz = bz - az
+            let segLen = sqrt(dx * dx + dz * dz)
+            if traveled + segLen >= cumDist {
+                let t = segLen > 0.0001 ? (cumDist - traveled) / segLen : 0
+                return (ax + t * dx, az + t * dz)
+            }
+            traveled += segLen
+        }
+        return points.last
+    }
+
+    /// Heading of the active route segment at a given cumulative distance, in degrees.
+    private func headingAlongRoute(cumDist: Double, points: [(Double, Double)]) -> Double? {
+        guard points.count >= 2 else { return nil }
+        var traveled = 0.0
+        for i in 0..<(points.count - 1) {
+            let (ax, az) = points[i]
+            let (bx, bz) = points[i+1]
+            let dx = bx - ax
+            let dz = bz - az
+            let segLen = sqrt(dx * dx + dz * dz)
+            if traveled + segLen >= cumDist || i == points.count - 2 {
+                var deg = atan2(dx, dz) * 180.0 / .pi
+                if deg < 0 { deg += 360 }
+                return deg
+            }
+            traveled += segLen
+        }
+        return nil
     }
 
     // MARK: - Next-Action Guidance (Phase 11)
@@ -1410,6 +1513,19 @@ class ARNavigationViewModel: ObservableObject {
             self.remainingDistance = max(0, totalDist - self.userCumulativeDistance)
             self.distanceToDestination = destDist
             self.isLowConfidence = bestDist > 3.0
+            self.userBuildingX = bx
+            self.userBuildingZ = bz
+
+            // Compute building-local heading by inverting the AR alignment rotation
+            // applied to the camera forward vector.
+            let arForward = self.cameraForward(from: transform)
+            let cosA = cos(radians)
+            let sinA = sin(radians)
+            let bfX = Double(arForward.x) * cosA + Double(arForward.z) * sinA
+            let bfZ = -Double(arForward.x) * sinA + Double(arForward.z) * cosA
+            var hdeg = atan2(bfX, bfZ) * 180.0 / .pi
+            if hdeg < 0 { hdeg += 360 }
+            self.userBuildingHeadingDegrees = hdeg
 
             // Update arrow visibility based on progress, hiding guidance that is behind the camera.
             let forward = self.cameraForward(from: transform)
@@ -1499,5 +1615,165 @@ class AnchorDetectionDelegate: NSObject, ARSessionDelegate {
 
     func sessionInterruptionEnded(_ session: ARSession) {
         sessionManager.sessionInterruptionEnded(session)
+    }
+}
+
+// MARK: - In-AR Minimap
+
+/// Compact minimap rendered in the top-right corner of the AR overlay. The user is locked
+/// to the centre. The route is projected in the user's heading frame so the path
+/// ahead of the user appears above the fixed player arrow.
+private struct NavigationMinimap: View {
+    let nodes: [BuildingPackageLoader.PackageNode]
+    let edges: [BuildingPackageLoader.PackageEdge]
+    let routeNodeIds: [String]
+    let userX: Double
+    let userZ: Double
+    let userHeadingDegrees: Double
+    let destinationPosition: (Double, Double)
+
+    /// Pixels per metre. ~8 pt/m matches the Android NavigationMinimap density.
+    private let pxPerMeter: CGFloat = 8
+    private let diameter: CGFloat = 132
+
+    var body: some View {
+        ZStack {
+            // Outer compass frame
+            Circle()
+                .fill(VecturTheme.canvas.opacity(0.86))
+                .overlay(Circle().stroke(VecturTheme.borderStrong, lineWidth: 1))
+
+            // Map content in user-relative coordinates.
+            Canvas { context, size in
+                drawMap(context: context, size: size)
+            }
+            .frame(width: diameter, height: diameter)
+            .clipShape(Circle())
+
+            // Cardinal "N" indicator rides with the world while the glyph stays upright.
+            northIndicator
+
+            // Player marker (fixed, always pointing up).
+            PlayerArrow()
+                .frame(width: 14, height: 16)
+                .foregroundStyle(VecturTheme.amber)
+        }
+        .frame(width: diameter, height: diameter)
+        .shadow(color: .black.opacity(0.35), radius: 10, y: 4)
+        .animation(.easeOut(duration: 0.18), value: userHeadingDegrees)
+        .animation(.easeOut(duration: 0.18), value: userX)
+        .animation(.easeOut(duration: 0.18), value: userZ)
+    }
+
+    private var northIndicator: some View {
+        Text("N")
+            .font(.system(size: 9, weight: .heavy))
+            .foregroundStyle(VecturTheme.cyan)
+            .offset(northOffset)
+    }
+
+    private var northOffset: CGSize {
+        let headingRad = userHeadingDegrees * .pi / 180.0
+        let radius = diameter / 2 - 12
+        return CGSize(
+            width: CGFloat(sin(headingRad)) * radius,
+            height: CGFloat(-cos(headingRad)) * radius
+        )
+    }
+
+    private func drawMap(context: GraphicsContext, size: CGSize) {
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let headingRad = userHeadingDegrees * .pi / 180.0
+        let sinH = sin(headingRad)
+        let cosH = cos(headingRad)
+
+        // Project a building-local point into the user's heading frame. The route
+        // contract treats +Z like the route preview's downward map axis, so user-right
+        // is the mirrored horizontal basis while user-forward still maps upward.
+        let project: (Double, Double) -> CGPoint = { x, z in
+            let dx = CGFloat(x - userX) * pxPerMeter
+            let dz = CGFloat(z - userZ) * pxPerMeter
+            let right = dx * CGFloat(cosH) - dz * CGFloat(sinH)
+            let forward = dx * CGFloat(sinH) + dz * CGFloat(cosH)
+            return CGPoint(x: center.x - right, y: center.y - forward)
+        }
+
+        // Outer fade ring so edges fade as they approach the rim.
+        let viewRadius = size.width / 2
+
+        // 1. Floor edges (gray).
+        for edge in edges {
+            guard let from = nodes.first(where: { $0.id == edge.from }),
+                  let to = nodes.first(where: { $0.id == edge.to }) else { continue }
+            var path = Path()
+            path.move(to: project(from.x, from.z))
+            path.addLine(to: project(to.x, to.z))
+            context.stroke(
+                path,
+                with: .color(VecturTheme.borderStrong.opacity(0.85)),
+                style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+            )
+        }
+
+        // 2. Active route polyline (cyan, thicker).
+        if routeNodeIds.count >= 2 {
+            let routeNodes = routeNodeIds.compactMap { id in nodes.first { $0.id == id } }
+            if routeNodes.count >= 2 {
+                var path = Path()
+                path.move(to: project(routeNodes[0].x, routeNodes[0].z))
+                for n in routeNodes.dropFirst() {
+                    path.addLine(to: project(n.x, n.z))
+                }
+                context.stroke(
+                    path,
+                    with: .color(VecturTheme.cyan.opacity(0.9)),
+                    style: StrokeStyle(lineWidth: 3.5, lineCap: .round, lineJoin: .round)
+                )
+            }
+        }
+
+        // 3. Floor nodes (small dots).
+        for node in nodes {
+            let p = project(node.x, node.z)
+            let dx = p.x - center.x, dy = p.y - center.y
+            if dx * dx + dy * dy > viewRadius * viewRadius { continue }
+            let r: CGFloat = 1.4
+            context.fill(
+                Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)),
+                with: .color(VecturTheme.textDisabled.opacity(0.9))
+            )
+        }
+
+        // 4. Destination marker (amber dot, slightly larger).
+        let destPt = project(destinationPosition.0, destinationPosition.1)
+        let destDx = destPt.x - center.x, destDy = destPt.y - center.y
+        if destDx * destDx + destDy * destDy <= viewRadius * viewRadius * 1.1 {
+            let r: CGFloat = 4
+            context.fill(
+                Path(ellipseIn: CGRect(x: destPt.x - r, y: destPt.y - r, width: r * 2, height: r * 2)),
+                with: .color(VecturTheme.amber)
+            )
+            context.stroke(
+                Path(ellipseIn: CGRect(x: destPt.x - r - 2, y: destPt.y - r - 2, width: (r + 2) * 2, height: (r + 2) * 2)),
+                with: .color(VecturTheme.amber.opacity(0.45)),
+                lineWidth: 1
+            )
+        }
+    }
+}
+
+/// Triangular "user is here" arrow pointing up.
+private struct PlayerArrow: View {
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            path.move(to: CGPoint(x: size.width / 2, y: 0))
+            path.addLine(to: CGPoint(x: 0, y: size.height))
+            path.addLine(to: CGPoint(x: size.width / 2, y: size.height * 0.72))
+            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.closeSubpath()
+            context.fill(path, with: .color(.white))
+            context.stroke(path, with: .color(VecturTheme.amber), lineWidth: 1.5)
+        }
     }
 }

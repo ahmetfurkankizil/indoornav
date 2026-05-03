@@ -52,6 +52,12 @@ class NavigationFlowModel: ObservableObject {
     /// The user-selected destination room. Must be non-nil before AR can start.
     @Published var selectedRoom: BuildingPackageLoader.PackageRoom?
 
+    /// Optional user-selected starting room. When nil, the entrance marker is used as start.
+    @Published var selectedOriginRoom: BuildingPackageLoader.PackageRoom?
+
+    /// While true, the destination picker is in "select origin" mode.
+    @Published var selectingOrigin: Bool = false
+
     /// Precomputed route package for the selected destination.
     @Published var routePackage: BuildingPackageLoader.LoadedPackage?
 
@@ -161,17 +167,42 @@ class NavigationFlowModel: ObservableObject {
     }
 
     func proceedToDestinationSelect() {
+        selectingOrigin = false
         state = .destinationSelect
+    }
+
+    /// Toggle the picker into origin-selection mode. The user lands back on
+    /// destinationSelect with `selectingOrigin = true`.
+    func beginSelectingOrigin() {
+        selectingOrigin = true
+        state = .destinationSelect
+    }
+
+    /// Reset the origin override back to the entrance marker.
+    func clearSelectedOrigin() {
+        selectedOriginRoom = nil
+        recomputeRoute()
+    }
+
+    /// Handle a room tap from DestinationSelectView, routing to either origin or
+    /// destination selection based on the current `selectingOrigin` flag.
+    func handleRoomSelection(_ room: BuildingPackageLoader.PackageRoom) {
+        if selectingOrigin {
+            selectedOriginRoom = room
+            selectingOrigin = false
+            // If a destination is already chosen, recompute the route and jump to preview.
+            if selectedRoom != nil {
+                recomputeRoute()
+                state = .routePreview
+            }
+        } else {
+            selectDestination(room)
+        }
     }
 
     func selectDestination(_ room: BuildingPackageLoader.PackageRoom) {
         selectedRoom = room
-        if let config = reviewedConfig {
-            routePackage = BuildingPackageLoader.computeRoute(
-                config: config,
-                destinationRoomId: room.id
-            )
-        }
+        recomputeRoute()
         state = .routePreview
     }
 
@@ -207,9 +238,22 @@ class NavigationFlowModel: ObservableObject {
         routePackage = BuildingPackageLoader.computeRoute(
             config: config,
             destinationNodeId: nodeId,
-            destinationLabel: displayName
+            destinationLabel: displayName,
+            originNodeId: selectedOriginRoom?.destinationNodeId
         )
         state = .routePreview
+    }
+
+    /// Recompute the route using the current origin (selectedOriginRoom or entrance fallback)
+    /// and the current destination.
+    private func recomputeRoute() {
+        guard let config = reviewedConfig, let destination = selectedRoom else { return }
+        routePackage = BuildingPackageLoader.computeRoute(
+            config: config,
+            destinationNodeId: destination.destinationNodeId,
+            destinationLabel: destination.displayName,
+            originNodeId: selectedOriginRoom?.destinationNodeId
+        )
     }
 
     func startNavigation() {
@@ -217,8 +261,25 @@ class NavigationFlowModel: ObservableObject {
         state = .arNavigation
     }
 
+    /// Exit AR navigation but keep the entrance/origin context so the user can pick a new
+    /// destination without rescanning the QR. Lands back on destinationSelect.
     func endNavigation() {
         selectedRoom = nil
+        routePackage = nil
+        selectingOrigin = false
+        if reviewedConfig != nil && !confirmedEntrance.isEmpty {
+            state = .destinationSelect
+        } else {
+            // No valid entrance context (shouldn't normally happen) — fall back to home.
+            state = .home
+        }
+    }
+
+    /// Full reset back to the home screen. Used by the back button on destinationSelect.
+    func goHome() {
+        selectedRoom = nil
+        selectedOriginRoom = nil
+        selectingOrigin = false
         routePackage = nil
         confirmedEntrance = ""
         validatedEntranceMarker = nil
@@ -228,6 +289,7 @@ class NavigationFlowModel: ObservableObject {
     func goBackToDestinationSelect() {
         selectedRoom = nil
         routePackage = nil
+        selectingOrigin = false
         state = .destinationSelect
     }
 

@@ -41,7 +41,8 @@ struct ContentView: View {
                         ),
                         destinationName: room.displayName,
                         routePackage: pkg,
-                        entranceMarker: flow.validatedEntranceMarker
+                        entranceMarker: flow.validatedEntranceMarker,
+                        usesEntranceAlignment: flow.selectedOriginRoom == nil
                     )
                 }
 

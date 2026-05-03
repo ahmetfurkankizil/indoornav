@@ -12,6 +12,15 @@ struct RoutePreviewView: View {
         max(1, flow.routePackage?.arrows.filter { $0.type != .follow }.count ?? 1)
     }
 
+    private var originName: String {
+        if let origin = flow.selectedOriginRoom { return origin.displayName }
+        return flow.confirmedEntrance.isEmpty ? "Main Entrance" : flow.confirmedEntrance
+    }
+
+    private var destinationName: String {
+        flow.selectedRoom?.displayName ?? "Destination"
+    }
+
     var body: some View {
         ZStack {
             VecturBackground()
@@ -32,8 +41,8 @@ struct RoutePreviewView: View {
                         routeSummaryCard
 
                         RouteTimelineCard(
-                            originName: flow.confirmedEntrance.isEmpty ? "Main Entrance" : flow.confirmedEntrance,
-                            destinationName: flow.selectedRoom?.displayName ?? "Destination",
+                            originName: originName,
+                            destinationName: destinationName,
                             distanceText: formatMeters(distance)
                         )
                     }
@@ -87,12 +96,17 @@ struct RoutePreviewView: View {
     private var routeSummaryCard: some View {
         VecturCard {
             VStack(spacing: 18) {
-                RouteMiniStrip(routePoints: flow.routePackage?.routePoints ?? [])
+                RoutePlanView(
+                    nodes: flow.reviewedConfig?.nodes ?? [],
+                    edges: flow.reviewedConfig?.edges ?? [],
+                    routeNodeIds: flow.routePackage?.routeNodeIds ?? [],
+                    routePoints: flow.routePackage?.routePoints ?? []
+                )
 
                 HStack(alignment: .top, spacing: 12) {
                     routeEndpoint(
                         label: "From",
-                        title: flow.confirmedEntrance.isEmpty ? "Main Entrance" : flow.confirmedEntrance,
+                        title: originName,
                         icon: "location.circle.fill",
                         color: VecturTheme.green
                     )
@@ -104,7 +118,7 @@ struct RoutePreviewView: View {
 
                     routeEndpoint(
                         label: "To",
-                        title: flow.selectedRoom?.displayName ?? "Destination",
+                        title: destinationName,
                         icon: "mappin.and.ellipse",
                         color: VecturTheme.amber,
                         alignTrailing: true
@@ -152,7 +166,9 @@ struct RoutePreviewView: View {
             }
             .buttonStyle(.plain)
 
-            Text("Point your camera at the entrance sign to begin")
+            Text(flow.selectedOriginRoom == nil
+                 ? "Point your camera at the entrance sign to begin"
+                 : "Start from your selected point")
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(VecturTheme.textDisabled)
                 .multilineTextAlignment(.center)
@@ -169,59 +185,146 @@ struct RoutePreviewView: View {
     }
 }
 
-private struct RouteMiniStrip: View {
+/// 2D floor-plan minimap shown in the route preview screen. Draws all edges in the loaded
+/// nav graph in gray, then the active route in cyan. The origin is marked green, the
+/// destination amber. Coordinates are projected from building-local (x, z) into the canvas
+/// while preserving aspect ratio.
+private struct RoutePlanView: View {
+    let nodes: [BuildingPackageLoader.PackageNode]
+    let edges: [BuildingPackageLoader.PackageEdge]
+    let routeNodeIds: [String]
     let routePoints: [(Double, Double)]
-    @State private var markerProgress: CGFloat = 0
+    @State private var pulse: CGFloat = 0
 
     var body: some View {
         Canvas { context, size in
-            let start = CGPoint(x: 24, y: size.height / 2)
-            let end = CGPoint(x: size.width - 24, y: size.height / 2)
-            var path = Path()
-            path.move(to: start)
-            path.addCurve(
-                to: end,
-                control1: CGPoint(x: size.width * 0.32, y: 10),
-                control2: CGPoint(x: size.width * 0.62, y: size.height - 10)
-            )
+            guard nodes.count >= 2 else {
+                drawEmpty(context: context, size: size)
+                return
+            }
 
-            context.stroke(
-                path,
-                with: .color(VecturTheme.borderStrong),
-                style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: [10, 8])
-            )
-            context.stroke(
-                path,
-                with: .linearGradient(
-                    Gradient(colors: [VecturTheme.blue, VecturTheme.cyan]),
-                    startPoint: .zero,
-                    endPoint: CGPoint(x: size.width, y: size.height)
-                ),
-                style: StrokeStyle(lineWidth: 4, lineCap: .round)
-            )
+            let bounds = computeBounds()
+            let project = makeProjector(bounds: bounds, size: size, padding: 18)
 
-            context.fill(Path(ellipseIn: CGRect(x: start.x - 6, y: start.y - 6, width: 12, height: 12)), with: .color(VecturTheme.green))
-            context.fill(Path(ellipseIn: CGRect(x: end.x - 6, y: end.y - 6, width: 12, height: 12)), with: .color(VecturTheme.amber))
+            // 1. Floor edges (gray)
+            for edge in edges {
+                guard let from = nodes.first(where: { $0.id == edge.from }),
+                      let to = nodes.first(where: { $0.id == edge.to }) else { continue }
+                var path = Path()
+                path.move(to: project(from.x, from.z))
+                path.addLine(to: project(to.x, to.z))
+                context.stroke(path,
+                               with: .color(VecturTheme.borderStrong),
+                               style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
+            }
 
-            let t = markerProgress
-            let markerX = start.x + (end.x - start.x) * t
-            let markerY = start.y - sin(t * CGFloat.pi) * 16
-            context.fill(Path(ellipseIn: CGRect(x: markerX - 4, y: markerY - 4, width: 8, height: 8)), with: .color(.white))
-
-            if routePoints.count > 1 {
+            // 2. Floor nodes (small dim dots — skip routes that are turning points only)
+            for node in nodes {
+                let p = project(node.x, node.z)
+                let r: CGFloat = 1.6
                 context.fill(
-                    Path(ellipseIn: CGRect(x: size.width / 2 - 2, y: size.height / 2 - 2, width: 4, height: 4)),
-                    with: .color(VecturTheme.cyan.opacity(0.45))
+                    Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)),
+                    with: .color(VecturTheme.borderSubtle.opacity(0.9))
+                )
+            }
+
+            // 3. Active route polyline (cyan)
+            if routeNodeIds.count >= 2 {
+                let routeNodes = routeNodeIds.compactMap { id in nodes.first { $0.id == id } }
+                guard routeNodes.count >= 2 else {
+                    drawEmpty(context: context, size: size)
+                    return
+                }
+
+                var path = Path()
+                path.move(to: project(routeNodes[0].x, routeNodes[0].z))
+                for n in routeNodes.dropFirst() {
+                    path.addLine(to: project(n.x, n.z))
+                }
+                context.stroke(path,
+                               with: .color(VecturTheme.cyan.opacity(0.95)),
+                               style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+
+                // 4. Origin (green) and destination (amber) markers.
+                let originPt = project(routeNodes.first!.x, routeNodes.first!.z)
+                let destPt = project(routeNodes.last!.x, routeNodes.last!.z)
+
+                let originRadius: CGFloat = 7
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: originPt.x - originRadius, y: originPt.y - originRadius,
+                        width: originRadius * 2, height: originRadius * 2
+                    )),
+                    with: .color(VecturTheme.green)
+                )
+
+                // Pulsing ring around the destination marker.
+                let pulseRadius: CGFloat = 8 + pulse * 6
+                context.stroke(
+                    Path(ellipseIn: CGRect(
+                        x: destPt.x - pulseRadius, y: destPt.y - pulseRadius,
+                        width: pulseRadius * 2, height: pulseRadius * 2
+                    )),
+                    with: .color(VecturTheme.amber.opacity(1.0 - Double(pulse))),
+                    lineWidth: 2
+                )
+                let destRadius: CGFloat = 7
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: destPt.x - destRadius, y: destPt.y - destRadius,
+                        width: destRadius * 2, height: destRadius * 2
+                    )),
+                    with: .color(VecturTheme.amber)
                 )
             }
         }
-        .frame(height: 66)
+        .frame(height: 180)
         .background(VecturTheme.elevated)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .onAppear {
-            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: false)) {
-                markerProgress = 1
+            withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+                pulse = 1
             }
+        }
+    }
+
+    private func drawEmpty(context: GraphicsContext, size: CGSize) {
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let r: CGFloat = 4
+        context.fill(
+            Path(ellipseIn: CGRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2)),
+            with: .color(VecturTheme.textDisabled)
+        )
+    }
+
+    private func computeBounds() -> (minX: Double, maxX: Double, minZ: Double, maxZ: Double) {
+        let minX = nodes.map(\.x).min() ?? 0
+        let maxX = nodes.map(\.x).max() ?? 1
+        let minZ = nodes.map(\.z).min() ?? 0
+        let maxZ = nodes.map(\.z).max() ?? 1
+        return (minX, maxX, minZ, maxZ)
+    }
+
+    /// Returns a closure that maps building-local (x, z) into canvas (x, y) space,
+    /// preserving aspect ratio and centering the floor plan.
+    private func makeProjector(
+        bounds: (minX: Double, maxX: Double, minZ: Double, maxZ: Double),
+        size: CGSize,
+        padding: CGFloat
+    ) -> (Double, Double) -> CGPoint {
+        let widthRange = max(0.001, bounds.maxX - bounds.minX)
+        let heightRange = max(0.001, bounds.maxZ - bounds.minZ)
+        let usableW = max(1, size.width - padding * 2)
+        let usableH = max(1, size.height - padding * 2)
+        let scale = min(usableW / widthRange, usableH / heightRange)
+        let centerOffsetX = (usableW - widthRange * scale) / 2
+        let centerOffsetY = (usableH - heightRange * scale) / 2
+        return { x, z in
+            let px = padding + centerOffsetX + (x - bounds.minX) * scale
+            // Flip Z so that +z forward (away from entrance) renders downward, matching
+            // the Android orientation where the entrance sits near the top of the strip.
+            let py = padding + centerOffsetY + (z - bounds.minZ) * scale
+            return CGPoint(x: px, y: py)
         }
     }
 }
@@ -235,9 +338,23 @@ private struct RouteTimelineCard: View {
         VecturCard {
             VStack(alignment: .leading, spacing: 12) {
                 VecturSectionHeader(title: "Steps")
-                TimelineStep(number: 1, title: "Start from \(originName)", detail: "Entrance", first: true)
-                TimelineStep(number: 2, title: "Follow the highlighted route", detail: "\(distanceText) total")
-                TimelineStep(number: 3, title: "Arrive at \(destinationName)", detail: "Destination", last: true)
+                TimelineStep(
+                    number: 1,
+                    title: "Proceed from \(originName)",
+                    detail: "Starting point",
+                    first: true
+                )
+                TimelineStep(
+                    number: 2,
+                    title: "Follow the highlighted path",
+                    detail: "\(distanceText) total"
+                )
+                TimelineStep(
+                    number: 3,
+                    title: "Arrive at \(destinationName)",
+                    detail: "Destination",
+                    last: true
+                )
             }
         }
     }
