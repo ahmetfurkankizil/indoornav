@@ -26,6 +26,10 @@
     </array>
     <key>NSCameraUsageDescription</key>
     <string>VecturAI needs camera access for AR indoor navigation.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>VecturAI uses the microphone so you can speak to the route assistant instead of typing.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>VecturAI converts your voice into text so the route assistant can understand what you're looking for.</string>
     <key>NSLocalNetworkUsageDescription</key>
     <string>VecturAI connects to the admin API on your local network for draft management.</string>
     <key>NSBonjourServices</key>

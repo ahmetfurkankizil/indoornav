@@ -354,6 +354,25 @@ struct BuildingPackageLoader {
 
     /// Compute a route from the entrance to a specific room.
     static func computeRoute(config: ReviewedConfig, destinationRoomId: String) -> LoadedPackage? {
+        guard let room = config.rooms.first(where: { $0.id == destinationRoomId }) else {
+            print("[PackageLoader] Room \(destinationRoomId) not found in config")
+            return nil
+        }
+        return computeRoute(
+            config: config,
+            destinationNodeId: room.destinationNodeId,
+            destinationLabel: room.displayName
+        )
+    }
+
+    /// Compute a route from the entrance to a specific graph node.
+    /// This variant lets the AI assistant route to semantic POIs that are not
+    /// listed as rooms in `rooms.json` but still map to a valid nav-graph node.
+    static func computeRoute(
+        config: ReviewedConfig,
+        destinationNodeId: String,
+        destinationLabel: String
+    ) -> LoadedPackage? {
         let nodeMap = Dictionary(uniqueKeysWithValues: config.nodes.map { ($0.id, $0) })
         var adjacency: [String: [(String, Double)]] = [:]
         for edge in config.edges {
@@ -365,13 +384,13 @@ struct BuildingPackageLoader {
 
         let startNodeId = config.entranceMarkers.first?.startNodeId ?? config.nodes.first?.id ?? ""
 
-        guard let room = config.rooms.first(where: { $0.id == destinationRoomId }) else {
-            print("[PackageLoader] Room \(destinationRoomId) not found in config")
+        guard nodeMap[destinationNodeId] != nil else {
+            print("[PackageLoader] Destination node \(destinationNodeId) not found in graph")
             return nil
         }
 
-        let destNodeId = room.destinationNodeId
-        let destName = room.displayName
+        let destNodeId = destinationNodeId
+        let destName = destinationLabel
 
         // Trivial case: entrance is the destination itself
         if startNodeId == destNodeId {

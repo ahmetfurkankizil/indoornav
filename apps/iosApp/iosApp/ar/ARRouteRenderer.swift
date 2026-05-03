@@ -1,7 +1,9 @@
 import Foundation
 import UIKit
 import RealityKit
+import Combine
 import simd
+import QuartzCore
 
 // MARK: - Visual design tokens (Aurora Lane)
 //
@@ -427,13 +429,13 @@ class ARRouteRenderer {
     private var arrowEntities: [String: Entity] = [:]
     private var allArrows: [ArrowPlacementData] = []
     private var arrowStates: [String: GuidanceState] = [:]
-    private var arrowFadeInProgress: [String: Float] = [:]
+    private var arrowFadeInStart: [String: CFTimeInterval] = [:]
 
     // Side rail entities (two per subdivision — left + right).
     private var railEntities: [String: Entity] = [:]
     private var allRailChunks: [RailChunkData] = []
     private var railStates: [String: GuidanceState] = [:]
-    private var railFadeInProgress: [String: Float] = [:]
+    private var railFadeInStart: [String: CFTimeInterval] = [:]
 
     // Turn anticipation rings (keyed by parent arrow id)
     private var turnRings: [String: Entity] = [:]
@@ -452,9 +454,20 @@ class ARRouteRenderer {
     private var fadeDistance: Double = 1.5
     private var arrowHeightOffset: Double = 0.05
 
-    /// Time (in pose samples) for a newly revealed entity to scale up to
-    /// full size. Pose timer fires at ~2 Hz so 5 frames ≈ 2.5 s.
-    private let fadeInFrames: Float = 5.0
+    /// Wall-clock duration of the reveal animation for a newly visible
+    /// entity. Driven by a per-frame scene subscription (not the 2 Hz
+    /// pose timer) so growth reads as a smooth ramp rather than chunky
+    /// 20%/step pop-ins that look like frame drops.
+    private let fadeInDuration: CFTimeInterval = 0.55
+
+    /// Per-frame animation ticker. Subscribed in `placeRoute` so fade-in
+    /// interpolates at the display refresh rate.
+    private var sceneUpdateSubscription: Cancellable?
+
+    /// Most recent user-cumulative distance fed into `applyVisibility`,
+    /// cached so the per-frame tick can re-apply `.fading` math without
+    /// needing a fresh pose sample.
+    private var lastUserCumulativeDistance: Double = 0.0
 
     /// Distance range (in meters along the route) within which a turn-ring
     /// should be rendered for its parent arrow.
@@ -509,6 +522,15 @@ class ARRouteRenderer {
         placeTurnRings(arrows: arrows, into: anchor)
 
         arView.scene.addAnchor(anchor)
+
+        // Drive the reveal animation at the display refresh rate so entities
+        // ramp in smoothly between pose updates. Pose ticks only flip the
+        // GuidanceState; this subscription interpolates scale/opacity.
+        sceneUpdateSubscription?.cancel()
+        sceneUpdateSubscription = arView.scene.subscribe(to: SceneEvents.Update.self) { [weak self] _ in
+            self?.tickFadeInAnimations()
+        }
+
         print("[RouteRenderer] Placed \(arrows.count) arrows and \(allRailChunks.count) rail chunks across \(routePoints.count) route points")
     }
 
@@ -522,7 +544,7 @@ class ARRouteRenderer {
 
     private func placeArrowEntities(arrows: [ArrowPlacementData], into anchor: AnchorEntity) {
         self.allArrows = arrows
-        arrowFadeInProgress.removeAll()
+        arrowFadeInStart.removeAll()
 
         for arrow in arrows {
             let entity = createArrowEntity(for: arrow)
@@ -586,7 +608,7 @@ class ARRouteRenderer {
     /// Place two parallel side rails along the route polyline. No center
     /// stripe — the two rails alone define the corridor edge.
     private func placeSideRails(routePoints: [(Double, Double)], into anchor: AnchorEntity) {
-        railFadeInProgress.removeAll()
+        railFadeInStart.removeAll()
         let chunks = buildRailChunks(routePoints: routePoints)
         self.allRailChunks = chunks
 
@@ -726,6 +748,7 @@ class ARRouteRenderer {
         userCumulativeDistance: Double,
         cameraCullCheck: ((Entity) -> Bool)?
     ) {
+        lastUserCumulativeDistance = userCumulativeDistance
         let aheadLimit = userCumulativeDistance + lookaheadDistance
         let behindLimit = userCumulativeDistance - fadeDistance
 
@@ -745,7 +768,7 @@ class ARRouteRenderer {
                 newState = .hidden
             }
 
-            tickFadeIn(id: arrow.id, newState: newState, oldState: oldState, progress: &arrowFadeInProgress)
+            updateFadeInStart(id: arrow.id, newState: newState, oldState: oldState, starts: &arrowFadeInStart)
             applyArrowState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
             arrowStates[arrow.id] = newState
 
@@ -777,9 +800,35 @@ class ARRouteRenderer {
                 newState = .hidden
             }
 
-            tickFadeIn(id: chunk.id, newState: newState, oldState: oldState, progress: &railFadeInProgress)
+            updateFadeInStart(id: chunk.id, newState: newState, oldState: oldState, starts: &railFadeInStart)
             applyRailState(newState, to: entity, chunk: chunk, userDistance: userCumulativeDistance)
             railStates[chunk.id] = newState
+        }
+    }
+
+    /// Per-frame animation tick — re-applies scale/opacity for entities
+    /// whose reveal animation is still in flight so growth reads as a
+    /// smooth ramp between the 2 Hz pose updates.
+    private func tickFadeInAnimations() {
+        let now = CACurrentMediaTime()
+        let userDist = lastUserCumulativeDistance
+
+        for arrow in allArrows {
+            guard let startTime = arrowFadeInStart[arrow.id],
+                  now - startTime < fadeInDuration,
+                  let entity = arrowEntities[arrow.id] else { continue }
+            let state = arrowStates[arrow.id] ?? .hidden
+            guard state != .hidden else { continue }
+            applyArrowState(state, to: entity, arrow: arrow, arrowDistance: arrow.cumulativeDistance, userDistance: userDist)
+        }
+
+        for chunk in allRailChunks {
+            guard let startTime = railFadeInStart[chunk.id],
+                  now - startTime < fadeInDuration,
+                  let entity = railEntities[chunk.id] else { continue }
+            let state = railStates[chunk.id] ?? .hidden
+            guard state != .hidden else { continue }
+            applyRailState(state, to: entity, chunk: chunk, userDistance: userDist)
         }
     }
 
@@ -798,18 +847,32 @@ class ARRouteRenderer {
         return .hidden
     }
 
-    private func tickFadeIn(
+    /// Bookkeeping for the per-entity reveal clock. We only stamp a start
+    /// time on the hidden→visible edge so an entity that re-enters the
+    /// frustum (e.g. after a camera cull) animates in fresh.
+    private func updateFadeInStart(
         id: String,
         newState: GuidanceState,
         oldState: GuidanceState,
-        progress: inout [String: Float]
+        starts: inout [String: CFTimeInterval]
     ) {
         if newState != .hidden {
-            let current = progress[id] ?? 0
-            progress[id] = min(fadeInFrames, current + 1)
+            if oldState == .hidden || starts[id] == nil {
+                starts[id] = CACurrentMediaTime()
+            }
         } else if oldState != .hidden {
-            progress.removeValue(forKey: id)
+            starts.removeValue(forKey: id)
         }
+    }
+
+    /// Normalized 0…1 reveal progress for an entity, shaped with an
+    /// ease-out cubic so growth is snappy up front and lands gently.
+    private func fadeInProgress(startTime: CFTimeInterval?) -> Float {
+        guard let startTime = startTime else { return 0 }
+        let elapsed = CACurrentMediaTime() - startTime
+        let linear = max(0.0, min(1.0, elapsed / fadeInDuration))
+        let eased = 1.0 - pow(1.0 - linear, 3.0)
+        return Float(eased)
     }
 
     // MARK: - State application
@@ -823,14 +886,14 @@ class ARRouteRenderer {
     ) {
         switch state {
         case .active:
-            let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
+            let fadeIn = fadeInProgress(startTime: arrowFadeInStart[arrow.id])
             entity.scale = baseScale(for: arrow.type) * fadeIn
             setOpacity(entity, opacity: fadeIn)
 
         case .fading:
             let behind = userDistance - arrowDistance
             let t = max(0, min(1, behind / fadeDistance))
-            let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
+            let fadeIn = fadeInProgress(startTime: arrowFadeInStart[arrow.id])
             let opacity = Float(1.0 - t * 0.85) * fadeIn
             let scale = Float(1.0 - t * 0.2) * fadeIn
             entity.scale = baseScale(for: arrow.type) * scale
@@ -853,14 +916,14 @@ class ARRouteRenderer {
 
         switch state {
         case .active:
-            let fadeIn = (railFadeInProgress[chunk.id] ?? fadeInFrames) / fadeInFrames
+            let fadeIn = fadeInProgress(startTime: railFadeInStart[chunk.id])
             entity.scale = SIMD3<Float>(fadeIn, fadeIn, lengthScale * fadeIn)
             setOpacity(entity, opacity: fadeIn)
 
         case .fading:
             let behind = userDistance - chunk.cumulativeMid
             let t = max(0, min(1, behind / fadeDistance))
-            let fadeIn = (railFadeInProgress[chunk.id] ?? fadeInFrames) / fadeInFrames
+            let fadeIn = fadeInProgress(startTime: railFadeInStart[chunk.id])
             let opacity = Float(1.0 - t * 0.85) * fadeIn
             let widthScale = Float(1.0 - t * 0.15) * fadeIn
             entity.scale = SIMD3<Float>(widthScale, widthScale, lengthScale * fadeIn)
@@ -914,8 +977,8 @@ class ARRouteRenderer {
             ring.scale = .zero
         }
 
-        arrowFadeInProgress.removeAll()
-        railFadeInProgress.removeAll()
+        arrowFadeInStart.removeAll()
+        railFadeInStart.removeAll()
 
         // Swap the beacon tint to the warm arrival glow and scale it up.
         if let destination = destinationEntity {
@@ -926,6 +989,9 @@ class ARRouteRenderer {
 
     /// Remove all route entities from the scene.
     func clearRoute(from arView: ARView) {
+        sceneUpdateSubscription?.cancel()
+        sceneUpdateSubscription = nil
+
         if let anchor = routeAnchor {
             arView.scene.removeAnchor(anchor)
         }
@@ -934,15 +1000,16 @@ class ARRouteRenderer {
         arrowEntities.removeAll()
         arrowStates.removeAll()
         allArrows.removeAll()
-        arrowFadeInProgress.removeAll()
+        arrowFadeInStart.removeAll()
 
         railEntities.removeAll()
         railStates.removeAll()
         allRailChunks.removeAll()
-        railFadeInProgress.removeAll()
+        railFadeInStart.removeAll()
 
         turnRings.removeAll()
         destinationEntity = nil
+        lastUserCumulativeDistance = 0.0
     }
 
     // MARK: - Opacity propagation

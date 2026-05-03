@@ -32,6 +32,19 @@
 		R5A5B5C5D5E5F5A5B5C5D5E5 /* route_rendering.json in Resources */ = {isa = PBXBuildFile; fileRef = R5A5B5C5D5E5F5A5B5C5D5E6 /* route_rendering.json */; };
 		S1A1B1C1D1E1F1A1B1C1D1E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */; };
 		VT01VT01VT01VT01VT01VT01 /* VecturTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */; };
+		AI01AI01AI01AI01AI01AI01 /* AiRouteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI11AI11AI11AI11AI11AI11 /* AiRouteModels.swift */; };
+		AI02AI02AI02AI02AI02AI02 /* SemanticPoiCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI12AI12AI12AI12AI12AI12 /* SemanticPoiCatalog.swift */; };
+		AI03AI03AI03AI03AI03AI03 /* RouteAgentTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI13AI13AI13AI13AI13AI13 /* RouteAgentTools.swift */; };
+		AI04AI04AI04AI04AI04AI04 /* AiRouteAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI14AI14AI14AI14AI14AI14 /* AiRouteAgent.swift */; };
+		AI05AI05AI05AI05AI05AI05 /* MockAiRouteAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI15AI15AI15AI15AI15AI15 /* MockAiRouteAgent.swift */; };
+		AI06AI06AI06AI06AI06AI06 /* BackendGptRouteAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI16AI16AI16AI16AI16AI16 /* BackendGptRouteAgent.swift */; };
+		AI07AI07AI07AI07AI07AI07 /* VoiceInputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI17AI17AI17AI17AI17AI17 /* VoiceInputManager.swift */; };
+		AI08AI08AI08AI08AI08AI08 /* AiAssistantViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI18AI18AI18AI18AI18AI18 /* AiAssistantViewModel.swift */; };
+		AI09AI09AI09AI09AI09AI09 /* AiAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI19AI19AI19AI19AI19AI19 /* AiAssistantView.swift */; };
+		AI10AI10AI10AI10AI10AI10 /* semantic_pois.json in Resources */ = {isa = PBXBuildFile; fileRef = AI20AI20AI20AI20AI20AI20 /* semantic_pois.json */; };
+		AI22AI22AI22AI22AI22AI22 /* AiAssistantDemoChecks.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI23AI23AI23AI23AI23AI23 /* AiAssistantDemoChecks.swift */; };
+		AI24AI24AI24AI24AI24AI24 /* MockPromptBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI25AI25AI25AI25AI25AI25 /* MockPromptBank.swift */; };
+		AI26AI26AI26AI26AI26AI26 /* AssistantConfirmationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AI27AI27AI27AI27AI27AI27 /* AssistantConfirmationOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +76,19 @@
 		R5A5B5C5D5E5F5A5B5C5D5E6 /* route_rendering.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = route_rendering.json; path = "iosApp/reviewed-package/route_rendering.json"; sourceTree = "<group>"; };
 		S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = iosApp/Assets.xcassets; sourceTree = "<group>"; };
 		VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VecturTheme.swift; path = iosApp/VecturTheme.swift; sourceTree = "<group>"; };
+		AI11AI11AI11AI11AI11AI11 /* AiRouteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AiRouteModels.swift; path = iosApp/ai/AiRouteModels.swift; sourceTree = "<group>"; };
+		AI12AI12AI12AI12AI12AI12 /* SemanticPoiCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SemanticPoiCatalog.swift; path = iosApp/ai/SemanticPoiCatalog.swift; sourceTree = "<group>"; };
+		AI13AI13AI13AI13AI13AI13 /* RouteAgentTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RouteAgentTools.swift; path = iosApp/ai/RouteAgentTools.swift; sourceTree = "<group>"; };
+		AI14AI14AI14AI14AI14AI14 /* AiRouteAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AiRouteAgent.swift; path = iosApp/ai/AiRouteAgent.swift; sourceTree = "<group>"; };
+		AI15AI15AI15AI15AI15AI15 /* MockAiRouteAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockAiRouteAgent.swift; path = iosApp/ai/MockAiRouteAgent.swift; sourceTree = "<group>"; };
+		AI16AI16AI16AI16AI16AI16 /* BackendGptRouteAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackendGptRouteAgent.swift; path = iosApp/ai/BackendGptRouteAgent.swift; sourceTree = "<group>"; };
+		AI17AI17AI17AI17AI17AI17 /* VoiceInputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VoiceInputManager.swift; path = iosApp/ai/VoiceInputManager.swift; sourceTree = "<group>"; };
+		AI18AI18AI18AI18AI18AI18 /* AiAssistantViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AiAssistantViewModel.swift; path = iosApp/ai/AiAssistantViewModel.swift; sourceTree = "<group>"; };
+		AI19AI19AI19AI19AI19AI19 /* AiAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AiAssistantView.swift; path = iosApp/ai/AiAssistantView.swift; sourceTree = "<group>"; };
+		AI20AI20AI20AI20AI20AI20 /* semantic_pois.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = semantic_pois.json; path = "iosApp/reviewed-package/semantic_pois.json"; sourceTree = "<group>"; };
+		AI23AI23AI23AI23AI23AI23 /* AiAssistantDemoChecks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AiAssistantDemoChecks.swift; path = iosApp/ai/AiAssistantDemoChecks.swift; sourceTree = "<group>"; };
+		AI25AI25AI25AI25AI25AI25 /* MockPromptBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockPromptBank.swift; path = iosApp/ai/MockPromptBank.swift; sourceTree = "<group>"; };
+		AI27AI27AI27AI27AI27AI27 /* AssistantConfirmationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AssistantConfirmationOverlay.swift; path = iosApp/ai/AssistantConfirmationOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +131,25 @@
 			name = ar;
 			sourceTree = "<group>";
 		};
+		AI21AI21AI21AI21AI21AI21 /* ai */ = {
+			isa = PBXGroup;
+			children = (
+				AI11AI11AI11AI11AI11AI11 /* AiRouteModels.swift */,
+				AI12AI12AI12AI12AI12AI12 /* SemanticPoiCatalog.swift */,
+				AI13AI13AI13AI13AI13AI13 /* RouteAgentTools.swift */,
+				AI14AI14AI14AI14AI14AI14 /* AiRouteAgent.swift */,
+				AI15AI15AI15AI15AI15AI15 /* MockAiRouteAgent.swift */,
+				AI16AI16AI16AI16AI16AI16 /* BackendGptRouteAgent.swift */,
+				AI17AI17AI17AI17AI17AI17 /* VoiceInputManager.swift */,
+				AI18AI18AI18AI18AI18AI18 /* AiAssistantViewModel.swift */,
+				AI19AI19AI19AI19AI19AI19 /* AiAssistantView.swift */,
+				AI25AI25AI25AI25AI25AI25 /* MockPromptBank.swift */,
+				AI27AI27AI27AI27AI27AI27 /* AssistantConfirmationOverlay.swift */,
+				AI23AI23AI23AI23AI23AI23 /* AiAssistantDemoChecks.swift */,
+			);
+			name = ai;
+			sourceTree = "<group>";
+		};
 		AA000005AA000005AA000005 = {
 			isa = PBXGroup;
 			children = (
@@ -118,6 +163,7 @@
 				VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */,
 				HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */,
 				AA000004AA000004AA000004 /* ar */,
+				AI21AI21AI21AI21AI21AI21 /* ai */,
 				AD07AD07AD07AD07AD07AD07 /* admin */,
 				S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */,
 				R6A6B6C6D6E6F6A6B6C6D6E6 /* reviewed-package */,
@@ -146,6 +192,7 @@
 				R3A3B3C3D3E3F3A3B3C3D3E4 /* nav_graph.json */,
 				R4A4B4C4D4E4F4A4B4C4D4E5 /* entrance_markers.json */,
 				R5A5B5C5D5E5F5A5B5C5D5E6 /* route_rendering.json */,
+				AI20AI20AI20AI20AI20AI20 /* semantic_pois.json */,
 			);
 			name = "reviewed-package";
 			sourceTree = "<group>";
@@ -213,6 +260,7 @@
 				R3A3B3C3D3E3F3A3B3C3D3E3 /* nav_graph.json in Resources */,
 				R4A4B4C4D4E4F4A4B4C4D4E4 /* entrance_markers.json in Resources */,
 				R5A5B5C5D5E5F5A5B5C5D5E5 /* route_rendering.json in Resources */,
+				AI10AI10AI10AI10AI10AI10 /* semantic_pois.json in Resources */,
 				S1A1B1C1D1E1F1A1B1C1D1E1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -243,6 +291,18 @@
 				AD03AD03AD03AD03AD03AD03 /* AdminDraftJobsView.swift in Sources */,
 				AD05AD05AD05AD05AD05AD05 /* AdminJobDetailView.swift in Sources */,
 				AD07AD08AD07AD08AD07AD08 /* AdminDraftReviewView.swift in Sources */,
+				AI01AI01AI01AI01AI01AI01 /* AiRouteModels.swift in Sources */,
+				AI02AI02AI02AI02AI02AI02 /* SemanticPoiCatalog.swift in Sources */,
+				AI03AI03AI03AI03AI03AI03 /* RouteAgentTools.swift in Sources */,
+				AI04AI04AI04AI04AI04AI04 /* AiRouteAgent.swift in Sources */,
+				AI05AI05AI05AI05AI05AI05 /* MockAiRouteAgent.swift in Sources */,
+				AI06AI06AI06AI06AI06AI06 /* BackendGptRouteAgent.swift in Sources */,
+				AI07AI07AI07AI07AI07AI07 /* VoiceInputManager.swift in Sources */,
+				AI08AI08AI08AI08AI08AI08 /* AiAssistantViewModel.swift in Sources */,
+				AI09AI09AI09AI09AI09AI09 /* AiAssistantView.swift in Sources */,
+				AI22AI22AI22AI22AI22AI22 /* AiAssistantDemoChecks.swift in Sources */,
+				AI24AI24AI24AI24AI24AI24 /* MockPromptBank.swift in Sources */,
+				AI26AI26AI26AI26AI26AI26 /* AssistantConfirmationOverlay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -204,12 +204,14 @@ struct VecturStatPill: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .bold))
-            .tracking(1.0)
+            .font(.system(size: 10, weight: .heavy))
+            .tracking(0.6)
             .textCase(.uppercase)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .foregroundStyle(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
             .background(color.opacity(0.15))
             .overlay(Capsule().stroke(color.opacity(0.42), lineWidth: 1))
             .clipShape(Capsule())

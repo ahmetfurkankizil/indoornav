@@ -2,11 +2,18 @@ import SwiftUI
 
 /// Destination selection screen.
 /// Rooms are grouped by category while browsing and shown as a flat list while searching.
+/// Also hosts the conversational AI route assistant (`AiAssistantView`).
 struct DestinationSelectView: View {
     @ObservedObject var flow: NavigationFlowModel
+    @StateObject private var assistantViewModel: AiAssistantViewModel
     @State private var searchText = ""
     @State private var selectedFilter: DestinationFilter = .all
     @FocusState private var searchFocused: Bool
+
+    init(flow: NavigationFlowModel) {
+        self.flow = flow
+        _assistantViewModel = StateObject(wrappedValue: AiAssistantViewModel(flow: flow))
+    }
 
     private var orderedRooms: [BuildingPackageLoader.PackageRoom] {
         flow.availableRooms.sorted { destinationSortIndex($0.id) < destinationSortIndex($1.id) }
@@ -87,6 +94,19 @@ struct DestinationSelectView: View {
             }
             .safeAreaPadding(.top)
             .safeAreaPadding(.bottom)
+
+            if let result = assistantViewModel.assistantResult {
+                AssistantConfirmationOverlay(
+                    result: result,
+                    onConfirm: { assistantViewModel.acceptAndStartNavigation() },
+                    onPickAlternative: { candidate in
+                        assistantViewModel.chooseAlternativeCandidate(candidate)
+                    },
+                    onCancel: { assistantViewModel.cancel() }
+                )
+                .transition(.opacity)
+                .zIndex(10)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(VecturTheme.canvas)
@@ -95,6 +115,10 @@ struct DestinationSelectView: View {
     private var roomScroll: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 18) {
+                if assistantViewModel.isAssistantAvailable {
+                    AiAssistantView(viewModel: assistantViewModel)
+                }
+
                 if searchText.isEmpty && selectedFilter == .all && !recentRooms.isEmpty {
                     VecturSectionHeader(title: "Recently Visited")
                     ScrollView(.horizontal, showsIndicators: false) {

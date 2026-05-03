@@ -175,6 +175,43 @@ class NavigationFlowModel: ObservableObject {
         state = .routePreview
     }
 
+    /// Confirm a destination produced by the AI route assistant.
+    ///
+    /// The assistant resolves a request to a real graph node (it never invents
+    /// coordinates). When the picked POI also corresponds to a row in
+    /// `rooms.json` we route through `selectDestination(_:)` so the existing
+    /// preview/AR flow is exercised with no special-casing. Otherwise we build
+    /// a synthetic `PackageRoom` anchored to the same node so route preview
+    /// still has a name + node to render.
+    func selectAssistantDestination(
+        displayName: String,
+        nodeId: String,
+        roomId: String?,
+        category: String?
+    ) {
+        guard let config = reviewedConfig else { return }
+        if let roomId, let existing = config.rooms.first(where: { $0.id == roomId }) {
+            selectDestination(existing)
+            return
+        }
+        let synthetic = BuildingPackageLoader.PackageRoom(
+            id: "ai-\(nodeId)",
+            displayName: displayName,
+            destinationNodeId: nodeId,
+            category: category,
+            description: nil,
+            floorId: nil,
+            floorName: nil
+        )
+        selectedRoom = synthetic
+        routePackage = BuildingPackageLoader.computeRoute(
+            config: config,
+            destinationNodeId: nodeId,
+            destinationLabel: displayName
+        )
+        state = .routePreview
+    }
+
     func startNavigation() {
         guard selectedRoom != nil, routePackage != nil else { return }
         state = .arNavigation
