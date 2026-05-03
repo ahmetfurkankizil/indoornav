@@ -17,6 +17,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -83,6 +84,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -367,7 +369,7 @@ fun DestinationSelectScreen(
 ) {
     val session by flowModel.session.collectAsState()
     var searchText by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf(DestinationFilter.All) }
+    var selectedCategory by remember { mutableStateOf("All") }
     val listState = rememberLazyListState()
     val collapse = (listState.firstVisibleItemScrollOffset / 160f).coerceIn(0f, 1f)
     val searchHeight by animateDpAsState(
@@ -377,12 +379,31 @@ fun DestinationSelectScreen(
     )
     val rooms = flowModel.availableRooms
     val orderedRooms = remember(rooms) { rooms.sortedBy { destinationSortIndex(it.id) } }
+    
+    // Filter out the "other" point (if selecting destination, hide origin; if selecting origin, hide destination)
     val filteredRooms = orderedRooms.filter { room ->
+        val isOtherPoint = if (session.selectingOrigin) {
+            room.id == session.selectedRoom?.id
+        } else {
+            // Hide the active origin: either the manually selected room or the scanned entrance node
+            room.id == session.selectedOriginRoom?.id || 
+            room.id == session.validatedEntranceMarker?.startNodeId ||
+            room.category?.lowercase() == "entrance"
+        }
+
         val matchesSearch = searchText.isBlank() ||
             room.displayName.contains(searchText, ignoreCase = true) ||
             room.description?.contains(searchText, ignoreCase = true) == true ||
             room.category?.contains(searchText, ignoreCase = true) == true
-        matchesSearch && selectedFilter.matches(room)
+        
+        val matchesCategory = selectedCategory == "All" || 
+            displayNameForCategory(room.category ?: "").equals(selectedCategory, ignoreCase = true)
+        
+        !isOtherPoint && matchesSearch && matchesCategory
+    }
+
+    val dynamicCategories = remember(rooms) {
+        listOf("All") + rooms.mapNotNull { it.category?.let { c -> displayNameForCategory(c) } }.distinct().sorted()
     }
     val groupedFilteredRooms = remember(filteredRooms, searchText) {
         if (searchText.isBlank()) groupedRooms(filteredRooms) else emptyList()
@@ -396,14 +417,14 @@ fun DestinationSelectScreen(
             rooms.firstOrNull { it.id == "fameo-cafe" },
         ).ifEmpty { rooms.take(2) }
     }
-    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val originName = session.selectedOriginRoom?.displayName ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(VecturaiColors.SurfaceCanvas),
     ) {
-        AuroraBackground(intensity = rememberAuroraIntensity())
+        // AuroraBackground removed for better scrolling performance
 
         Column(
             modifier = Modifier
@@ -422,8 +443,10 @@ fun DestinationSelectScreen(
                 Spacer(Modifier.height(Spacing.lg))
                 DestinationHeader(
                     originName = originName,
+                    selectingOrigin = session.selectingOrigin,
                     collapse = collapse,
                     onCancel = onCancel,
+                    onChangeOrigin = { flowModel.toggleSelectingOrigin(true) }
                 )
                 Spacer(Modifier.height(Spacing.md))
                 SearchField(
@@ -433,8 +456,9 @@ fun DestinationSelectScreen(
                 )
                 Spacer(Modifier.height(Spacing.sm))
                 DestinationFilterRow(
-                    selectedFilter = selectedFilter,
-                    onSelect = { selectedFilter = it },
+                    categories = dynamicCategories,
+                    selectedCategory = selectedCategory,
+                    onSelect = { selectedCategory = it },
                 )
             }
 
@@ -451,7 +475,7 @@ fun DestinationSelectScreen(
                     SkeletonDestinationRows()
                 }
 
-                if (searchText.isBlank() && selectedFilter == DestinationFilter.All && recentRooms.isNotEmpty()) {
+                if (searchText.isBlank() && selectedCategory == "All" && recentRooms.isNotEmpty()) {
                     Spacer(Modifier.height(Spacing.xl))
                     SectionHeader("RECENTLY VISITED")
                     Spacer(Modifier.height(Spacing.sm))
@@ -468,7 +492,9 @@ fun DestinationSelectScreen(
 
                 Spacer(Modifier.height(Spacing.xl))
                 SectionHeader(
-                    title = if (searchText.isBlank()) "LOCATIONS" else "SEARCH RESULTS",
+                    title = if (searchText.isBlank()) {
+                        if (session.selectingOrigin) "STARTING POINT" else "LOCATIONS"
+                    } else "SEARCH RESULTS",
                     trailing = "${filteredRooms.size} places",
                 )
                 Spacer(Modifier.height(Spacing.xs))
@@ -476,7 +502,7 @@ fun DestinationSelectScreen(
 
             if (filteredRooms.isEmpty() && rooms.isNotEmpty()) {
                 item {
-                    EmptyRoomsState(searchText)
+                    EmptyRoomsState(searchText, selectedCategory)
                 }
             } else if (groupedFilteredRooms.isNotEmpty()) {
                 groupedFilteredRooms.forEach { (category, categoryRooms) ->
@@ -488,8 +514,11 @@ fun DestinationSelectScreen(
                     items(categoryRooms, key = { it.id }) { room ->
                         DestinationRow(
                             room = room,
-                            routeSummary = routeSummaries[room.id],
-                            onClick = { flowModel.selectDestination(room) },
+                            routeSummary = if (session.selectingOrigin) null else routeSummaries[room.id],
+                            onClick = { 
+                                if (session.selectingOrigin) flowModel.selectOrigin(room)
+                                else flowModel.selectDestination(room)
+                            },
                         )
                     }
                 }
@@ -514,7 +543,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     val distance = routePackage?.totalDistance ?: 0.0
     val routeStepCount = routePackage?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
     val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
-    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val originName = session.selectedOriginRoom?.displayName ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
     val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
     val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
     val walkingMinutes = if (distance > 0.0) ceil((distance / 1.2) / 60.0).toInt().coerceAtLeast(1) else 1
@@ -551,13 +580,15 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    val buildingName = session.reviewedConfig?.manifest?.buildingName ?: "Building"
+                    val floorName = session.selectedRoom?.floorName ?: "Floor"
                     Text(
-                        text = "Building A - Floor G",
+                        text = "$buildingName - $floorName",
                         color = VecturaiColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
-                StatPill(text = "Floor G")
+                StatPill(text = session.selectedRoom?.floorName ?: "Floor")
             }
 
             Spacer(Modifier.height(Spacing.xl))
@@ -570,6 +601,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 RouteHeroCard(
+                    session = session,
                     originName = originName,
                     destinationName = destinationName,
                     distanceText = distanceText,
@@ -605,7 +637,12 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
 }
 
 @Composable
-fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
+fun EntranceConfirmedSheet(
+    entranceName: String,
+    buildingName: String,
+    floorName: String,
+    onContinue: () -> Unit,
+) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
     AnimatedVisibility(
@@ -638,7 +675,7 @@ fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
 
                     Spacer(Modifier.height(Spacing.lg))
 
-                    StatPill(text = "Building A - Floor G", color = VecturaiColors.AccentGreen)
+                    StatPill(text = "$buildingName - $floorName", color = VecturaiColors.AccentGreen)
 
                     Spacer(Modifier.height(Spacing.md))
 
@@ -650,7 +687,7 @@ fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
                     )
                     Spacer(Modifier.height(Spacing.xs))
                     Text(
-                        text = "$entranceName - Building A - Floor G",
+                        text = "$entranceName - $buildingName - $floorName",
                         color = VecturaiColors.TextMuted,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
@@ -688,7 +725,7 @@ fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
-                                    text = "Ground Floor - Building A",
+                                    text = "$floorName - $buildingName",
                                     color = VecturaiColors.TextMuted,
                                     style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 1,
@@ -709,27 +746,13 @@ fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
     }
 }
 
-private enum class DestinationFilter(val label: String) {
-    All("All"),
-    Rooms("Rooms"),
-    Labs("Labs"),
-    Food("Food"),
-    Services("Services");
-
-    fun matches(room: AndroidReviewedPackageLoader.PackageRoom): Boolean = when (this) {
-        All -> true
-        Rooms -> room.category == "classroom" || room.category == "office"
-        Labs -> room.category == "lab"
-        Food -> room.category == "cafe" || room.category == "kitchen"
-        Services -> room.category == "toilet" || room.category == "vertical_transport"
-    }
-}
-
 @Composable
 private fun DestinationHeader(
     originName: String,
+    selectingOrigin: Boolean,
     collapse: Float,
     onCancel: () -> Unit,
+    onChangeOrigin: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconChip(
@@ -740,9 +763,9 @@ private fun DestinationHeader(
         Spacer(Modifier.width(Spacing.sm))
         Column(Modifier.weight(1f)) {
             Text(
-                text = if (collapse > 0.5f) "Destinations" else "Where to?",
+                text = "Where to?",
                 color = VecturaiColors.TextPrimary,
-                style = if (collapse > 0.5f) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -754,12 +777,24 @@ private fun DestinationHeader(
                 )
                 Spacer(Modifier.width(Spacing.xs))
                 Text(
-                    text = "From $originName",
-                    color = VecturaiColors.TextMuted,
+                    text = if (selectingOrigin) "Select starting point" else "From $originName",
+                    color = if (selectingOrigin) VecturaiColors.AccentCyan else VecturaiColors.TextMuted,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+                if (!selectingOrigin) {
+                    Text(
+                        text = "Change",
+                        color = VecturaiColors.AccentCyan,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable { onChangeOrigin() }
+                            .padding(horizontal = Spacing.sm, vertical = 2.dp)
+                    )
+                }
             }
         }
     }
@@ -826,14 +861,14 @@ private fun SearchField(
 
 @Composable
 private fun DestinationFilterRow(
-    selectedFilter: DestinationFilter,
-    onSelect: (DestinationFilter) -> Unit,
+    categories: List<String>,
+    selectedCategory: String,
+    onSelect: (String) -> Unit,
 ) {
     val density = LocalDensity.current
-    // Hardcoded slot widths can't track variable chip text; measure each chip and
-    // animate the underline to the selection's actual bounds.
-    val chipBounds = remember { mutableStateMapOf<DestinationFilter, Pair<Int, Int>>() }
-    val target = chipBounds[selectedFilter]
+    val chipBounds = remember { mutableStateMapOf<String, Pair<Int, Int>>() }
+    val target = chipBounds[selectedCategory]
+    
     val animatedOffsetPx by animateIntAsState(
         targetValue = target?.first ?: 0,
         animationSpec = tween(220, easing = FastOutSlowInEasing),
@@ -844,21 +879,22 @@ private fun DestinationFilterRow(
         animationSpec = tween(220, easing = FastOutSlowInEasing),
         label = "filterIndicatorWidth",
     )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            DestinationFilter.entries.forEach { filter ->
+            categories.forEach { category ->
                 VecturaiFilterChip(
-                    text = filter.label,
-                    selected = selectedFilter == filter,
-                    onClick = { onSelect(filter) },
+                    text = category,
+                    selected = selectedCategory == category,
+                    onClick = { onSelect(category) },
                     modifier = Modifier.onGloballyPositioned { coords ->
                         val parent = coords.parentLayoutCoordinates ?: return@onGloballyPositioned
                         val origin = parent.localPositionOf(coords, Offset.Zero)
-                        chipBounds[filter] = origin.x.roundToInt() to coords.size.width
+                        chipBounds[category] = origin.x.roundToInt() to coords.size.width
                     },
                 )
             }
@@ -1020,11 +1056,11 @@ private fun WalkTimePill(routeSummary: ArCameraFlowViewModel.RouteSummary?) {
 }
 
 @Composable
-private fun EmptyRoomsState(searchText: String) {
+private fun EmptyRoomsState(searchText: String, selectedCategory: String) {
     val message = if (searchText.isBlank()) {
-        "No destinations in this filter"
+        if (selectedCategory == "All") "No destinations found" else "No $selectedCategory found here"
     } else {
-        "No rooms match \"$searchText\""
+        "No results for \"$searchText\""
     }
     Column(
         modifier = Modifier
@@ -1106,13 +1142,6 @@ private fun RouteReadyCard() {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
-                    text = "Start at the entrance poster",
-                    color = VecturaiColors.TextMuted,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
             }
         }
     }
@@ -1120,6 +1149,7 @@ private fun RouteReadyCard() {
 
 @Composable
 private fun RouteHeroCard(
+    session: ArCameraFlowViewModel.SessionData,
     originName: String,
     destinationName: String,
     distanceText: String,
@@ -1136,15 +1166,21 @@ private fun RouteHeroCard(
                 style = VecturaiTypography.numericDisplay(),
                 textAlign = TextAlign.Center,
             )
+            val floorName = session.selectedRoom?.floorName ?: "Floor"
             Text(
-                text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - Ground Floor",
+                text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - $floorName",
                 color = VecturaiColors.TextMuted,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(Spacing.md))
-            RouteMiniStrip(routePoints = routePoints)
-            Spacer(Modifier.height(Spacing.md))
+            Spacer(Modifier.height(Spacing.lg))
+
+            RoutePlanView(
+                session = session,
+                routePoints = routePoints,
+            )
+
+            Spacer(Modifier.height(Spacing.lg))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -1178,6 +1214,176 @@ private fun RouteHeroCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun RoutePlanView(
+    session: ArCameraFlowViewModel.SessionData,
+    routePoints: List<Pair<Double, Double>>,
+) {
+    val config = session.reviewedConfig ?: return
+    val currentFloorId = session.selectedRoom?.floorId
+    
+    // Filter nodes and edges for the current floor to draw the "map"
+    val floorNodes = config.nodes.filter { it.floorId == currentFloorId || currentFloorId == null }
+    val floorEdges = config.edges.filter { edge ->
+        val fromNode = config.nodes.find { it.id == edge.from }
+        fromNode?.floorId == currentFloorId || currentFloorId == null
+    }
+
+    if (floorNodes.isEmpty()) {
+        RouteMiniStrip(routePoints) // Fallback if no floor data
+        return
+    }
+
+    // Bounds calculation for auto-scaling - EXTREME ZOOM to route
+    val padding = 0.5 // Minimal padding for maximum zoom
+    val (minX, maxX, minZ, maxZ) = if (routePoints.isNotEmpty()) {
+        val rMinX = routePoints.minOf { it.first }
+        val rMaxX = routePoints.maxOf { it.first }
+        val rMinZ = routePoints.minOf { it.second }
+        val rMaxZ = routePoints.maxOf { it.second }
+        
+        // Expansion factor: very low to keep it tightly centered
+        val dx = (rMaxX - rMinX).coerceAtLeast(2.0)
+        val dz = (rMaxZ - rMinZ).coerceAtLeast(2.0)
+        
+        listOf(rMinX - dx * 0.05, rMaxX + dx * 0.05, rMinZ - dz * 0.05, rMaxZ + dz * 0.05)
+    } else {
+        listOf(floorNodes.minOf { it.x }, floorNodes.maxOf { it.x }, floorNodes.minOf { it.z }, floorNodes.maxOf { it.z })
+    }
+    
+    val mapWidth = (maxX - minX).coerceAtLeast(1.0)
+    val mapHeight = (maxZ - minZ).coerceAtLeast(1.0)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .clip(VecturaiShapes.Large)
+            .background(VecturaiColors.SurfaceElevated)
+            .border(1.dp, VecturaiColors.BorderSubtle, VecturaiShapes.Large),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            val canvasW = size.width
+            val canvasH = size.height
+            
+            // Tighter scale calculation
+            val scale = kotlin.math.min(canvasW / (mapWidth + padding), canvasH / (mapHeight + padding)).toFloat()
+            
+            val offsetX = (canvasW - mapWidth.toFloat() * scale) / 2f - minX.toFloat() * scale
+            val offsetZ = (canvasH - mapHeight.toFloat() * scale) / 2f - minZ.toFloat() * scale
+
+            fun project(x: Double, z: Double): Offset {
+                return Offset(
+                    x.toFloat() * scale + offsetX,
+                    z.toFloat() * scale + offsetZ
+                )
+            }
+
+            // 1. Draw "Corridors" / Walls (Edges)
+            floorEdges.forEach { edge ->
+                val from = config.nodes.find { it.id == edge.from }
+                val to = config.nodes.find { it.id == edge.to }
+                if (from != null && to != null) {
+                    drawLine(
+                        color = VecturaiColors.BorderStrong.copy(alpha = 0.35f),
+                        start = project(from.x, from.z),
+                        end = project(to.x, to.z),
+                        strokeWidth = 12.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                }
+            }
+
+            // 2. Draw "Room Spaces" and Objects
+            floorNodes.forEach { node ->
+                val pos = project(node.x, node.z)
+                when (node.type) {
+                    "room" -> {
+                        drawCircle(
+                            color = VecturaiColors.SurfaceElevated,
+                            radius = 10.dp.toPx(),
+                            center = pos
+                        )
+                        drawCircle(
+                            color = VecturaiColors.BorderSubtle,
+                            radius = 10.dp.toPx(),
+                            center = pos,
+                            style = Stroke(width = 1.dp.toPx())
+                        )
+                    }
+                    "waypoint" -> {
+                        drawCircle(
+                            color = VecturaiColors.TextMuted.copy(alpha = 0.2f),
+                            radius = 2.dp.toPx(),
+                            center = pos
+                        )
+                    }
+                }
+            }
+
+            // 3. Draw the Active Route
+            if (routePoints.size > 1) {
+                val routePath = androidx.compose.ui.graphics.Path().apply {
+                    val start = project(routePoints[0].first, routePoints[0].second)
+                    moveTo(start.x, start.y)
+                    for (i in 1 until routePoints.size) { project(routePoints[i].first, routePoints[i].second).let { lineTo(it.x, it.y) } }
+                }
+                
+                // Route Glow
+                drawPath(
+                    path = routePath,
+                    color = VecturaiColors.GradientMid.copy(alpha = 0.3f),
+                    style = Stroke(width = 16.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+                )
+                
+                // Route Main Line
+                drawPath(
+                    path = routePath,
+                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                        listOf(VecturaiColors.GradientStart, VecturaiColors.GradientEnd)
+                    ),
+                    style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+                )
+            }
+
+            // 4. Start and End Markers
+            if (routePoints.isNotEmpty()) {
+                val startPos = project(routePoints.first().first, routePoints.first().second)
+                val endPos = project(routePoints.last().first, routePoints.last().second)
+                
+                // Origin
+                drawCircle(VecturaiColors.AccentGreen, radius = 6.dp.toPx(), center = startPos)
+                drawCircle(Color.White, radius = 2.dp.toPx(), center = startPos)
+                
+                // Destination
+                drawCircle(VecturaiColors.AccentAmber, radius = 7.dp.toPx(), center = endPos)
+                drawCircle(Color.White, radius = 3.dp.toPx(), center = endPos)
+            }
+        }
+        
+        // Map Overlay Labels
+        Box(Modifier.fillMaxSize().padding(Spacing.sm)) {
+            Icon(
+                Icons.Default.Map,
+                contentDescription = null,
+                tint = VecturaiColors.TextMuted.copy(alpha = 0.4f),
+                modifier = Modifier.size(20.dp).align(Alignment.TopEnd)
+            )
+            Text(
+                text = session.selectedRoom?.floorName ?: "Floor Plan",
+                style = MaterialTheme.typography.labelSmall,
+                color = VecturaiColors.TextMuted,
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
         }
     }
 }
@@ -1246,7 +1452,7 @@ private fun RouteTimelineCard(
     VecturaiCard {
         SectionHeader(title = "STEPS")
         Spacer(Modifier.height(Spacing.sm))
-        TimelineStep(number = 1, title = "Start from $originName", detail = "Entrance", first = true)
+        TimelineStep(number = 1, title = "Start from $originName", detail = "Starting point", first = true)
         TimelineStep(number = 2, title = "Follow the highlighted route", detail = "$distanceText total")
         TimelineStep(number = 3, title = "Arrive at $destinationName", detail = "Destination", last = true)
     }
@@ -1428,7 +1634,7 @@ private fun DemoBuildingStatus() {
             )
             Spacer(Modifier.width(Spacing.xs))
             Text(
-                text = "Demo building: Building A",
+                text = "Dynamic building data active",
                 color = VecturaiColors.TextMuted,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -1555,16 +1761,9 @@ private val VecturaiBrandIcon: ImageVector = ImageVector.Builder(
 private fun AndroidReviewedPackageLoader.PackageRoom.prettyDestinationName(): String =
     displayName.replace("EA 102", "EA102")
 
-private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String = when (id) {
-    "ea101" -> "Ground Floor - East Wing"
-    "ea102" -> "Ground Floor - East Wing"
-    "cs-lab" -> "Ground Floor - Computer Science"
-    "me-lab" -> "First Floor - Northeast Wing"
-    "fameo-cafe" -> "Ground Floor - East Corridor"
-    "elevators" -> "Ground Floor - Main Core"
-    "west-men-wc", "west-women-wc" -> "Ground Floor - West Wing"
-    "east-men-wc", "east-women-wc" -> "Ground Floor - East Wing"
-    else -> description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(category ?: "other")
+private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String {
+    val floor = floorName ?: "Unknown Floor"
+    return description?.takeIf { it.isNotBlank() } ?: "$floor - ${displayNameForCategory(category ?: "other")}"
 }
 
 private fun destinationSortIndex(id: String): Int = when (id) {
@@ -1589,16 +1788,16 @@ private fun destinationAccent(room: AndroidReviewedPackageLoader.PackageRoom): C
 private fun groupedRooms(
     rooms: List<AndroidReviewedPackageLoader.PackageRoom>,
 ): List<Pair<String, List<AndroidReviewedPackageLoader.PackageRoom>>> {
-    val grouped = rooms.groupBy { it.category ?: "other" }
-    val preferred = listOf(
-        "classroom", "lab", "cafe", "vertical_transport", "toilet",
-        "kitchen", "living_room", "bedroom", "bathroom", "office", "other",
-    )
-    val ordered = preferred.filter { grouped.containsKey(it) } +
-        grouped.keys.filter { it !in preferred }.sorted()
-    return ordered.mapNotNull { category ->
-        grouped[category]?.takeIf { it.isNotEmpty() }?.let { category to it }
-    }
+    // Group by Floor Name/ID ALWAYS to satisfy the floor-based categorization requirement
+    return rooms.sortedWith(compareBy({ it.floorId }, { it.category }, { it.displayName }))
+        .groupBy { it.floorName ?: it.floorId?.let { id -> "Floor $id" } ?: "Other" }
+        .flatMap { (floorName, floorRooms) ->
+            floorRooms.groupBy { it.category ?: "other" }
+                .map { (cat, catRooms) -> 
+                    val catDisplay = displayNameForCategory(cat)
+                    "$floorName • $catDisplay" to catRooms 
+                }
+        }
 }
 
 private fun iconForCategory(category: String?): ImageVector = when (category) {
@@ -1619,18 +1818,16 @@ private fun categoryColor(category: String?): Color = when (category) {
     else -> Color(0xFF64748B)
 }
 
-private fun displayNameForCategory(category: String): String = when (category) {
+private fun displayNameForCategory(category: String): String = when (category.lowercase()) {
+    "room" -> "Rooms"
     "classroom" -> "Classrooms"
     "lab" -> "Laboratories"
     "cafe" -> "Cafe"
-    "vertical_transport" -> "Elevators"
-    "toilet" -> "Restrooms"
-    "kitchen" -> "Kitchen"
-    "living_room", "salon" -> "Living Room"
-    "bedroom" -> "Bedroom"
-    "bathroom" -> "Bathroom"
-    "office" -> "Office"
-    else -> "Other"
+    "vertical_transport", "elevator", "stairs" -> "Elevators/Stairs"
+    "toilet", "restroom" -> "Restrooms"
+    "office" -> "Offices"
+    "entrance" -> "Entrances"
+    else -> category.replaceFirstChar { it.uppercase() }
 }
 
 private fun formatWalkingTime(seconds: Double): String {

@@ -25,7 +25,6 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -84,8 +83,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
@@ -95,6 +96,8 @@ import com.vecturai.android.ar.AndroidArNavigationViewModel
 import com.vecturai.android.ar.ArNavigationUiState
 import com.vecturai.android.ar.NavigationActionIcon
 import com.vecturai.android.ar.TrackingStatusIcon
+import com.vecturai.android.data.AndroidReviewedPackageLoader
+import com.vecturai.android.data.ArrowPlacementData
 import com.vecturai.designsystem.AnimatedNumber
 import com.vecturai.designsystem.GradientText
 import com.vecturai.designsystem.IconChip
@@ -162,11 +165,17 @@ fun ArNavigationScreen(
                         allowSimulation = isEmulator,
                     )
                 }
-                else -> ActiveNavigationOverlay(
-                    uiState = uiState,
-                    onEnd = onEnd,
-                    onAdvance = viewModel::advanceProgress,
-                )
+                else -> {
+                    val pkg = viewModel.getRoutePackage()
+                    val arrowsList: List<ArrowPlacementData> = pkg?.legs?.firstOrNull()?.arrows ?: emptyList()
+                    ActiveNavigationOverlay(
+                        uiState = uiState,
+                        config = pkg?.config,
+                        arrows = arrowsList,
+                        onEnd = onEnd,
+                        onAdvance = viewModel::advanceProgress,
+                    )
+                }
             }
         }
     }
@@ -282,22 +291,38 @@ private fun AlignmentOverlay(
 @Composable
 private fun ActiveNavigationOverlay(
     uiState: ArNavigationUiState,
+    config: AndroidReviewedPackageLoader.ReviewedConfig?,
+    arrows: List<ArrowPlacementData>,
     onEnd: () -> Unit,
     onAdvance: () -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
-        InstructionBanner(
-            uiState,
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(start = Spacing.sm, top = Spacing.xs, end = Spacing.sm),
-        )
-        CompassStrip(
-            bearingDegrees = uiState.relativeBearingDegrees,
-            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
-        )
-        Spacer(Modifier.weight(1f))
-        BottomHud(uiState = uiState, onEnd = onEnd, onAdvance = onAdvance)
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
+            InstructionBanner(
+                uiState,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(start = Spacing.sm, top = Spacing.xs, end = Spacing.sm),
+            )
+            CompassStrip(
+                bearingDegrees = uiState.relativeBearingDegrees,
+                modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
+            )
+            Spacer(Modifier.weight(1f))
+            BottomHud(uiState = uiState, onEnd = onEnd, onAdvance = onAdvance)
+        }
+
+        // CS:GO style Real-time Minimap
+        if (config != null) {
+            NavigationMinimap(
+                uiState = uiState,
+                config = config,
+                arrows = arrows,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 135.dp, end = Spacing.md)
+            )
+        }
     }
 }
 
@@ -468,15 +493,16 @@ private fun RowScope.ProgressEtaCluster(uiState: ArNavigationUiState) {
 
 @Composable
 private fun SwipeToEndRoute(onEnd: () -> Unit, modifier: Modifier = Modifier) {
-    BoxWithConstraints(
+    var maxPx by remember { mutableFloatStateOf(0f) }
+    Box(
         modifier = modifier
             .height(48.dp)
+            .fillMaxWidth()
+            .onSizeChanged { maxPx = it.width.toFloat() }
             .clip(VecturaiShapes.Medium)
             .background(VecturaiColors.AccentRed.copy(alpha = 0.14f))
             .border(BorderStroke(1.dp, VecturaiColors.AccentRed.copy(alpha = 0.34f)), VecturaiShapes.Medium),
     ) {
-        val density = LocalDensity.current
-        val maxPx = with(density) { maxWidth.toPx() }
         var dragPx by remember { mutableFloatStateOf(0f) }
         val state = rememberDraggableState { delta ->
             dragPx = (dragPx + delta).coerceIn(0f, maxPx)
@@ -826,6 +852,11 @@ private fun TurnGlyph(
 
 @Composable
 private fun CompassStrip(bearingDegrees: Float, modifier: Modifier = Modifier) {
+    val animatedBearing by animateFloatAsState(
+        targetValue = bearingDegrees,
+        animationSpec = spring(stiffness = 150f),
+        label = "compassBearing",
+    )
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -836,7 +867,7 @@ private fun CompassStrip(bearingDegrees: Float, modifier: Modifier = Modifier) {
     ) {
         Canvas(Modifier.fillMaxSize()) {
             val centerY = size.height / 2f
-            val offset = (bearingDegrees / 180f) * size.width * 0.35f
+            val offset = (animatedBearing / 180f) * size.width * 0.35f
             for (i in -6..6) {
                 val x = size.width / 2f + i * 28.dp.toPx() - offset
                 drawLine(
@@ -848,6 +879,152 @@ private fun CompassStrip(bearingDegrees: Float, modifier: Modifier = Modifier) {
                 )
             }
             drawCircle(VecturaiColors.AccentCyan, radius = 3.dp.toPx(), center = Offset(size.width / 2f, centerY))
+        }
+    }
+}
+
+@Composable
+private fun NavigationMinimap(
+    uiState: ArNavigationUiState,
+    config: AndroidReviewedPackageLoader.ReviewedConfig,
+    arrows: List<ArrowPlacementData>,
+    modifier: Modifier = Modifier
+) {
+    val zoom = 8f
+    // Synchronized rotation: Align user's forward direction with the top of the minimap
+    val userHeadingDeg = Math.toDegrees(uiState.userHeadingRad).toFloat()
+    val rotationDeg = userHeadingDeg - 180f
+
+    Box(
+        modifier = modifier.size(144.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // 1. Tacticle Compass Frame (Outer Layer)
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val center = Offset(size.width / 2f, size.height / 2f)
+            val outerRadius = size.width / 2f
+            
+            // Frame Background
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(VecturaiColors.SurfaceCanvas.copy(alpha = 0.4f), VecturaiColors.SurfaceElevated.copy(alpha = 0.8f)),
+                    center = center,
+                    radius = outerRadius
+                )
+            )
+            
+            // Frame Border
+            drawCircle(
+                color = VecturaiColors.AccentCyan.copy(alpha = 0.35f),
+                style = Stroke(width = 1.5.dp.toPx()),
+                radius = outerRadius
+            )
+            
+            // Rotating Compass Ticks
+            rotate(rotationDeg, pivot = center) {
+                for (angle in 0 until 360 step 15) {
+                    val isMajor = angle % 90 == 0
+                    val isMid = angle % 45 == 0 && !isMajor
+                    val tickLen = if (isMajor) 12.dp.toPx() else if (isMid) 8.dp.toPx() else 4.dp.toPx()
+                    val rad = Math.toRadians(angle.toDouble() - 90.0)
+                    
+                    val outerR = outerRadius - 3.dp.toPx()
+                    val innerR = outerR - tickLen
+                    
+                    drawLine(
+                        color = if (isMajor) VecturaiColors.AccentCyan else Color.White.copy(alpha = 0.45f),
+                        start = center + Offset(cos(rad).toFloat() * outerR, sin(rad).toFloat() * outerR),
+                        end = center + Offset(cos(rad).toFloat() * innerR, sin(rad).toFloat() * innerR),
+                        strokeWidth = if (isMajor) 2.dp.toPx() else 1.2.dp.toPx()
+                    )
+                }
+            }
+        }
+
+        // 2. Inner Map Circle (Glass Layer)
+        Surface(
+            modifier = Modifier
+                .size(110.dp)
+                .clip(CircleShape),
+            color = VecturaiColors.SurfaceCard.copy(alpha = 0.75f),
+            border = BorderStroke(1.dp, VecturaiColors.AccentCyan.copy(alpha = 0.25f)),
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val userX = uiState.userStableBuildingX.toFloat()
+                val userZ = uiState.userStableBuildingZ.toFloat()
+                
+                rotate(rotationDeg, pivot = center) {
+                    // 1. Draw floor plan layout (Edges)
+                    config.edges.forEach { edge ->
+                        val from = config.nodes.find { it.id == edge.from }
+                        val to = config.nodes.find { it.id == edge.to }
+                        if (from != null && to != null) {
+                            // Unified Mapping: ScreenX = buildingX, ScreenY = buildingZ
+                            // Rotation -180 handles Ahead -> Up (-Y) alignment
+                            val fromDx = from.x.toFloat() - userX
+                            val fromDz = from.z.toFloat() - userZ
+                            val toDx = to.x.toFloat() - userX
+                            val toDz = to.z.toFloat() - userZ
+
+                            drawLine(
+                                color = VecturaiColors.TextDisabled.copy(alpha = 0.25f),
+                                start = center + Offset(fromDx * zoom, fromDz * zoom),
+                                end = center + Offset(toDx * zoom, toDz * zoom),
+                                strokeWidth = 1.5.dp.toPx()
+                            )
+                        }
+                    }
+                    
+                    // 2. Draw Active Route
+                    if (arrows.isNotEmpty()) {
+                        for (i in 0 until arrows.size - 1) {
+                            val a = arrows[i]
+                            val b = arrows[i + 1]
+                            val aDx = a.positionX.toFloat() - userX
+                            val aDz = a.positionZ.toFloat() - userZ
+                            val bDx = b.positionX.toFloat() - userX
+                            val bDz = b.positionZ.toFloat() - userZ
+
+                            drawLine(
+                                color = VecturaiColors.AccentCyan.copy(alpha = 0.85f),
+                                start = center + Offset(aDx * zoom, aDz * zoom),
+                                end = center + Offset(bDx * zoom, bDz * zoom),
+                                strokeWidth = 5.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        }
+                    }
+
+                    // 3. Draw destination nodes
+                    config.nodes.filter { it.type != "turning_point" }.forEach { node ->
+                        val nDx = node.x.toFloat() - userX
+                        val nDz = node.z.toFloat() - userZ
+                        drawCircle(
+                            color = VecturaiColors.TextMuted.copy(alpha = 0.5f),
+                            radius = 2.5.dp.toPx(),
+                            center = center + Offset(nDx * zoom, nDz * zoom)
+                        )
+                    }
+                }
+                
+                // 4. Draw Player Marker (Fixed at center, Amber)
+                drawCircle(
+                    color = VecturaiColors.AccentAmber.copy(alpha = 0.35f),
+                    radius = 12.dp.toPx(),
+                    center = center
+                )
+                
+                drawPath(
+                    path = androidx.compose.ui.graphics.Path().apply {
+                        moveTo(center.x, center.y - 10.dp.toPx())
+                        lineTo(center.x - 7.5.dp.toPx(), center.y + 7.5.dp.toPx())
+                        lineTo(center.x + 7.5.dp.toPx(), center.y + 7.5.dp.toPx())
+                        close()
+                    },
+                    color = VecturaiColors.AccentAmber
+                )
+            }
         }
     }
 }

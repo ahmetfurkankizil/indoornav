@@ -276,14 +276,25 @@ class AndroidReviewedPackageLoader(
         }
         val allEdges = intraFloorEdges + crossFloorEdges
 
-        // Rooms: all nodes with type "room" — tagged with their floor
-        val rooms = allNodes.filter { it.type == "room" }.map { n ->
+        // Rooms: only functional nodes (STRICTLY EXCLUDING all turning points and technical markers)
+        val rooms = allNodes.filter { n ->
+            val t = n.type.lowercase()
+            val label = n.label?.lowercase() ?: ""
+            val id = n.id.lowercase()
+            
+            // Aggressive blacklist for any technical markers
+            val isTechnical = t.contains("turning") || t.contains("waypoint") || t.contains("path") || t == "node" ||
+                             label.contains("turning point") || label.contains("waypoint") ||
+                             id.startsWith("tp") || id.startsWith("wp")
+            
+            !isTechnical
+        }.map { n ->
             val floor = n.floorId?.let { floorInfoMap[it] }
             PackageRoom(
                 id = n.id,
-                displayName = n.label ?: "Room ${n.id.take(4)}",
+                displayName = n.label ?: "${n.type.replaceFirstChar { it.uppercase() }} ${n.id.take(4)}",
                 destinationNodeId = n.id,
-                category = "room",
+                category = n.type,
                 floorId = n.floorId,
                 floorName = floor?.floorName,
             )

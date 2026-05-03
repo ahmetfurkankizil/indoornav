@@ -473,6 +473,16 @@ class AndroidArNavigationViewModel(
             }
         }
 
+        // Compass: Calculate relative bearing to next arrow
+        val nextArrow = currentLeg.arrows.firstOrNull { it.cumulativeDistance > bestDistanceOnPath }
+        val relativeBearing = if (nextArrow != null) {
+            val targetHeadingRad = Math.atan2(nextArrow.positionX - buildingX, nextArrow.positionZ - buildingZ)
+            var relRad = targetHeadingRad - userHeadingRad
+            while (relRad > Math.PI) relRad -= 2.0 * Math.PI
+            while (relRad < -Math.PI) relRad += 2.0 * Math.PI
+            Math.toDegrees(relRad).toFloat()
+        } else 0f
+
         _uiState.update {
             it.copy(
                 isOffPath = isFarFromPath,
@@ -482,6 +492,7 @@ class AndroidArNavigationViewModel(
                 userStableBuildingX = stableX,
                 userStableBuildingZ = stableZ,
                 userHeadingRad = userHeadingRad,
+                relativeBearingDegrees = relativeBearing,
             )
         }
 

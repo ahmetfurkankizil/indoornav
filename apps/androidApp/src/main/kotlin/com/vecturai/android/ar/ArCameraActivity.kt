@@ -200,6 +200,8 @@ class ArCameraActivity : ComponentActivity() {
                 )
                 is ArCameraFlowViewModel.Phase.EntranceConfirmed -> EntranceConfirmedSheet(
                     entranceName = currentPhase.entranceName,
+                    buildingName = currentPhase.buildingName,
+                    floorName = currentPhase.floorName,
                     onContinue = flowModel::proceedToDestinationSelect,
                 )
                 ArCameraFlowViewModel.Phase.DestinationSelect -> DestinationSelectScreen(

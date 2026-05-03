@@ -54,7 +54,11 @@ class ArCameraFlowViewModel(
     sealed interface Phase {
         data object Loading : Phase
         data object QrScan : Phase
-        data class EntranceConfirmed(val entranceName: String) : Phase
+        data class EntranceConfirmed(
+            val entranceName: String,
+            val buildingName: String,
+            val floorName: String,
+        ) : Phase
         data object DestinationSelect : Phase
         data object RoutePreview : Phase
         data object ArNavigation : Phase
@@ -69,6 +73,7 @@ class ArCameraFlowViewModel(
         val validatedEntranceMarker: AndroidReviewedPackageLoader.PackageMarker? = null,
         val reviewedConfig: AndroidReviewedPackageLoader.ReviewedConfig? = null,
         val qrToken: String = "",
+        val selectingOrigin: Boolean = false,
     )
 
     data class RouteSummary(
@@ -163,7 +168,14 @@ class ArCameraFlowViewModel(
 
     fun selectOrigin(room: AndroidReviewedPackageLoader.PackageRoom?) {
         println("[FlowModel] selectOrigin: ${room?.id ?: "null"}")
-        _session.value = _session.value.copy(selectedOriginRoom = room)
+        _session.value = _session.value.copy(
+            selectedOriginRoom = room,
+            selectingOrigin = false
+        )
+    }
+
+    fun toggleSelectingOrigin(selecting: Boolean) {
+        _session.value = _session.value.copy(selectingOrigin = selecting)
     }
 
     fun selectDestination(room: AndroidReviewedPackageLoader.PackageRoom) {
@@ -209,11 +221,23 @@ class ArCameraFlowViewModel(
         val config = _session.value.reviewedConfig ?: return
         val marker = config.entranceMarkers.firstOrNull { it.id == payload.entranceId }
         val displayName = marker?.displayName ?: "Entrance"
+        
+        val buildingName = config.manifest.buildingName
+        val entranceNode = config.nodes.find { it.id == marker?.startNodeId }
+        val floorId = entranceNode?.floorId
+        val floorName = config.rooms.firstOrNull { it.floorId == floorId }?.floorName 
+            ?: floorId?.let { "Floor $it" } 
+            ?: "Unknown Floor"
+
         _session.value = _session.value.copy(
             confirmedEntrance = displayName,
             validatedEntranceMarker = marker,
         )
         _qrDetected.value = true
-        _phase.value = Phase.EntranceConfirmed(displayName)
+        _phase.value = Phase.EntranceConfirmed(
+            entranceName = displayName,
+            buildingName = buildingName,
+            floorName = floorName
+        )
     }
 }
