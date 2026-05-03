@@ -9,6 +9,10 @@ import android.os.VibratorManager
 class AndroidHapticManager(context: Context) {
     var isEnabled: Boolean = true
 
+    companion object {
+        var HapticsEnabled: Boolean = true
+    }
+
     private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         context.getSystemService(VibratorManager::class.java)?.defaultVibrator
     } else {

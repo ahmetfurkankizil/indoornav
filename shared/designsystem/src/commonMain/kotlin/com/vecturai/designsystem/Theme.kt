@@ -20,43 +20,37 @@ private val LightColorScheme = lightColorScheme(
     onSurface = VecturaiColors.OnSurface,
     surfaceVariant = VecturaiColors.SurfaceVariant,
     onSurfaceVariant = VecturaiColors.OnSurfaceVariant,
+    outline = VecturaiColors.BorderSubtle,
     error = VecturaiColors.Error,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = VecturaiColors.PrimaryLight,
-    onPrimary = VecturaiColors.PrimaryDark,
-    primaryContainer = VecturaiColors.Primary,
-    secondary = VecturaiColors.SecondaryLight,
-    onSecondary = VecturaiColors.PrimaryDark,
+    primary = VecturaiColors.Primary,
+    onPrimary = VecturaiColors.OnPrimary,
+    primaryContainer = VecturaiColors.PrimaryDark,
+    secondary = VecturaiColors.AccentCyan,
+    onSecondary = VecturaiColors.SurfaceCanvas,
     secondaryContainer = VecturaiColors.Secondary,
-    tertiary = VecturaiColors.AccentLight,
+    tertiary = VecturaiColors.AccentAmber,
     onTertiary = VecturaiColors.OnAccent,
-    background = VecturaiColors.BackgroundDark,
-    onBackground = VecturaiColors.OnBackgroundDark,
-    surface = VecturaiColors.SurfaceDark,
-    onSurface = VecturaiColors.OnSurfaceDark,
-    surfaceVariant = VecturaiColors.SurfaceVariantDark,
-    onSurfaceVariant = VecturaiColors.OnSurfaceVariant,
-    error = VecturaiColors.Error,
+    background = VecturaiColors.SurfaceCanvas,
+    onBackground = VecturaiColors.TextPrimary,
+    surface = VecturaiColors.SurfaceCard,
+    onSurface = VecturaiColors.TextPrimary,
+    surfaceVariant = VecturaiColors.SurfaceElevated,
+    onSurfaceVariant = VecturaiColors.TextMuted,
+    outline = VecturaiColors.BorderSubtle,
+    error = VecturaiColors.AccentRed,
 )
 
-/**
- * VecturAI Material 3 theme.
- *
- * @param darkTheme Whether to use dark color scheme
- * @param content The themed content
- */
 @Composable
 fun VecturaiTheme(
-    darkTheme: Boolean = false, // TODO: Follow system setting
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = VecturaiTypography,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+        typography = VecturaiTypography.material(),
         content = content,
     )
 }

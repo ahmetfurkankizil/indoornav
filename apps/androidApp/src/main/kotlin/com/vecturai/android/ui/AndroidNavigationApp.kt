@@ -1,14 +1,22 @@
 package com.vecturai.android.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,24 +24,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Elevator
@@ -49,18 +59,19 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,23 +79,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vecturai.android.data.AndroidReviewedPackageLoader
+import com.vecturai.android.ar.AndroidHapticManager
 import com.vecturai.android.navigation.ArCameraFlowViewModel
 import com.vecturai.android.navigation.AndroidNavigationFlowModel
+import com.vecturai.designsystem.AnimatedGradientNumber
+import com.vecturai.designsystem.AnimatedNumber
+import com.vecturai.designsystem.AuroraBackground
+import com.vecturai.designsystem.CategoryBadge
+import com.vecturai.designsystem.GradientText
+import com.vecturai.designsystem.IconChip
+import com.vecturai.designsystem.SectionHeader
+import com.vecturai.designsystem.Spacing
+import com.vecturai.designsystem.StatPill
+import com.vecturai.designsystem.VecturaiBrush
+import com.vecturai.designsystem.VecturaiCard
+import com.vecturai.designsystem.VecturaiColors
+import com.vecturai.designsystem.VecturaiFilterChip
+import com.vecturai.designsystem.VecturaiHapticsGate
+import com.vecturai.designsystem.VecturaiPrimaryButton
+import com.vecturai.designsystem.VecturaiSecondaryButton
+import com.vecturai.designsystem.VecturaiShapes
 import com.vecturai.designsystem.VecturaiTheme
+import com.vecturai.designsystem.VecturaiTypography
+import com.vecturai.designsystem.vecturaiTap
+import kotlinx.coroutines.delay
 import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlin.math.min
 
 @Composable
@@ -95,19 +133,19 @@ fun AndroidNavigationApp(
     val state by flowModel.state.collectAsState()
 
     VecturaiTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            when (val current = state) {
-                AndroidNavigationFlowModel.HomeState.Home -> HomeScreen(
-                    onStartNavigation = onStartNavigation,
-                )
-                is AndroidNavigationFlowModel.HomeState.PackageError -> PackageErrorScreen(
-                    message = current.message,
-                    onRetry = flowModel::retryPackageLoad,
-                )
+        VecturaiHapticsGate(enabled = AndroidHapticManager.HapticsEnabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+            ) {
+                when (val current = state) {
+                    AndroidNavigationFlowModel.HomeState.Home -> HomeScreen(onStartNavigation = onStartNavigation)
+                    is AndroidNavigationFlowModel.HomeState.PackageError -> PackageErrorScreen(
+                        message = current.message,
+                        onRetry = flowModel::retryPackageLoad,
+                    )
+                }
             }
         }
     }
@@ -115,254 +153,161 @@ fun AndroidNavigationApp(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeScreen(
-    onStartNavigation: () -> Unit,
-) {
+private fun HomeScreen(onStartNavigation: () -> Unit) {
     var showAdminTools by remember { mutableStateOf(false) }
+    var gearArmed by remember { mutableStateOf(false) }
+    var activePill by remember { mutableIntStateOf(0) }
+    val reduceMotion = rememberReduceMotion()
+    val intensity = rememberAuroraIntensity()
+    val gearRotation by animateFloatAsState(
+        targetValue = if (gearArmed) 30f else 0f,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "gearRotation",
+    )
+
+    LaunchedEffect(reduceMotion) {
+        if (reduceMotion) return@LaunchedEffect
+        while (true) {
+            delay(2_000)
+            activePill = (activePill + 1) % HomePillLabels.size
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18)),
+            .background(VecturaiColors.SurfaceCanvas),
     ) {
-        DotGridBackground()
+        AuroraBackground(intensity = intensity)
 
-        Box(
+        IconChip(
+            icon = Icons.Default.Settings,
+            contentDescription = "Admin Tools",
+            onClick = {
+                gearArmed = true
+                showAdminTools = true
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
-                .padding(top = 8.dp, end = 16.dp)
-                .size(44.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(Color(0xFF121A28).copy(alpha = 0.92f))
-                .border(1.dp, Color(0xFF253149), RoundedCornerShape(14.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            IconButton(
-                onClick = { showAdminTools = true },
-                modifier = Modifier.size(44.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Admin Tools",
-                    tint = Color(0xFF8C99AD),
-                    modifier = Modifier.size(22.dp),
-                )
-            }
-        }
+                .padding(top = Spacing.xs, end = Spacing.md)
+                .graphicsLayer { rotationZ = gearRotation },
+            tint = VecturaiColors.TextMuted,
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 22.dp),
+                .padding(horizontal = Spacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.weight(1f))
 
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(Color(0xFF148BFF)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    modifier = Modifier.size(43.dp),
-                    tint = Color.White,
-                )
-            }
+            BrandMark(
+                pulsing = !reduceMotion,
+                modifier = Modifier.size(88.dp),
+            )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Spacing.lg))
 
-            Text(
+            GradientText(
                 text = "VecturAI",
-                color = Color.White,
-                fontSize = 31.sp,
-                fontWeight = FontWeight.ExtraBold,
-                lineHeight = 34.sp,
+                style = MaterialTheme.typography.displayLarge,
+                textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Spacing.xs))
             Text(
-                text = "Find any room in seconds.",
-                color = Color(0xFF8994A6),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = "Find your way indoors",
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
             )
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(Spacing.xxl))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FeaturePill("Live AR", Modifier.weight(1f))
-                FeaturePill("Smart Routes", Modifier.weight(1f))
-                FeaturePill("Indoor Maps", Modifier.weight(1f))
+                HomePillLabels.forEachIndexed { index, label ->
+                    FeaturePill(
+                        text = label,
+                        active = activePill == index,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
 
             Spacer(Modifier.weight(1f))
 
-            WelcomePrimaryButton(onClick = onStartNavigation)
+            VecturaiPrimaryButton(
+                text = "Scan Entrance Code",
+                leadingIcon = Icons.Default.QrCodeScanner,
+                onClick = onStartNavigation,
+            )
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Spacing.md))
 
             Text(
-                text = "Scan the QR code at any building entrance",
-                color = Color(0xFF465164),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = "Scan the entrance poster to begin",
+                color = VecturaiColors.TextDisabled,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Spacing.sm))
+            DemoBuildingStatus()
+            Spacer(Modifier.height(Spacing.xl))
         }
     }
 
     if (showAdminTools) {
         ModalBottomSheet(
-            onDismissRequest = { showAdminTools = false },
-            containerColor = Color(0xFF101827),
+            onDismissRequest = {
+                showAdminTools = false
+                gearArmed = false
+            },
+            containerColor = VecturaiColors.SurfaceElevated,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .padding(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF071C33)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = null,
-                            tint = Color(0xFF168BFF),
-                            modifier = Modifier.size(22.dp),
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
+                    BrandMark(pulsing = false, modifier = Modifier.size(48.dp))
+                    Spacer(Modifier.width(Spacing.sm))
                     Column(Modifier.weight(1f)) {
-                        Text(
-                            "Admin Tools",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
+                        Text("Admin Tools", color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.titleLarge)
                         Text(
                             "Draft jobs are not available on this device.",
-                            color = Color(0xFF8A95A8),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            color = VecturaiColors.TextMuted,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFF151F31),
-                    border = BorderStroke(1.dp, Color(0xFF233149)),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                VecturaiCard {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.WorkspacePremium,
                             contentDescription = null,
-                            tint = Color(0xFF2563EB),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp),
                         )
-                        Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(Spacing.sm))
                         Text(
                             "Visitor navigation is ready. Admin review tools stay separate from the demo flow.",
-                            color = Color(0xFFB6BFCE),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            lineHeight = 18.sp,
+                            color = VecturaiColors.TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(Spacing.md))
             }
         }
-    }
-}
-
-@Composable
-private fun DotGridBackground() {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val spacing = 22.dp.toPx()
-        val radius = 0.85.dp.toPx()
-        var x = 10.dp.toPx()
-        while (x < size.width) {
-            var y = 14.dp.toPx()
-            while (y < size.height) {
-                drawCircle(
-                    color = Color(0xFF263750).copy(alpha = 0.36f),
-                    radius = radius,
-                    center = Offset(x, y),
-                )
-                y += spacing
-            }
-            x += spacing
-        }
-    }
-}
-
-@Composable
-private fun FeaturePill(text: String, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(50),
-        color = Color(0xFF071C33).copy(alpha = 0.72f),
-        border = BorderStroke(1.dp, Color(0xFF0B60AE)),
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            color = Color(0xFF238CFF),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-        )
-    }
-}
-
-@Composable
-private fun WelcomePrimaryButton(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF168BFF))
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = Icons.Default.QrCodeScanner,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(22.dp),
-        )
-        Spacer(Modifier.width(12.dp))
-        Text(
-            text = "Scan Entrance Code",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.ExtraBold,
-        )
     }
 }
 
@@ -371,73 +316,50 @@ private fun PackageErrorScreen(message: String, onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18)),
+            .background(VecturaiColors.SurfaceCanvas),
         contentAlignment = Alignment.Center,
     ) {
-        DotGridBackground()
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            shape = RoundedCornerShape(22.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
+        AuroraBackground(intensity = rememberAuroraIntensity())
+        VecturaiCard(
+            modifier = Modifier.padding(Spacing.xl),
         ) {
             Column(
-                modifier = Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color(0xFF3B2A08)),
+                        .clip(VecturaiShapes.Large)
+                        .background(VecturaiColors.AccentAmber.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Default.Warning,
-                        contentDescription = null,
+                        contentDescription = "Unable to load navigation data",
                         modifier = Modifier.size(32.dp),
-                        tint = Color(0xFFF59E0B),
+                        tint = VecturaiColors.AccentAmber,
                     )
                 }
                 Text(
                     "Unable to load navigation data",
-                    color = Color.White,
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                 )
                 Text(
                     message,
                     textAlign = TextAlign.Center,
-                    color = Color(0xFF8A95A8),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Color(0xFF168BFF))
-                        .clickable(role = Role.Button, onClick = onRetry),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Try Again",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
+                VecturaiPrimaryButton(text = "Try Again", onClick = onRetry)
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DestinationSelectScreen(
     flowModel: ArCameraFlowViewModel,
@@ -446,7 +368,13 @@ fun DestinationSelectScreen(
     val session by flowModel.session.collectAsState()
     var searchText by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableStateOf(DestinationFilter.All) }
-    var isSelectingOrigin by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val collapse = (listState.firstVisibleItemScrollOffset / 160f).coerceIn(0f, 1f)
+    val searchHeight by animateDpAsState(
+        targetValue = if (collapse > 0.45f) 44.dp else 54.dp,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "searchCollapse",
+    )
     val rooms = flowModel.availableRooms
     val orderedRooms = remember(rooms) { rooms.sortedBy { destinationSortIndex(it.id) } }
     val filteredRooms = orderedRooms.filter { room ->
@@ -468,169 +396,100 @@ fun DestinationSelectScreen(
             rooms.firstOrNull { it.id == "fameo-cafe" },
         ).ifEmpty { rooms.take(2) }
     }
-    val originName = session.selectedOriginRoom?.displayName 
-        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18)),
+            .background(VecturaiColors.SurfaceCanvas),
     ) {
-        DotGridBackground()
+        AuroraBackground(intensity = rememberAuroraIntensity())
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 22.dp),
-            contentPadding = PaddingValues(bottom = 28.dp),
+                .padding(horizontal = Spacing.xl),
         ) {
-            item {
-                Spacer(Modifier.height(18.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(13.dp))
-                            .background(Color(0xFF121A28))
-                            .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
-                            .clickable(role = Role.Button, onClick = onCancel),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color(0xFF168BFF),
-                            modifier = Modifier.size(21.dp),
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            text = if (isSelectingOrigin) "Select Start" else "Where to?",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 26.sp,
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .clickable { isSelectingOrigin = !isSelectingOrigin }
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isSelectingOrigin) Color(0xFFFFB01A) else Color(0xFF10D978)),
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text(
-                                text = "From $originName",
-                                color = if (isSelectingOrigin) Color(0xFFFFB01A) else Color(0xFF7F8A9D),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Text(
-                                text = if (isSelectingOrigin) "(Cancel)" else "(Change)",
-                                color = Color(0xFF168BFF),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Spacing.sm),
+            ) {
+                Spacer(Modifier.height(Spacing.md))
+                FlowProgressStrip(activeStep = 1)
+                Spacer(Modifier.height(Spacing.lg))
+                DestinationHeader(
+                    originName = originName,
+                    collapse = collapse,
+                    onCancel = onCancel,
+                )
+                Spacer(Modifier.height(Spacing.md))
                 SearchField(
                     value = searchText,
                     onValueChange = { searchText = it },
+                    height = searchHeight,
                 )
+                Spacer(Modifier.height(Spacing.sm))
+                DestinationFilterRow(
+                    selectedFilter = selectedFilter,
+                    onSelect = { selectedFilter = it },
+                )
+            }
 
-                Spacer(Modifier.height(14.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp),
-                ) {
-                    DestinationFilter.entries.forEach { filter ->
-                        DestinationFilterChip(
-                            filter = filter,
-                            selected = selectedFilter == filter,
-                            onClick = { selectedFilter = filter },
-                        )
-                    }
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentPadding = PaddingValues(bottom = Spacing.xxl),
+            ) {
+                item {
+                if (rooms.isEmpty()) {
+                    Spacer(Modifier.height(Spacing.xl))
+                    SkeletonDestinationRows()
                 }
 
                 if (searchText.isBlank() && selectedFilter == DestinationFilter.All && recentRooms.isNotEmpty()) {
-                    Spacer(Modifier.height(18.dp))
-                    SectionLabel("RECENTLY VISITED")
-                    Spacer(Modifier.height(10.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        recentRooms.forEach { room ->
+                    Spacer(Modifier.height(Spacing.xl))
+                    SectionHeader("RECENTLY VISITED")
+                    Spacer(Modifier.height(Spacing.sm))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                        items(recentRooms, key = { it.id }) { room ->
                             RecentDestinationCard(
                                 room = room,
                                 routeSummary = routeSummaries[room.id],
-                                modifier = Modifier.weight(1f),
-                                onClick = { 
-                                    if (isSelectingOrigin) {
-                                        flowModel.selectOrigin(room)
-                                        isSelectingOrigin = false
-                                    } else {
-                                        flowModel.selectDestination(room)
-                                    }
-                                },
+                                onClick = { flowModel.selectDestination(room) },
                             )
                         }
                     }
                 }
 
-                Spacer(Modifier.height(20.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    SectionLabel(if (searchText.isBlank()) "LOCATIONS" else "SEARCH RESULTS")
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        text = "${filteredRooms.size} places",
-                        color = Color(0xFF5C6779),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Spacing.xl))
+                SectionHeader(
+                    title = if (searchText.isBlank()) "LOCATIONS" else "SEARCH RESULTS",
+                    trailing = "${filteredRooms.size} places",
+                )
+                Spacer(Modifier.height(Spacing.xs))
             }
 
-            if (filteredRooms.isEmpty()) {
+            if (filteredRooms.isEmpty() && rooms.isNotEmpty()) {
                 item {
                     EmptyRoomsState(searchText)
                 }
             } else if (groupedFilteredRooms.isNotEmpty()) {
                 groupedFilteredRooms.forEach { (category, categoryRooms) ->
                     item(key = "header-$category") {
-                        Spacer(Modifier.height(10.dp))
-                        SectionLabel(displayNameForCategory(category).uppercase())
-                        Spacer(Modifier.height(2.dp))
+                        Spacer(Modifier.height(Spacing.sm))
+                        SectionHeader(displayNameForCategory(category).uppercase())
+                        Spacer(Modifier.height(Spacing.xs))
                     }
                     items(categoryRooms, key = { it.id }) { room ->
                         DestinationRow(
                             room = room,
                             routeSummary = routeSummaries[room.id],
-                            onClick = { 
-                                if (isSelectingOrigin) {
-                                    flowModel.selectOrigin(room)
-                                    isSelectingOrigin = false
-                                } else {
-                                    flowModel.selectDestination(room)
-                                }
-                            },
+                            onClick = { flowModel.selectDestination(room) },
                         )
                     }
                 }
@@ -639,16 +498,212 @@ fun DestinationSelectScreen(
                     DestinationRow(
                         room = room,
                         routeSummary = routeSummaries[room.id],
-                        onClick = { 
-                            if (isSelectingOrigin) {
-                                flowModel.selectOrigin(room)
-                                isSelectingOrigin = false
-                            } else {
-                                flowModel.selectDestination(room)
-                            }
-                        },
+                        onClick = { flowModel.selectDestination(room) },
                     )
                 }
+            }
+        }
+    }
+}
+}
+
+@Composable
+fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
+    val session by flowModel.session.collectAsState()
+    val routePackage = session.routePackage
+    val distance = routePackage?.totalDistance ?: 0.0
+    val routeStepCount = routePackage?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
+    val destinationName = session.selectedRoom?.prettyDestinationName().orEmpty()
+    val originName = session.confirmedEntrance.ifBlank { "Main Entrance" }
+    val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
+    val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
+    val walkingMinutes = if (distance > 0.0) ceil((distance / 1.2) / 60.0).toInt().coerceAtLeast(1) else 1
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(VecturaiColors.SurfaceCanvas),
+    ) {
+        AuroraBackground(intensity = rememberAuroraIntensity())
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = Spacing.xl),
+        ) {
+            Spacer(Modifier.height(Spacing.md))
+            FlowProgressStrip(activeStep = 2)
+            Spacer(Modifier.height(Spacing.lg))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconChip(
+                    icon = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    onClick = flowModel::goBackToDestinationSelect,
+                )
+                Spacer(Modifier.width(Spacing.sm))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "Route to $destinationName",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = "Building A - Floor G",
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                StatPill(text = "Floor G")
+            }
+
+            Spacer(Modifier.height(Spacing.xl))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                RouteHeroCard(
+                    originName = originName,
+                    destinationName = destinationName,
+                    distanceText = distanceText,
+                    walkingTimeText = walkingTimeText,
+                    walkingMinutes = walkingMinutes,
+                    stepCount = routeStepCount,
+                    routePoints = routePackage?.routePoints.orEmpty(),
+                )
+
+                Spacer(Modifier.height(Spacing.md))
+
+                RouteTimelineCard(
+                    originName = originName,
+                    destinationName = destinationName,
+                    distanceText = distanceText,
+                )
+
+                Spacer(Modifier.height(Spacing.md))
+
+                RouteReadyCard()
+                Spacer(Modifier.height(Spacing.lg))
+            }
+
+            VecturaiPrimaryButton(
+                text = "Start AR Navigation",
+                leadingIcon = Icons.Default.Place,
+                onClick = flowModel::startNavigation,
+            )
+
+            Spacer(Modifier.height(Spacing.xl))
+        }
+    }
+}
+
+@Composable
+fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(220, easing = FastOutSlowInEasing)),
+        exit = fadeOut(tween(220, easing = FastOutSlowInEasing)),
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(VecturaiColors.SurfaceCanvas),
+        ) {
+            AuroraBackground(intensity = rememberAuroraIntensity())
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = Spacing.xl),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(Modifier.height(Spacing.md))
+                FlowProgressStrip(activeStep = 0)
+                Spacer(Modifier.weight(1f))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AnimatedCheckMark()
+
+                    Spacer(Modifier.height(Spacing.lg))
+
+                    StatPill(text = "Building A - Floor G", color = VecturaiColors.AccentGreen)
+
+                    Spacer(Modifier.height(Spacing.md))
+
+                    Text(
+                        text = "Entrance confirmed",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.displayMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(Spacing.xs))
+                    Text(
+                        text = "$entranceName - Building A - Floor G",
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Spacer(Modifier.height(Spacing.xxl))
+
+                    VecturaiCard {
+                        SectionHeader(title = "STARTING POINT")
+                        Spacer(Modifier.height(Spacing.sm))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(VecturaiShapes.Medium)
+                                    .background(VecturaiColors.AccentGreen.copy(alpha = 0.18f)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = null,
+                                    tint = VecturaiColors.AccentGreen,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+                            Spacer(Modifier.width(Spacing.sm))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    text = entranceName,
+                                    color = VecturaiColors.TextPrimary,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = "Ground Floor - Building A",
+                                    color = VecturaiColors.TextMuted,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 1,
+                                )
+                            }
+                            StatPill(text = "Confirmed", color = VecturaiColors.AccentGreen)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                VecturaiPrimaryButton(text = "Choose Destination", onClick = onContinue)
+
+                Spacer(Modifier.height(Spacing.xl))
             }
         }
     }
@@ -671,66 +726,98 @@ private enum class DestinationFilter(val label: String) {
 }
 
 @Composable
+private fun DestinationHeader(
+    originName: String,
+    collapse: Float,
+    onCancel: () -> Unit,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconChip(
+            icon = Icons.Default.ArrowBack,
+            contentDescription = "Back",
+            onClick = onCancel,
+        )
+        Spacer(Modifier.width(Spacing.sm))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = if (collapse > 0.5f) "Destinations" else "Where to?",
+                color = VecturaiColors.TextPrimary,
+                style = if (collapse > 0.5f) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineLarge,
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(VecturaiColors.AccentGreen)
+                        .semantics { contentDescription = "Origin status indicator: connected" },
+                )
+                Spacer(Modifier.width(Spacing.xs))
+                Text(
+                    text = "From $originName",
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun SearchField(
     value: String,
     onValueChange: (String) -> Unit,
+    height: androidx.compose.ui.unit.Dp,
 ) {
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
         singleLine = true,
-        textStyle = TextStyle(
-            color = Color.White,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold,
-        ),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = VecturaiColors.TextPrimary),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = Modifier
             .fillMaxWidth()
             .semantics { contentDescription = "Search destinations" },
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier
-                    .height(50.dp)
+                    .height(height)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF121A28))
-                    .border(1.dp, Color(0xFF1E2B40), RoundedCornerShape(14.dp))
-                    .padding(horizontal = 14.dp),
+                    .clip(VecturaiShapes.Medium)
+                    .background(VecturaiColors.SurfaceElevated.copy(alpha = 0.94f))
+                    .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle), VecturaiShapes.Medium)
+                    .padding(horizontal = Spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    tint = Color(0xFF657185),
+                    tint = VecturaiColors.TextDisabled,
                     modifier = Modifier.size(21.dp),
                 )
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(Spacing.sm))
                 Box(Modifier.weight(1f)) {
                     if (value.isEmpty()) {
                         Text(
                             text = "Search rooms, labs, facilities...",
-                            color = Color(0xFF667286),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            color = VecturaiColors.TextDisabled,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                     innerTextField()
                 }
                 if (value.isNotEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .clickable(role = Role.Button) { onValueChange("") },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Clear search",
-                            tint = Color(0xFF657185),
-                            modifier = Modifier.size(19.dp),
-                        )
-                    }
+                    IconChip(
+                        icon = Icons.Default.Close,
+                        contentDescription = "Clear search",
+                        onClick = { onValueChange("") },
+                        modifier = Modifier.size(48.dp),
+                        tint = VecturaiColors.TextMuted,
+                    )
                 }
             }
         },
@@ -738,98 +825,95 @@ private fun SearchField(
 }
 
 @Composable
-private fun DestinationFilterChip(
-    filter: DestinationFilter,
-    selected: Boolean,
-    onClick: () -> Unit,
+private fun DestinationFilterRow(
+    selectedFilter: DestinationFilter,
+    onSelect: (DestinationFilter) -> Unit,
 ) {
-    val background = if (selected) Color(0xFF168BFF) else Color(0xFF121A28)
-    val textColor = if (selected) Color.White else Color(0xFF8994A6)
-    Surface(
+    val density = LocalDensity.current
+    // Hardcoded slot widths can't track variable chip text; measure each chip and
+    // animate the underline to the selection's actual bounds.
+    val chipBounds = remember { mutableStateMapOf<DestinationFilter, Pair<Int, Int>>() }
+    val target = chipBounds[selectedFilter]
+    val animatedOffsetPx by animateIntAsState(
+        targetValue = target?.first ?: 0,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "filterIndicatorOffset",
+    )
+    val animatedWidthPx by animateIntAsState(
+        targetValue = target?.second ?: 0,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "filterIndicatorWidth",
+    )
+    Column(
         modifier = Modifier
-            .height(40.dp)
-            .clickable(role = Role.Button, onClick = onClick),
-        shape = RoundedCornerShape(50),
-        color = background,
-        border = if (selected) null else BorderStroke(1.dp, Color(0xFF1E2B40)),
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = filter.label,
-                color = textColor,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1,
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            DestinationFilter.entries.forEach { filter ->
+                VecturaiFilterChip(
+                    text = filter.label,
+                    selected = selectedFilter == filter,
+                    onClick = { onSelect(filter) },
+                    modifier = Modifier.onGloballyPositioned { coords ->
+                        val parent = coords.parentLayoutCoordinates ?: return@onGloballyPositioned
+                        val origin = parent.localPositionOf(coords, Offset.Zero)
+                        chipBounds[filter] = origin.x.roundToInt() to coords.size.width
+                    },
+                )
+            }
+        }
+        Spacer(Modifier.height(Spacing.xxs))
+        if (target != null) {
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset(animatedOffsetPx, 0) }
+                    .width(with(density) { animatedWidthPx.toDp() })
+                    .height(3.dp)
+                    .clip(VecturaiShapes.Pill)
+                    .background(VecturaiBrush.Primary),
             )
+        } else {
+            Spacer(Modifier.height(3.dp))
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        color = Color(0xFF6D7788),
-        fontSize = 13.sp,
-        fontWeight = FontWeight.ExtraBold,
-        letterSpacing = 0.sp,
-    )
 }
 
 @Composable
 private fun RecentDestinationCard(
     room: AndroidReviewedPackageLoader.PackageRoom,
     routeSummary: ArCameraFlowViewModel.RouteSummary?,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     val accent = destinationAccent(room)
     Surface(
-        modifier = modifier
-            .height(60.dp)
-            .clickable(role = Role.Button, onClick = onClick),
-        shape = RoundedCornerShape(13.dp),
-        color = Color(0xFF151F31),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
+        modifier = Modifier
+            .width(190.dp)
+            .height(72.dp)
+            .clip(VecturaiShapes.Medium)
+            .vecturaiTap(onClick = onClick),
+        shape = VecturaiShapes.Medium,
+        color = VecturaiColors.SurfaceCard.copy(alpha = 0.96f),
+        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = Spacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(11.dp))
-                    .background(accent.copy(alpha = 0.17f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = iconForCategory(room.category),
-                    contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            Spacer(Modifier.width(11.dp))
+            CategoryIcon(room.category, accent)
+            Spacer(Modifier.width(Spacing.sm))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = room.prettyDestinationName(),
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = routeSummary?.walkTimeText() ?: displayNameForCategory(room.category ?: "other"),
-                    color = Color(0xFF6F7B8E),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -848,86 +932,90 @@ private fun DestinationRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = 10.dp),
+            .clip(VecturaiShapes.Large)
+            .background(VecturaiColors.SurfaceCard.copy(alpha = 0.74f))
+            .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle.copy(alpha = 0.58f)), VecturaiShapes.Large)
+            .vecturaiTap(onClick = onClick)
+            .padding(end = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(accent.copy(alpha = 0.14f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = iconForCategory(room.category),
-                contentDescription = null,
-                tint = accent,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        Spacer(Modifier.width(12.dp))
+                .width(4.dp)
+                .height(72.dp)
+                .clip(VecturaiShapes.Pill)
+                .background(accent),
+        )
+        Spacer(Modifier.width(Spacing.sm))
+        CategoryIcon(room.category, accent)
+        Spacer(Modifier.width(Spacing.sm))
         Column(Modifier.weight(1f)) {
             Text(
                 text = room.prettyDestinationName(),
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.ExtraBold,
+                color = VecturaiColors.TextPrimary,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = room.locationSubtitle(),
-                color = Color(0xFF6F7B8E),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color(0xFF151D2B),
-                border = BorderStroke(1.dp, Color(0xFF273247)),
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.DirectionsWalk,
-                        contentDescription = null,
-                        tint = Color(0xFF8E99AA),
-                        modifier = Modifier.size(13.dp),
-                    )
-                    Spacer(Modifier.width(3.dp))
-                    Text(
-                        text = routeSummary?.walkTimeText() ?: "Route",
-                        color = Color(0xFFB5BECC),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
-            Spacer(Modifier.height(4.dp))
+            WalkTimePill(routeSummary)
+            Spacer(Modifier.height(Spacing.xxs))
             Text(
                 text = routeSummary?.distanceText() ?: displayNameForCategory(room.category ?: "other"),
-                color = Color(0xFF657185),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
+                color = VecturaiColors.TextDisabled,
+                style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(Spacing.xs))
         Icon(
             imageVector = Icons.Default.KeyboardArrowRight,
             contentDescription = null,
-            tint = Color(0xFF354156),
+            tint = VecturaiColors.TextDisabled,
             modifier = Modifier.size(20.dp),
         )
+    }
+    Spacer(Modifier.height(Spacing.xs))
+}
+
+@Composable
+private fun WalkTimePill(routeSummary: ArCameraFlowViewModel.RouteSummary?) {
+    Surface(
+        shape = VecturaiShapes.Pill,
+        color = VecturaiColors.SurfaceOverlay,
+        border = BorderStroke(1.dp, VecturaiColors.BorderStrong),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = Spacing.xs, vertical = Spacing.xxs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.DirectionsWalk,
+                contentDescription = null,
+                tint = VecturaiColors.TextMuted,
+                modifier = Modifier.size(13.dp),
+            )
+            Spacer(Modifier.width(Spacing.xxs))
+            if (routeSummary != null) {
+                AnimatedNumber(
+                    value = routeSummary.walkMinutes(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = VecturaiColors.TextSecondary,
+                )
+                Text(" min", color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
+            } else {
+                Text("Route", color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
+            }
+        }
     }
 }
 
@@ -941,273 +1029,87 @@ private fun EmptyRoomsState(searchText: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
-            .padding(32.dp),
+            .height(196.dp)
+            .padding(Spacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(36.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(12.dp))
+        BrandMark(
+            pulsing = false,
+            muted = true,
+            modifier = Modifier.size(52.dp),
+        )
+        Spacer(Modifier.height(Spacing.sm))
         Text(
             message,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = VecturaiColors.TextMuted,
             textAlign = TextAlign.Center,
         )
     }
 }
 
 @Composable
-fun RoutePreviewContent(
-    config: AndroidReviewedPackageLoader.ReviewedConfig?,
-    routeLeg: AndroidReviewedPackageLoader.RouteLeg?,
-    originName: String,
-    onBack: () -> Unit,
-    onStart: () -> Unit,
-    buttonText: String = "START AR NAVIGATION"
-) {
-    val distance = routeLeg?.totalDistance ?: 0.0
-    val routeStepCount = routeLeg?.routeNodeIds?.let { (it.size - 1).coerceAtLeast(1) } ?: 1
-    val destinationName = routeLeg?.destinationName ?: "Destination"
-    val distanceText = if (distance > 0.0) "${distance.formatMeters()} m" else "--"
-    val walkingTimeText = if (distance > 0.0) formatWalkingTime(distance / 1.2) else "< 1 min"
-    val floorName = routeLeg?.floorName ?: ""
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF070D18)),
-    ) {
-        DotGridBackground()
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 22.dp),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(RoundedCornerShape(13.dp))
-                        .background(Color(0xFF121A28))
-                        .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
-                        .clickable(role = Role.Button, onClick = onBack),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color(0xFF168BFF),
-                        modifier = Modifier.size(21.dp),
-                    )
-                }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = "Route Preview",
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(18.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // 2D MAP PREVIEW
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(320.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color(0xFF0C1420))
-                        .border(1.dp, Color(0xFF253149), RoundedCornerShape(24.dp)),
-                    color = Color.Transparent
-                ) {
-                    RouteMapPreview(
-                        config = config,
-                        routePoints = routeLeg?.routePoints ?: emptyList(),
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                // INFO CARD
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    color = Color(0xFF151F31),
-                    border = BorderStroke(1.dp, Color(0xFF233149)),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Route to $destinationName",
-                                color = Color.White,
-                                fontSize = 19.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = "Building A - Ground Floor", // We could dynamically fetch building name, but sticking to existing pattern
-                                color = Color(0xFF6F7B8E),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        }
-                        Surface(
-                            shape = RoundedCornerShape(50),
-                            color = Color(0xFF071C33).copy(alpha = 0.9f),
-                            border = BorderStroke(1.dp, Color(0xFF0B60AE)),
-                        ) {
-                            Text(
-                                text = floorName,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                color = Color(0xFF168BFF),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
-
-                RouteSummaryCard(
-                    originName = originName,
-                    destinationName = destinationName,
-                    distanceText = distanceText,
-                    walkingTimeText = walkingTimeText,
-                    stepCount = routeStepCount,
-                )
-
-                RouteStepsCard(
-                    originName = originName,
-                    destinationName = destinationName,
-                    distanceText = distanceText,
-                )
-
-                Spacer(Modifier.height(120.dp)) // Extra space to scroll past the floating button
-            } // End of inner Column
-        } // End of outer Column
-
-        // FLOATING START BUTTON (Always visible at the bottom)
+private fun SkeletonDestinationRows() {
+    val transition = rememberInfiniteTransition(label = "skeleton")
+    val shimmer by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(900), RepeatMode.Restart),
+        label = "skeletonShimmer",
+    )
+    val brush = androidx.compose.ui.graphics.Brush.linearGradient(
+        listOf(
+            VecturaiColors.SurfaceElevated.copy(alpha = 0.45f),
+            VecturaiColors.SurfaceOverlay.copy(alpha = 0.95f),
+            VecturaiColors.SurfaceElevated.copy(alpha = 0.45f),
+        ),
+        start = Offset(shimmer * -500f, 0f),
+        end = Offset(shimmer * 500f, 0f),
+    )
+    repeat(6) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(22.dp)
-                .navigationBarsPadding(),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            Surface(
-                onClick = onStart,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = RoundedCornerShape(18.dp),
-                color = Color(0xFF168BFF),
-                shadowElevation = 12.dp,
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Navigation,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = buttonText,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp
-                    )
-                }
-            }
-        }
+                .fillMaxWidth()
+                .height(72.dp)
+                .clip(VecturaiShapes.Large)
+                .background(brush),
+        )
+        Spacer(Modifier.height(Spacing.xs))
     }
 }
 
 @Composable
-fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
-    val session by flowModel.session.collectAsState()
-    val routePackage = session.routePackage
-    val firstLeg = routePackage?.legs?.firstOrNull()
-    val originName = session.selectedOriginRoom?.displayName 
-        ?: session.confirmedEntrance.ifBlank { "Main Entrance" }
-
-    RoutePreviewContent(
-        config = session.reviewedConfig,
-        routeLeg = firstLeg,
-        originName = originName,
-        onBack = flowModel::goBackToDestinationSelect,
-        onStart = flowModel::startNavigation
-    )
-}
-
-@Composable
 private fun RouteReadyCard() {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = Color(0xFF111B2B),
-        border = BorderStroke(1.dp, Color(0xFF213047)),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    VecturaiCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(13.dp))
-                    .background(Color(0xFF0A3A66)),
+                    .size(44.dp)
+                    .clip(VecturaiShapes.Medium)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.Place,
                     contentDescription = null,
-                    tint = Color(0xFF168BFF),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(Modifier.width(13.dp))
+            Spacer(Modifier.width(Spacing.sm))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = "Ready for AR guidance",
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(Modifier.height(3.dp))
                 Text(
-                    text = "Start at the entrance marker",
-                    color = Color(0xFF7B8698),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    text = "Start at the entrance poster",
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -1217,93 +1119,42 @@ private fun RouteReadyCard() {
 }
 
 @Composable
-private fun RouteSummaryCard(
+private fun RouteHeroCard(
     originName: String,
     destinationName: String,
     distanceText: String,
     walkingTimeText: String,
+    walkingMinutes: Int,
     stepCount: Int,
+    routePoints: List<Pair<Double, Double>>,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        color = Color(0xFF151F31),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
-    ) {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 18.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = walkingTimeText,
-                        color = Color.White,
-                        fontSize = 31.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 34.sp,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - Ground Floor",
-                        color = Color(0xFF6F7B8E),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(13.dp),
-                    color = Color(0xFF0A3A66),
-                    border = BorderStroke(1.dp, Color(0xFF0B60AE)),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Map,
-                            contentDescription = null,
-                            tint = Color(0xFF168BFF),
-                            modifier = Modifier.size(22.dp),
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Route",
-                            color = Color(0xFF168BFF),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Color(0xFF263247)),
+    VecturaiCard {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AnimatedGradientNumber(
+                value = walkingMinutes,
+                suffix = if (walkingTimeText.contains("min")) " min" else "",
+                style = VecturaiTypography.numericDisplay(),
+                textAlign = TextAlign.Center,
             )
-
+            Text(
+                text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - Ground Floor",
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Spacing.md))
+            RouteMiniStrip(routePoints = routePoints)
+            Spacer(Modifier.height(Spacing.md))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text(
-                        text = "From",
-                        color = Color(0xFF7D8899),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Text("From", color = VecturaiColors.TextMuted, style = VecturaiTypography.overline())
                     Text(
                         text = originName,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.ExtraBold,
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -1311,23 +1162,17 @@ private fun RouteSummaryCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = Color(0xFF667286),
+                    tint = VecturaiColors.TextDisabled,
                     modifier = Modifier
-                        .padding(horizontal = 14.dp)
+                        .padding(horizontal = Spacing.sm)
                         .size(20.dp),
                 )
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "To",
-                        color = Color(0xFF7D8899),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Text("To", color = VecturaiColors.TextMuted, style = VecturaiTypography.overline())
                     Text(
                         text = destinationName,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.ExtraBold,
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -1338,300 +1183,388 @@ private fun RouteSummaryCard(
 }
 
 @Composable
-private fun RouteStepsCard(
+private fun RouteMiniStrip(routePoints: List<Pair<Double, Double>>) {
+    val reduceMotion = rememberReduceMotion()
+    val transition = rememberInfiniteTransition(label = "routeStrip")
+    val markerProgress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = if (reduceMotion) 0f else 1f,
+        animationSpec = infiniteRepeatable(tween(1_800, easing = FastOutSlowInEasing), RepeatMode.Restart),
+        label = "routeStripMarker",
+    )
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(VecturaiShapes.Medium)
+            .background(VecturaiColors.SurfaceElevated),
+    ) {
+        val left = 24.dp.toPx()
+        val right = size.width - 24.dp.toPx()
+        val midY = size.height / 2f
+        val path = androidx.compose.ui.graphics.Path().apply {
+            moveTo(left, midY)
+            cubicTo(size.width * 0.32f, 10.dp.toPx(), size.width * 0.62f, size.height - 10.dp.toPx(), right, midY)
+        }
+        drawPath(
+            path = path,
+            color = VecturaiColors.BorderStrong,
+            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
+        )
+        drawPath(
+            path = path,
+            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                listOf(
+                    VecturaiColors.GradientStart,
+                    VecturaiColors.GradientMid,
+                    VecturaiColors.GradientEnd,
+                ),
+            ),
+            style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round),
+        )
+        drawCircle(VecturaiColors.AccentGreen, radius = 6.dp.toPx(), center = Offset(left, midY))
+        drawCircle(VecturaiColors.AccentAmber, radius = 6.dp.toPx(), center = Offset(right, midY))
+        val markerX = left + (right - left) * markerProgress
+        val markerY = midY + kotlin.math.sin(markerProgress * Math.PI).toFloat() * 16.dp.toPx()
+        drawCircle(Color.White, radius = 4.dp.toPx(), center = Offset(markerX, markerY))
+        if (routePoints.size > 1) {
+            drawCircle(
+                VecturaiColors.AccentCyan.copy(alpha = 0.45f),
+                radius = 2.dp.toPx(),
+                center = Offset(size.width / 2f, midY),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RouteTimelineCard(
     originName: String,
     destinationName: String,
     distanceText: String,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = Color(0xFF151F31),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
-        ) {
-            Text(
-                text = "STEPS",
-                color = Color(0xFF687486),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.sp,
-            )
-            Spacer(Modifier.height(14.dp))
-            RouteStepRow(number = 1, title = "Start from $originName", distance = "Entrance")
-            Spacer(Modifier.height(14.dp))
-            RouteStepRow(
-                number = 2,
-                title = "Follow the highlighted route",
-                distance = "$distanceText total",
-            )
-            Spacer(Modifier.height(14.dp))
-            RouteStepRow(
-                number = 3,
-                title = "Arrive at $destinationName",
-                distance = "Destination",
-            )
-        }
+    VecturaiCard {
+        SectionHeader(title = "STEPS")
+        Spacer(Modifier.height(Spacing.sm))
+        TimelineStep(number = 1, title = "Start from $originName", detail = "Entrance", first = true)
+        TimelineStep(number = 2, title = "Follow the highlighted route", detail = "$distanceText total")
+        TimelineStep(number = 3, title = "Arrive at $destinationName", detail = "Destination", last = true)
     }
 }
 
 @Composable
-private fun RouteStepRow(number: Int, title: String, distance: String) {
-    Row(verticalAlignment = Alignment.Top) {
-        Box(
-            modifier = Modifier
-                .size(27.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF0A3A66))
-                .border(1.dp, Color(0xFF0B60AE), CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = number.toString(),
-                color = Color(0xFF168BFF),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.ExtraBold,
-            )
+private fun TimelineStep(
+    number: Int,
+    title: String,
+    detail: String,
+    first: Boolean = false,
+    last: Boolean = false,
+) {
+    val reduceMotion = rememberReduceMotion()
+    var appeared by remember { mutableStateOf(reduceMotion) }
+    LaunchedEffect(reduceMotion) {
+        if (reduceMotion) {
+            appeared = true
+        } else {
+            delay(number * 80L)
+            appeared = true
         }
-        Spacer(Modifier.width(12.dp))
-        Column {
+    }
+    val scale by animateFloatAsState(
+        targetValue = if (appeared) 1f else 0.5f,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "timelineDot",
+    )
+    Row(verticalAlignment = Alignment.Top) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (!first) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(12.dp)
+                        .background(VecturaiColors.BorderStrong),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f))
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.48f)), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                AnimatedNumber(
+                    value = number,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (!last) {
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(28.dp)
+                        .background(VecturaiColors.BorderStrong),
+                )
+            }
+        }
+        Spacer(Modifier.width(Spacing.sm))
+        Column(Modifier.padding(top = if (first) 2.dp else Spacing.sm)) {
             Text(
                 text = title,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.ExtraBold,
-                lineHeight = 17.sp,
+                color = VecturaiColors.TextPrimary,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = distance,
-                color = Color(0xFF6F7B8E),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = detail,
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }
 }
 
 @Composable
-fun EntranceConfirmedSheet(entranceName: String, onContinue: () -> Unit) {
-    AnimatedVisibility(
-        visible = true,
-        enter = fadeIn(),
-        exit = fadeOut(),
-        modifier = Modifier.fillMaxSize(),
+private fun CategoryIcon(category: String?, accent: Color) {
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .clip(VecturaiShapes.Medium)
+            .background(accent.copy(alpha = 0.16f)),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF070D18)),
+        Icon(
+            imageVector = iconForCategory(category),
+            contentDescription = null,
+            tint = accent,
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+@Composable
+private fun BrandMark(
+    pulsing: Boolean,
+    modifier: Modifier = Modifier,
+    muted: Boolean = false,
+) {
+    val transition = rememberInfiniteTransition(label = "brandMark")
+    val pulse by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = if (pulsing) 1.04f else 1f,
+        animationSpec = infiniteRepeatable(tween(2_000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "brandPulse",
+    )
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = pulse
+                scaleY = pulse
+                alpha = if (muted) 0.45f else 1f
+            }
+            .clip(VecturaiShapes.XLarge)
+            .background(if (muted) VecturaiColors.SurfaceElevated else VecturaiColors.SurfaceOverlay)
+            .border(BorderStroke(1.dp, if (muted) VecturaiColors.BorderStrong else MaterialTheme.colorScheme.primary), VecturaiShapes.XLarge),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = VecturaiBrandIcon,
+            contentDescription = null,
+            tint = if (muted) VecturaiColors.TextMuted else Color.White,
+            modifier = Modifier.size(48.dp),
+        )
+    }
+}
+
+@Composable
+private fun FeaturePill(text: String, active: Boolean, modifier: Modifier = Modifier) {
+    val scale by animateFloatAsState(
+        targetValue = if (active) 1.04f else 1f,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "featurePill",
+    )
+    Surface(
+        modifier = modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        },
+        shape = VecturaiShapes.Pill,
+        color = if (active) VecturaiColors.AccentCyan.copy(alpha = 0.16f) else VecturaiColors.SurfaceElevated.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, if (active) VecturaiColors.AccentCyan.copy(alpha = 0.58f) else VecturaiColors.BorderSubtle),
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+            color = if (active) VecturaiColors.AccentCyan else VecturaiColors.TextMuted,
+            style = MaterialTheme.typography.labelMedium,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun DemoBuildingStatus() {
+    Surface(
+        shape = VecturaiShapes.Pill,
+        color = VecturaiColors.SurfaceElevated.copy(alpha = 0.75f),
+        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            DotGridBackground()
-
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .size(7.dp)
+                    .clip(CircleShape)
+                    .background(VecturaiColors.AccentGreen),
+            )
+            Spacer(Modifier.width(Spacing.xs))
+            Text(
+                text = "Demo building: Building A",
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FlowProgressStrip(activeStep: Int) {
+    val steps = listOf("Entrance", "Destination", "Navigate")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        steps.forEachIndexed { index, label ->
+            val active = index <= activeStep
+            Surface(
+                shape = VecturaiShapes.Pill,
+                color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else VecturaiColors.SurfaceElevated.copy(alpha = 0.72f),
+                border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.48f) else VecturaiColors.BorderSubtle),
             ) {
-                Spacer(Modifier.weight(1f))
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF063D24))
-                            .border(2.dp, Color(0xFF0E7E45), CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(68.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF0B5836).copy(alpha = 0.9f)),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                tint = Color(0xFF13D06D),
-                                modifier = Modifier.size(42.dp),
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.height(22.dp))
-
-                    Surface(
-                        shape = RoundedCornerShape(50),
-                        color = Color(0xFF073E27),
-                        border = BorderStroke(1.dp, Color(0xFF0C7040)),
-                    ) {
-                        Text(
-                            text = "Building A - Floor G",
-                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp),
-                            color = Color(0xFF12CF69),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                    }
-
-                    Spacer(Modifier.height(18.dp))
-
-                    Text(
-                        text = "Entrance confirmed",
-                        color = Color.White,
-                        fontSize = 27.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 31.sp,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(7.dp))
-                    Text(
-                        text = "$entranceName - Building A - Floor G",
-                        color = Color(0xFF8D98AA),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-
-                    Spacer(Modifier.height(32.dp))
-
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(18.dp),
-                        color = Color(0xFF151F31),
-                        border = BorderStroke(1.dp, Color(0xFF233149)),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 17.dp),
-                        ) {
-                            Text(
-                                text = "STARTING POINT",
-                                color = Color(0xFF687486),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 0.sp,
-                            )
-                            Spacer(Modifier.height(14.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(42.dp)
-                                        .clip(RoundedCornerShape(13.dp))
-                                        .background(Color(0xFF0B5A3C).copy(alpha = 0.55f)),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.LocationOn,
-                                        contentDescription = null,
-                                        tint = Color(0xFF14D978),
-                                        modifier = Modifier.size(22.dp),
-                                    )
-                                }
-                                Spacer(Modifier.width(13.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(
-                                        text = entranceName,
-                                        color = Color.White,
-                                        fontSize = 17.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    Text(
-                                        text = "Ground Floor - Building A",
-                                        color = Color(0xFF8A95A8),
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        maxLines = 1,
-                                    )
-                                }
-                                Surface(
-                                    shape = RoundedCornerShape(50),
-                                    color = Color(0xFF0C6B42).copy(alpha = 0.82f),
-                                ) {
-                                    Text(
-                                        text = "Confirmed",
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                                        color = Color(0xFF28E07E),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                Row(
+                Text(
+                    text = if (index < activeStep) "$label done" else label,
+                    modifier = Modifier.padding(horizontal = Spacing.xs, vertical = Spacing.xxs),
+                    color = if (active) VecturaiColors.TextPrimary else VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                )
+            }
+            if (index != steps.lastIndex) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Color(0xFF168BFF))
-                        .clickable(role = Role.Button, onClick = onContinue),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Choose Destination",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-
-                Spacer(Modifier.height(24.dp))
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(if (index < activeStep) MaterialTheme.colorScheme.primary else VecturaiColors.BorderSubtle),
+                )
             }
         }
     }
 }
+
 @Composable
-fun GradientPrimaryButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val pressedScale by animateFloatAsState(targetValue = 1f, label = "buttonScale")
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(52.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(
-                Brush.linearGradient(
-                    listOf(Color(0xFF2563EB), Color(0xFF1D4ED8)),
-                )
+fun AnimatedCheckMark(modifier: Modifier = Modifier, size: androidx.compose.ui.unit.Dp = 104.dp) {
+    var started by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { started = true }
+    val progress by animateFloatAsState(
+        targetValue = if (started) 1f else 0f,
+        animationSpec = tween(350, easing = FastOutSlowInEasing),
+        label = "checkPath",
+    )
+    val ring by animateFloatAsState(
+        targetValue = if (started) 1f else 0.45f,
+        animationSpec = tween(520, easing = FastOutSlowInEasing),
+        label = "checkRing",
+    )
+    Canvas(modifier = modifier.size(size)) {
+        val center = Offset(size.toPx() / 2f, size.toPx() / 2f)
+        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.16f * (1f - ring * 0.4f)), radius = size.toPx() * 0.5f * ring, center = center)
+        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.28f), radius = size.toPx() * 0.36f, center = center)
+        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.88f), radius = size.toPx() * 0.25f, center = center)
+        val start = Offset(size.toPx() * 0.36f, size.toPx() * 0.52f)
+        val mid = Offset(size.toPx() * 0.47f, size.toPx() * 0.63f)
+        val end = Offset(size.toPx() * 0.68f, size.toPx() * 0.39f)
+        val firstProgress = min(progress / 0.5f, 1f)
+        val secondProgress = max((progress - 0.5f) / 0.5f, 0f)
+        drawLine(
+            color = Color.White,
+            start = start,
+            end = Offset(
+                x = start.x + (mid.x - start.x) * firstProgress,
+                y = start.y + (mid.y - start.y) * firstProgress,
+            ),
+            strokeWidth = 5.dp.toPx(),
+            cap = StrokeCap.Round,
+        )
+        if (progress > 0.5f) {
+            drawLine(
+                color = Color.White,
+                start = mid,
+                end = Offset(
+                    x = mid.x + (end.x - mid.x) * secondProgress,
+                    y = mid.y + (end.y - mid.y) * secondProgress,
+                ),
+                strokeWidth = 5.dp.toPx(),
+                cap = StrokeCap.Round,
             )
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size((20 * pressedScale).dp))
-        Spacer(Modifier.width(8.dp))
-        Text(text, color = Color.White, fontWeight = FontWeight.SemiBold)
+        }
     }
 }
+
+private val HomePillLabels = listOf("Live AR", "Smart Routes", "Indoor Maps")
+
+private val VecturaiBrandIcon: ImageVector = ImageVector.Builder(
+    name = "VecturaiBrandMark",
+    defaultWidth = 24.dp,
+    defaultHeight = 24.dp,
+    viewportWidth = 24f,
+    viewportHeight = 24f,
+).apply {
+    path(fill = SolidColor(Color.White)) {
+        moveTo(4f, 12.7f)
+        lineTo(13.7f, 3f)
+        curveTo(14.25f, 2.45f, 15.2f, 2.84f, 15.2f, 3.62f)
+        lineTo(15.2f, 8.3f)
+        lineTo(20.3f, 8.3f)
+        curveTo(21.05f, 8.3f, 21.46f, 9.17f, 20.98f, 9.74f)
+        lineTo(11.3f, 21.05f)
+        curveTo(10.8f, 21.64f, 9.82f, 21.28f, 9.82f, 20.5f)
+        lineTo(9.82f, 15.45f)
+        lineTo(4.66f, 15.45f)
+        curveTo(3.9f, 15.45f, 3.47f, 13.24f, 4f, 12.7f)
+        close()
+    }
+    path(fill = SolidColor(Color.White)) {
+        moveTo(17.2f, 17.1f)
+        curveTo(17.2f, 15.55f, 18.45f, 14.3f, 20f, 14.3f)
+        curveTo(21.55f, 14.3f, 22.8f, 15.55f, 22.8f, 17.1f)
+        curveTo(22.8f, 18.65f, 21.55f, 19.9f, 20f, 19.9f)
+        curveTo(18.45f, 19.9f, 17.2f, 18.65f, 17.2f, 17.1f)
+        close()
+    }
+}.build()
 
 private fun AndroidReviewedPackageLoader.PackageRoom.prettyDestinationName(): String =
     displayName.replace("EA 102", "EA102")
 
-private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String {
-    val floorText = floorName ?: "Unknown Floor"
-    val descText = description?.takeIf { it.isNotBlank() }
-    
-    // If we have a custom description from the backend, append the floor
-    if (descText != null) {
-        return "$floorText - $descText"
-    }
-    
-    return floorText
+private fun AndroidReviewedPackageLoader.PackageRoom.locationSubtitle(): String = when (id) {
+    "ea101" -> "Ground Floor - East Wing"
+    "ea102" -> "Ground Floor - East Wing"
+    "cs-lab" -> "Ground Floor - Computer Science"
+    "me-lab" -> "First Floor - Northeast Wing"
+    "fameo-cafe" -> "Ground Floor - East Corridor"
+    "elevators" -> "Ground Floor - Main Core"
+    "west-men-wc", "west-women-wc" -> "Ground Floor - West Wing"
+    "east-men-wc", "east-women-wc" -> "Ground Floor - East Wing"
+    else -> description?.takeIf { it.isNotBlank() } ?: displayNameForCategory(category ?: "other")
 }
 
 private fun destinationSortIndex(id: String): Int = when (id) {
@@ -1686,147 +1619,6 @@ private fun categoryColor(category: String?): Color = when (category) {
     else -> Color(0xFF64748B)
 }
 
-@Composable
-private fun RouteMapPreview(
-    config: AndroidReviewedPackageLoader.ReviewedConfig?,
-    routePoints: List<Pair<Double, Double>>,
-    modifier: Modifier = Modifier,
-) {
-    if (config == null || config.nodes.isEmpty()) return
-
-    val nodes = config.nodes
-    val minX = nodes.minOf { it.x }
-    val maxX = nodes.maxOf { it.x }
-    val minZ = nodes.minOf { it.z }
-    val maxZ = nodes.maxOf { it.z }
-
-    val width = (maxX - minX).coerceAtLeast(1.0)
-    val height = (maxZ - minZ).coerceAtLeast(1.0)
-
-    Canvas(modifier = modifier.padding(16.dp)) {
-        val scale = (min(size.width / width, size.height / height) * 0.9).toFloat()
-        val offsetX = (size.width - width.toFloat() * scale) / 2f - minX.toFloat() * scale
-        val offsetZ = (size.height - height.toFloat() * scale) / 2f - minZ.toFloat() * scale
-
-        // 1. FLOOR GRID (Blueprint style)
-        val gridSize = 20.dp.toPx()
-        for (x in 0..(size.width / gridSize).toInt()) {
-            drawLine(
-                color = Color(0xFF1A2637),
-                start = Offset(x * gridSize, 0f),
-                end = Offset(x * gridSize, size.height),
-                strokeWidth = 0.5.dp.toPx()
-            )
-        }
-        for (y in 0..(size.height / gridSize).toInt()) {
-            drawLine(
-                color = Color(0xFF1A2637),
-                start = Offset(0f, y * gridSize),
-                end = Offset(size.width, y * gridSize),
-                strokeWidth = 0.5.dp.toPx()
-            )
-        }
-
-        // 2. ROOM ENCLOSURES (The "Walls")
-        config.rooms.forEach { room ->
-            val node = nodes.find { it.id == room.destinationNodeId }
-            if (node != null) {
-                val cx = node.x.toFloat() * scale + offsetX
-                val cz = node.z.toFloat() * scale + offsetZ
-                val roomSize = 40.dp.toPx()
-                
-                // Room Fill
-                drawRoundRect(
-                    color = categoryColor(room.category).copy(alpha = 0.1f),
-                    topLeft = Offset(cx - roomSize / 2, cz - roomSize / 2),
-                    size = androidx.compose.ui.geometry.Size(roomSize, roomSize),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx())
-                )
-                
-                // Room Outline (Thick Walls)
-                drawRoundRect(
-                    color = Color(0xFF324562),
-                    topLeft = Offset(cx - roomSize / 2, cz - roomSize / 2),
-                    size = androidx.compose.ui.geometry.Size(roomSize, roomSize),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx()),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())
-                )
-            }
-        }
-
-        // 3. ARCHITECTURAL SKELETON (Corridors/Connections)
-        config.edges.forEach { edge ->
-            val from = nodes.find { it.id == edge.from }
-            val to = nodes.find { it.id == edge.to }
-            if (from != null && to != null) {
-                // Draw corridor "bounds"
-                drawLine(
-                    color = Color(0xFF253149),
-                    start = Offset((from.x.toFloat() * scale + offsetX), (from.z.toFloat() * scale + offsetZ)),
-                    end = Offset((to.x.toFloat() * scale + offsetX), (to.z.toFloat() * scale + offsetZ)),
-                    strokeWidth = 10.dp.toPx(),
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
-                // Center line
-                drawLine(
-                    color = Color(0xFF1A2637),
-                    start = Offset((from.x.toFloat() * scale + offsetX), (from.z.toFloat() * scale + offsetZ)),
-                    end = Offset((to.x.toFloat() * scale + offsetX), (to.z.toFloat() * scale + offsetZ)),
-                    strokeWidth = 1.dp.toPx()
-                )
-            }
-        }
-
-        // 4. ROUTE (Glowing blue path)
-        if (routePoints.size >= 2) {
-            for (i in 0 until routePoints.size - 1) {
-                val start = routePoints[i]
-                val end = routePoints[i + 1]
-                
-                // Shadow
-                drawLine(
-                    color = Color(0xFF168BFF).copy(alpha = 0.3f),
-                    start = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ)),
-                    end = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
-                    strokeWidth = 12.dp.toPx(),
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
-                
-                // Active path
-                drawLine(
-                    color = Color(0xFF168BFF),
-                    start = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ)),
-                    end = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
-                    strokeWidth = 5.dp.toPx(),
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
-            }
-
-            // Start/End Icons
-            val start = routePoints.first()
-            val end = routePoints.last()
-            
-            drawCircle(
-                color = Color(0xFF10D978),
-                radius = 7.dp.toPx(),
-                center = Offset((start.first.toFloat() * scale + offsetX), (start.second.toFloat() * scale + offsetZ))
-            )
-            
-            drawCircle(
-                color = Color(0xFF168BFF),
-                radius = 9.dp.toPx(),
-                center = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ))
-            )
-            drawCircle(
-                color = Color.White,
-                radius = 11.dp.toPx(),
-                center = Offset((end.first.toFloat() * scale + offsetX), (end.second.toFloat() * scale + offsetZ)),
-                style = androidx.compose.ui.graphics.drawscope.Stroke(2.dp.toPx())
-            )
-        }
-    }
-}
-
 private fun displayNameForCategory(category: String): String = when (category) {
     "classroom" -> "Classrooms"
     "lab" -> "Laboratories"
@@ -1848,6 +1640,9 @@ private fun formatWalkingTime(seconds: Double): String {
 
 private fun ArCameraFlowViewModel.RouteSummary.walkTimeText(): String =
     formatWalkingTime(distanceMeters / 1.2)
+
+private fun ArCameraFlowViewModel.RouteSummary.walkMinutes(): Int =
+    ceil((distanceMeters / 1.2) / 60.0).toInt().coerceAtLeast(1)
 
 private fun ArCameraFlowViewModel.RouteSummary.distanceText(): String =
     "${distanceMeters.formatMeters()} m"

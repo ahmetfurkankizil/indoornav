@@ -40,6 +40,10 @@ data class ArNavigationUiState(
     val distanceToDestination: Double = 0.0,
     val isLowConfidence: Boolean = false,
     val alignmentTimedOut: Boolean = false,
+    val markerAssetError: String? = null,
+    val markerFramesAnalyzed: Int = 0,
+    val markerCandidatesDetected: Int = 0,
+    val relativeBearingDegrees: Float = 0f,
     val sessionErrorMessage: String? = null,
     val sessionErrorIsArCoreInstall: Boolean = false,
     val timeoutReasonMessage: String = "Wait while we stabilize AR",
@@ -171,6 +175,11 @@ class AndroidArNavigationViewModel(
     }
 
     fun isPendingSimulatedAlignment(): Boolean = pendingSimulateAlignment
+
+    fun simulateAlignment() {
+        simulateAlignmentRequestedMs = System.currentTimeMillis()
+        pendingSimulateAlignment = true
+    }
 
     fun retryAlignment() {
         alignmentTimeoutJob?.cancel()

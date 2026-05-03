@@ -222,6 +222,7 @@ class ArCameraActivity : ComponentActivity() {
                             isEmulator = isEmulator,
                             onEnd = flowModel::goBackToDestinationSelect,
                             onRetryActivity = ::recreate,
+                            onNavigateElsewhere = flowModel::goBackToDestinationSelect,
                         )
                     }
                 }

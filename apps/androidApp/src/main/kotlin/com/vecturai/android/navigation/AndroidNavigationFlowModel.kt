@@ -85,6 +85,9 @@ class ArCameraFlowViewModel(
     private val _qrError = MutableStateFlow<String?>(null)
     val qrError: StateFlow<String?> = _qrError.asStateFlow()
 
+    private val _qrDetected = MutableStateFlow(false)
+    val qrDetected: StateFlow<Boolean> = _qrDetected.asStateFlow()
+
     private val qrScanner = ArFrameQrScanner { rawValue ->
         onQRScanned(rawValue)
     }
@@ -117,6 +120,7 @@ class ArCameraFlowViewModel(
 
     fun clearQRError() {
         _qrError.value = null
+        _qrDetected.value = false
         qrScanner.reset()
     }
 
@@ -209,6 +213,7 @@ class ArCameraFlowViewModel(
             confirmedEntrance = displayName,
             validatedEntranceMarker = marker,
         )
+        _qrDetected.value = true
         _phase.value = Phase.EntranceConfirmed(displayName)
     }
 }
