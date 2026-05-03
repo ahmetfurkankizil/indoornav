@@ -125,26 +125,21 @@ struct QRScanView: View {
         isProcessing = true
         scanError = nil
 
-        let result = QRPayload.parse(raw)
-        switch result {
-        case .failure(let error):
-            scanError = error.description
+        Task {
+            let error = await flow.handleQRScanned(raw)
             isProcessing = false
-
-        case .success(let payload):
-            if let validationError = flow.validateQRPayload(payload) {
-                scanError = validationError.description
-                isProcessing = false
-            } else {
-                flow.confirmEntrance(fromPayload: payload)
+            if let error {
+                scanError = error
             }
         }
     }
 
     #if targetEnvironment(simulator)
     private func simulateScan() {
+        // Paste a real QR token here to test remote fetch on Simulator,
+        // or keep the v1 bundled format for the local demo building.
         let demoPayload = """
-        {"type":"vecturai-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}
+        {"type":"vecturai-entrance","buildingId":"house-demo-01","entranceId":"marker-entrance-a","v":1}
         """
         handleScannedCode(demoPayload)
     }

@@ -84,3 +84,28 @@ export const createConnection = (
 
 export const deleteConnection = (buildingId: string, connectionId: string) =>
   api.delete(`/api/manager/buildings/${buildingId}/connections/${connectionId}`)
+
+// ── Entrance markers ──────────────────────────────────────────────────────────
+
+export interface EntranceMarker {
+  id: string; buildingId: string; displayName?: string; startNodeId: string
+  physicalWidthMeters: number; physicalHeightMeters: number
+  worldX?: number; worldY?: number; worldZ?: number
+  forwardBasis: string; rotationYDegrees?: number; referenceImageName?: string
+}
+
+export interface CreateEntranceMarkerRequest {
+  displayName?: string; startNodeId: string
+  physicalWidthMeters?: number; physicalHeightMeters?: number
+  worldX?: number; worldY?: number; worldZ?: number
+  forwardBasis?: string; rotationYDegrees?: number; referenceImageName?: string
+}
+
+export const listEntranceMarkers = (buildingId: string) =>
+  api.get<EntranceMarker[]>(`/api/manager/buildings/${buildingId}/entrance-markers`).then(r => r.data)
+
+export const createEntranceMarker = (buildingId: string, data: CreateEntranceMarkerRequest) =>
+  api.post<EntranceMarker>(`/api/manager/buildings/${buildingId}/entrance-markers`, data).then(r => r.data)
+
+export const deleteEntranceMarker = (buildingId: string, markerId: string) =>
+  api.delete(`/api/manager/buildings/${buildingId}/entrance-markers/${markerId}`)

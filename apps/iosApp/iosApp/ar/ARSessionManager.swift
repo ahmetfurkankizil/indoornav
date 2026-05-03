@@ -151,6 +151,22 @@ class ARSessionManager: NSObject, ObservableObject {
         print("[ARSession] Session stopped")
     }
 
+    /// Start a plain world-tracking session with no marker image detection.
+    /// Used when no entrance poster is configured (web-published buildings).
+    func startWorldTrackingSession(arView: ARView) {
+        self.arView = arView
+        let config = ARWorldTrackingConfiguration()
+        config.planeDetection = [.horizontal]
+        config.environmentTexturing = .automatic
+        self.imageConfiguration = config
+        arView.session.delegate = self
+        arView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
+        isSessionRunning = true
+        hasLoadedReferenceImages = false
+        trackingStateDescription = "Tracking"
+        print("[ARSession] World-tracking started (no marker detection)")
+    }
+
     /// Check if a specific reference image exists in the bundled AR Resources.
     static func hasReferenceImage(named name: String) -> Bool {
         guard let images = ARReferenceImage.referenceImages(

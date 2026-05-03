@@ -38,7 +38,7 @@
              This entry is intentionally narrow — only the exact host is exempted. -->
         <key>NSExceptionDomains</key>
         <dict>
-            <key>172.20.10.4</key>
+            <key>192.168.1.18</key>
             <dict>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
                 <true/>

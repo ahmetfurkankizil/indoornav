@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 /// App-level navigation state machine for the iOS truth-path flow.
 ///
@@ -25,6 +26,12 @@ class NavigationFlowModel: ObservableObject {
     }
 
     @Published var state: FlowState = .home
+
+    // MARK: - Admin API
+
+    /// Base URL for the VecturAI admin API.
+    /// Simulator: localhost works. Real device: update to your Mac's LAN IP.
+    static let adminAPIBaseURL = "http://192.168.1.18:8080"
 
     // MARK: - Session Data
 
@@ -56,35 +63,79 @@ class NavigationFlowModel: ObservableObject {
 
     // MARK: - Package Loading
 
-    /// Load the reviewed package on startup. If it fails, the app enters
-    /// a packageError state and will not silently fall back to draft data.
+    /// Load the bundled reviewed package on startup.
+    /// Failure is non-fatal — the user can still scan a v2 QR to fetch a remote package.
     func loadPackage() {
         let result = BuildingPackageLoader.loadReviewedPackage()
         switch result {
         case .success(let config):
             reviewedConfig = config
-            state = .home
         case .failure(let error):
+            print("[FlowModel] Bundled package unavailable: \(error.description)")
             reviewedConfig = nil
-            state = .packageError(message: error.description)
+        }
+        state = .home
+    }
+
+    // MARK: - QR Handling
+
+    /// Process a raw scanned QR string, handling both v1 (bundled) and v2 (remote) flows.
+    /// Returns an error description string on failure, or nil on success.
+    func handleQRScanned(_ raw: String) async -> String? {
+        switch QRPayload.parse(raw) {
+        case .failure(let error):
+            return error.description
+        case .success(let payload):
+            switch payload.format! {
+            case .bundled:
+                guard let config = reviewedConfig else {
+                    return "No local navigation package available"
+                }
+                if let error = payload.validate(against: config) { return error.description }
+                confirmEntrance(fromPayload: payload)
+                return nil
+            case .remote(let token):
+                return await fetchRemotePackage(token: token)
+            }
         }
     }
 
-    // MARK: - QR Payload Validation
+    private func fetchRemotePackage(token: String) async -> String? {
+        let urlString = "\(NavigationFlowModel.adminAPIBaseURL)/mobile/buildings/\(token)/nav-package"
+        guard let url = URL(string: urlString) else { return "Invalid server URL" }
 
-    /// Validate a scanned QR payload against the loaded reviewed package.
-    /// Returns nil if valid, or the validation error if invalid.
-    func validateQRPayload(_ payload: QRPayload) -> QRPayload.PayloadError? {
-        guard let config = reviewedConfig else {
-            return .notJSON // no config loaded
+        let data: Data
+        do {
+            let (responseData, response) = try await URLSession.shared.data(from: url)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                return "Building not found or not published on server"
+            }
+            data = responseData
+        } catch {
+            return "Network error: \(error.localizedDescription)"
         }
-        return payload.validate(against: config)
+
+        guard let jsonString = String(data: data, encoding: .utf8) else {
+            return "Invalid response from server"
+        }
+
+        switch BuildingPackageLoader.parseUnifiedPackage(jsonString) {
+        case .failure(let error):
+            return "Failed to parse building data: \(error.description)"
+        case .success(let config):
+            reviewedConfig = config
+            let marker = config.entranceMarkers.first
+            validatedEntranceMarker = marker
+            let displayName = marker?.displayName ?? "Entrance"
+            confirmedEntrance = displayName
+            state = .entranceConfirmed(entranceName: displayName)
+            return nil
+        }
     }
 
     // MARK: - State Transitions
 
     func startQRScan() {
-        guard reviewedConfig != nil else { return }
         state = .qrScan
     }
 

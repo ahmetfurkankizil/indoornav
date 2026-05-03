@@ -18,6 +18,7 @@ struct BuildingPackageLoader {
         let z: Double
         let type: String
         let label: String?
+        let floorId: String?
     }
 
     struct PackageEdge: Codable {
@@ -53,6 +54,8 @@ struct BuildingPackageLoader {
         let destinationNodeId: String
         let category: String?
         let description: String?
+        let floorId: String?
+        let floorName: String?
     }
 
     struct RouteRenderingConfig: Codable {
@@ -61,6 +64,37 @@ struct BuildingPackageLoader {
         let destinationThresholdMeters: Double
         let turnMarkerThresholdDegrees: Double
         let arrowHeightOffsetMeters: Double
+    }
+
+    // MARK: - Unified (remote) package format
+
+    struct UnifiedFloor: Codable {
+        let floorId: String
+        let floorNumber: Int
+        let floorName: String
+        let floorY: Double
+        let nodes: [PackageNode]
+        let edges: [PackageEdge]
+    }
+
+    struct CrossFloorConnection: Codable {
+        let id: String
+        let fromNodeId: String
+        let toNodeId: String
+        let type: String
+        let bidirectional: Bool
+    }
+
+    struct UnifiedPackage: Codable {
+        let buildingId: String
+        let buildingName: String
+        let version: Int
+        let floors: [UnifiedFloor]
+        let entranceMarkers: [PackageMarker]
+        let buildingWidthMeters: Double?
+        let routeRendering: RouteRenderingConfig
+        let crossFloorConnections: [CrossFloorConnection]?
+        let checksum: String?
     }
 
     // MARK: - Multi-file package containers
@@ -233,6 +267,89 @@ struct BuildingPackageLoader {
         return .success(config)
     }
 
+    // MARK: - Remote package parsing
+
+    /// Parse a `UnifiedPackage` JSON string returned by the admin API mobile endpoint.
+    /// Scales all coordinates from map units to real-world metres, tags nodes with their
+    /// floor, and derives rooms from nodes whose type == "room".
+    static func parseUnifiedPackage(_ jsonString: String) -> Result<ReviewedConfig, PackageError> {
+        guard let data = jsonString.data(using: .utf8) else {
+            return .failure(.decodingFailed("package", NSError(domain: "utf8", code: 0)))
+        }
+        let unified: UnifiedPackage
+        do {
+            unified = try JSONDecoder().decode(UnifiedPackage.self, from: data)
+        } catch {
+            return .failure(.decodingFailed("unified package", error))
+        }
+
+        let targetWidth = unified.buildingWidthMeters ?? 25.0
+        let allRaw = unified.floors.flatMap { $0.nodes }
+        let minX = allRaw.map(\.x).min() ?? 0.0
+        let maxX = allRaw.map(\.x).max() ?? 1.0
+        let mapUnitWidth = maxX - minX
+        let scale = mapUnitWidth > 0.1 ? targetWidth / mapUnitWidth : 1.0
+
+        let floorInfoMap = Dictionary(uniqueKeysWithValues: unified.floors.map { ($0.floorId, $0) })
+
+        let allNodes: [PackageNode] = unified.floors.flatMap { floor in
+            floor.nodes.map { n in
+                PackageNode(id: n.id, x: n.x * scale, y: n.y * scale, z: n.z * scale,
+                            type: n.type, label: n.label, floorId: floor.floorId)
+            }
+        }
+        let nodeMap = Dictionary(uniqueKeysWithValues: allNodes.map { ($0.id, $0) })
+
+        let intraEdges = unified.floors.flatMap { $0.edges }
+        let crossEdges = (unified.crossFloorConnections ?? []).map { c -> PackageEdge in
+            let fromFloor = nodeMap[c.fromNodeId]?.floorId.flatMap { floorInfoMap[$0] }
+            let toFloor   = nodeMap[c.toNodeId]?.floorId.flatMap { floorInfoMap[$0] }
+            let floorDiff: Double = (fromFloor != nil && toFloor != nil)
+                ? Double(abs(fromFloor!.floorNumber - toFloor!.floorNumber)) : 1.0
+            return PackageEdge(id: c.id, from: c.fromNodeId, to: c.toNodeId,
+                               cost: floorDiff * 5.0, bidirectional: c.bidirectional)
+        }
+        let allEdges = intraEdges + crossEdges
+
+        let rooms: [PackageRoom] = allNodes.filter { $0.type == "room" }.map { n in
+            let floor = n.floorId.flatMap { floorInfoMap[$0] }
+            return PackageRoom(id: n.id, displayName: n.label ?? "Room",
+                               destinationNodeId: n.id, category: "room", description: nil,
+                               floorId: n.floorId, floorName: floor?.floorName)
+        }
+
+        if rooms.isEmpty { return .failure(.noRooms) }
+        if unified.entranceMarkers.isEmpty {
+            print("[PackageLoader] Warning: no entrance markers in remote package — AR alignment will be skipped")
+        }
+
+        let scaledMarkers = unified.entranceMarkers.map { m in
+            PackageMarker(id: m.id, displayName: m.displayName, startNodeId: m.startNodeId,
+                          physicalWidthMeters: m.physicalWidthMeters,
+                          physicalHeightMeters: m.physicalHeightMeters,
+                          position: Position3D(x: m.position.x * scale,
+                                               y: m.position.y * scale,
+                                               z: m.position.z * scale),
+                          forwardBasis: m.forwardBasis, rotationYDegrees: m.rotationYDegrees,
+                          referenceImageName: m.referenceImageName, notes: m.notes)
+        }
+
+        let manifest = Manifest(
+            packageVersion: "\(unified.version)",
+            buildingId: unified.buildingId,
+            buildingName: unified.buildingName,
+            floorId: unified.floors.first?.floorId ?? "0",
+            reviewStatus: "published",
+            files: ManifestFiles(rooms: "", navGraph: "", entranceMarkers: "", routeRendering: "")
+        )
+
+        print("[PackageLoader] Remote: \(allNodes.count) nodes, \(allEdges.count) edges, \(rooms.count) rooms, scale=\(String(format: "%.3f", scale))")
+
+        return .success(ReviewedConfig(manifest: manifest, rooms: rooms, nodes: allNodes,
+                                       edges: allEdges, entranceMarkers: scaledMarkers,
+                                       routeRendering: unified.routeRendering))
+    }
+
     // MARK: - Route Computation
 
     /// Compute a route from the entrance to a specific room.
@@ -255,6 +372,19 @@ struct BuildingPackageLoader {
 
         let destNodeId = room.destinationNodeId
         let destName = room.displayName
+
+        // Trivial case: entrance is the destination itself
+        if startNodeId == destNodeId {
+            guard let destNode = nodeMap[destNodeId] else { return nil }
+            let destPos = (destNode.x, destNode.z)
+            print("[PackageLoader] Route to \(destName): start == destination (0m)")
+            return LoadedPackage(
+                config: config, routeNodeIds: [startNodeId],
+                arrows: [], routePoints: [destPos], totalDistance: 0,
+                entranceMarker: config.entranceMarkers.first, destinationName: destName,
+                destinationPosition: destPos
+            )
+        }
 
         let routeNodeIds = dijkstra(from: startNodeId, to: destNodeId, adjacency: adjacency)
 

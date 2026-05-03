@@ -6,7 +6,8 @@ import {
   getBuilding, updateBuilding, createFloor, deleteFloor, publishBuilding,
   listConnections, createConnection, deleteConnection,
   getQrUrl, replaceFloor, listBuildingNodes,
-  type Floor, type FloorConnection,
+  listEntranceMarkers, createEntranceMarker, deleteEntranceMarker,
+  type Floor, type FloorConnection, type EntranceMarker,
 } from '../../api/buildings'
 import { api } from '../../api/client'
 import { listNodes, type Node } from '../../api/mapEditor'
@@ -28,6 +29,11 @@ export function BuildingDetailPage() {
   const [connTo, setConnTo]             = useState('')
   const [connType, setConnType]         = useState('elevator')
   const [errorPopup, setErrorPopup]     = useState<string | null>(null)
+  const [showAddMarker, setShowAddMarker]   = useState(false)
+  const [markerNodeId, setMarkerNodeId]     = useState('')
+  const [markerName, setMarkerName]         = useState('Main Entrance')
+  const [markerWidth, setMarkerWidth]       = useState(0.21)
+  const [markerHeight, setMarkerHeight]     = useState(0.21)
 
   const { data: building, isLoading } = useQuery({
     queryKey: ['building', buildingId],
@@ -45,6 +51,28 @@ export function BuildingDetailPage() {
     queryKey: ['buildingNodes', buildingId],
     queryFn: () => listBuildingNodes(buildingId!),
     enabled: !!buildingId,
+  })
+
+  const { data: entranceMarkers = [] } = useQuery<EntranceMarker[]>({
+    queryKey: ['entranceMarkers', buildingId],
+    queryFn: () => listEntranceMarkers(buildingId!),
+    enabled: !!buildingId,
+  })
+
+  const addMarkerMut = useMutation({
+    mutationFn: () => createEntranceMarker(buildingId!, {
+      displayName: markerName, startNodeId: markerNodeId,
+      physicalWidthMeters: markerWidth, physicalHeightMeters: markerHeight,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entranceMarkers', buildingId] })
+      setShowAddMarker(false); setMarkerNodeId(''); setMarkerName('Main Entrance')
+    },
+  })
+
+  const deleteMarkerMut = useMutation({
+    mutationFn: (markerId: string) => deleteEntranceMarker(buildingId!, markerId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['entranceMarkers', buildingId] }),
   })
 
   // Auto-detect connection type
@@ -313,7 +341,7 @@ export function BuildingDetailPage() {
                         <span className="font-semibold text-gray-900">{fromNode?.label || 'Unknown'}</span>
                         <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">{fromFloor?.floorName || 'Unknown Floor'}</span>
                       </div>
-                      
+
                       <div className="flex flex-col items-center">
                         <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded mt-1">{c.connectionType}</span>
@@ -328,6 +356,47 @@ export function BuildingDetailPage() {
                     <button onClick={() => delConnMut.mutate(c.id)}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       title="Remove connection">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Entrance Markers */}
+        <section className="mt-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold">Entrance Markers</h2>
+            <button onClick={() => setShowAddMarker(true)}
+              className="text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700">
+              + Add Marker
+            </button>
+          </div>
+
+          {entranceMarkers.length === 0 ? (
+            <p className="text-gray-400 text-sm py-4">
+              No entrance markers yet. Add at least one so the mobile app knows where to start AR navigation.
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {entranceMarkers.map((m) => {
+                const startNode = nodes.find(n => n.id === m.startNodeId)
+                const startFloor = building.floors?.find(f => f.id === startNode?.floorId)
+                return (
+                  <div key={m.id} className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-5 py-3 text-sm shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex-1">
+                      <span className="font-semibold text-gray-900">{m.displayName || 'Unnamed Entrance'}</span>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        Start node: <span className="font-medium text-gray-600">{startNode?.label || m.startNodeId}</span>
+                        {startFloor && <span className="ml-1">({startFloor.floorName})</span>}
+                        <span className="ml-3">{m.physicalWidthMeters}m × {m.physicalHeightMeters}m</span>
+                      </div>
+                    </div>
+                    <button onClick={() => deleteMarkerMut.mutate(m.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete marker">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
@@ -389,6 +458,59 @@ export function BuildingDetailPage() {
       {/* QR modal */}
       {showQr && (
         <QrModal buildingId={buildingId!} onClose={() => setShowQr(false)} />
+      )}
+
+      {/* Add entrance marker modal */}
+      {showAddMarker && (
+        <Modal title="Add Entrance Marker" onClose={() => setShowAddMarker(false)}>
+          <form onSubmit={e => { e.preventDefault(); addMarkerMut.mutate() }} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Display Name</label>
+              <input value={markerName} onChange={e => setMarkerName(e.target.value)}
+                placeholder="e.g. Main Entrance"
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Start Node <span className="text-red-500">*</span></label>
+              <select required value={markerNodeId} onChange={e => setMarkerNodeId(e.target.value)}
+                className="w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Select a node...</option>
+                {nodes.map(n => {
+                  const floor = building.floors?.find(f => f.id === n.floorId)
+                  return (
+                    <option key={n.id} value={n.id}>
+                      {n.label || 'Unnamed'} {floor ? `(${floor.floorName})` : ''}
+                    </option>
+                  )
+                })}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">The node closest to the physical entrance poster.</p>
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-1">Poster Width (m)</label>
+                <input type="number" step="0.01" min="0.05" value={markerWidth}
+                  onChange={e => setMarkerWidth(parseFloat(e.target.value))}
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-1">Poster Height (m)</label>
+                <input type="number" step="0.01" min="0.05" value={markerHeight}
+                  onChange={e => setMarkerHeight(parseFloat(e.target.value))}
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400">Default 0.21×0.21m matches a standard A4 printout at 21cm.</p>
+            <div className="flex gap-2 justify-end pt-2">
+              <button type="button" onClick={() => setShowAddMarker(false)}
+                className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
+              <button type="submit" disabled={addMarkerMut.isPending || !markerNodeId}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+                {addMarkerMut.isPending ? 'Saving...' : 'Add Marker'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {/* Error Popup */}

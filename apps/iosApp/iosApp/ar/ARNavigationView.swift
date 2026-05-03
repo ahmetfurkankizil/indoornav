@@ -2,16 +2,18 @@ import SwiftUI
 import ARKit
 import RealityKit
 
-/// Native AR navigation view with alignment-gated rendering.
+/// Native AR navigation view with optional marker-gated rendering.
 ///
-/// Phase 4: AR does not render navigation arrows until initial alignment is
-/// established from the entrance marker. The entrance marker metadata from
-/// the reviewed package drives the alignment transform.
+/// Phase 4: When an entrance marker includes a reference image, AR does not
+/// render navigation arrows until initial alignment is established from that
+/// marker. Web-published buildings may omit the reference image; in that case
+/// navigation starts from the user's current AR origin without asking for a
+/// second physical poster.
 ///
 /// Flow:
-///   1. AR session starts with image detection for the entrance marker.
-///   2. Pre-alignment overlay: "Point camera at the entrance QR"
-///   3. On marker detection → compute alignment transform → place arrows.
+///   1. AR session starts with image detection when a marker image is configured.
+///   2. Pre-alignment overlay asks for the entrance poster only in that case.
+///   3. On marker detection, or immediately for markerless packages, place arrows.
 ///   4. Phase 3 rolling lookahead + fade-behind + distance arrival continues.
 ///
 /// This view REQUIRES an explicit destination and precomputed route package.
@@ -505,6 +507,13 @@ class ARNavigationViewModel: ObservableObject {
     var detectionCandidateCount: Int { markerDetector.totalCandidatesSeen }
     var detectionRejectedCount: Int { markerDetector.rejectedCandidates }
     var expectedMarkerNameForDebug: String { markerDetector.expectedMarkerName ?? "none" }
+    private var configuredReferenceImageName: String? {
+        guard let name = entranceMarker?.referenceImageName?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !name.isEmpty else {
+            return nil
+        }
+        return name
+    }
 
     /// Configure with a precomputed route package and entrance marker.
     func configure(with package: BuildingPackageLoader.LoadedPackage, entranceMarker: BuildingPackageLoader.PackageMarker?) {
@@ -571,7 +580,7 @@ class ARNavigationViewModel: ObservableObject {
 
         markerDetector.configure(
             markerId: marker?.id ?? "marker-entrance-a",
-            markerName: marker?.referenceImageName ?? "entrance_marker_main",
+            markerName: configuredReferenceImageName,
             buildingX: marker?.position.x ?? 0.0,
             buildingY: marker?.position.y ?? 1.2,
             buildingZ: marker?.position.z ?? 0.0,
@@ -586,17 +595,25 @@ class ARNavigationViewModel: ObservableObject {
 
     func startSession() {
         guard let arView = arView else { return }
-        sessionStateLabel = "Waiting for Poster"
-        stateColor = .orange
         alignmentTimedOut = false
+        markerAssetError = nil
 
         let marker = self.entranceMarker
-        let markerWidth = marker?.physicalWidthMeters ?? 0.21
-        let markerImageName = marker?.referenceImageName ?? "entrance_marker_main"
 
         // Pre-start validation: verify asset chain
         print("[ARNav] --- Pre-Start Validation ---")
         print("[ARNav] Entrance marker from package: id=\(marker?.id ?? "nil"), refImage=\(marker?.referenceImageName ?? "nil"), width=\(marker?.physicalWidthMeters ?? -1)m")
+
+        guard let markerImageName = configuredReferenceImageName else {
+            print("[ARNav] No reference image configured; starting markerless world tracking")
+            sessionManager.startWorldTrackingSession(arView: arView)
+            alignToCurrentPosition()
+            return
+        }
+
+        sessionStateLabel = "Waiting for Poster"
+        stateColor = .orange
+        let markerWidth = marker?.physicalWidthMeters ?? 0.21
 
         #if !targetEnvironment(simulator)
         // Check that the reference image exists before starting the session
@@ -673,15 +690,22 @@ class ARNavigationViewModel: ObservableObject {
 
     func retryAlignment() {
         alignmentTimedOut = false
-        sessionStateLabel = "Waiting for Marker"
-        stateColor = .orange
+        markerAssetError = nil
         markerDetector.reset()
 
         // Restart the session to reset tracking
         guard let arView = arView else { return }
         let marker = self.entranceMarker
+
+        guard let markerImageName = configuredReferenceImageName else {
+            sessionManager.startWorldTrackingSession(arView: arView)
+            alignToCurrentPosition()
+            return
+        }
+
+        sessionStateLabel = "Waiting for Poster"
+        stateColor = .orange
         let markerWidth = marker?.physicalWidthMeters ?? 0.21
-        let markerImageName = marker?.referenceImageName ?? "entrance_marker_main"
 
         sessionManager.startSession(
             arView: arView,
@@ -721,10 +745,50 @@ class ARNavigationViewModel: ObservableObject {
         handleMarkerDetected(event)
     }
 
+    private func alignToCurrentPosition() {
+        alignmentTimeoutTimer?.invalidate()
+        alignmentTimedOut = false
+        isSimulated = false
+        isAligned = true
+        sessionStateLabel = "Navigating"
+        stateColor = .blue
+        currentInstruction = "Follow the path"
+        isLowConfidence = false
+        HapticManager.shared.routeStarted()
+
+        progress = 0.0
+        userCumulativeDistance = 0.0
+
+        guard let pkg = routePackage, let arView = arView else { return }
+
+        let startPoint = pkg.routePoints.first ?? (0.0, 0.0)
+        alignmentOffsetX = -startPoint.0
+        alignmentOffsetY = 0.0
+        alignmentOffsetZ = -startPoint.1
+        alignmentRotYDeg = 0.0
+
+        routeRenderer.setAlignmentTransform(
+            offsetX: alignmentOffsetX,
+            offsetY: alignmentOffsetY,
+            offsetZ: alignmentOffsetZ,
+            rotationYDeg: alignmentRotYDeg
+        )
+
+        remainingDistance = pkg.totalDistance
+        distanceToDestination = pkg.totalDistance
+        routeRenderer.placeAllArrows(in: arView, arrows: pkg.arrows)
+        routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
+        arrowCount = routeRenderer.renderedArrowCount
+        updateNextAction()
+
+        print("[ARNav] Markerless alignment locked at current position — route start mapped to AR origin")
+        startPoseUpdates()
+    }
+
     func advanceProgress() {
         guard let pkg = routePackage else { return }
         userCumulativeDistance = min(userCumulativeDistance + 2.0, pkg.totalDistance)
-        progress = min(userCumulativeDistance / pkg.totalDistance, 1.0)
+        progress = pkg.totalDistance > 0 ? min(userCumulativeDistance / pkg.totalDistance, 1.0) : 1.0
         remainingDistance = max(0, pkg.totalDistance - userCumulativeDistance)
 
         // Approximate: use remaining route distance as proxy in simulation

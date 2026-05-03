@@ -1,31 +1,31 @@
 import Foundation
 
-/// Decoded QR payload from an entrance marker.
+/// Decoded QR payload from an entrance poster.
 ///
-/// Phase 4: The QR code encodes a small JSON object identifying the building
-/// and entrance. The app validates it against the bundled reviewed package.
-///
-/// Payload format (JSON):
-/// ```json
-/// {
-///   "type": "vecturai-entrance",
-///   "buildingId": "19",
-///   "entranceId": "marker-main-entrance",
-///   "v": 1
-/// }
-/// ```
+/// Two formats are supported:
+/// - v1 (bundled package): {"type":"vecturai-entrance","buildingId":"...","entranceId":"...","v":1}
+/// - v2 (remote package):  {"type":"vecturai-building","token":"...","v":2}
 struct QRPayload: Codable, Equatable {
     let type: String
-    let buildingId: String
-    let entranceId: String
+    let token: String?      // v2 only
+    let buildingId: String? // v1 only
+    let entranceId: String? // v1 only
     let v: Int
 
-    /// Expected `type` field value.
-    static let expectedType = "vecturai-entrance"
-    /// Current payload version.
-    static let currentVersion = 1
+    enum Format: Equatable {
+        case bundled(buildingId: String, entranceId: String)
+        case remote(token: String)
+    }
 
-    // MARK: - Parsing
+    var format: Format? {
+        if type == "vecturai-building", let t = token { return .remote(token: t) }
+        if type == "vecturai-entrance", let b = buildingId, let e = entranceId {
+            return .bundled(buildingId: b, entranceId: e)
+        }
+        return nil
+    }
+
+    // MARK: - Errors
 
     enum PayloadError: Error, CustomStringConvertible {
         case notJSON
@@ -50,37 +50,32 @@ struct QRPayload: Codable, Equatable {
         }
     }
 
-    /// Parse a raw QR string into a validated payload.
+    // MARK: - Parsing
+
     static func parse(_ raw: String) -> Result<QRPayload, PayloadError> {
         guard let data = raw.data(using: .utf8),
               let payload = try? JSONDecoder().decode(QRPayload.self, from: data) else {
             return .failure(.notJSON)
         }
-
-        guard payload.type == expectedType else {
+        guard payload.format != nil else {
             return .failure(.wrongType(payload.type))
         }
-
-        guard payload.v >= 1, payload.v <= currentVersion else {
+        guard payload.v >= 1 && payload.v <= 2 else {
             return .failure(.unsupportedVersion(payload.v))
         }
-
         return .success(payload)
     }
 
-    /// Validate that the payload matches a loaded reviewed package config.
+    /// Validate a v1 (bundled) payload against a loaded reviewed package.
+    /// Always returns nil for v2 payloads (those are validated after remote fetch).
     func validate(against config: BuildingPackageLoader.ReviewedConfig) -> PayloadError? {
-        // Check building id
-        if config.manifest.buildingId != buildingId {
-            return .buildingMismatch(expected: config.manifest.buildingId, got: buildingId)
+        guard case .bundled(let bid, let eid) = format else { return nil }
+        if config.manifest.buildingId != bid {
+            return .buildingMismatch(expected: config.manifest.buildingId, got: bid)
         }
-
-        // Check entrance exists
-        let entranceExists = config.entranceMarkers.contains { $0.id == entranceId }
-        if !entranceExists {
-            return .entranceNotFound(entranceId)
+        if !config.entranceMarkers.contains(where: { $0.id == eid }) {
+            return .entranceNotFound(eid)
         }
-
         return nil
     }
 }

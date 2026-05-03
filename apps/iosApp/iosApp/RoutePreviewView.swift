@@ -96,7 +96,7 @@ struct RoutePreviewView: View {
                             RoundedRectangle(cornerRadius: 6)
                                 .fill(Color.blue.opacity(0.15))
                                 .frame(width: 32, height: 32)
-                            Image(systemName: "mappin.fill")
+                            Image(systemName: "mappin")
                                 .font(.system(size: 14))
                                 .foregroundStyle(.blue)
                         }

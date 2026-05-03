@@ -116,22 +116,8 @@ private struct PackageErrorView: View {
 
 private struct HomeView: View {
     @ObservedObject var flow: NavigationFlowModel
-    @State private var showAdminTools = false
-
     var body: some View {
         VStack(spacing: 0) {
-            // Admin gear — top trailing, secondary visual weight
-            HStack {
-                Spacer()
-                Button(action: { showAdminTools = true }) {
-                    Image(systemName: "gearshape")
-                        .font(.body)
-                        .foregroundStyle(Color(.tertiaryLabel))
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
-            }
-
             Spacer()
 
             // App identity
@@ -175,9 +161,6 @@ private struct HomeView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .sheet(isPresented: $showAdminTools) {
-            AdminDraftJobsView()
-        }
     }
 }
 
