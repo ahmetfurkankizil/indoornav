@@ -12,6 +12,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -91,12 +92,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.vecturai.android.R
 import com.vecturai.android.data.AndroidReviewedPackageLoader
 import com.vecturai.android.ar.AndroidHapticManager
 import com.vecturai.android.navigation.ArCameraFlowViewModel
@@ -156,16 +159,9 @@ fun AndroidNavigationApp(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(onStartNavigation: () -> Unit) {
-    var showAdminTools by remember { mutableStateOf(false) }
-    var gearArmed by remember { mutableStateOf(false) }
     var activePill by remember { mutableIntStateOf(0) }
     val reduceMotion = rememberReduceMotion()
     val intensity = rememberAuroraIntensity()
-    val gearRotation by animateFloatAsState(
-        targetValue = if (gearArmed) 30f else 0f,
-        animationSpec = tween(220, easing = FastOutSlowInEasing),
-        label = "gearRotation",
-    )
 
     LaunchedEffect(reduceMotion) {
         if (reduceMotion) return@LaunchedEffect
@@ -182,20 +178,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
     ) {
         AuroraBackground(intensity = intensity)
 
-        IconChip(
-            icon = Icons.Default.Settings,
-            contentDescription = "Admin Tools",
-            onClick = {
-                gearArmed = true
-                showAdminTools = true
-            },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(top = Spacing.xs, end = Spacing.md)
-                .graphicsLayer { rotationZ = gearRotation },
-            tint = VecturaiColors.TextMuted,
-        )
+
 
         Column(
             modifier = Modifier
@@ -215,7 +198,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
             Spacer(Modifier.height(Spacing.lg))
 
             GradientText(
-                text = "VecturAI",
+                text = "Vectura AI",
                 style = MaterialTheme.typography.displayLarge,
                 textAlign = TextAlign.Center,
             )
@@ -265,52 +248,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
         }
     }
 
-    if (showAdminTools) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showAdminTools = false
-                gearArmed = false
-            },
-            containerColor = VecturaiColors.SurfaceElevated,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Spacing.xl),
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    BrandMark(pulsing = false, modifier = Modifier.size(48.dp))
-                    Spacer(Modifier.width(Spacing.sm))
-                    Column(Modifier.weight(1f)) {
-                        Text("Admin Tools", color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            "Draft jobs are not available on this device.",
-                            color = VecturaiColors.TextMuted,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-                VecturaiCard {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.WorkspacePremium,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp),
-                        )
-                        Spacer(Modifier.width(Spacing.sm))
-                        Text(
-                            "Visitor navigation is ready. Admin review tools stay separate from the demo flow.",
-                            color = VecturaiColors.TextSecondary,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-                Spacer(Modifier.height(Spacing.md))
-            }
-        }
-    }
+
 }
 
 @Composable
@@ -1579,10 +1517,9 @@ private fun BrandMark(
             .border(BorderStroke(1.dp, if (muted) VecturaiColors.BorderStrong else MaterialTheme.colorScheme.primary), VecturaiShapes.XLarge),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = VecturaiBrandIcon,
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
             contentDescription = null,
-            tint = if (muted) VecturaiColors.TextMuted else Color.White,
             modifier = Modifier.size(48.dp),
         )
     }

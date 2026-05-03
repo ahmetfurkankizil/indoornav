@@ -7,6 +7,6 @@ package com.vecturai.android
  * so your phone can talk to the server running on your computer.
  */
 object VecturaiConfig {
-    const val PC_IP = "10.187.102.95" // <--- UPDATED
+    const val PC_IP = "192.168.1.14" // <--- UPDATED
     const val API_BASE_URL = "http://$PC_IP:8080"
 }

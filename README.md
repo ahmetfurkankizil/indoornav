@@ -1,4 +1,4 @@
-# VecturAI — Indoor AR Navigation
+# Vectura AI — Indoor AR Navigation
 
 > Kotlin Multiplatform indoor AR navigation for Android & iOS.
 

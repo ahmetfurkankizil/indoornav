@@ -36,7 +36,7 @@ fun HomeScreen(
     ) {
         // Header
         Text(
-            text = "VecturAI",
+            text = "Vectura AI",
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary,
         )

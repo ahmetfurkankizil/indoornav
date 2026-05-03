@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "VecturAI"
+rootProject.name = "Vectura AI"
 
 // ── App Modules ──────────────────────────────────────────
 include(":apps:androidApp")

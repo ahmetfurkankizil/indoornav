@@ -13,7 +13,9 @@
     <application
         android:name=".VecturaiApp"
         android:allowBackup="false"
-        android:label="VecturAI"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:label="Vectura AI"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">

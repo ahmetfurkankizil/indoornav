@@ -1,8 +1,8 @@
-# VecturAI — AGENTS.md
+# Vectura AI — AGENTS.md
 
 ## Project Overview
 
-VecturAI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
+Vectura AI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
 
 ## Phase 11 — Client-Facing Polish (2026-04-13)
 

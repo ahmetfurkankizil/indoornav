@@ -106,7 +106,7 @@ fun SettingsScreen(
 
         // App info
         Text(
-            text = "VecturAI v0.1.0 (MVP)",
+            text = "Vectura AI v0.1.0 (MVP)",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally),
