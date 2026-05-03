@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import RealityKit
 import simd
 
@@ -20,7 +21,7 @@ class ARRouteRenderer {
     private var routeAnchor: AnchorEntity?
 
     /// All arrow entities, keyed by placement ID
-    private var arrowEntities: [String: ModelEntity] = [:]
+    private var arrowEntities: [String: Entity] = [:]
 
     /// All arrow placements (full route)
     private var allArrows: [ArrowPlacementData] = []
@@ -36,7 +37,11 @@ class ARRouteRenderer {
 
     // Rendering config from reviewed package
     private var lookaheadDistance: Double = 8.0
-    private var fadeDistance: Double = 3.0
+    private var fadeDistance: Double = 1.5
+    private var arrowHeightOffset: Double = 0.05
+    private var arrowFadeInProgress: [String: Float] = [:]
+
+    private let fadeInFrames: Float = 10.0
 
     /// Number of currently visible (active + fading) arrows
     var renderedArrowCount: Int {
@@ -46,10 +51,12 @@ class ARRouteRenderer {
     /// Configure rendering parameters from the reviewed package.
     func configureRendering(
         lookaheadDistanceMeters: Double,
-        fadeDistanceMeters: Double = 3.0
+        fadeDistanceMeters: Double = 1.5,
+        arrowHeightOffsetMeters: Double = 0.05
     ) {
         self.lookaheadDistance = lookaheadDistanceMeters
         self.fadeDistance = fadeDistanceMeters
+        self.arrowHeightOffset = arrowHeightOffsetMeters
     }
 
     /// Set the alignment transform (building-local → AR world).
@@ -71,6 +78,7 @@ class ARRouteRenderer {
         self.allArrows = arrows
         let anchor = AnchorEntity(world: .zero)
         routeAnchor = anchor
+        arrowFadeInProgress.removeAll()
 
         for arrow in arrows {
             let entity = createArrowEntity(for: arrow)
@@ -89,7 +97,7 @@ class ARRouteRenderer {
             )
             if simd_length(arDir) > 0.001 {
                 let forward = simd_normalize(arDir)
-                let angle = atan2(forward.x, forward.z)
+                let angle = atan2(forward.x, forward.z) + .pi
                 entity.orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
             }
 
@@ -128,14 +136,66 @@ class ARRouteRenderer {
                 newState = .hidden
             }
 
-            // Only update entity if state changed
-            if newState != oldState {
-                applyState(newState, to: entity, arrowDistance: dist, userDistance: userCumulativeDistance)
-                arrowStates[arrow.id] = newState
-            } else if newState == .fading {
-                // Update fade opacity continuously
-                applyState(newState, to: entity, arrowDistance: dist, userDistance: userCumulativeDistance)
+            if newState != .hidden {
+                let current = arrowFadeInProgress[arrow.id] ?? 0
+                arrowFadeInProgress[arrow.id] = min(fadeInFrames, current + 1)
+            } else if oldState != .hidden {
+                arrowFadeInProgress.removeValue(forKey: arrow.id)
             }
+
+            applyState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
+            arrowStates[arrow.id] = newState
+        }
+    }
+
+    /// Update arrow visibility and cull guidance that is well behind the camera.
+    func updateVisibility(
+        userCumulativeDistance: Double,
+        cameraWorldX: Float,
+        cameraWorldZ: Float,
+        cameraForwardX: Float,
+        cameraForwardZ: Float
+    ) {
+        let aheadLimit = userCumulativeDistance + lookaheadDistance
+        let behindLimit = userCumulativeDistance - fadeDistance
+
+        for arrow in allArrows {
+            guard let entity = arrowEntities[arrow.id] else { continue }
+            let dist = arrow.cumulativeDistance
+            let oldState = arrowStates[arrow.id] ?? .hidden
+
+            var newState: ArrowState
+            if dist >= userCumulativeDistance && dist <= aheadLimit {
+                newState = .active
+            } else if dist >= behindLimit && dist < userCumulativeDistance {
+                newState = .fading
+            } else {
+                newState = .hidden
+            }
+
+            if newState != .hidden {
+                let pos = transformToAR(
+                    buildingX: arrow.positionX,
+                    buildingY: arrow.positionY,
+                    buildingZ: arrow.positionZ
+                )
+                let toArrowX = pos.x - cameraWorldX
+                let toArrowZ = pos.z - cameraWorldZ
+                let dot = toArrowX * cameraForwardX + toArrowZ * cameraForwardZ
+                if dot < -0.5 {
+                    newState = .hidden
+                }
+            }
+
+            if newState != .hidden {
+                let current = arrowFadeInProgress[arrow.id] ?? 0
+                arrowFadeInProgress[arrow.id] = min(fadeInFrames, current + 1)
+            } else if oldState != .hidden {
+                arrowFadeInProgress.removeValue(forKey: arrow.id)
+            }
+
+            applyState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
+            arrowStates[arrow.id] = newState
         }
     }
 
@@ -145,6 +205,7 @@ class ARRouteRenderer {
             entity.scale = .zero
             arrowStates[id] = .hidden
         }
+        arrowFadeInProgress.removeAll()
     }
 
     /// Remove all route entities from the scene.
@@ -156,22 +217,25 @@ class ARRouteRenderer {
         arrowEntities.removeAll()
         arrowStates.removeAll()
         allArrows.removeAll()
+        arrowFadeInProgress.removeAll()
     }
 
     // MARK: - State Application
 
-    private func applyState(_ state: ArrowState, to entity: ModelEntity, arrowDistance: Double, userDistance: Double) {
+    private func applyState(_ state: ArrowState, to entity: Entity, arrow: ArrowPlacementData, arrowDistance: Double, userDistance: Double) {
         switch state {
         case .active:
-            entity.scale = SIMD3<Float>(1, 1, 1)
-            setOpacity(entity, opacity: 1.0)
+            let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
+            entity.scale = baseScale(for: arrow.type) * fadeIn
+            setOpacity(entity, opacity: fadeIn)
 
         case .fading:
             let behind = userDistance - arrowDistance
             let t = max(0, min(1, behind / fadeDistance))
-            let opacity = Float(1.0 - t * 0.8) // fade from 1.0 down to 0.2
-            let scale = Float(1.0 - t * 0.3)   // shrink slightly
-            entity.scale = SIMD3<Float>(scale, scale, scale)
+            let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
+            let opacity = Float(1.0 - t * 0.8) * fadeIn
+            let scale = Float(1.0 - t * 0.3) * fadeIn
+            entity.scale = baseScale(for: arrow.type) * scale
             setOpacity(entity, opacity: opacity)
 
         case .hidden:
@@ -179,41 +243,107 @@ class ARRouteRenderer {
         }
     }
 
-    private func setOpacity(_ entity: ModelEntity, opacity: Float) {
-        guard var material = entity.model?.materials.first as? SimpleMaterial else { return }
-        material.color.tint = material.color.tint.withAlphaComponent(CGFloat(opacity))
-        entity.model?.materials = [material]
+    private func setOpacity(_ entity: Entity, opacity: Float) {
+        if let model = entity as? ModelEntity,
+           var material = model.model?.materials.first as? SimpleMaterial {
+            let alpha = entity.name.hasSuffix("-shadow") ? opacity * 0.22 : opacity
+            material.color.tint = material.color.tint.withAlphaComponent(CGFloat(alpha))
+            model.model?.materials = [material]
+        }
+        for child in entity.children {
+            setOpacity(child, opacity: opacity)
+        }
     }
 
     // MARK: - Entity Creation
 
-    private func createArrowEntity(for arrow: ArrowPlacementData) -> ModelEntity {
-        let entity: ModelEntity
-
+    private func createArrowEntity(for arrow: ArrowPlacementData) -> Entity {
         switch arrow.type {
         case .follow:
-            let mesh = MeshResource.generateBox(size: [0.15, 0.05, 0.3], cornerRadius: 0.02)
-            let material = SimpleMaterial(color: .systemBlue, roughness: 0.3, isMetallic: false)
-            entity = ModelEntity(mesh: mesh, materials: [material])
+            return makeChevronArrow(name: arrow.id, color: UIColor(red: 0.086, green: 0.545, blue: 1.0, alpha: 1.0))
 
         case .turnLeft, .turnRight:
-            let mesh = MeshResource.generateBox(size: [0.25, 0.08, 0.25], cornerRadius: 0.02)
-            let material = SimpleMaterial(color: .systemYellow, roughness: 0.3, isMetallic: false)
-            entity = ModelEntity(mesh: mesh, materials: [material])
+            return makeChevronArrow(name: arrow.id, color: UIColor(red: 0.98, green: 0.80, blue: 0.08, alpha: 1.0), isTurn: true)
 
         case .uTurn:
-            let mesh = MeshResource.generateBox(size: [0.3, 0.1, 0.3], cornerRadius: 0.02)
-            let material = SimpleMaterial(color: .systemOrange, roughness: 0.3, isMetallic: false)
-            entity = ModelEntity(mesh: mesh, materials: [material])
+            return makeChevronArrow(name: arrow.id, color: .systemOrange, isTurn: true)
 
         case .destination:
             let mesh = MeshResource.generateSphere(radius: 0.15)
             let material = SimpleMaterial(color: .systemGreen, roughness: 0.3, isMetallic: false)
-            entity = ModelEntity(mesh: mesh, materials: [material])
+            let entity = ModelEntity(mesh: mesh, materials: [material])
+            entity.name = arrow.id
+            return entity
         }
+    }
 
-        entity.name = arrow.id
-        return entity
+    private func makeChevronArrow(name: String, color: UIColor, isTurn: Bool = false) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        let core = makeChevronLineSet(
+            name: "\(name)-core",
+            color: color,
+            width: 0.055,
+            height: 0.018,
+            length: isTurn ? 0.58 : 0.50,
+            spread: isTurn ? 0.28 : 0.24
+        )
+        core.position = [0, 0.015, 0]
+        root.addChild(core)
+
+        let glow = makeChevronLineSet(
+            name: "\(name)-glow",
+            color: color.withAlphaComponent(0.32),
+            width: 0.11,
+            height: 0.01,
+            length: isTurn ? 0.64 : 0.56,
+            spread: isTurn ? 0.32 : 0.28
+        )
+        glow.position = [0, 0.006, 0]
+        root.addChild(glow)
+
+        return root
+    }
+
+    private func makeChevronLineSet(
+        name: String,
+        color: UIColor,
+        width: Float,
+        height: Float,
+        length: Float,
+        spread: Float
+    ) -> Entity {
+        let root = Entity()
+        root.name = name
+        let material = SimpleMaterial(color: color, roughness: 0.12, isMetallic: false)
+        let segmentLength = sqrt(length * length + spread * spread)
+        let mesh = MeshResource.generateBox(size: [width, height, segmentLength], cornerRadius: width * 0.45)
+
+        let left = ModelEntity(mesh: mesh, materials: [material])
+        left.position = [-spread / 2.0, 0, 0]
+        left.orientation = simd_quatf(angle: -.pi / 4.0, axis: [0, 1, 0])
+        root.addChild(left)
+
+        let right = ModelEntity(mesh: mesh, materials: [material])
+        right.position = [spread / 2.0, 0, 0]
+        right.orientation = simd_quatf(angle: .pi / 4.0, axis: [0, 1, 0])
+        root.addChild(right)
+
+        return root
+    }
+
+    private func baseScale(for type: ArrowPlacementType) -> SIMD3<Float> {
+        switch type {
+        case .follow:
+            return SIMD3<Float>(1.0, 1.0, 1.0)
+        case .turnLeft, .turnRight:
+            return SIMD3<Float>(1.18, 1.18, 1.18)
+        case .uTurn:
+            return SIMD3<Float>(1.25, 1.25, 1.25)
+        case .destination:
+            return SIMD3<Float>(1.0, 1.0, 1.0)
+        }
     }
 
     // MARK: - Coordinate Transform

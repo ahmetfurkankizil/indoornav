@@ -523,7 +523,8 @@ class ARNavigationViewModel: ObservableObject {
         let renderConfig = package.config.routeRendering
         self.destinationThreshold = renderConfig.destinationThresholdMeters
         routeRenderer.configureRendering(
-            lookaheadDistanceMeters: renderConfig.lookaheadDistanceMeters
+            lookaheadDistanceMeters: renderConfig.lookaheadDistanceMeters,
+            arrowHeightOffsetMeters: renderConfig.arrowHeightOffsetMeters
         )
     }
 
@@ -755,6 +756,7 @@ class ARNavigationViewModel: ObservableObject {
         currentInstruction = "Follow the path"
         isLowConfidence = false
         HapticManager.shared.routeStarted()
+        lastHapticArrowId = nil
 
         progress = 0.0
         userCumulativeDistance = 0.0
@@ -762,10 +764,20 @@ class ARNavigationViewModel: ObservableObject {
         guard let pkg = routePackage, let arView = arView else { return }
 
         let startPoint = pkg.routePoints.first ?? (0.0, 0.0)
-        alignmentOffsetX = -startPoint.0
-        alignmentOffsetY = 0.0
-        alignmentOffsetZ = -startPoint.1
-        alignmentRotYDeg = 0.0
+        let routeForward = initialRouteForward(from: pkg.routePoints)
+        alignmentRotYDeg = markerlessRotationToFaceForward(routeForward: routeForward)
+
+        let rotRad = alignmentRotYDeg * .pi / 180.0
+        let cosR = cos(rotRad)
+        let sinR = sin(rotRad)
+        let rotatedStartX = startPoint.0 * cosR + startPoint.1 * sinR
+        let rotatedStartZ = -startPoint.0 * sinR + startPoint.1 * cosR
+
+        let startDistanceInFrontOfCamera = 0.8
+        let markerlessGuidanceHeight = 1.15
+        alignmentOffsetX = -rotatedStartX
+        alignmentOffsetY = markerlessGuidanceHeight
+        alignmentOffsetZ = -startDistanceInFrontOfCamera - rotatedStartZ
 
         routeRenderer.setAlignmentTransform(
             offsetX: alignmentOffsetX,
@@ -781,8 +793,29 @@ class ARNavigationViewModel: ObservableObject {
         arrowCount = routeRenderer.renderedArrowCount
         updateNextAction()
 
-        print("[ARNav] Markerless alignment locked at current position — route start mapped to AR origin")
+        print("[ARNav] Markerless alignment locked — route starts \(startDistanceInFrontOfCamera)m ahead, guidance height: \(markerlessGuidanceHeight)m, first segment rotation: \(alignmentRotYDeg)°")
         startPoseUpdates()
+    }
+
+    private func initialRouteForward(from routePoints: [(Double, Double)]) -> (x: Double, z: Double) {
+        guard routePoints.count >= 2 else { return (0.0, -1.0) }
+
+        for index in 0..<(routePoints.count - 1) {
+            let dx = routePoints[index + 1].0 - routePoints[index].0
+            let dz = routePoints[index + 1].1 - routePoints[index].1
+            let length = sqrt(dx * dx + dz * dz)
+            if length > 0.01 {
+                return (dx / length, dz / length)
+            }
+        }
+
+        return (0.0, -1.0)
+    }
+
+    private func markerlessRotationToFaceForward(routeForward: (x: Double, z: Double)) -> Double {
+        let routeAngle = atan2(routeForward.x, routeForward.z)
+        let arForwardAngle = Double.pi
+        return (arForwardAngle - routeAngle) * 180.0 / .pi
     }
 
     func advanceProgress() {
@@ -878,6 +911,7 @@ class ARNavigationViewModel: ObservableObject {
         currentInstruction = "Follow the path"
         isLowConfidence = false
         HapticManager.shared.routeStarted()
+        lastHapticArrowId = nil
 
         if !isSimulated {
             progress = 0.0
@@ -991,8 +1025,15 @@ class ARNavigationViewModel: ObservableObject {
             self.distanceToDestination = destDist
             self.isLowConfidence = bestDist > 3.0
 
-            // Update arrow visibility based on progress
-            self.routeRenderer.updateVisibility(userCumulativeDistance: self.userCumulativeDistance)
+            // Update arrow visibility based on progress, hiding guidance that is behind the camera.
+            let forward = self.cameraForward(from: transform)
+            self.routeRenderer.updateVisibility(
+                userCumulativeDistance: self.userCumulativeDistance,
+                cameraWorldX: pos.x,
+                cameraWorldZ: pos.z,
+                cameraForwardX: forward.x,
+                cameraForwardZ: forward.z
+            )
             self.arrowCount = self.routeRenderer.renderedArrowCount
 
             // Phase 11: Update next-action guidance
@@ -1000,6 +1041,18 @@ class ARNavigationViewModel: ObservableObject {
 
             self.checkArrival(distToDest: destDist)
         }
+    }
+
+    private func cameraForward(from transform: Transform) -> SIMD3<Float> {
+        let matrix = transform.matrix
+        let forward = SIMD3<Float>(
+            -matrix.columns.2.x,
+            -matrix.columns.2.y,
+            -matrix.columns.2.z
+        )
+        let length = simd_length(forward)
+        guard length > 0.001 else { return SIMD3<Float>(0, 0, -1) }
+        return forward / length
     }
 
     private func checkArrival(distToDest: Double) {
