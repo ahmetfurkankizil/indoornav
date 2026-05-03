@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Node, Edge, SuggestedEdge } from '../api/mapEditor'
+import type { Node, Edge, SuggestedEdge, SuggestedNode } from '../api/mapEditor'
 
 export type EditorMode = 'select' | 'addNode' | 'addEdge'
 
