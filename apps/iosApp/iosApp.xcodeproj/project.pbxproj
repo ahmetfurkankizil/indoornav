@@ -12,26 +12,26 @@
 		72BAC161DD994E869A7EE3C2 /* ARRouteRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8EEA798F3BE4F7090F8C7FE /* ARRouteRenderer.swift */; };
 		7D3F0417ADA54C4EBC7FB493 /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAB25D341A5492CA4C4C720 /* ARSessionManager.swift */; };
 		A074C7C24B504600B4D15792 /* ARMarkerDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30DA58F85314710BF85B0A9 /* ARMarkerDetector.swift */; };
-		AEB18B6B1F1F4DEBBD1AC45E /* ARBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD511EB06B44B0BB2E61FDF /* ARBridge.swift */; };
-		C1A2B3C4D5E6F7A8B9C0D1E2 /* BuildingPackageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B3C4D5E6F7A8B9C0D1E2F3 /* BuildingPackageLoader.swift */; };
-		EBA14F1EBBEF4609A39695E6 /* ARNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49272C0B47044B29A4AFF748 /* ARNavigationView.swift */; };
-		P1A1B1C1D1E1F1A1B1C1D1E1 /* NavigationFlowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1A1B1C1D1E1F1A1B1C1D1E2 /* NavigationFlowModel.swift */; };
-		P2A2B2C2D2E2F2A2B2C2D2E2 /* QRScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P2A2B2C2D2E2F2A2B2C2D2E3 /* QRScanView.swift */; };
-		P3A3B3C3D3E3F3A3B3C3D3E3 /* DestinationSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */; };
-		P4A4B4C4D4E4F4A4B4C4D4E4 /* RoutePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */; };
-		VT01VT01VT01VT01VT01VT01 /* VecturTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */; };
-		HM01HM01HM01HM01HM01HM01 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */; };
-		Q1A1B1C1D1E1F1A1B1C1D1E1 /* QRPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */; };
 		AD01AD01AD01AD01AD01AD01 /* AdminAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD02AD02AD02AD02AD02AD02 /* AdminAPIClient.swift */; };
 		AD03AD03AD03AD03AD03AD03 /* AdminDraftJobsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD04AD04AD04AD04AD04AD04 /* AdminDraftJobsView.swift */; };
 		AD05AD05AD05AD05AD05AD05 /* AdminJobDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD06AD06AD06AD06AD06AD06 /* AdminJobDetailView.swift */; };
 		AD07AD08AD07AD08AD07AD08 /* AdminDraftReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD07AD09AD07AD09AD07AD09 /* AdminDraftReviewView.swift */; };
+		AEB18B6B1F1F4DEBBD1AC45E /* ARBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD511EB06B44B0BB2E61FDF /* ARBridge.swift */; };
+		C1A2B3C4D5E6F7A8B9C0D1E2 /* BuildingPackageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B3C4D5E6F7A8B9C0D1E2F3 /* BuildingPackageLoader.swift */; };
+		EBA14F1EBBEF4609A39695E6 /* ARNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49272C0B47044B29A4AFF748 /* ARNavigationView.swift */; };
+		HM01HM01HM01HM01HM01HM01 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */; };
+		P1A1B1C1D1E1F1A1B1C1D1E1 /* NavigationFlowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1A1B1C1D1E1F1A1B1C1D1E2 /* NavigationFlowModel.swift */; };
+		P2A2B2C2D2E2F2A2B2C2D2E2 /* QRScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P2A2B2C2D2E2F2A2B2C2D2E3 /* QRScanView.swift */; };
+		P3A3B3C3D3E3F3A3B3C3D3E3 /* DestinationSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */; };
+		P4A4B4C4D4E4F4A4B4C4D4E4 /* RoutePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */; };
+		Q1A1B1C1D1E1F1A1B1C1D1E1 /* QRPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */; };
 		R1A1B1C1D1E1F1A1B1C1D1E1 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = R1A1B1C1D1E1F1A1B1C1D1E2 /* manifest.json */; };
 		R2A2B2C2D2E2F2A2B2C2D2E2 /* rooms.json in Resources */ = {isa = PBXBuildFile; fileRef = R2A2B2C2D2E2F2A2B2C2D2E3 /* rooms.json */; };
 		R3A3B3C3D3E3F3A3B3C3D3E3 /* nav_graph.json in Resources */ = {isa = PBXBuildFile; fileRef = R3A3B3C3D3E3F3A3B3C3D3E4 /* nav_graph.json */; };
 		R4A4B4C4D4E4F4A4B4C4D4E4 /* entrance_markers.json in Resources */ = {isa = PBXBuildFile; fileRef = R4A4B4C4D4E4F4A4B4C4D4E5 /* entrance_markers.json */; };
 		R5A5B5C5D5E5F5A5B5C5D5E5 /* route_rendering.json in Resources */ = {isa = PBXBuildFile; fileRef = R5A5B5C5D5E5F5A5B5C5D5E6 /* route_rendering.json */; };
 		S1A1B1C1D1E1F1A1B1C1D1E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */; };
+		VT01VT01VT01VT01VT01VT01 /* VecturTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,17 +41,20 @@
 		49272C0B47044B29A4AFF748 /* ARNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARNavigationView.swift; path = iosApp/ar/ARNavigationView.swift; sourceTree = "<group>"; };
 		98997B31EEE0464D9E4C8A54 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = iOSApp.swift; path = iosApp/iOSApp.swift; sourceTree = "<group>"; };
 		A57DC81635104117870158E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = iosApp/Info.plist; sourceTree = "<group>"; };
+		AD02AD02AD02AD02AD02AD02 /* AdminAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminAPIClient.swift; path = iosApp/admin/AdminAPIClient.swift; sourceTree = "<group>"; };
+		AD04AD04AD04AD04AD04AD04 /* AdminDraftJobsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminDraftJobsView.swift; path = iosApp/admin/AdminDraftJobsView.swift; sourceTree = "<group>"; };
+		AD06AD06AD06AD06AD06AD06 /* AdminJobDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminJobDetailView.swift; path = iosApp/admin/AdminJobDetailView.swift; sourceTree = "<group>"; };
+		AD07AD09AD07AD09AD07AD09 /* AdminDraftReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminDraftReviewView.swift; path = iosApp/admin/AdminDraftReviewView.swift; sourceTree = "<group>"; };
 		AEAB25D341A5492CA4C4C720 /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARSessionManager.swift; path = iosApp/ar/ARSessionManager.swift; sourceTree = "<group>"; };
 		B30DA58F85314710BF85B0A9 /* ARMarkerDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARMarkerDetector.swift; path = iosApp/ar/ARMarkerDetector.swift; sourceTree = "<group>"; };
 		D2B3C4D5E6F7A8B9C0D1E2F3 /* BuildingPackageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuildingPackageLoader.swift; path = iosApp/ar/BuildingPackageLoader.swift; sourceTree = "<group>"; };
 		D8EEA798F3BE4F7090F8C7FE /* ARRouteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARRouteRenderer.swift; path = iosApp/ar/ARRouteRenderer.swift; sourceTree = "<group>"; };
 		F800D82031F44DD1A2BC8350 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HapticManager.swift; path = iosApp/HapticManager.swift; sourceTree = "<group>"; };
 		P1A1B1C1D1E1F1A1B1C1D1E2 /* NavigationFlowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NavigationFlowModel.swift; path = iosApp/NavigationFlowModel.swift; sourceTree = "<group>"; };
 		P2A2B2C2D2E2F2A2B2C2D2E3 /* QRScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRScanView.swift; path = iosApp/QRScanView.swift; sourceTree = "<group>"; };
 		P3A3B3C3D3E3F3A3B3C3D3E4 /* DestinationSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DestinationSelectView.swift; path = iosApp/DestinationSelectView.swift; sourceTree = "<group>"; };
 		P4A4B4C4D4E4F4A4B4C4D4E5 /* RoutePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RoutePreviewView.swift; path = iosApp/RoutePreviewView.swift; sourceTree = "<group>"; };
-		VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VecturTheme.swift; path = iosApp/VecturTheme.swift; sourceTree = "<group>"; };
-		HM02HM02HM02HM02HM02HM02 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HapticManager.swift; path = iosApp/HapticManager.swift; sourceTree = "<group>"; };
 		Q1A1B1C1D1E1F1A1B1C1D1E2 /* QRPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRPayload.swift; path = iosApp/QRPayload.swift; sourceTree = "<group>"; };
 		R1A1B1C1D1E1F1A1B1C1D1E2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "iosApp/reviewed-package/manifest.json"; sourceTree = "<group>"; };
 		R2A2B2C2D2E2F2A2B2C2D2E3 /* rooms.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = rooms.json; path = "iosApp/reviewed-package/rooms.json"; sourceTree = "<group>"; };
@@ -59,10 +62,7 @@
 		R4A4B4C4D4E4F4A4B4C4D4E5 /* entrance_markers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = entrance_markers.json; path = "iosApp/reviewed-package/entrance_markers.json"; sourceTree = "<group>"; };
 		R5A5B5C5D5E5F5A5B5C5D5E6 /* route_rendering.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = route_rendering.json; path = "iosApp/reviewed-package/route_rendering.json"; sourceTree = "<group>"; };
 		S1A1B1C1D1E1F1A1B1C1D1E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = iosApp/Assets.xcassets; sourceTree = "<group>"; };
-		AD02AD02AD02AD02AD02AD02 /* AdminAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminAPIClient.swift; path = iosApp/admin/AdminAPIClient.swift; sourceTree = "<group>"; };
-		AD04AD04AD04AD04AD04AD04 /* AdminDraftJobsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminDraftJobsView.swift; path = iosApp/admin/AdminDraftJobsView.swift; sourceTree = "<group>"; };
-		AD06AD06AD06AD06AD06AD06 /* AdminJobDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminJobDetailView.swift; path = iosApp/admin/AdminJobDetailView.swift; sourceTree = "<group>"; };
-		AD07AD09AD07AD09AD07AD09 /* AdminDraftReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AdminDraftReviewView.swift; path = iosApp/admin/AdminDraftReviewView.swift; sourceTree = "<group>"; };
+		VT02VT02VT02VT02VT02VT02 /* VecturTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VecturTheme.swift; path = iosApp/VecturTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,7 +373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = TGH796D8T8;
+				DEVELOPMENT_TEAM = 46Z8H576RW;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -399,7 +399,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = TGH796D8T8;
+				DEVELOPMENT_TEAM = 46Z8H576RW;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

@@ -173,7 +173,7 @@ struct ARNavigationView: View {
                 .padding(.horizontal, 12)
                 .safeAreaPadding(.top)
 
-            CompassStrip(progress: viewModel.progress)
+            CompassStrip(headingDegrees: viewModel.cameraHeadingDegrees)
                 .padding(.horizontal, 18)
                 .padding(.top, 8)
 
@@ -272,19 +272,12 @@ struct ARNavigationView: View {
                     .background(Color.indigo)
                     .clipShape(Circle())
             }
-            .padding(.trailing, 10)
+            .padding(.trailing, 8)
             #endif
 
-            Button(action: {
+            SwipeToEndControl {
                 viewModel.endNavigation()
                 isPresented = false
-            }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(VecturTheme.red)
-                    .clipShape(Circle())
             }
         }
         .padding(14)
@@ -478,33 +471,185 @@ private struct ProgressRing: View {
     }
 }
 
+/// Compact "slide to end" control that replaces the plain close button.
+/// The thumb tracks the finger exactly, subtle chevron hints animate to
+/// indicate the drag direction, and the track fills with a red tint that
+/// intensifies with progress so the destructive intent is obvious.
+/// Releasing below the commit threshold springs the thumb back; releasing
+/// past it snaps to the end, fires a success haptic, then invokes `action`.
+private struct SwipeToEndControl: View {
+    let action: () -> Void
+
+    @State private var dragOffset: CGFloat = 0
+    @State private var isDragging: Bool = false
+    @State private var confirmed: Bool = false
+    @State private var didPrimeHaptic: Bool = false
+    @State private var hintPhase: Double = 0
+
+    private let trackWidth: CGFloat = 118
+    private let trackHeight: CGFloat = 46
+    private let thumbSize: CGFloat = 38
+    private let innerPadding: CGFloat = 4
+    /// Fraction of the track the user must cover before the gesture commits.
+    private let commitThreshold: CGFloat = 0.78
+
+    private var maxOffset: CGFloat {
+        max(0, trackWidth - thumbSize - innerPadding * 2)
+    }
+
+    var body: some View {
+        let progress: CGFloat = maxOffset > 0 ? min(1, max(0, dragOffset / maxOffset)) : 0
+        let hintOpacity = max(0, 1 - Double(progress) * 1.8)
+
+        ZStack(alignment: .leading) {
+            Capsule()
+                .fill(VecturTheme.elevated.opacity(0.94))
+
+            // Filled tint grows as the user drags — visual commitment cue.
+            Capsule()
+                .fill(VecturTheme.red.opacity(0.22 + 0.42 * Double(progress)))
+                .frame(width: thumbSize + dragOffset + innerPadding * 2)
+
+            // Subtle animated chevron hints — only visible while the thumb
+            // is still near its starting position.
+            HStack(spacing: 3) {
+                ForEach(0..<3, id: \.self) { index in
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(
+                            VecturTheme.textMuted.opacity(
+                                hintOpacity * (0.35 + 0.5 * sin(hintPhase + Double(index) * 0.7))
+                            )
+                        )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.trailing, 14)
+
+            Circle()
+                .fill(VecturTheme.red)
+                .frame(width: thumbSize, height: thumbSize)
+                .overlay(
+                    Image(systemName: confirmed ? "checkmark" : "xmark")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(.white)
+                )
+                .shadow(color: VecturTheme.red.opacity(0.36), radius: 6, y: 2)
+                .offset(x: dragOffset + innerPadding)
+                .animation(isDragging ? nil : .spring(response: 0.30, dampingFraction: 0.78), value: dragOffset)
+        }
+        .frame(width: trackWidth, height: trackHeight)
+        .overlay(Capsule().stroke(VecturTheme.borderSubtle, lineWidth: 1))
+        .clipShape(Capsule())
+        .contentShape(Capsule())
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    if !isDragging {
+                        isDragging = true
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        didPrimeHaptic = false
+                    }
+                    let new = min(maxOffset, max(0, value.translation.width))
+                    dragOffset = new
+
+                    if !didPrimeHaptic && new >= maxOffset * commitThreshold {
+                        didPrimeHaptic = true
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    }
+                }
+                .onEnded { _ in
+                    isDragging = false
+                    if dragOffset >= maxOffset * commitThreshold {
+                        confirmed = true
+                        dragOffset = maxOffset
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                            action()
+                        }
+                    } else {
+                        dragOffset = 0
+                        didPrimeHaptic = false
+                    }
+                }
+        )
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: false)) {
+                hintPhase = 2 * .pi
+            }
+        }
+        .accessibilityLabel(Text("End navigation"))
+        .accessibilityHint(Text("Swipe right to confirm"))
+        .accessibilityAddTraits(.isButton)
+    }
+}
+
+/// Heading strip — a shallow bearing ruler whose ticks slide as the user
+/// rotates the phone. The cyan pointer at the top always marks the user's
+/// current forward direction; everything else moves relative to it.
 private struct CompassStrip: View {
-    let progress: Double
+    let headingDegrees: Double
+
+    private static let pixelsPerDegree: CGFloat = 2.4
+    private static let minorStep: Int = 5
+    private static let majorStep: Int = 30
 
     var body: some View {
         Canvas { context, size in
+            let centerX = size.width / 2
             let centerY = size.height / 2
-            let offset = CGFloat(progress) * 42
 
-            for index in -6...6 {
-                let x = size.width / 2 + CGFloat(index) * 28 - offset
-                let active = index == 0
-                var path = Path()
-                path.move(to: CGPoint(x: x, y: centerY - 5))
-                path.addLine(to: CGPoint(x: x, y: centerY + 5))
+            let halfVisibleDeg = Double(size.width / 2 / Self.pixelsPerDegree) + 6.0
+            let firstDeg = Int(floor(headingDegrees - halfVisibleDeg))
+            let lastDeg = Int(ceil(headingDegrees + halfVisibleDeg))
+            let alignedFirst = Int(floor(Double(firstDeg) / Double(Self.minorStep))) * Self.minorStep
+
+            var deg = alignedFirst
+            while deg <= lastDeg {
+                let delta = Double(deg) - headingDegrees
+                let x = centerX + CGFloat(delta) * Self.pixelsPerDegree
+
+                let isMajor = deg.isMultiple(of: Self.majorStep)
+                let isHalfMajor = deg.isMultiple(of: Self.majorStep / 2) && !isMajor
+                let tickLen: CGFloat = isMajor ? 7 : (isHalfMajor ? 5 : 3)
+                let tickColor: Color = isMajor ? VecturTheme.textSecondary : VecturTheme.textDisabled
+                let tickWidth: CGFloat = isMajor ? 1.6 : 1.0
+
+                // Fade ticks near the strip edges so the sliding motion feels
+                // continuous instead of popping in/out.
+                let edgeFade = min(1.0, (size.width / 2 - abs(x - centerX) * 0.92) / 24.0)
+                let alpha = max(0.15, Double(edgeFade))
+
+                var tick = Path()
+                tick.move(to: CGPoint(x: x, y: centerY - tickLen))
+                tick.addLine(to: CGPoint(x: x, y: centerY + tickLen))
                 context.stroke(
-                    path,
-                    with: .color(active ? VecturTheme.cyan : VecturTheme.textDisabled),
-                    style: StrokeStyle(lineWidth: active ? 2 : 1, lineCap: .round)
+                    tick,
+                    with: .color(tickColor.opacity(alpha)),
+                    style: StrokeStyle(lineWidth: tickWidth, lineCap: .round)
                 )
+
+                deg += Self.minorStep
             }
 
-            context.fill(
-                Path(ellipseIn: CGRect(x: size.width / 2 - 3, y: centerY - 3, width: 6, height: 6)),
-                with: .color(VecturTheme.cyan)
+            // Center tick + pointer triangle = current heading.
+            var centerTick = Path()
+            centerTick.move(to: CGPoint(x: centerX, y: centerY - 10))
+            centerTick.addLine(to: CGPoint(x: centerX, y: centerY + 10))
+            context.stroke(
+                centerTick,
+                with: .color(VecturTheme.cyan),
+                style: StrokeStyle(lineWidth: 2.2, lineCap: .round)
             )
+
+            var pointer = Path()
+            pointer.move(to: CGPoint(x: centerX - 5, y: 0))
+            pointer.addLine(to: CGPoint(x: centerX + 5, y: 0))
+            pointer.addLine(to: CGPoint(x: centerX, y: 6))
+            pointer.closeSubpath()
+            context.fill(pointer, with: .color(VecturTheme.cyan))
         }
-        .frame(height: 24)
+        .frame(height: 28)
         .background(VecturTheme.card.opacity(0.58))
         .overlay(Capsule().stroke(VecturTheme.borderSubtle.opacity(0.7), lineWidth: 1))
         .clipShape(Capsule())
@@ -658,6 +803,9 @@ class ARNavigationViewModel: ObservableObject {
     @Published var remainingDistance: Double = 0.0
     @Published var distanceToDestination: Double = 0.0
     @Published var totalDistance: Double = 0.0
+    /// Current AR camera yaw in degrees (0..<360). Published at ~20 Hz so the
+    /// compass strip reacts smoothly to how the user rotates the phone.
+    @Published var cameraHeadingDegrees: Double = 0.0
     @Published var routeStepCount: Int = 1
     @Published var isLowConfidence: Bool = false
     @Published var stateColor: Color = .orange
@@ -703,6 +851,9 @@ class ARNavigationViewModel: ObservableObject {
     private var alignmentRotYDeg: Double = 0
 
     private var poseTimer: Timer?
+    /// Dedicated high-frequency ticker that only samples camera yaw for the
+    /// compass strip; far cheaper than the full pose → route-matching pass.
+    private var headingTimer: Timer?
     private var alignmentTimeoutTimer: Timer?
     /// Tracks the last arrow that triggered a turn haptic, to fire only once per turn.
     private var lastHapticArrowId: String?
@@ -986,7 +1137,10 @@ class ARNavigationViewModel: ObservableObject {
         let rotatedStartZ = -startPoint.0 * sinR + startPoint.1 * cosR
 
         let startDistanceInFrontOfCamera = 0.8
-        let markerlessGuidanceHeight = 1.15
+        // Floor-plane offset: in markerless mode the camera is assumed to be
+        // at standing height, so the route (rails/arrows/beacon) sits below
+        // the camera by roughly one body height to land on the real floor.
+        let markerlessGuidanceHeight = -1.0
         alignmentOffsetX = -rotatedStartX
         alignmentOffsetY = markerlessGuidanceHeight
         alignmentOffsetZ = -startDistanceInFrontOfCamera - rotatedStartZ
@@ -1000,7 +1154,7 @@ class ARNavigationViewModel: ObservableObject {
 
         remainingDistance = pkg.totalDistance
         distanceToDestination = pkg.totalDistance
-        routeRenderer.placeAllArrows(in: arView, arrows: pkg.arrows)
+        routeRenderer.placeRoute(in: arView, arrows: pkg.arrows, routePoints: pkg.routePoints)
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
         updateNextAction()
@@ -1102,6 +1256,8 @@ class ARNavigationViewModel: ObservableObject {
     func endNavigation() {
         poseTimer?.invalidate()
         poseTimer = nil
+        headingTimer?.invalidate()
+        headingTimer = nil
         alignmentTimeoutTimer?.invalidate()
         alignmentTimeoutTimer = nil
         sessionManager.stopSession()
@@ -1150,8 +1306,9 @@ class ARNavigationViewModel: ObservableObject {
         guard let pkg = routePackage, let arView = arView else { return }
         remainingDistance = pkg.totalDistance
 
-        // Place all arrows (initially hidden), then show forward slice
-        routeRenderer.placeAllArrows(in: arView, arrows: pkg.arrows)
+        // Place full route (side rails + arrows + turn rings + beacon),
+        // initially hidden, then reveal the forward slice.
+        routeRenderer.placeRoute(in: arView, arrows: pkg.arrows, routePoints: pkg.routePoints)
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
 
@@ -1169,6 +1326,23 @@ class ARNavigationViewModel: ObservableObject {
         poseTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             self?.sampleCameraPose()
         }
+
+        // Separate high-frequency ticker for the compass: the route-matching
+        // pass in sampleCameraPose is too expensive to run every frame, but
+        // heading is just an atan2 on the camera forward vector.
+        headingTimer?.invalidate()
+        headingTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 20.0, repeats: true) { [weak self] _ in
+            self?.sampleHeading()
+        }
+    }
+
+    private func sampleHeading() {
+        guard let arView = arView, isAligned, !hasArrived else { return }
+        let forward = cameraForward(from: arView.cameraTransform)
+        let rad = atan2(Double(forward.x), Double(forward.z))
+        var deg = rad * 180.0 / .pi
+        if deg < 0 { deg += 360.0 }
+        cameraHeadingDegrees = deg
     }
 
     private func sampleCameraPose() {
@@ -1277,6 +1451,8 @@ class ARNavigationViewModel: ObservableObject {
     private func arriveAtDestination() {
         guard !hasArrived else { return }
         poseTimer?.invalidate()
+        headingTimer?.invalidate()
+        headingTimer = nil
         hasArrived = true
         sessionStateLabel = "Arrived"
         stateColor = .green

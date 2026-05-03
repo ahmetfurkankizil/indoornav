@@ -3,31 +3,443 @@ import UIKit
 import RealityKit
 import simd
 
-/// Renders navigation arrows in the RealityKit scene with rolling
-/// lookahead and fade-behind behavior.
+// MARK: - Visual design tokens (Aurora Lane)
+//
+// The AR world layer uses a minimal "two parallel rails + compact glowing
+// chevrons + beacon at destination" language. Everything is an UnlitMaterial
+// so the neon surfaces survive ARKit's environment lighting.
+// Tokens live here — the renderer reads them but never mutates them.
+
+private enum VecturARPalette {
+    /// Primary neon accent — electric aurora cyan.
+    static let auroraCore  = UIColor(red: 0.247, green: 0.816, blue: 0.961, alpha: 1.0)   // #3FD0F5
+    /// Slightly cooler shade — used for the wide halo bloom.
+    static let auroraHalo  = UIColor(red: 0.184, green: 0.729, blue: 0.906, alpha: 1.0)   // #2FBAE7
+    /// Warm-white arrival tint.
+    static let arrivalGlow = UIColor(red: 0.88, green: 0.97, blue: 1.0, alpha: 1.0)
+}
+
+private enum VecturARGeometry {
+    // Path plane offsets — everything hugs the floor.
+    static let sideRailHeightOffset: Float = 0.015
+    static let turnRingHeightOffset: Float = 0.010
+
+    // Two parallel side rails define the corridor (no center stripe).
+    static let sideRailHalfWidth:  Float = 0.34
+    static let sideRailCoreWidth:  Float = 0.038
+    static let sideRailCoreHeight: Float = 0.014
+    static let sideRailHaloWidth:  Float = 0.105
+    static let sideRailHaloHeight: Float = 0.006
+    static let sideRailChunkLen:   Float = 0.48
+
+    // Compact, minimal chevron arrows.
+    static let chevronArmLength:  Float = 0.21
+    static let chevronSpread:     Float = 0.18
+    static let chevronCoreWidth:  Float = 0.034
+    static let chevronMidWidth:   Float = 0.072
+    static let chevronHaloWidth:  Float = 0.128
+    static let chevronCoreHeight: Float = 0.022
+    static let chevronMidHeight:  Float = 0.013
+    static let chevronHaloHeight: Float = 0.006
+
+    // Turn anticipation ring.
+    static let turnRingRadius:    Float = 0.42
+    static let turnRingThickness: Float = 0.022
+
+    // Destination beacon.
+    static let beaconRingRadius:    Float = 0.38
+    static let beaconRingThickness: Float = 0.045
+    static let beaconPillarHeight:  Float = 0.80
+    static let beaconPillarWidth:   Float = 0.040
+    static let beaconHaloRadius:    Float = 0.60
+}
+
+/// Layer-kind suffixes on child entity names let the opacity walker apply
+/// per-layer alpha multipliers (halo < mid < core) from a single scalar
+/// while keeping material colors untouched.
+private enum VecturARLayer {
+    static let halo   = "-halo"
+    static let mid    = "-mid"
+    static let core   = "-core"
+    static let ring   = "-ring"
+    static let pillar = "-pillar"
+
+    /// Alpha multiplier a layer receives when its parent chain is fully
+    /// opaque. Halo/mid values are intentionally low so the runway and
+    /// chevrons read as glowing-but-matte surfaces rather than neon bloom.
+    static func multiplier(for name: String) -> Float {
+        if name.hasSuffix(halo)   { return 0.22 }
+        if name.hasSuffix(mid)    { return 0.55 }
+        if name.hasSuffix(core)   { return 1.00 }
+        if name.hasSuffix(ring)   { return 0.85 }
+        if name.hasSuffix(pillar) { return 0.70 }
+        return 1.0
+    }
+}
+
+// MARK: - Material helpers
+
+private enum VecturARMaterial {
+    /// Unlit emissive-looking material — survives AR environment lighting
+    /// so neon surfaces keep reading as "light", not paint.
+    static func unlit(color: UIColor, opacity: Float = 1.0) -> UnlitMaterial {
+        var mat = UnlitMaterial()
+        mat.color = .init(tint: color)
+        mat.blending = .transparent(
+            opacity: PhysicallyBasedMaterial.Opacity(floatLiteral: max(0, min(1, opacity)))
+        )
+        return mat
+    }
+}
+
+// MARK: - Chevron factory (follow / turn)
+
+/// Builds the layered chevron arrow used along the route.
 ///
-/// Phase 3: Only a forward slice of arrows is shown. Passed arrows fade out.
-/// Visibility is driven by the user's cumulative distance along the route.
+/// Stack:
+///   1. `-halo`  wide faint bloom
+///   2. `-mid`   mid-width soft body
+///   3. `-core`  crisp bright centerline (white)
+///
+/// Each arrow is a V composed of two rounded boxes rotated ±45°.
+private enum ARChevronFactory {
+
+    static func make(name: String, emphasis: Emphasis) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        let scale = emphasis.scale
+
+        // Halo — widest, low alpha
+        let halo = buildV(
+            name: "\(name)\(VecturARLayer.halo)",
+            width: VecturARGeometry.chevronHaloWidth * scale,
+            height: VecturARGeometry.chevronHaloHeight,
+            length: VecturARGeometry.chevronArmLength * (emphasis == .turn ? 1.15 : 1.0),
+            spread: VecturARGeometry.chevronSpread   * (emphasis == .turn ? 1.15 : 1.0),
+            color: VecturARPalette.auroraHalo
+        )
+        halo.position = [0, 0.004, 0]
+        root.addChild(halo)
+
+        // Mid — colored soft body
+        let mid = buildV(
+            name: "\(name)\(VecturARLayer.mid)",
+            width: VecturARGeometry.chevronMidWidth * scale,
+            height: VecturARGeometry.chevronMidHeight,
+            length: VecturARGeometry.chevronArmLength * (emphasis == .turn ? 1.10 : 1.0),
+            spread: VecturARGeometry.chevronSpread   * (emphasis == .turn ? 1.10 : 1.0),
+            color: VecturARPalette.auroraCore
+        )
+        mid.position = [0, 0.010, 0]
+        root.addChild(mid)
+
+        // Core — crisp white centerline
+        let core = buildV(
+            name: "\(name)\(VecturARLayer.core)",
+            width: VecturARGeometry.chevronCoreWidth * scale,
+            height: VecturARGeometry.chevronCoreHeight,
+            length: VecturARGeometry.chevronArmLength,
+            spread: VecturARGeometry.chevronSpread,
+            color: UIColor.white
+        )
+        core.position = [0, 0.018, 0]
+        root.addChild(core)
+
+        return root
+    }
+
+    /// Visual emphasis — follow arrows are unobtrusive, turn arrows read
+    /// larger to match the extra attention the user needs.
+    enum Emphasis {
+        case follow
+        case turn
+
+        var scale: Float {
+            switch self {
+            case .follow: return 1.0
+            case .turn:   return 1.25
+            }
+        }
+    }
+
+    private static func buildV(
+        name: String,
+        width: Float,
+        height: Float,
+        length: Float,
+        spread: Float,
+        color: UIColor
+    ) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        let mat = VecturARMaterial.unlit(color: color)
+        let segmentLength = sqrt(length * length + spread * spread)
+        let mesh = MeshResource.generateBox(
+            size: [width, height, segmentLength],
+            cornerRadius: width * 0.48
+        )
+
+        let left = ModelEntity(mesh: mesh, materials: [mat])
+        left.name = "\(name)-left"
+        left.position = [-spread / 2.0, 0, 0]
+        left.orientation = simd_quatf(angle: -.pi / 4.0, axis: [0, 1, 0])
+        root.addChild(left)
+
+        let right = ModelEntity(mesh: mesh, materials: [mat])
+        right.name = "\(name)-right"
+        right.position = [spread / 2.0, 0, 0]
+        right.orientation = simd_quatf(angle: .pi / 4.0, axis: [0, 1, 0])
+        root.addChild(right)
+
+        return root
+    }
+}
+
+// MARK: - Side rail factory (parallel lane line)
+
+/// Thin lane line. Two of these placed at ±sideRailHalfWidth form the
+/// complete path — there is no center stripe. Built at unit length
+/// (`sideRailChunkLen`) and scaled along Z per chunk.
+private enum ARSideRailFactory {
+
+    static func make(name: String) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        // Halo — low alpha soft band
+        let haloMesh = MeshResource.generateBox(
+            size: [VecturARGeometry.sideRailHaloWidth,
+                   VecturARGeometry.sideRailHaloHeight,
+                   VecturARGeometry.sideRailChunkLen],
+            cornerRadius: VecturARGeometry.sideRailHaloHeight * 0.5
+        )
+        let halo = ModelEntity(
+            mesh: haloMesh,
+            materials: [VecturARMaterial.unlit(color: VecturARPalette.auroraHalo)]
+        )
+        halo.name = "\(name)\(VecturARLayer.halo)"
+        halo.position = [0, VecturARGeometry.sideRailHaloHeight * 0.5, 0]
+        root.addChild(halo)
+
+        // Core — crisp bright centerline of the rail
+        let coreMesh = MeshResource.generateBox(
+            size: [VecturARGeometry.sideRailCoreWidth,
+                   VecturARGeometry.sideRailCoreHeight,
+                   VecturARGeometry.sideRailChunkLen],
+            cornerRadius: VecturARGeometry.sideRailCoreHeight * 0.5
+        )
+        let core = ModelEntity(
+            mesh: coreMesh,
+            materials: [VecturARMaterial.unlit(color: VecturARPalette.auroraCore)]
+        )
+        core.name = "\(name)\(VecturARLayer.core)"
+        core.position = [0, VecturARGeometry.sideRailCoreHeight * 0.5 + 0.005, 0]
+        root.addChild(core)
+
+        return root
+    }
+}
+
+// MARK: - Ring segment helper
+
+/// Builds a single segment of a flat ring from a thin rounded box. Multiple
+/// of these, rotated around Y, approximate an annulus without requiring
+/// custom mesh generation at runtime.
+private func makeRingSegment(
+    name: String,
+    radius: Float,
+    thickness: Float,
+    segAngle: Float,
+    segHeight: Float,
+    color: UIColor
+) -> ModelEntity {
+    let segLen = radius * segAngle * 1.06
+    let mesh = MeshResource.generateBox(
+        size: [thickness, segHeight, segLen],
+        cornerRadius: thickness * 0.45
+    )
+    let entity = ModelEntity(
+        mesh: mesh,
+        materials: [VecturARMaterial.unlit(color: color)]
+    )
+    entity.name = name
+    return entity
+}
+
+// MARK: - Turn anticipation ring
+
+/// A glowing halo drawn on the floor at the turn pivot a few meters
+/// before the turn chevron, so the user recognizes the maneuver before
+/// they reach it. Pulses via scale in the renderer.
+private enum ARTurnRingFactory {
+
+    static func make(name: String, isRight: Bool) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        let segments = 28
+        let segAngle = 2.0 * Float.pi / Float(segments)
+
+        for i in 0..<segments {
+            let angle = Float(i) * segAngle
+            let seg = makeRingSegment(
+                name: "\(name)\(VecturARLayer.ring)-\(i)",
+                radius: VecturARGeometry.turnRingRadius,
+                thickness: VecturARGeometry.turnRingThickness,
+                segAngle: segAngle,
+                segHeight: 0.009,
+                color: VecturARPalette.auroraCore
+            )
+            seg.position = [
+                VecturARGeometry.turnRingRadius * cos(angle),
+                VecturARGeometry.turnRingHeightOffset,
+                VecturARGeometry.turnRingRadius * sin(angle)
+            ]
+            seg.orientation = simd_quatf(angle: -angle, axis: [0, 1, 0])
+            root.addChild(seg)
+        }
+
+        // Directional hint inside the ring showing the turn side.
+        let chev = ARChevronFactory.make(name: "\(name)-hint", emphasis: .follow)
+        let rot: Float = isRight ? -.pi / 2.0 : .pi / 2.0
+        chev.orientation = simd_quatf(angle: rot, axis: [0, 1, 0])
+        chev.position = [0, 0.02, 0]
+        chev.scale = SIMD3<Float>(repeating: 0.62)
+        root.addChild(chev)
+
+        return root
+    }
+}
+
+// MARK: - Destination beacon
+//
+// Multi-element beacon:
+//   - wide floor halo ring (soft presence)
+//   - crisp cyan ring (pinpoint)
+//   - short vertical pillar of light (spatial anchor)
+//
+// On arrival the renderer swaps the color to `arrivalGlow` and scales up.
+private enum ARDestinationBeaconFactory {
+
+    static func make(name: String) -> Entity {
+        let root = Entity()
+        root.name = name
+
+        // Floor halo (wide, soft)
+        let segmentsHalo = 36
+        let segAngleHalo = 2.0 * Float.pi / Float(segmentsHalo)
+        for i in 0..<segmentsHalo {
+            let angle = Float(i) * segAngleHalo
+            let seg = makeRingSegment(
+                name: "\(name)\(VecturARLayer.halo)-\(i)",
+                radius: VecturARGeometry.beaconHaloRadius,
+                thickness: 0.09,
+                segAngle: segAngleHalo,
+                segHeight: 0.009,
+                color: VecturARPalette.auroraHalo
+            )
+            seg.position = [
+                VecturARGeometry.beaconHaloRadius * cos(angle),
+                0.008,
+                VecturARGeometry.beaconHaloRadius * sin(angle)
+            ]
+            seg.orientation = simd_quatf(angle: -angle, axis: [0, 1, 0])
+            root.addChild(seg)
+        }
+
+        // Pinpoint ring (crisp)
+        let segmentsRing = 32
+        let segAngleRing = 2.0 * Float.pi / Float(segmentsRing)
+        for i in 0..<segmentsRing {
+            let angle = Float(i) * segAngleRing
+            let seg = makeRingSegment(
+                name: "\(name)\(VecturARLayer.ring)-\(i)",
+                radius: VecturARGeometry.beaconRingRadius,
+                thickness: VecturARGeometry.beaconRingThickness,
+                segAngle: segAngleRing,
+                segHeight: 0.010,
+                color: VecturARPalette.auroraCore
+            )
+            seg.position = [
+                VecturARGeometry.beaconRingRadius * cos(angle),
+                0.016,
+                VecturARGeometry.beaconRingRadius * sin(angle)
+            ]
+            seg.orientation = simd_quatf(angle: -angle, axis: [0, 1, 0])
+            root.addChild(seg)
+        }
+
+        // Vertical pillar (crisp white) + colored glow sleeve.
+        let pillarMesh = MeshResource.generateBox(
+            size: [VecturARGeometry.beaconPillarWidth,
+                   VecturARGeometry.beaconPillarHeight,
+                   VecturARGeometry.beaconPillarWidth],
+            cornerRadius: VecturARGeometry.beaconPillarWidth * 0.5
+        )
+        let pillar = ModelEntity(
+            mesh: pillarMesh,
+            materials: [VecturARMaterial.unlit(color: UIColor.white)]
+        )
+        pillar.name = "\(name)\(VecturARLayer.pillar)"
+        pillar.position = [0, VecturARGeometry.beaconPillarHeight * 0.5 + 0.02, 0]
+        root.addChild(pillar)
+
+        let sleeveMesh = MeshResource.generateBox(
+            size: [VecturARGeometry.beaconPillarWidth * 2.4,
+                   VecturARGeometry.beaconPillarHeight * 0.98,
+                   VecturARGeometry.beaconPillarWidth * 2.4],
+            cornerRadius: VecturARGeometry.beaconPillarWidth * 1.2
+        )
+        let sleeve = ModelEntity(
+            mesh: sleeveMesh,
+            materials: [VecturARMaterial.unlit(color: VecturARPalette.auroraCore, opacity: 0.7)]
+        )
+        sleeve.name = "\(name)\(VecturARLayer.halo)-pillar"
+        sleeve.position = [0, VecturARGeometry.beaconPillarHeight * 0.5 + 0.02, 0]
+        root.addChild(sleeve)
+
+        return root
+    }
+}
+
+// MARK: - AR Route Renderer
+//
+// Orchestrates placement of every guidance entity (side rails, chevron
+// arrows, turn anticipation rings, destination beacon) and drives the
+// rolling lookahead / fade-behind window based on the user's cumulative
+// distance along the route.
+
 class ARRouteRenderer {
 
-    /// Arrow visibility state.
-    enum ArrowState {
+    /// Visibility state for any guidance entity (arrow / rail chunk / ring).
+    enum GuidanceState {
         case hidden      // too far ahead or fully faded
         case active      // within lookahead window
         case fading      // behind user, fading out
     }
 
-    /// Root anchor for all navigation entities
+    /// Root anchor for all navigation entities.
     private var routeAnchor: AnchorEntity?
 
-    /// All arrow entities, keyed by placement ID
+    // Arrow placement entities
     private var arrowEntities: [String: Entity] = [:]
-
-    /// All arrow placements (full route)
     private var allArrows: [ArrowPlacementData] = []
+    private var arrowStates: [String: GuidanceState] = [:]
+    private var arrowFadeInProgress: [String: Float] = [:]
 
-    /// Current visibility state per arrow id
-    private var arrowStates: [String: ArrowState] = [:]
+    // Side rail entities (two per subdivision — left + right).
+    private var railEntities: [String: Entity] = [:]
+    private var allRailChunks: [RailChunkData] = []
+    private var railStates: [String: GuidanceState] = [:]
+    private var railFadeInProgress: [String: Float] = [:]
+
+    // Turn anticipation rings (keyed by parent arrow id)
+    private var turnRings: [String: Entity] = [:]
+
+    // Destination beacon — distinguished for arrival updates.
+    private weak var destinationEntity: Entity?
 
     // Alignment transform components
     private var offsetX: Double = 0.0
@@ -39,14 +451,21 @@ class ARRouteRenderer {
     private var lookaheadDistance: Double = 8.0
     private var fadeDistance: Double = 1.5
     private var arrowHeightOffset: Double = 0.05
-    private var arrowFadeInProgress: [String: Float] = [:]
 
-    private let fadeInFrames: Float = 10.0
+    /// Time (in pose samples) for a newly revealed entity to scale up to
+    /// full size. Pose timer fires at ~2 Hz so 5 frames ≈ 2.5 s.
+    private let fadeInFrames: Float = 5.0
 
-    /// Number of currently visible (active + fading) arrows
+    /// Distance range (in meters along the route) within which a turn-ring
+    /// should be rendered for its parent arrow.
+    private let turnRingPreviewDistance: Double = 4.0
+
+    /// Number of currently visible (active + fading) arrows.
     var renderedArrowCount: Int {
         arrowStates.values.filter { $0 != .hidden }.count
     }
+
+    // MARK: - Configuration
 
     /// Configure rendering parameters from the reviewed package.
     func configureRendering(
@@ -70,22 +489,52 @@ class ARRouteRenderer {
         self.rotationYRad = rotationYDeg * .pi / 180.0
     }
 
-    /// Place all arrows into the AR scene (initially hidden).
-    /// Call updateVisibility() afterward to show the initial forward slice.
-    func placeAllArrows(in arView: ARView, arrows: [ArrowPlacementData]) {
+    // MARK: - Placement
+
+    /// Place all guidance (side rails + arrows + turn rings + destination
+    /// beacon) into the AR scene. Everything starts hidden; call
+    /// `updateVisibility(...)` after to reveal the forward slice.
+    func placeRoute(
+        in arView: ARView,
+        arrows: [ArrowPlacementData],
+        routePoints: [(Double, Double)]
+    ) {
         clearRoute(from: arView)
 
-        self.allArrows = arrows
         let anchor = AnchorEntity(world: .zero)
         routeAnchor = anchor
+
+        placeSideRails(routePoints: routePoints, into: anchor)
+        placeArrowEntities(arrows: arrows, into: anchor)
+        placeTurnRings(arrows: arrows, into: anchor)
+
+        arView.scene.addAnchor(anchor)
+        print("[RouteRenderer] Placed \(arrows.count) arrows and \(allRailChunks.count) rail chunks across \(routePoints.count) route points")
+    }
+
+    /// Backwards-compatible shim — places arrows only, with no side rails.
+    /// Prefer `placeRoute(in:arrows:routePoints:)` for the full visual.
+    func placeAllArrows(in arView: ARView, arrows: [ArrowPlacementData]) {
+        placeRoute(in: arView, arrows: arrows, routePoints: [])
+    }
+
+    // MARK: - Sub-placements
+
+    private func placeArrowEntities(arrows: [ArrowPlacementData], into anchor: AnchorEntity) {
+        self.allArrows = arrows
         arrowFadeInProgress.removeAll()
 
         for arrow in arrows {
             let entity = createArrowEntity(for: arrow)
 
+            // Force every guidance entity onto the same floor plane. The
+            // original `arrow.positionY` from the authoring pipeline is
+            // ignored on purpose so arrows never hover at a different
+            // height than the rails.
+            let floorY = floorBuildingY(for: arrow.type)
             let arPos = transformToAR(
                 buildingX: arrow.positionX,
-                buildingY: arrow.positionY,
+                buildingY: floorY,
                 buildingZ: arrow.positionZ
             )
             entity.position = arPos
@@ -101,54 +550,162 @@ class ARRouteRenderer {
                 entity.orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
             }
 
-            // Start hidden
+            // Turn chevrons get a subtle yaw toward the turn direction so
+            // the V visibly leans into the maneuver instead of pointing
+            // straight ahead like a follow arrow.
+            switch arrow.type {
+            case .turnLeft:
+                entity.orientation = entity.orientation * simd_quatf(angle: .pi / 5, axis: [0, 1, 0])
+            case .turnRight:
+                entity.orientation = entity.orientation * simd_quatf(angle: -.pi / 5, axis: [0, 1, 0])
+            case .uTurn:
+                entity.orientation = entity.orientation * simd_quatf(angle: .pi, axis: [0, 1, 0])
+            default:
+                break
+            }
+
             entity.scale = .zero
             arrowStates[arrow.id] = .hidden
 
             anchor.addChild(entity)
             arrowEntities[arrow.id] = entity
         }
-
-        arView.scene.addAnchor(anchor)
-        print("[RouteRenderer] Placed \(arrows.count) arrows (all hidden initially)")
     }
 
-    /// Update arrow visibility based on user's cumulative distance along the route.
-    ///
-    /// - Arrows within [userDistance, userDistance + lookahead] → active (full opacity)
-    /// - Arrows within [userDistance - fadeDistance, userDistance] → fading
-    /// - All other arrows → hidden
-    func updateVisibility(userCumulativeDistance: Double) {
-        let aheadLimit = userCumulativeDistance + lookaheadDistance
-        let behindLimit = userCumulativeDistance - fadeDistance
-
-        for arrow in allArrows {
-            guard let entity = arrowEntities[arrow.id] else { continue }
-            let dist = arrow.cumulativeDistance
-            let oldState = arrowStates[arrow.id] ?? .hidden
-
-            let newState: ArrowState
-            if dist >= userCumulativeDistance && dist <= aheadLimit {
-                newState = .active
-            } else if dist >= behindLimit && dist < userCumulativeDistance {
-                newState = .fading
-            } else {
-                newState = .hidden
-            }
-
-            if newState != .hidden {
-                let current = arrowFadeInProgress[arrow.id] ?? 0
-                arrowFadeInProgress[arrow.id] = min(fadeInFrames, current + 1)
-            } else if oldState != .hidden {
-                arrowFadeInProgress.removeValue(forKey: arrow.id)
-            }
-
-            applyState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
-            arrowStates[arrow.id] = newState
+    /// Returns the building-local Y at which a given guidance type should
+    /// sit. Everything hugs the floor plane.
+    private func floorBuildingY(for type: ArrowPlacementType) -> Double {
+        switch type {
+        case .follow, .turnLeft, .turnRight, .uTurn:
+            return arrowHeightOffset
+        case .destination:
+            return 0
         }
     }
 
-    /// Update arrow visibility and cull guidance that is well behind the camera.
+    /// Place two parallel side rails along the route polyline. No center
+    /// stripe — the two rails alone define the corridor edge.
+    private func placeSideRails(routePoints: [(Double, Double)], into anchor: AnchorEntity) {
+        railFadeInProgress.removeAll()
+        let chunks = buildRailChunks(routePoints: routePoints)
+        self.allRailChunks = chunks
+
+        for chunk in chunks {
+            let entity = ARSideRailFactory.make(name: chunk.id)
+
+            let arPos = transformToAR(
+                buildingX: chunk.midX,
+                buildingY: Double(VecturARGeometry.sideRailHeightOffset),
+                buildingZ: chunk.midZ
+            )
+            entity.position = arPos
+
+            let dirAR = transformDirectionToAR(dx: chunk.dirX, dy: 0, dz: chunk.dirZ)
+            if simd_length(dirAR) > 0.001 {
+                let forward = simd_normalize(dirAR)
+                let angle = atan2(forward.x, forward.z)
+                entity.orientation = simd_quatf(angle: angle, axis: [0, 1, 0])
+            }
+
+            entity.scale = .zero
+            railStates[chunk.id] = .hidden
+
+            anchor.addChild(entity)
+            railEntities[chunk.id] = entity
+        }
+    }
+
+    private func placeTurnRings(arrows: [ArrowPlacementData], into anchor: AnchorEntity) {
+        for arrow in arrows {
+            guard arrow.type == .turnLeft || arrow.type == .turnRight else { continue }
+            let ringName = "turn-ring-\(arrow.id)"
+            let isRight = (arrow.type == .turnRight)
+            let ring = ARTurnRingFactory.make(name: ringName, isRight: isRight)
+            ring.position = transformToAR(
+                buildingX: arrow.positionX,
+                buildingY: Double(VecturARGeometry.turnRingHeightOffset),
+                buildingZ: arrow.positionZ
+            )
+            ring.scale = .zero
+            anchor.addChild(ring)
+            turnRings[arrow.id] = ring
+        }
+    }
+
+    // MARK: - Data builders
+
+    /// Subdivide each route polyline edge into ~`chunkLen`-meter chunks,
+    /// emitting one left and one right rail per subdivision. They share
+    /// `cumulativeMid` so the visibility system reveals both sides of
+    /// the corridor together.
+    private func buildRailChunks(routePoints: [(Double, Double)]) -> [RailChunkData] {
+        guard routePoints.count >= 2 else { return [] }
+
+        var chunks: [RailChunkData] = []
+        var cumulative: Double = 0.0
+        var counter = 0
+
+        let chunkLenTarget = Double(VecturARGeometry.sideRailChunkLen)
+        let railHalfWidth = Double(VecturARGeometry.sideRailHalfWidth)
+
+        for i in 0..<(routePoints.count - 1) {
+            let (ax, az) = routePoints[i]
+            let (bx, bz) = routePoints[i + 1]
+            let dx = bx - ax
+            let dz = bz - az
+            let segLen = sqrt(dx * dx + dz * dz)
+            guard segLen > 0.01 else { continue }
+
+            let dirX = dx / segLen
+            let dirZ = dz / segLen
+
+            // 2-D left perpendicular to (dirX, dirZ); right is its negation.
+            let normalLX = -dirZ
+            let normalLZ = dirX
+
+            let count = max(1, Int(ceil(segLen / chunkLenTarget)))
+            let chunkLen = segLen / Double(count)
+
+            for k in 0..<count {
+                let tMid = Double(k) * chunkLen + chunkLen * 0.5
+                let cx = ax + dirX * tMid
+                let cz = az + dirZ * tMid
+                let cumMid = cumulative + tMid
+
+                // Left side rail
+                chunks.append(RailChunkData(
+                    id: "rail-L-\(counter)",
+                    midX: cx + normalLX * railHalfWidth,
+                    midZ: cz + normalLZ * railHalfWidth,
+                    dirX: dirX, dirZ: dirZ,
+                    length: Float(chunkLen),
+                    cumulativeMid: cumMid
+                ))
+                // Right side rail
+                chunks.append(RailChunkData(
+                    id: "rail-R-\(counter)",
+                    midX: cx - normalLX * railHalfWidth,
+                    midZ: cz - normalLZ * railHalfWidth,
+                    dirX: dirX, dirZ: dirZ,
+                    length: Float(chunkLen),
+                    cumulativeMid: cumMid
+                ))
+
+                counter += 1
+            }
+
+            cumulative += segLen
+        }
+
+        return chunks
+    }
+
+    // MARK: - Visibility
+
+    func updateVisibility(userCumulativeDistance: Double) {
+        applyVisibility(userCumulativeDistance: userCumulativeDistance, cameraCullCheck: nil)
+    }
+
     func updateVisibility(
         userCumulativeDistance: Double,
         cameraWorldX: Float,
@@ -156,73 +713,114 @@ class ARRouteRenderer {
         cameraForwardX: Float,
         cameraForwardZ: Float
     ) {
+        applyVisibility(userCumulativeDistance: userCumulativeDistance) { entity in
+            let pos = entity.position
+            let toX = pos.x - cameraWorldX
+            let toZ = pos.z - cameraWorldZ
+            let dot = toX * cameraForwardX + toZ * cameraForwardZ
+            return dot < -0.5
+        }
+    }
+
+    private func applyVisibility(
+        userCumulativeDistance: Double,
+        cameraCullCheck: ((Entity) -> Bool)?
+    ) {
         let aheadLimit = userCumulativeDistance + lookaheadDistance
         let behindLimit = userCumulativeDistance - fadeDistance
 
+        // Arrows
         for arrow in allArrows {
             guard let entity = arrowEntities[arrow.id] else { continue }
             let dist = arrow.cumulativeDistance
             let oldState = arrowStates[arrow.id] ?? .hidden
 
-            var newState: ArrowState
-            if dist >= userCumulativeDistance && dist <= aheadLimit {
-                newState = .active
-            } else if dist >= behindLimit && dist < userCumulativeDistance {
-                newState = .fading
-            } else {
+            var newState = stateFor(
+                cumulative: dist,
+                userCumulative: userCumulativeDistance,
+                aheadLimit: aheadLimit,
+                behindLimit: behindLimit
+            )
+            if newState != .hidden, let cull = cameraCullCheck, cull(entity) {
                 newState = .hidden
             }
 
-            if newState != .hidden {
-                let pos = transformToAR(
-                    buildingX: arrow.positionX,
-                    buildingY: arrow.positionY,
-                    buildingZ: arrow.positionZ
-                )
-                let toArrowX = pos.x - cameraWorldX
-                let toArrowZ = pos.z - cameraWorldZ
-                let dot = toArrowX * cameraForwardX + toArrowZ * cameraForwardZ
-                if dot < -0.5 {
-                    newState = .hidden
-                }
-            }
-
-            if newState != .hidden {
-                let current = arrowFadeInProgress[arrow.id] ?? 0
-                arrowFadeInProgress[arrow.id] = min(fadeInFrames, current + 1)
-            } else if oldState != .hidden {
-                arrowFadeInProgress.removeValue(forKey: arrow.id)
-            }
-
-            applyState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
+            tickFadeIn(id: arrow.id, newState: newState, oldState: oldState, progress: &arrowFadeInProgress)
+            applyArrowState(newState, to: entity, arrow: arrow, arrowDistance: dist, userDistance: userCumulativeDistance)
             arrowStates[arrow.id] = newState
+
+            // Turn ring visibility follows the parent arrow but only
+            // reveals within the anticipation distance so it feels like
+            // pre-turn signage rather than ambient clutter.
+            if let ring = turnRings[arrow.id] {
+                applyTurnRingState(
+                    ring: ring,
+                    arrow: arrow,
+                    parentState: newState,
+                    userDistance: userCumulativeDistance
+                )
+            }
+        }
+
+        // Side rails (left + right)
+        for chunk in allRailChunks {
+            guard let entity = railEntities[chunk.id] else { continue }
+            let oldState = railStates[chunk.id] ?? .hidden
+
+            var newState = stateFor(
+                cumulative: chunk.cumulativeMid,
+                userCumulative: userCumulativeDistance,
+                aheadLimit: aheadLimit,
+                behindLimit: behindLimit
+            )
+            if newState != .hidden, let cull = cameraCullCheck, cull(entity) {
+                newState = .hidden
+            }
+
+            tickFadeIn(id: chunk.id, newState: newState, oldState: oldState, progress: &railFadeInProgress)
+            applyRailState(newState, to: entity, chunk: chunk, userDistance: userCumulativeDistance)
+            railStates[chunk.id] = newState
         }
     }
 
-    /// Hide all arrows (e.g. on arrival).
-    func hideAllArrows() {
-        for (id, entity) in arrowEntities {
-            entity.scale = .zero
-            arrowStates[id] = .hidden
+    private func stateFor(
+        cumulative: Double,
+        userCumulative: Double,
+        aheadLimit: Double,
+        behindLimit: Double
+    ) -> GuidanceState {
+        if cumulative >= userCumulative && cumulative <= aheadLimit {
+            return .active
         }
-        arrowFadeInProgress.removeAll()
+        if cumulative >= behindLimit && cumulative < userCumulative {
+            return .fading
+        }
+        return .hidden
     }
 
-    /// Remove all route entities from the scene.
-    func clearRoute(from arView: ARView) {
-        if let anchor = routeAnchor {
-            arView.scene.removeAnchor(anchor)
+    private func tickFadeIn(
+        id: String,
+        newState: GuidanceState,
+        oldState: GuidanceState,
+        progress: inout [String: Float]
+    ) {
+        if newState != .hidden {
+            let current = progress[id] ?? 0
+            progress[id] = min(fadeInFrames, current + 1)
+        } else if oldState != .hidden {
+            progress.removeValue(forKey: id)
         }
-        routeAnchor = nil
-        arrowEntities.removeAll()
-        arrowStates.removeAll()
-        allArrows.removeAll()
-        arrowFadeInProgress.removeAll()
     }
 
-    // MARK: - State Application
+    // MARK: - State application
 
-    private func applyState(_ state: ArrowState, to entity: Entity, arrow: ArrowPlacementData, arrowDistance: Double, userDistance: Double) {
+    private func applyArrowState(
+        _ state: GuidanceState,
+        to entity: Entity,
+        arrow: ArrowPlacementData,
+        arrowDistance: Double,
+        userDistance: Double
+    ) {
         switch state {
         case .active:
             let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
@@ -233,8 +831,8 @@ class ARRouteRenderer {
             let behind = userDistance - arrowDistance
             let t = max(0, min(1, behind / fadeDistance))
             let fadeIn = (arrowFadeInProgress[arrow.id] ?? fadeInFrames) / fadeInFrames
-            let opacity = Float(1.0 - t * 0.8) * fadeIn
-            let scale = Float(1.0 - t * 0.3) * fadeIn
+            let opacity = Float(1.0 - t * 0.85) * fadeIn
+            let scale = Float(1.0 - t * 0.2) * fadeIn
             entity.scale = baseScale(for: arrow.type) * scale
             setOpacity(entity, opacity: opacity)
 
@@ -243,94 +841,166 @@ class ARRouteRenderer {
         }
     }
 
-    private func setOpacity(_ entity: Entity, opacity: Float) {
-        if let model = entity as? ModelEntity,
-           var material = model.model?.materials.first as? SimpleMaterial {
-            let alpha = entity.name.hasSuffix("-shadow") ? opacity * 0.22 : opacity
-            material.color.tint = material.color.tint.withAlphaComponent(CGFloat(alpha))
-            model.model?.materials = [material]
-        }
-        for child in entity.children {
-            setOpacity(child, opacity: opacity)
+    private func applyRailState(
+        _ state: GuidanceState,
+        to entity: Entity,
+        chunk: RailChunkData,
+        userDistance: Double
+    ) {
+        // Rails are modeled at unit chunk length; scale along Z so short
+        // remainder chunks at segment ends still land cleanly.
+        let lengthScale = chunk.length / VecturARGeometry.sideRailChunkLen
+
+        switch state {
+        case .active:
+            let fadeIn = (railFadeInProgress[chunk.id] ?? fadeInFrames) / fadeInFrames
+            entity.scale = SIMD3<Float>(fadeIn, fadeIn, lengthScale * fadeIn)
+            setOpacity(entity, opacity: fadeIn)
+
+        case .fading:
+            let behind = userDistance - chunk.cumulativeMid
+            let t = max(0, min(1, behind / fadeDistance))
+            let fadeIn = (railFadeInProgress[chunk.id] ?? fadeInFrames) / fadeInFrames
+            let opacity = Float(1.0 - t * 0.85) * fadeIn
+            let widthScale = Float(1.0 - t * 0.15) * fadeIn
+            entity.scale = SIMD3<Float>(widthScale, widthScale, lengthScale * fadeIn)
+            setOpacity(entity, opacity: opacity)
+
+        case .hidden:
+            entity.scale = .zero
         }
     }
 
-    // MARK: - Entity Creation
+    /// Turn ring: visible only when the parent arrow is within the
+    /// anticipation window. Ring scales slightly up as the user gets
+    /// closer — a premium "get ready to turn" cue.
+    private func applyTurnRingState(
+        ring: Entity,
+        arrow: ArrowPlacementData,
+        parentState: GuidanceState,
+        userDistance: Double
+    ) {
+        guard parentState == .active else {
+            ring.scale = .zero
+            return
+        }
+        let ahead = arrow.cumulativeDistance - userDistance
+        guard ahead >= 0 && ahead <= turnRingPreviewDistance else {
+            ring.scale = .zero
+            return
+        }
+        let t = 1.0 - (ahead / turnRingPreviewDistance)        // 0 far, 1 at turn
+        let scale = Float(0.75 + 0.35 * t)
+        ring.scale = SIMD3<Float>(scale, 1.0, scale)
+        let opacity = Float(0.45 + 0.55 * t)
+        setOpacity(ring, opacity: opacity)
+    }
+
+    /// Hide all guidance (e.g. on arrival). The destination beacon stays
+    /// visible so the user still sees where they've arrived.
+    func hideAllArrows() {
+        for (id, entity) in arrowEntities {
+            if let arrow = allArrows.first(where: { $0.id == id }), arrow.type == .destination {
+                continue
+            }
+            entity.scale = .zero
+            arrowStates[id] = .hidden
+        }
+        for (id, entity) in railEntities {
+            entity.scale = .zero
+            railStates[id] = .hidden
+        }
+        for (_, ring) in turnRings {
+            ring.scale = .zero
+        }
+
+        arrowFadeInProgress.removeAll()
+        railFadeInProgress.removeAll()
+
+        // Swap the beacon tint to the warm arrival glow and scale it up.
+        if let destination = destinationEntity {
+            recolorEntityTree(destination, to: VecturARPalette.arrivalGlow)
+            destination.scale = SIMD3<Float>(1.15, 1.15, 1.15)
+        }
+    }
+
+    /// Remove all route entities from the scene.
+    func clearRoute(from arView: ARView) {
+        if let anchor = routeAnchor {
+            arView.scene.removeAnchor(anchor)
+        }
+        routeAnchor = nil
+
+        arrowEntities.removeAll()
+        arrowStates.removeAll()
+        allArrows.removeAll()
+        arrowFadeInProgress.removeAll()
+
+        railEntities.removeAll()
+        railStates.removeAll()
+        allRailChunks.removeAll()
+        railFadeInProgress.removeAll()
+
+        turnRings.removeAll()
+        destinationEntity = nil
+    }
+
+    // MARK: - Opacity propagation
+
+    /// Apply a normalized opacity to every glow surface in `entity`'s subtree.
+    /// Per-layer multipliers (halo/mid/core/ring/pillar) come from
+    /// `VecturARLayer.multiplier(for:)` so a single scalar cascades correctly.
+    private func setOpacity(_ entity: Entity, opacity: Float, layerMultiplier: Float = 1.0) {
+        var multiplier = layerMultiplier
+        let name = entity.name
+        let hit = VecturARLayer.multiplier(for: name)
+        if hit != 1.0 {
+            multiplier = hit
+        }
+
+        if let model = entity as? ModelEntity {
+            let alpha = max(0, min(1, opacity * multiplier))
+            applyAlpha(alpha, to: model)
+        }
+        for child in entity.children {
+            setOpacity(child, opacity: opacity, layerMultiplier: multiplier)
+        }
+    }
+
+    private func applyAlpha(_ alpha: Float, to model: ModelEntity) {
+        guard var material = model.model?.materials.first as? UnlitMaterial else { return }
+        material.blending = .transparent(opacity: PhysicallyBasedMaterial.Opacity(floatLiteral: alpha))
+        model.model?.materials = [material]
+    }
+
+    /// Swap every unlit material in the subtree to a given tint, preserving
+    /// the current opacity so transitions stay smooth.
+    private func recolorEntityTree(_ entity: Entity, to color: UIColor) {
+        if let model = entity as? ModelEntity,
+           var material = model.model?.materials.first as? UnlitMaterial {
+            material.color = .init(tint: color)
+            model.model?.materials = [material]
+        }
+        for child in entity.children {
+            recolorEntityTree(child, to: color)
+        }
+    }
+
+    // MARK: - Arrow entity creation
 
     private func createArrowEntity(for arrow: ArrowPlacementData) -> Entity {
         switch arrow.type {
         case .follow:
-            return makeChevronArrow(name: arrow.id, color: UIColor(red: 0.086, green: 0.545, blue: 1.0, alpha: 1.0))
+            return ARChevronFactory.make(name: arrow.id, emphasis: .follow)
 
-        case .turnLeft, .turnRight:
-            return makeChevronArrow(name: arrow.id, color: UIColor(red: 0.98, green: 0.80, blue: 0.08, alpha: 1.0), isTurn: true)
-
-        case .uTurn:
-            return makeChevronArrow(name: arrow.id, color: .systemOrange, isTurn: true)
+        case .turnLeft, .turnRight, .uTurn:
+            return ARChevronFactory.make(name: arrow.id, emphasis: .turn)
 
         case .destination:
-            let mesh = MeshResource.generateSphere(radius: 0.15)
-            let material = SimpleMaterial(color: .systemGreen, roughness: 0.3, isMetallic: false)
-            let entity = ModelEntity(mesh: mesh, materials: [material])
-            entity.name = arrow.id
-            return entity
+            let beacon = ARDestinationBeaconFactory.make(name: arrow.id)
+            destinationEntity = beacon
+            return beacon
         }
-    }
-
-    private func makeChevronArrow(name: String, color: UIColor, isTurn: Bool = false) -> Entity {
-        let root = Entity()
-        root.name = name
-
-        let core = makeChevronLineSet(
-            name: "\(name)-core",
-            color: color,
-            width: 0.055,
-            height: 0.018,
-            length: isTurn ? 0.58 : 0.50,
-            spread: isTurn ? 0.28 : 0.24
-        )
-        core.position = [0, 0.015, 0]
-        root.addChild(core)
-
-        let glow = makeChevronLineSet(
-            name: "\(name)-glow",
-            color: color.withAlphaComponent(0.32),
-            width: 0.11,
-            height: 0.01,
-            length: isTurn ? 0.64 : 0.56,
-            spread: isTurn ? 0.32 : 0.28
-        )
-        glow.position = [0, 0.006, 0]
-        root.addChild(glow)
-
-        return root
-    }
-
-    private func makeChevronLineSet(
-        name: String,
-        color: UIColor,
-        width: Float,
-        height: Float,
-        length: Float,
-        spread: Float
-    ) -> Entity {
-        let root = Entity()
-        root.name = name
-        let material = SimpleMaterial(color: color, roughness: 0.12, isMetallic: false)
-        let segmentLength = sqrt(length * length + spread * spread)
-        let mesh = MeshResource.generateBox(size: [width, height, segmentLength], cornerRadius: width * 0.45)
-
-        let left = ModelEntity(mesh: mesh, materials: [material])
-        left.position = [-spread / 2.0, 0, 0]
-        left.orientation = simd_quatf(angle: -.pi / 4.0, axis: [0, 1, 0])
-        root.addChild(left)
-
-        let right = ModelEntity(mesh: mesh, materials: [material])
-        right.position = [spread / 2.0, 0, 0]
-        right.orientation = simd_quatf(angle: .pi / 4.0, axis: [0, 1, 0])
-        root.addChild(right)
-
-        return root
     }
 
     private func baseScale(for type: ArrowPlacementType) -> SIMD3<Float> {
@@ -338,7 +1008,7 @@ class ARRouteRenderer {
         case .follow:
             return SIMD3<Float>(1.0, 1.0, 1.0)
         case .turnLeft, .turnRight:
-            return SIMD3<Float>(1.18, 1.18, 1.18)
+            return SIMD3<Float>(1.15, 1.15, 1.15)
         case .uTurn:
             return SIMD3<Float>(1.25, 1.25, 1.25)
         case .destination:
@@ -346,7 +1016,7 @@ class ARRouteRenderer {
         }
     }
 
-    // MARK: - Coordinate Transform
+    // MARK: - Coordinate transform
 
     private func transformToAR(buildingX: Double, buildingY: Double, buildingZ: Double) -> SIMD3<Float> {
         let cosR = cos(rotationYRad)
@@ -374,7 +1044,7 @@ class ARRouteRenderer {
     }
 }
 
-// MARK: - Data Transfer Types
+// MARK: - Data transfer types
 
 /// Swift-side arrow placement data (mirrors shared ArrowPlacement).
 struct ArrowPlacementData {
@@ -397,4 +1067,18 @@ enum ArrowPlacementType {
     case turnRight
     case uTurn
     case destination
+}
+
+// MARK: - Internal chunk model
+
+/// One subdivision of a side rail (left or right — identified by its `id`
+/// prefix, e.g. `rail-L-…` / `rail-R-…`).
+private struct RailChunkData {
+    let id: String
+    let midX: Double
+    let midZ: Double
+    let dirX: Double
+    let dirZ: Double
+    let length: Float
+    let cumulativeMid: Double
 }
