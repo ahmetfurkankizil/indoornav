@@ -29,7 +29,7 @@ class NavigationFlowModel: ObservableObject {
 
     // MARK: - Admin API
 
-    /// Base URL for the VecturAI admin API.
+    /// Base URL for the Vectura AI admin API.
     /// Simulator: localhost works. Real device: update to your Mac's LAN IP.
     static let adminAPIBaseURL = "http://192.168.1.18:8080"
 

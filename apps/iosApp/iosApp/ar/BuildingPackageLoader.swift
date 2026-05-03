@@ -271,7 +271,7 @@ struct BuildingPackageLoader {
 
     /// Parse a `UnifiedPackage` JSON string returned by the admin API mobile endpoint.
     /// Scales all coordinates from map units to real-world metres, tags nodes with their
-    /// floor, and derives rooms from nodes whose type == "room".
+    /// floor, and derives destination rows from navigable graph nodes.
     static func parseUnifiedPackage(_ jsonString: String) -> Result<ReviewedConfig, PackageError> {
         guard let data = jsonString.data(using: .utf8) else {
             return .failure(.decodingFailed("package", NSError(domain: "utf8", code: 0)))
@@ -311,10 +311,13 @@ struct BuildingPackageLoader {
         }
         let allEdges = intraEdges + crossEdges
 
-        let rooms: [PackageRoom] = allNodes.filter { $0.type == "room" }.map { n in
+        let rooms: [PackageRoom] = allNodes.filter(isRemoteDestinationNode).map { n in
             let floor = n.floorId.flatMap { floorInfoMap[$0] }
-            return PackageRoom(id: n.id, displayName: n.label ?? "Room",
-                               destinationNodeId: n.id, category: "room", description: nil,
+            let displayName = cleanLabel(n.label, fallback: "Room")
+            return PackageRoom(id: n.id, displayName: displayName,
+                               destinationNodeId: n.id,
+                               category: inferredCategory(nodeType: n.type, label: displayName),
+                               description: nil,
                                floorId: n.floorId, floorName: floor?.floorName)
         }
 
@@ -474,6 +477,110 @@ struct BuildingPackageLoader {
         let dx = node.x - position.x
         let dz = node.z - position.z
         return dx * dx + dz * dz
+    }
+
+    private static func isRemoteDestinationNode(_ node: PackageNode) -> Bool {
+        !isNavigationHelperNode(node)
+    }
+
+    static func isNavigationHelperNode(_ node: PackageNode) -> Bool {
+        let rawType = node.type.lowercased()
+        let normalizedType = normalizedHelperToken(rawType)
+        let label = cleanLabel(node.label, fallback: "")
+
+        switch normalizedType {
+        case "corridor", "hallway", "junction", "entrance", "exit",
+            "waypoint", "path", "turn", "turning_point", "turn_point",
+            "turnpoint", "route_helper", "navigation_helper", "nav_helper",
+            "helper", "corridor_projection", "projection", "connector", "fork":
+            return true
+        default:
+            break
+        }
+
+        return isHelperNodeLabel(label)
+    }
+
+    private static func normalizedHelperToken(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "-", with: "_")
+            .replacingOccurrences(of: " ", with: "_")
+    }
+
+    private static func isHelperNodeLabel(_ label: String) -> Bool {
+        let normalized = label.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return false }
+
+        let helperFragments = [
+            "turning point",
+            "turn point",
+            "turnpoint",
+            "waypoint",
+            "junction",
+            "corridor projection",
+            "projection",
+            "corridor point",
+            "route point",
+            "navigation point",
+            "helper",
+            "fork",
+            "landing"
+        ]
+
+        if helperFragments.contains(where: { normalized.contains($0) }) {
+            return true
+        }
+
+        return normalized.hasPrefix("turn ") || normalized.hasPrefix("turn-")
+    }
+
+    private static func cleanLabel(_ label: String?, fallback: String) -> String {
+        let trimmed = label?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? fallback : trimmed
+    }
+
+    private static func inferredCategory(nodeType: String, label: String) -> String {
+        let rawType = nodeType.lowercased()
+        let rawLabel = label.lowercased()
+
+        switch rawType {
+        case "classroom", "lecture", "lecture_room":
+            return "classroom"
+        case "lab", "laboratory":
+            return "lab"
+        case "cafe", "coffee", "cafeteria":
+            return "cafe"
+        case "vertical_transport", "elevator", "lift":
+            return "vertical_transport"
+        case "toilet", "restroom", "wc", "bathroom":
+            return "toilet"
+        default:
+            break
+        }
+
+        if rawLabel.contains("wc") ||
+            rawLabel.contains("toilet") ||
+            rawLabel.contains("restroom") ||
+            rawLabel.contains("bathroom") ||
+            rawLabel.contains("men's") ||
+            rawLabel.contains("women's") {
+            return "toilet"
+        }
+        if rawLabel.contains("elevator") || rawLabel.contains("lift") {
+            return "vertical_transport"
+        }
+        if rawLabel.contains("cafe") || rawLabel.contains("coffee") {
+            return "cafe"
+        }
+        if rawLabel.contains("lab") || rawLabel.contains("laboratory") {
+            return "lab"
+        }
+        if rawLabel.contains("class") || rawLabel.contains("lecture") {
+            return "classroom"
+        }
+
+        return "other"
     }
 
     // MARK: - Dijkstra

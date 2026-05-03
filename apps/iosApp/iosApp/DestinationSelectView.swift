@@ -470,7 +470,7 @@ private struct OriginDestinationHeader: View {
     let onResetOrigin: (() -> Void)?
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
+        HStack(alignment: .center, spacing: 6) {
             endpointPill(
                 label: "From",
                 value: originName,
@@ -478,9 +478,10 @@ private struct OriginDestinationHeader: View {
                 tint: VecturTheme.green,
                 highlighted: selectingOrigin
             )
+            .layoutPriority(1)
 
             Image(systemName: "arrow.right")
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(VecturTheme.textDisabled)
 
             endpointPill(
@@ -491,14 +492,15 @@ private struct OriginDestinationHeader: View {
                 highlighted: !selectingOrigin && destinationName != nil,
                 dimmed: destinationName == nil
             )
+            .layoutPriority(destinationName == nil ? 2 : 1)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 if let onResetOrigin {
                     Button(action: onResetOrigin) {
                         Image(systemName: "arrow.uturn.backward")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(VecturTheme.textSecondary)
-                            .frame(width: 32, height: 32)
+                            .frame(width: 30, height: 30)
                             .background(VecturTheme.elevated)
                             .clipShape(Circle())
                     }
@@ -508,16 +510,19 @@ private struct OriginDestinationHeader: View {
                 if !selectingOrigin {
                     Button(action: onChangeOrigin) {
                         Text("Change")
-                            .font(.caption.weight(.bold))
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 12)
-                            .frame(height: 32)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .allowsTightening(true)
+                            .frame(width: 50, height: 30)
                             .background(VecturTheme.primaryGradient)
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .fixedSize(horizontal: true, vertical: false)
         }
     }
 
@@ -529,25 +534,29 @@ private struct OriginDestinationHeader: View {
         highlighted: Bool,
         dimmed: Bool = false
     ) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(tint)
+                .frame(width: 12)
             VStack(alignment: .leading, spacing: 1) {
                 Text(label)
-                    .font(.system(size: 9, weight: .bold))
-                    .tracking(1.0)
+                    .font(.system(size: 8, weight: .bold))
+                    .tracking(0.6)
                     .textCase(.uppercase)
                     .foregroundStyle(VecturTheme.textMuted)
                 Text(value)
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(dimmed ? VecturTheme.textMuted : VecturTheme.textPrimary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .allowsTightening(true)
+                    .truncationMode(.tail)
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 10)
-        .frame(height: 44)
+        .padding(.horizontal, 7)
+        .frame(height: 42)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(highlighted ? tint.opacity(0.16) : VecturTheme.elevated)
         .overlay(

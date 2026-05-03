@@ -245,19 +245,13 @@ struct VecturBrandMark: View {
     var pulsing = false
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
-                .fill(VecturTheme.overlay)
-                .overlay(
-                    RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
-                        .stroke(VecturTheme.cyan.opacity(0.7), lineWidth: 1)
-                )
-            Image(systemName: "bolt.fill")
-                .font(.system(size: size * 0.48, weight: .bold))
-                .foregroundStyle(.white)
-        }
-        .frame(width: size, height: size)
-        .shadow(color: VecturTheme.cyan.opacity(0.18), radius: 20, y: 8)
+        Image("VecturaLogo")
+            .renderingMode(.original)
+            .resizable()
+            .scaledToFit()
+            .accessibilityLabel("Vectura AI")
+            .frame(width: size, height: size)
+            .shadow(color: VecturTheme.cyan.opacity(0.18), radius: 20, y: 8)
     }
 }
 

@@ -218,8 +218,9 @@ private struct RoutePlanView: View {
                                style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
             }
 
-            // 2. Floor nodes (small dim dots — skip routes that are turning points only)
+            // 2. Visible destination/facility nodes. Routing helpers stay invisible.
             for node in nodes {
+                if BuildingPackageLoader.isNavigationHelperNode(node) { continue }
                 let p = project(node.x, node.z)
                 let r: CGFloat = 1.6
                 context.fill(

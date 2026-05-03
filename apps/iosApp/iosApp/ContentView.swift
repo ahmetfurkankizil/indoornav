@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Root content view for the VecturAI iOS app.
+/// Root content view for the Vectura AI iOS app.
 ///
 /// Drives the full user flow via NavigationFlowModel:
 ///   home -> qrScan -> entranceConfirmed -> destinationSelect -> routePreview -> arNavigation
@@ -123,10 +123,10 @@ private struct HomeView: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 48)
 
-                VecturBrandMark(size: 88, pulsing: true)
-                    .padding(.bottom, 20)
+                VecturBrandMark(size: 128, pulsing: true)
+                    .padding(.bottom, 18)
 
-                Text("VecturAI")
+                Text("Vectura AI")
                     .font(.system(size: 42, weight: .heavy, design: .rounded))
                     .foregroundStyle(VecturTheme.primaryGradient)
 

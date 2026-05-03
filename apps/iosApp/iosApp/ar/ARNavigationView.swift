@@ -852,7 +852,7 @@ class ARNavigationViewModel: ObservableObject {
     @Published var timeoutHintMessage: String = ""
 
     /// User's most recent position in building-local coords. Published so the minimap
-    /// overlay can render the user marker. Updated each pose sample (~2 Hz).
+    /// overlay can render the user marker. Updated by the lightweight display ticker.
     @Published var userBuildingX: Double = 0.0
     @Published var userBuildingZ: Double = 0.0
 
@@ -893,6 +893,9 @@ class ARNavigationViewModel: ObservableObject {
     private var alignmentTimeoutTimer: Timer?
     /// Tracks the last arrow that triggered a turn haptic, to fire only once per turn.
     private var lastHapticArrowId: String?
+    private var smoothedMinimapX: Double?
+    private var smoothedMinimapZ: Double?
+    private var smoothedMinimapHeadingDegrees: Double?
 
     /// Alignment timeout in seconds.
     private let alignmentTimeoutSeconds: TimeInterval = 30.0
@@ -1182,6 +1185,8 @@ class ARNavigationViewModel: ObservableObject {
 
         let startPoint = pkg.routePoints.first ?? (0.0, 0.0)
         let routeForward = initialRouteForward(from: pkg.routePoints)
+        let initialHeading = normalizedDegrees(atan2(routeForward.x, routeForward.z) * 180.0 / .pi)
+        resetMinimapSmoothing(x: startPoint.0, z: startPoint.1, headingDegrees: initialHeading)
         alignmentRotYDeg = markerlessRotationToFaceForward(routeForward: routeForward)
 
         let rotRad = alignmentRotYDeg * .pi / 180.0
@@ -1408,6 +1413,11 @@ class ARNavigationViewModel: ObservableObject {
 
         guard let pkg = routePackage, let arView = arView else { return }
         remainingDistance = pkg.totalDistance
+        if let startPoint = pkg.routePoints.first {
+            let routeForward = initialRouteForward(from: pkg.routePoints)
+            let initialHeading = normalizedDegrees(atan2(routeForward.x, routeForward.z) * 180.0 / .pi)
+            resetMinimapSmoothing(x: startPoint.0, z: startPoint.1, headingDegrees: initialHeading)
+        }
 
         // Place full route (side rails + arrows + turn rings + beacon),
         // initially hidden, then reveal the forward slice.
@@ -1430,37 +1440,53 @@ class ARNavigationViewModel: ObservableObject {
             self?.sampleCameraPose()
         }
 
-        // Separate high-frequency ticker for the compass: the route-matching
-        // pass in sampleCameraPose is too expensive to run every frame, but
-        // heading is just an atan2 on the camera forward vector.
+        // Separate high-frequency ticker for visible HUD motion. The route-matching
+        // pass in sampleCameraPose is too expensive to run every frame, but camera
+        // heading + building-local minimap pose are cheap and need to feel live.
         headingTimer?.invalidate()
         headingTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 20.0, repeats: true) { [weak self] _ in
-            self?.sampleHeading()
+            self?.sampleDisplayPose()
         }
     }
 
-    private func sampleHeading() {
-        guard let arView = arView, isAligned, !hasArrived else { return }
-        let forward = cameraForward(from: arView.cameraTransform)
+    private func sampleDisplayPose() {
+        guard let arView = arView, isAligned, !isSimulated, !hasArrived else { return }
+        let transform = arView.cameraTransform
+        let forward = cameraForward(from: transform)
         let rad = atan2(Double(forward.x), Double(forward.z))
-        var deg = rad * 180.0 / .pi
-        if deg < 0 { deg += 360.0 }
+        let deg = normalizedDegrees(rad * 180.0 / .pi)
         cameraHeadingDegrees = deg
+
+        let pose = buildingPose(from: transform)
+        let smoothing = 0.35
+        if let currentX = smoothedMinimapX,
+           let currentZ = smoothedMinimapZ,
+           let currentHeading = smoothedMinimapHeadingDegrees {
+            smoothedMinimapX = currentX + (pose.x - currentX) * smoothing
+            smoothedMinimapZ = currentZ + (pose.z - currentZ) * smoothing
+            smoothedMinimapHeadingDegrees = smoothAngleDegrees(
+                from: currentHeading,
+                to: pose.headingDegrees,
+                alpha: smoothing
+            )
+        } else {
+            smoothedMinimapX = pose.x
+            smoothedMinimapZ = pose.z
+            smoothedMinimapHeadingDegrees = pose.headingDegrees
+        }
+
+        userBuildingX = smoothedMinimapX ?? pose.x
+        userBuildingZ = smoothedMinimapZ ?? pose.z
+        userBuildingHeadingDegrees = smoothedMinimapHeadingDegrees ?? pose.headingDegrees
     }
 
     private func sampleCameraPose() {
         guard let arView = arView, isAligned, !isSimulated, !hasArrived else { return }
         let transform = arView.cameraTransform
         let pos = transform.translation
-
-        // Convert AR world → building-local
-        let radians = -alignmentRotYDeg * .pi / 180.0
-        let cosR = cos(radians)
-        let sinR = sin(radians)
-        let tx = Double(pos.x) - alignmentOffsetX
-        let tz = Double(pos.z) - alignmentOffsetZ
-        let bx = tx * cosR + tz * sinR
-        let bz = -tx * sinR + tz * cosR
+        let pose = buildingPose(from: transform)
+        let bx = pose.x
+        let bz = pose.z
 
         guard let pkg = routePackage else { return }
         let routePoints = pkg.routePoints
@@ -1513,19 +1539,6 @@ class ARNavigationViewModel: ObservableObject {
             self.remainingDistance = max(0, totalDist - self.userCumulativeDistance)
             self.distanceToDestination = destDist
             self.isLowConfidence = bestDist > 3.0
-            self.userBuildingX = bx
-            self.userBuildingZ = bz
-
-            // Compute building-local heading by inverting the AR alignment rotation
-            // applied to the camera forward vector.
-            let arForward = self.cameraForward(from: transform)
-            let cosA = cos(radians)
-            let sinA = sin(radians)
-            let bfX = Double(arForward.x) * cosA + Double(arForward.z) * sinA
-            let bfZ = -Double(arForward.x) * sinA + Double(arForward.z) * cosA
-            var hdeg = atan2(bfX, bfZ) * 180.0 / .pi
-            if hdeg < 0 { hdeg += 360 }
-            self.userBuildingHeadingDegrees = hdeg
 
             // Update arrow visibility based on progress, hiding guidance that is behind the camera.
             let forward = self.cameraForward(from: transform)
@@ -1543,6 +1556,50 @@ class ARNavigationViewModel: ObservableObject {
 
             self.checkArrival(distToDest: destDist)
         }
+    }
+
+    private func buildingPose(from transform: Transform) -> (x: Double, z: Double, headingDegrees: Double) {
+        let pos = transform.translation
+
+        // Convert AR world -> building-local.
+        let radians = -alignmentRotYDeg * .pi / 180.0
+        let cosR = cos(radians)
+        let sinR = sin(radians)
+        let tx = Double(pos.x) - alignmentOffsetX
+        let tz = Double(pos.z) - alignmentOffsetZ
+        let bx = tx * cosR + tz * sinR
+        let bz = -tx * sinR + tz * cosR
+
+        // Compute building-local heading by applying the inverse alignment rotation
+        // to the camera forward vector.
+        let arForward = cameraForward(from: transform)
+        let bfX = Double(arForward.x) * cosR + Double(arForward.z) * sinR
+        let bfZ = -Double(arForward.x) * sinR + Double(arForward.z) * cosR
+        let heading = normalizedDegrees(atan2(bfX, bfZ) * 180.0 / .pi)
+        return (bx, bz, heading)
+    }
+
+    private func resetMinimapSmoothing(x: Double, z: Double, headingDegrees: Double) {
+        let heading = normalizedDegrees(headingDegrees)
+        smoothedMinimapX = x
+        smoothedMinimapZ = z
+        smoothedMinimapHeadingDegrees = heading
+        userBuildingX = x
+        userBuildingZ = z
+        userBuildingHeadingDegrees = heading
+    }
+
+    private func normalizedDegrees(_ degrees: Double) -> Double {
+        var value = degrees.truncatingRemainder(dividingBy: 360.0)
+        if value < 0 { value += 360.0 }
+        return value
+    }
+
+    private func smoothAngleDegrees(from current: Double, to target: Double, alpha: Double) -> Double {
+        var delta = normalizedDegrees(target) - normalizedDegrees(current)
+        if delta > 180.0 { delta -= 360.0 }
+        if delta < -180.0 { delta += 360.0 }
+        return normalizedDegrees(current + delta * alpha)
     }
 
     private func cameraForward(from transform: Transform) -> SIMD3<Float> {
@@ -1660,9 +1717,9 @@ private struct NavigationMinimap: View {
         }
         .frame(width: diameter, height: diameter)
         .shadow(color: .black.opacity(0.35), radius: 10, y: 4)
-        .animation(.easeOut(duration: 0.18), value: userHeadingDegrees)
-        .animation(.easeOut(duration: 0.18), value: userX)
-        .animation(.easeOut(duration: 0.18), value: userZ)
+        .animation(.linear(duration: 0.06), value: userHeadingDegrees)
+        .animation(.linear(duration: 0.06), value: userX)
+        .animation(.linear(duration: 0.06), value: userZ)
     }
 
     private var northIndicator: some View {
@@ -1686,6 +1743,7 @@ private struct NavigationMinimap: View {
         let headingRad = userHeadingDegrees * .pi / 180.0
         let sinH = sin(headingRad)
         let cosH = cos(headingRad)
+        let nodeById = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
 
         // Project a building-local point into the user's heading frame. The route
         // contract treats +Z like the route preview's downward map axis, so user-right
@@ -1703,8 +1761,8 @@ private struct NavigationMinimap: View {
 
         // 1. Floor edges (gray).
         for edge in edges {
-            guard let from = nodes.first(where: { $0.id == edge.from }),
-                  let to = nodes.first(where: { $0.id == edge.to }) else { continue }
+            guard let from = nodeById[edge.from],
+                  let to = nodeById[edge.to] else { continue }
             var path = Path()
             path.move(to: project(from.x, from.z))
             path.addLine(to: project(to.x, to.z))
@@ -1717,7 +1775,7 @@ private struct NavigationMinimap: View {
 
         // 2. Active route polyline (cyan, thicker).
         if routeNodeIds.count >= 2 {
-            let routeNodes = routeNodeIds.compactMap { id in nodes.first { $0.id == id } }
+            let routeNodes = routeNodeIds.compactMap { nodeById[$0] }
             if routeNodes.count >= 2 {
                 var path = Path()
                 path.move(to: project(routeNodes[0].x, routeNodes[0].z))
@@ -1732,8 +1790,9 @@ private struct NavigationMinimap: View {
             }
         }
 
-        // 3. Floor nodes (small dots).
+        // 3. Visible destination/facility nodes. Routing helpers stay invisible.
         for node in nodes {
+            if BuildingPackageLoader.isNavigationHelperNode(node) { continue }
             let p = project(node.x, node.z)
             let dx = p.x - center.x, dy = p.y - center.y
             if dx * dx + dy * dy > viewRadius * viewRadius { continue }

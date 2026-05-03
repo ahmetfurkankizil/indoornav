@@ -37,7 +37,7 @@ struct QRPayload: Codable, Equatable {
         var description: String {
             switch self {
             case .notJSON:
-                return "QR code does not contain a valid VecturAI payload"
+                return "QR code does not contain a valid Vectura AI payload"
             case .wrongType(let t):
                 return "Unknown QR type: \(t)"
             case .unsupportedVersion(let v):
