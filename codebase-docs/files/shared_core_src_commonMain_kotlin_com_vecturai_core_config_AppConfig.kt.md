@@ -1,7 +1,7 @@
 # File Dossier: AppConfig.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\config\AppConfig.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\config\AppConfig.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
 /**
  * App configuration profiles.

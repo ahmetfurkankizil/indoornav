@@ -1,7 +1,7 @@
 # File Dossier: GlbParserTest.kt
 
 ## Path
-`tools\nav-preprocessor\src\test\kotlin\com\vecturai\tools\preprocessor\GlbParserTest.kt`
+`tools\nav-preprocessor\src\test\kotlin\com\Vectura AI\tools\preprocessor\GlbParserTest.kt`
 
 ## Type
 Unit/Integration Test
@@ -12,10 +12,10 @@ Unit/Integration Test for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.glb.GlbParser
-import com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor
+import com.Vectura AI.tools.preprocessor.glb.GlbParser
+import com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

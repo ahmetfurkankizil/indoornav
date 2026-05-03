@@ -1,7 +1,7 @@
 # File Dossier: NavigationState.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\domain\NavigationState.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\domain\NavigationState.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.domain
+package com.Vectura AI.core.domain
 
 /**
  * Represents the current state of the navigation flow.

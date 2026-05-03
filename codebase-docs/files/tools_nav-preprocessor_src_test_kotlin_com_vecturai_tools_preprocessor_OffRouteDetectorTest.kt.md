@@ -1,7 +1,7 @@
 # File Dossier: OffRouteDetectorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/OffRouteDetectorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/OffRouteDetectorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `navigation_session_management`
 - **Status**: Mapped

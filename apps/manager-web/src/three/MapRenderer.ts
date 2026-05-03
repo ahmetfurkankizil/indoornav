@@ -5,6 +5,22 @@ export type { GlbRenderResult as MapRenderResult }
 export type { RenderBounds } from './GlbRenderer'
 
 /**
+ * Render a map file from a Blob (for local/IndexedDB-sourced files).
+ * mimeType is used to determine the format; falls back to blob.type.
+ */
+export async function renderMapBlob(blob: Blob, mimeType?: string): Promise<GlbRenderResult> {
+  const ct = ((mimeType ?? blob.type) ?? '').toLowerCase()
+  if (ct.includes('svg') || ct.includes('png') || ct.includes('jpeg') || ct.includes('webp') || ct.includes('image')) {
+    return render2DImageFromBlob(blob)
+  }
+  if (ct.includes('dxf')) {
+    return renderDxfFromText(await blob.text())
+  }
+  const objUrl = URL.createObjectURL(blob)
+  try { return await renderGlbTopDown(objUrl) } finally { URL.revokeObjectURL(objUrl) }
+}
+
+/**
  * Fetch the map file once, detect format from Content-Type, and render to a
  * top-down 1024×1024 image. Supports GLB, SVG, PNG, and DXF.
  */

@@ -1,6 +1,6 @@
-# File Dossier: shared/data-remote/src/commonMain/kotlin/com/vecturai/data/remote/KtorBuildingDataSource.kt
+# File Dossier: shared/data-remote/src/commonMain/kotlin/com/Vectura AI/data/remote/KtorBuildingDataSource.kt
 
-- **Path**: `shared/data-remote/src/commonMain/kotlin/com/vecturai/data/remote/KtorBuildingDataSource.kt`
+- **Path**: `shared/data-remote/src/commonMain/kotlin/com/Vectura AI/data/remote/KtorBuildingDataSource.kt`
 - **Type**: source
 - **Role**: Ktor-based implementation for fetching building data from the remote backend.
 - **Imports / Includes**:
@@ -22,7 +22,7 @@
 - **Used By**:
     - `DataRemoteModule` (DI)
 - **Config / Constants / Protocol Details**:
-    - `baseUrl = "https://api.vecturai.com/v1"`
+    - `baseUrl = "https://api.Vectura AI.com/v1"`
 - **Related Tests**: N/A
 - **Notes / Risks**:
     - Actual network calls are currently [TODO].

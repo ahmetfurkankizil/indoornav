@@ -1,12 +1,12 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/repository/BuildingRepository.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/repository/BuildingRepository.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/repository/BuildingRepository.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/repository/BuildingRepository.kt`
 - **Type**: source
 - **Role**: Interface defining the data access contract for building-specific information.
 - **Imports / Includes**:
-    - `com.vecturai.core.domain.EntranceMarker`
-    - `com.vecturai.core.domain.NavGraph`
-    - `com.vecturai.core.domain.Room`
+    - `com.Vectura AI.core.domain.EntranceMarker`
+    - `com.Vectura AI.core.domain.NavGraph`
+    - `com.Vectura AI.core.domain.Room`
 - **Exports / Public Surface**:
     - `BuildingRepository` interface
     - `BuildingInfo` data class

@@ -1,13 +1,13 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/routing/DijkstraRouteEngine.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/routing/DijkstraRouteEngine.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/routing/DijkstraRouteEngine.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/routing/DijkstraRouteEngine.kt`
 - **Type**: source
 - **Role**: Implements the core pathfinding logic using Dijkstra's algorithm.
 - **Imports / Includes**:
-    - `com.vecturai.core.domain.NavGraph`
-    - `com.vecturai.core.domain.NavNode`
-    - `com.vecturai.core.domain.Route`
-    - `com.vecturai.core.domain.RouteSegment`
+    - `com.Vectura AI.core.domain.NavGraph`
+    - `com.Vectura AI.core.domain.NavNode`
+    - `com.Vectura AI.core.domain.Route`
+    - `com.Vectura AI.core.domain.RouteSegment`
 - **Exports / Public Surface**:
     - `DijkstraRouteEngine` class
     - `computeRoute(graph, fromNodeId, toNodeId)`

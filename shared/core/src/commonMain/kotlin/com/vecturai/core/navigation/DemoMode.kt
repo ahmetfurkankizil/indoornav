@@ -1,7 +1,7 @@
-package com.vecturai.core.navigation
+package com.Vectura AI.core.navigation
 
-import com.vecturai.core.domain.BuildingPackage
-import com.vecturai.core.domain.Room
+import com.Vectura AI.core.domain.BuildingPackage
+import com.Vectura AI.core.domain.Room
 
 /**
  * Demo mode helper for investor-style presentations.

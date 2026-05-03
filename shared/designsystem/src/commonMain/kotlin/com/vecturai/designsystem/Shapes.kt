@@ -1,9 +1,9 @@
-package com.vecturai.designsystem
+package com.Vectura AI.designsystem
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
-object VecturaiShapes {
+object Vectura AIShapes {
     val Small = RoundedCornerShape(8.dp)
     val Medium = RoundedCornerShape(14.dp)
     val Large = RoundedCornerShape(20.dp)

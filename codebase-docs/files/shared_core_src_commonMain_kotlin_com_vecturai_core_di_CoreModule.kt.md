@@ -1,6 +1,6 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/di/CoreModule.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/di/CoreModule.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/di/CoreModule.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/di/CoreModule.kt`
 - **Type**: source
 - **Role**: Defines the dependency injection wiring for all core shared logic using Koin.
 - **Imports / Includes**:
@@ -19,7 +19,7 @@
     - Koin DSL
     - All core service classes
 - **Used By**:
-    - Platform-specific app initialization (Android `VecturaiApp.kt`, iOS app setup).
+    - Platform-specific app initialization (Android `Vectura AIApp.kt`, iOS app setup).
 - **Config / Constants / Protocol Details**:
     - Follows the Koin `module { single { ... } }` pattern.
 - **Related Tests**: N/A

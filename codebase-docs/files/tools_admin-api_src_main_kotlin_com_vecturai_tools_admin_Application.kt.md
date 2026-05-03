@@ -1,7 +1,7 @@
 # File Dossier: Application.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/vecturai/tools/admin/Application.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/Application.kt`
 - **Type**: Kotlin Source (Entrypoint)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

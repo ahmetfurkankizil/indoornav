@@ -1,10 +1,10 @@
-# File Dossier: shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/navigation/AppNavigation.kt
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/navigation/AppNavigation.kt
 
-- **Path**: `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/navigation/AppNavigation.kt`
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/navigation/AppNavigation.kt`
 - **Type**: source
 - **Role**: Main navigation shell for the non-AR parts of the application.
 - **Imports / Includes**:
-    - `com.vecturai.designsystem.screens.*`
+    - `com.Vectura AI.designsystem.screens.*`
     - `androidx.compose.material3.Scaffold`
 - **Exports / Public Surface**:
     - `AppNavigation` Composable
@@ -19,7 +19,7 @@
     - `Screen` (navigation model)
     - All feature screen composables
 - **Used By**:
-    - `VecturaiAppContent`
+    - `Vectura AIAppContent`
 - **Config / Constants / Protocol Details**:
     - Does NOT use a complex navigation library (like Jetpack Navigation) to keep the KMP shared logic simple and dependency-light.
 - **Related Tests**: N/A

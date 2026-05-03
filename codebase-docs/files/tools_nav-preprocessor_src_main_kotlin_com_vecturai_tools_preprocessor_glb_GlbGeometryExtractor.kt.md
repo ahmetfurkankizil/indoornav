@@ -1,7 +1,7 @@
 # File Dossier: GlbGeometryExtractor.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/glb/GlbGeometryExtractor.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/glb/GlbGeometryExtractor.kt`
 - **Type**: Kotlin Source (Geometry Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

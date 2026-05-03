@@ -1,4 +1,4 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -16,7 +16,7 @@ class QRCodeService(private val uploadsDir: String) {
 
     fun buildPayload(qrToken: String): String {
         val payload = buildJsonObject {
-            put("type", "vecturai-building")
+            put("type", "Vectura AI-building")
             put("token", qrToken)
             put("v", 2)
         }

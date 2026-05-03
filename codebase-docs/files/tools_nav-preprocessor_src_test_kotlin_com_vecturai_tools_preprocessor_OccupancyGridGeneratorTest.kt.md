@@ -1,7 +1,7 @@
 # File Dossier: OccupancyGridGeneratorTest.kt
 
 ## Path
-`tools\nav-preprocessor\src\test\kotlin\com\vecturai\tools\preprocessor\OccupancyGridGeneratorTest.kt`
+`tools\nav-preprocessor\src\test\kotlin\com\Vectura AI\tools\preprocessor\OccupancyGridGeneratorTest.kt`
 
 ## Type
 Unit/Integration Test
@@ -12,10 +12,10 @@ Unit/Integration Test for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator
-import com.vecturai.tools.preprocessor.glb.Vec3
+import com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator
+import com.Vectura AI.tools.preprocessor.glb.Vec3
 import kotlin.test.*
 
 /**

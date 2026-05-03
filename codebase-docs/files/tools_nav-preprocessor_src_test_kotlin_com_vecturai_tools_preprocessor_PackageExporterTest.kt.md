@@ -1,7 +1,7 @@
 # File Dossier: PackageExporterTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/PackageExporterTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/PackageExporterTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`, `navigation_data_format`
 - **Status**: Mapped

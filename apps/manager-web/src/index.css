@@ -5,3 +5,12 @@
 body {
   @apply bg-gray-50 text-gray-900;
 }
+
+@keyframes slide-up-fade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.5s ease-out forwards;
+}

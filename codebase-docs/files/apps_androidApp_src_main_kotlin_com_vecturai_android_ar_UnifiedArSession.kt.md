@@ -1,7 +1,7 @@
 # File Dossier: UnifiedArSession.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArSession.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArSession.kt`
 
 ## Type
 Authored Source (ARCore Session Lifecycle)

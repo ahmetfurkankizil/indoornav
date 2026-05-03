@@ -10,6 +10,6 @@ plugins {
 }
 
 allprojects {
-    group = "com.vecturai"
+    group = "com.Vectura AI"
     version = "0.1.0-SNAPSHOT"
 }

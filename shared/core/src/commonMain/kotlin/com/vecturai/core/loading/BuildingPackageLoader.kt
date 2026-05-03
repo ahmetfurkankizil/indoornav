@@ -1,6 +1,6 @@
-package com.vecturai.core.loading
+package com.Vectura AI.core.loading
 
-import com.vecturai.core.domain.*
+import com.Vectura AI.core.domain.*
 import kotlinx.serialization.json.Json
 
 /**

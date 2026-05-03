@@ -1,8 +1,8 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator
-import com.vecturai.tools.preprocessor.analysis.ZoneSuggester
-import com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter
+import com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator
+import com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester
+import com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter
 import kotlin.test.*
 
 /**

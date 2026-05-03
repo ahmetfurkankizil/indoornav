@@ -16,7 +16,7 @@ Authored Source for the docs component.
 
 **Status:** Accepted
 **Date:** 2026-03-22
-**Deciders:** VecturAI iOS team
+**Deciders:** Vectura AI iOS team
 **Relates to:** ADR-025, ADR-003, ADR-012
 
 ## Context

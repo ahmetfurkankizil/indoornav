@@ -1,7 +1,7 @@
 # File Dossier: CompletionStatus.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\navigation\CompletionStatus.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\navigation\CompletionStatus.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.navigation
+package com.Vectura AI.core.navigation
 
 import kotlinx.serialization.Serializable
 

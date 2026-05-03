@@ -14,7 +14,7 @@ Data Contract / Sample Data for the docs component.
 ```kotlin
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "VecturAI Navigation Graph",
+    "title": "Vectura AI Navigation Graph",
     "description": "Indoor navigation graph with nodes (waypoints) and edges (connections) for pathfinding.",
     "type": "object",
     "required": [

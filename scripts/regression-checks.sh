@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Minimal Regression Checks for VecturAI iOS MVP
+# Minimal Regression Checks for Vectura AI iOS MVP
 #
 # Fast, lightweight checks that can be run before any commit or build.
 # Tests QR payload parsing, package loading logic, route existence, and
@@ -22,7 +22,7 @@ pass() { green "  PASS: $1"; }
 fail() { red   "  FAIL: $1"; ERRORS=$((ERRORS + 1)); }
 
 echo ""
-blue "=== VecturAI Regression Checks ==="
+blue "=== Vectura AI Regression Checks ==="
 echo ""
 
 PKG_DIR="sample/reviewed-house-package"
@@ -34,9 +34,9 @@ python3 -c "
 import json, sys
 
 # Test 1: Valid payload parses correctly
-valid = '{\"type\":\"vecturai-entrance\",\"buildingId\":\"19\",\"entranceId\":\"marker-main-entrance\",\"v\":1}'
+valid = '{\"type\":\"Vectura AI-entrance\",\"buildingId\":\"19\",\"entranceId\":\"marker-main-entrance\",\"v\":1}'
 p = json.loads(valid)
-assert p['type'] == 'vecturai-entrance', 'type mismatch'
+assert p['type'] == 'Vectura AI-entrance', 'type mismatch'
 assert p['buildingId'] == '19', 'buildingId mismatch'
 assert p['entranceId'] == 'marker-main-entrance', 'entranceId mismatch'
 assert p['v'] == 1, 'version mismatch'

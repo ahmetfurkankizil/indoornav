@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin.routes
+package com.Vectura AI.tools.admin.routes
 
-import com.vecturai.tools.admin.db.tables.Buildings
-import com.vecturai.tools.admin.db.tables.NavigationPackages
+import com.Vectura AI.tools.admin.db.tables.Buildings
+import com.Vectura AI.tools.admin.db.tables.NavigationPackages
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -14,7 +14,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import com.vecturai.tools.admin.Env
+import com.Vectura AI.tools.admin.Env
 import java.util.UUID
 
 fun Route.mobileApiRoutes() {
@@ -88,7 +88,7 @@ fun Route.mobileApiRoutes() {
             } ?: return@get call.respond(HttpStatusCode.NotFound, buildJsonObject { put("error", "Building not found") })
 
             val uploadsDir = Env.get("UPLOADS_DIR") ?: "uploads"
-            val qrService = com.vecturai.tools.admin.service.QRCodeService(uploadsDir)
+            val qrService = com.Vectura AI.tools.admin.service.QRCodeService(uploadsDir)
             
             val bytes = qrService.getQrImageBytes(buildingId)
                 ?: qrService.generate(qrToken)

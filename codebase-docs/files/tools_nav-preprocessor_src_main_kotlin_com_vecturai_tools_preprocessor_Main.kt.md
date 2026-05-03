@@ -1,7 +1,7 @@
 # File Dossier: Main.kt (nav-preprocessor)
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/Main.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/Main.kt`
 - **Type**: Kotlin Source (CLI Entry point)
 - **Feature**: `preprocessing`
 - **Status**: Mapped
@@ -11,8 +11,8 @@ The central entry point for the Navigation Preprocessor CLI tool. It defines the
 
 ## Imports
 - `com.github.ajalt.clikt`: For CLI argument parsing and subcommand management.
-- `com.vecturai.tools.preprocessor.glb`: For GLB parsing and geometry extraction.
-- `com.vecturai.tools.preprocessor.analysis`: For floor estimation.
+- `com.Vectura AI.tools.preprocessor.glb`: For GLB parsing and geometry extraction.
+- `com.Vectura AI.tools.preprocessor.analysis`: For floor estimation.
 
 ## Public Surface
 - `main(args: Array<String>)`: Application entry point.

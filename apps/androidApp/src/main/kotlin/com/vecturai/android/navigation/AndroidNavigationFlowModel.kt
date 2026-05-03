@@ -1,12 +1,12 @@
-package com.vecturai.android.navigation
+package com.Vectura AI.android.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ar.core.Frame
-import com.vecturai.android.data.AndroidReviewedPackageLoader
-import com.vecturai.android.qr.ArFrameQrScanner
-import com.vecturai.android.qr.QRPayload
-import com.vecturai.data.remote.RemoteBuildingDataSource
+import com.Vectura AI.android.data.AndroidReviewedPackageLoader
+import com.Vectura AI.android.qr.ArFrameQrScanner
+import com.Vectura AI.android.qr.QRPayload
+import com.Vectura AI.data.remote.RemoteBuildingDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

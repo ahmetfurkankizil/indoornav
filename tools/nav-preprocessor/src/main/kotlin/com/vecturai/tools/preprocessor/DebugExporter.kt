@@ -1,6 +1,6 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.model.AuthoringConfig
+import com.Vectura AI.tools.preprocessor.model.AuthoringConfig
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -200,11 +200,11 @@ class DebugExporter {
 
 
     fun exportDraftDebug(
-        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
-        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
-        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
-        floorEstimate: com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
-        geometry: com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
+        grid: com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        floorEstimate: com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
+        geometry: com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
         outputDir: String,
     ) {
         val outDir = File(outputDir)
@@ -215,8 +215,8 @@ class DebugExporter {
     }
 
     private fun exportOccupancySvg(
-        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
-        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        grid: com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester.Zone>,
         outDir: File,
     ) {
         val cellPx = 6
@@ -242,7 +242,7 @@ class DebugExporter {
             for (col in 0 until grid.width) {
                 val x = col * cellPx
                 val y = row * cellPx
-                val fill = if (grid.cells[row][col] == com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OCCUPIED) {
+                val fill = if (grid.cells[row][col] == com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator.OCCUPIED) {
                     val zoneIdx = cellZoneMap[Pair(col, row)]
                     if (zoneIdx != null) zoneColors[zoneIdx % zoneColors.size] else "#6c7086"
                 } else "#313244"
@@ -267,9 +267,9 @@ class DebugExporter {
     }
 
     private fun exportDraftGraphSvg(
-        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
-        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
-        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        grid: com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
         outDir: File,
     ) {
         if (draftGraph.nodes.isEmpty()) return
@@ -385,11 +385,11 @@ class DebugExporter {
     )
 
     private fun exportGeometryStats(
-        grid: com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
-        zones: List<com.vecturai.tools.preprocessor.analysis.ZoneSuggester.Zone>,
-        draftGraph: com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
-        floorEstimate: com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
-        geometry: com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
+        grid: com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator.OccupancyGrid,
+        zones: List<com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester.Zone>,
+        draftGraph: com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter.DraftNavGraph,
+        floorEstimate: com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator.FloorEstimate,
+        geometry: com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor.GeometryResult,
         outDir: File,
     ) {
         val stats = GeometryStats(

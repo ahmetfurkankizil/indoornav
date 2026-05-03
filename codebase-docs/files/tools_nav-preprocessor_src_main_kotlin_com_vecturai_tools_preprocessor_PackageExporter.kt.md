@@ -1,7 +1,7 @@
 # File Dossier: PackageExporter.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/PackageExporter.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/PackageExporter.kt`
 - **Type**: Kotlin Source (Export Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped
@@ -25,4 +25,4 @@ The final output stage of the preprocessing tool. It transforms the human-readab
 
 ## Notes / Risks
 - **Schema Versions**: Uses hardcoded schema versions (v1). Any breaking changes to the mobile app's loader must be reflected here.
-- **Payload Generation**: Generates `vecturai://` deep links for markers, which are used by the mobile app's QR scanner.
+- **Payload Generation**: Generates `Vectura AI://` deep links for markers, which are used by the mobile app's QR scanner.

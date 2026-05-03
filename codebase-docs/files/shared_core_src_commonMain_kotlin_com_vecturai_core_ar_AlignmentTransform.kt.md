@@ -1,6 +1,6 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/ar/AlignmentTransform.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/AlignmentTransform.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/AlignmentTransform.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/AlignmentTransform.kt`
 - **Type**: source
 - **Role**: Handles 3D coordinate transformations between building-local and AR-world spaces.
 - **Imports / Includes**:

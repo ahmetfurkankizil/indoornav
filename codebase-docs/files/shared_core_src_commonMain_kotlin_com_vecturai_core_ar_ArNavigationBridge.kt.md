@@ -1,7 +1,7 @@
 # File Dossier: ArNavigationBridge.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\ar\ArNavigationBridge.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\ArNavigationBridge.kt`
 
 ## Type
 Authored Source
@@ -12,10 +12,10 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
-import com.vecturai.core.domain.BuildingPackage
-import com.vecturai.core.domain.Room
+import com.Vectura AI.core.domain.BuildingPackage
+import com.Vectura AI.core.domain.Room
 
 /**
  * Bridge interface between shared navigation logic and native AR layer.

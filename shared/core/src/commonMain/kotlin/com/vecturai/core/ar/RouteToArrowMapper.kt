@@ -1,8 +1,8 @@
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
-import com.vecturai.core.domain.NavGraph
-import com.vecturai.core.domain.Route
-import com.vecturai.core.domain.RouteRenderingConfig
+import com.Vectura AI.core.domain.NavGraph
+import com.Vectura AI.core.domain.Route
+import com.Vectura AI.core.domain.RouteRenderingConfig
 import kotlin.math.*
 
 /**

@@ -1,4 +1,4 @@
-package com.vecturai.android.ui
+package com.Vectura AI.android.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -97,30 +97,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.vecturai.android.data.AndroidReviewedPackageLoader
-import com.vecturai.android.ar.AndroidHapticManager
-import com.vecturai.android.navigation.ArCameraFlowViewModel
-import com.vecturai.android.navigation.AndroidNavigationFlowModel
-import com.vecturai.designsystem.AnimatedGradientNumber
-import com.vecturai.designsystem.AnimatedNumber
-import com.vecturai.designsystem.AuroraBackground
-import com.vecturai.designsystem.CategoryBadge
-import com.vecturai.designsystem.GradientText
-import com.vecturai.designsystem.IconChip
-import com.vecturai.designsystem.SectionHeader
-import com.vecturai.designsystem.Spacing
-import com.vecturai.designsystem.StatPill
-import com.vecturai.designsystem.VecturaiBrush
-import com.vecturai.designsystem.VecturaiCard
-import com.vecturai.designsystem.VecturaiColors
-import com.vecturai.designsystem.VecturaiFilterChip
-import com.vecturai.designsystem.VecturaiHapticsGate
-import com.vecturai.designsystem.VecturaiPrimaryButton
-import com.vecturai.designsystem.VecturaiSecondaryButton
-import com.vecturai.designsystem.VecturaiShapes
-import com.vecturai.designsystem.VecturaiTheme
-import com.vecturai.designsystem.VecturaiTypography
-import com.vecturai.designsystem.vecturaiTap
+import com.Vectura AI.android.data.AndroidReviewedPackageLoader
+import com.Vectura AI.android.ar.AndroidHapticManager
+import com.Vectura AI.android.navigation.ArCameraFlowViewModel
+import com.Vectura AI.android.navigation.AndroidNavigationFlowModel
+import com.Vectura AI.designsystem.AnimatedGradientNumber
+import com.Vectura AI.designsystem.AnimatedNumber
+import com.Vectura AI.designsystem.AuroraBackground
+import com.Vectura AI.designsystem.CategoryBadge
+import com.Vectura AI.designsystem.GradientText
+import com.Vectura AI.designsystem.IconChip
+import com.Vectura AI.designsystem.SectionHeader
+import com.Vectura AI.designsystem.Spacing
+import com.Vectura AI.designsystem.StatPill
+import com.Vectura AI.designsystem.Vectura AIBrush
+import com.Vectura AI.designsystem.Vectura AICard
+import com.Vectura AI.designsystem.Vectura AIColors
+import com.Vectura AI.designsystem.Vectura AIFilterChip
+import com.Vectura AI.designsystem.Vectura AIHapticsGate
+import com.Vectura AI.designsystem.Vectura AIPrimaryButton
+import com.Vectura AI.designsystem.Vectura AISecondaryButton
+import com.Vectura AI.designsystem.Vectura AIShapes
+import com.Vectura AI.designsystem.Vectura AITheme
+import com.Vectura AI.designsystem.Vectura AITypography
+import com.Vectura AI.designsystem.Vectura AITap
 import kotlinx.coroutines.delay
 import kotlin.math.ceil
 import kotlin.math.max
@@ -134,8 +134,8 @@ fun AndroidNavigationApp(
 ) {
     val state by flowModel.state.collectAsState()
 
-    VecturaiTheme {
-        VecturaiHapticsGate(enabled = AndroidHapticManager.HapticsEnabled) {
+    Vectura AITheme {
+        Vectura AIHapticsGate(enabled = AndroidHapticManager.HapticsEnabled) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -178,7 +178,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(VecturaiColors.SurfaceCanvas),
+            .background(Vectura AIColors.SurfaceCanvas),
     ) {
         AuroraBackground(intensity = intensity)
 
@@ -194,7 +194,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
                 .statusBarsPadding()
                 .padding(top = Spacing.xs, end = Spacing.md)
                 .graphicsLayer { rotationZ = gearRotation },
-            tint = VecturaiColors.TextMuted,
+            tint = Vectura AIColors.TextMuted,
         )
 
         Column(
@@ -215,14 +215,14 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
             Spacer(Modifier.height(Spacing.lg))
 
             GradientText(
-                text = "VecturAI",
+                text = "Vectura AI",
                 style = MaterialTheme.typography.displayLarge,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = "Find your way indoors",
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
             )
@@ -245,7 +245,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
 
             Spacer(Modifier.weight(1f))
 
-            VecturaiPrimaryButton(
+            Vectura AIPrimaryButton(
                 text = "Scan Entrance Code",
                 leadingIcon = Icons.Default.QrCodeScanner,
                 onClick = onStartNavigation,
@@ -255,7 +255,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
 
             Text(
                 text = "Scan the entrance poster to begin",
-                color = VecturaiColors.TextDisabled,
+                color = Vectura AIColors.TextDisabled,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
@@ -271,7 +271,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
                 showAdminTools = false
                 gearArmed = false
             },
-            containerColor = VecturaiColors.SurfaceElevated,
+            containerColor = Vectura AIColors.SurfaceElevated,
         ) {
             Column(
                 modifier = Modifier
@@ -283,15 +283,15 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
                     BrandMark(pulsing = false, modifier = Modifier.size(48.dp))
                     Spacer(Modifier.width(Spacing.sm))
                     Column(Modifier.weight(1f)) {
-                        Text("Admin Tools", color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.titleLarge)
+                        Text("Admin Tools", color = Vectura AIColors.TextPrimary, style = MaterialTheme.typography.titleLarge)
                         Text(
                             "Draft jobs are not available on this device.",
-                            color = VecturaiColors.TextMuted,
+                            color = Vectura AIColors.TextMuted,
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
-                VecturaiCard {
+                Vectura AICard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.WorkspacePremium,
@@ -302,7 +302,7 @@ private fun HomeScreen(onStartNavigation: () -> Unit) {
                         Spacer(Modifier.width(Spacing.sm))
                         Text(
                             "Visitor navigation is ready. Admin review tools stay separate from the demo flow.",
-                            color = VecturaiColors.TextSecondary,
+                            color = Vectura AIColors.TextSecondary,
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -318,11 +318,11 @@ private fun PackageErrorScreen(message: String, onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(VecturaiColors.SurfaceCanvas),
+            .background(Vectura AIColors.SurfaceCanvas),
         contentAlignment = Alignment.Center,
     ) {
         AuroraBackground(intensity = rememberAuroraIntensity())
-        VecturaiCard(
+        Vectura AICard(
             modifier = Modifier.padding(Spacing.xl),
         ) {
             Column(
@@ -332,30 +332,30 @@ private fun PackageErrorScreen(message: String, onRetry: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(VecturaiShapes.Large)
-                        .background(VecturaiColors.AccentAmber.copy(alpha = 0.16f)),
+                        .clip(Vectura AIShapes.Large)
+                        .background(Vectura AIColors.AccentAmber.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Default.Warning,
                         contentDescription = "Unable to load navigation data",
                         modifier = Modifier.size(32.dp),
-                        tint = VecturaiColors.AccentAmber,
+                        tint = Vectura AIColors.AccentAmber,
                     )
                 }
                 Text(
                     "Unable to load navigation data",
-                    color = VecturaiColors.TextPrimary,
+                    color = Vectura AIColors.TextPrimary,
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                 )
                 Text(
                     message,
                     textAlign = TextAlign.Center,
-                    color = VecturaiColors.TextMuted,
+                    color = Vectura AIColors.TextMuted,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                VecturaiPrimaryButton(text = "Try Again", onClick = onRetry)
+                Vectura AIPrimaryButton(text = "Try Again", onClick = onRetry)
             }
         }
     }
@@ -422,7 +422,7 @@ fun DestinationSelectScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(VecturaiColors.SurfaceCanvas),
+            .background(Vectura AIColors.SurfaceCanvas),
     ) {
         // AuroraBackground removed for better scrolling performance
 
@@ -551,7 +551,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(VecturaiColors.SurfaceCanvas),
+            .background(Vectura AIColors.SurfaceCanvas),
     ) {
         AuroraBackground(intensity = rememberAuroraIntensity())
 
@@ -575,7 +575,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = "Route to $destinationName",
-                        color = VecturaiColors.TextPrimary,
+                        color = Vectura AIColors.TextPrimary,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -584,7 +584,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                     val floorName = session.selectedRoom?.floorName ?: "Floor"
                     Text(
                         text = "$buildingName - $floorName",
-                        color = VecturaiColors.TextMuted,
+                        color = Vectura AIColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -625,7 +625,7 @@ fun RoutePreviewScreen(flowModel: ArCameraFlowViewModel) {
                 Spacer(Modifier.height(Spacing.lg))
             }
 
-            VecturaiPrimaryButton(
+            Vectura AIPrimaryButton(
                 text = "Start AR Navigation",
                 leadingIcon = Icons.Default.Place,
                 onClick = flowModel::startNavigation,
@@ -654,7 +654,7 @@ fun EntranceConfirmedSheet(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(VecturaiColors.SurfaceCanvas),
+                .background(Vectura AIColors.SurfaceCanvas),
         ) {
             AuroraBackground(intensity = rememberAuroraIntensity())
 
@@ -675,20 +675,20 @@ fun EntranceConfirmedSheet(
 
                     Spacer(Modifier.height(Spacing.lg))
 
-                    StatPill(text = "$buildingName - $floorName", color = VecturaiColors.AccentGreen)
+                    StatPill(text = "$buildingName - $floorName", color = Vectura AIColors.AccentGreen)
 
                     Spacer(Modifier.height(Spacing.md))
 
                     Text(
                         text = "Entrance confirmed",
-                        color = VecturaiColors.TextPrimary,
+                        color = Vectura AIColors.TextPrimary,
                         style = MaterialTheme.typography.displayMedium,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(Spacing.xs))
                     Text(
                         text = "$entranceName - $buildingName - $floorName",
-                        color = VecturaiColors.TextMuted,
+                        color = Vectura AIColors.TextMuted,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
@@ -697,21 +697,21 @@ fun EntranceConfirmedSheet(
 
                     Spacer(Modifier.height(Spacing.xxl))
 
-                    VecturaiCard {
+                    Vectura AICard {
                         SectionHeader(title = "STARTING POINT")
                         Spacer(Modifier.height(Spacing.sm))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
                                     .size(44.dp)
-                                    .clip(VecturaiShapes.Medium)
-                                    .background(VecturaiColors.AccentGreen.copy(alpha = 0.18f)),
+                                    .clip(Vectura AIShapes.Medium)
+                                    .background(Vectura AIColors.AccentGreen.copy(alpha = 0.18f)),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.LocationOn,
                                     contentDescription = null,
-                                    tint = VecturaiColors.AccentGreen,
+                                    tint = Vectura AIColors.AccentGreen,
                                     modifier = Modifier.size(22.dp),
                                 )
                             }
@@ -719,26 +719,26 @@ fun EntranceConfirmedSheet(
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     text = entranceName,
-                                    color = VecturaiColors.TextPrimary,
+                                    color = Vectura AIColors.TextPrimary,
                                     style = MaterialTheme.typography.titleMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = "$floorName - $buildingName",
-                                    color = VecturaiColors.TextMuted,
+                                    color = Vectura AIColors.TextMuted,
                                     style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 1,
                                 )
                             }
-                            StatPill(text = "Confirmed", color = VecturaiColors.AccentGreen)
+                            StatPill(text = "Confirmed", color = Vectura AIColors.AccentGreen)
                         }
                     }
                 }
 
                 Spacer(Modifier.weight(1f))
 
-                VecturaiPrimaryButton(text = "Choose Destination", onClick = onContinue)
+                Vectura AIPrimaryButton(text = "Choose Destination", onClick = onContinue)
 
                 Spacer(Modifier.height(Spacing.xl))
             }
@@ -764,7 +764,7 @@ private fun DestinationHeader(
         Column(Modifier.weight(1f)) {
             Text(
                 text = "Where to?",
-                color = VecturaiColors.TextPrimary,
+                color = Vectura AIColors.TextPrimary,
                 style = MaterialTheme.typography.headlineMedium,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -772,13 +772,13 @@ private fun DestinationHeader(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(VecturaiColors.AccentGreen)
+                        .background(Vectura AIColors.AccentGreen)
                         .semantics { contentDescription = "Origin status indicator: connected" },
                 )
                 Spacer(Modifier.width(Spacing.xs))
                 Text(
                     text = if (selectingOrigin) "Select starting point" else "From $originName",
-                    color = if (selectingOrigin) VecturaiColors.AccentCyan else VecturaiColors.TextMuted,
+                    color = if (selectingOrigin) Vectura AIColors.AccentCyan else Vectura AIColors.TextMuted,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -787,7 +787,7 @@ private fun DestinationHeader(
                 if (!selectingOrigin) {
                     Text(
                         text = "Change",
-                        color = VecturaiColors.AccentCyan,
+                        color = Vectura AIColors.AccentCyan,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier
                             .clip(CircleShape)
@@ -810,7 +810,7 @@ private fun SearchField(
         value = value,
         onValueChange = onValueChange,
         singleLine = true,
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = VecturaiColors.TextPrimary),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Vectura AIColors.TextPrimary),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = Modifier
             .fillMaxWidth()
@@ -820,16 +820,16 @@ private fun SearchField(
                 modifier = Modifier
                     .height(height)
                     .fillMaxWidth()
-                    .clip(VecturaiShapes.Medium)
-                    .background(VecturaiColors.SurfaceElevated.copy(alpha = 0.94f))
-                    .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle), VecturaiShapes.Medium)
+                    .clip(Vectura AIShapes.Medium)
+                    .background(Vectura AIColors.SurfaceElevated.copy(alpha = 0.94f))
+                    .border(BorderStroke(1.dp, Vectura AIColors.BorderSubtle), Vectura AIShapes.Medium)
                     .padding(horizontal = Spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    tint = VecturaiColors.TextDisabled,
+                    tint = Vectura AIColors.TextDisabled,
                     modifier = Modifier.size(21.dp),
                 )
                 Spacer(Modifier.width(Spacing.sm))
@@ -837,7 +837,7 @@ private fun SearchField(
                     if (value.isEmpty()) {
                         Text(
                             text = "Search rooms, labs, facilities...",
-                            color = VecturaiColors.TextDisabled,
+                            color = Vectura AIColors.TextDisabled,
                             style = MaterialTheme.typography.bodyLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -851,7 +851,7 @@ private fun SearchField(
                         contentDescription = "Clear search",
                         onClick = { onValueChange("") },
                         modifier = Modifier.size(48.dp),
-                        tint = VecturaiColors.TextMuted,
+                        tint = Vectura AIColors.TextMuted,
                     )
                 }
             }
@@ -887,7 +887,7 @@ private fun DestinationFilterRow(
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             categories.forEach { category ->
-                VecturaiFilterChip(
+                Vectura AIFilterChip(
                     text = category,
                     selected = selectedCategory == category,
                     onClick = { onSelect(category) },
@@ -906,8 +906,8 @@ private fun DestinationFilterRow(
                     .offset { IntOffset(animatedOffsetPx, 0) }
                     .width(with(density) { animatedWidthPx.toDp() })
                     .height(3.dp)
-                    .clip(VecturaiShapes.Pill)
-                    .background(VecturaiBrush.Primary),
+                    .clip(Vectura AIShapes.Pill)
+                    .background(Vectura AIBrush.Primary),
             )
         } else {
             Spacer(Modifier.height(3.dp))
@@ -926,11 +926,11 @@ private fun RecentDestinationCard(
         modifier = Modifier
             .width(190.dp)
             .height(72.dp)
-            .clip(VecturaiShapes.Medium)
-            .vecturaiTap(onClick = onClick),
-        shape = VecturaiShapes.Medium,
-        color = VecturaiColors.SurfaceCard.copy(alpha = 0.96f),
-        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle),
+            .clip(Vectura AIShapes.Medium)
+            .Vectura AITap(onClick = onClick),
+        shape = Vectura AIShapes.Medium,
+        color = Vectura AIColors.SurfaceCard.copy(alpha = 0.96f),
+        border = BorderStroke(1.dp, Vectura AIColors.BorderSubtle),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = Spacing.sm),
@@ -941,14 +941,14 @@ private fun RecentDestinationCard(
             Column(Modifier.weight(1f)) {
                 Text(
                     text = room.prettyDestinationName(),
-                    color = VecturaiColors.TextPrimary,
+                    color = Vectura AIColors.TextPrimary,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = routeSummary?.walkTimeText() ?: displayNameForCategory(room.category ?: "other"),
-                    color = VecturaiColors.TextMuted,
+                    color = Vectura AIColors.TextMuted,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -968,10 +968,10 @@ private fun DestinationRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(VecturaiShapes.Large)
-            .background(VecturaiColors.SurfaceCard.copy(alpha = 0.74f))
-            .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle.copy(alpha = 0.58f)), VecturaiShapes.Large)
-            .vecturaiTap(onClick = onClick)
+            .clip(Vectura AIShapes.Large)
+            .background(Vectura AIColors.SurfaceCard.copy(alpha = 0.74f))
+            .border(BorderStroke(1.dp, Vectura AIColors.BorderSubtle.copy(alpha = 0.58f)), Vectura AIShapes.Large)
+            .Vectura AITap(onClick = onClick)
             .padding(end = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -979,7 +979,7 @@ private fun DestinationRow(
             modifier = Modifier
                 .width(4.dp)
                 .height(72.dp)
-                .clip(VecturaiShapes.Pill)
+                .clip(Vectura AIShapes.Pill)
                 .background(accent),
         )
         Spacer(Modifier.width(Spacing.sm))
@@ -988,14 +988,14 @@ private fun DestinationRow(
         Column(Modifier.weight(1f)) {
             Text(
                 text = room.prettyDestinationName(),
-                color = VecturaiColors.TextPrimary,
+                color = Vectura AIColors.TextPrimary,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = room.locationSubtitle(),
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -1006,7 +1006,7 @@ private fun DestinationRow(
             Spacer(Modifier.height(Spacing.xxs))
             Text(
                 text = routeSummary?.distanceText() ?: displayNameForCategory(room.category ?: "other"),
-                color = VecturaiColors.TextDisabled,
+                color = Vectura AIColors.TextDisabled,
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -1016,7 +1016,7 @@ private fun DestinationRow(
         Icon(
             imageVector = Icons.Default.KeyboardArrowRight,
             contentDescription = null,
-            tint = VecturaiColors.TextDisabled,
+            tint = Vectura AIColors.TextDisabled,
             modifier = Modifier.size(20.dp),
         )
     }
@@ -1026,9 +1026,9 @@ private fun DestinationRow(
 @Composable
 private fun WalkTimePill(routeSummary: ArCameraFlowViewModel.RouteSummary?) {
     Surface(
-        shape = VecturaiShapes.Pill,
-        color = VecturaiColors.SurfaceOverlay,
-        border = BorderStroke(1.dp, VecturaiColors.BorderStrong),
+        shape = Vectura AIShapes.Pill,
+        color = Vectura AIColors.SurfaceOverlay,
+        border = BorderStroke(1.dp, Vectura AIColors.BorderStrong),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = Spacing.xs, vertical = Spacing.xxs),
@@ -1037,7 +1037,7 @@ private fun WalkTimePill(routeSummary: ArCameraFlowViewModel.RouteSummary?) {
             Icon(
                 imageVector = Icons.Default.DirectionsWalk,
                 contentDescription = null,
-                tint = VecturaiColors.TextMuted,
+                tint = Vectura AIColors.TextMuted,
                 modifier = Modifier.size(13.dp),
             )
             Spacer(Modifier.width(Spacing.xxs))
@@ -1045,11 +1045,11 @@ private fun WalkTimePill(routeSummary: ArCameraFlowViewModel.RouteSummary?) {
                 AnimatedNumber(
                     value = routeSummary.walkMinutes(),
                     style = MaterialTheme.typography.labelMedium,
-                    color = VecturaiColors.TextSecondary,
+                    color = Vectura AIColors.TextSecondary,
                 )
-                Text(" min", color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
+                Text(" min", color = Vectura AIColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
             } else {
-                Text("Route", color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
+                Text("Route", color = Vectura AIColors.TextSecondary, style = MaterialTheme.typography.labelMedium)
             }
         }
     }
@@ -1079,7 +1079,7 @@ private fun EmptyRoomsState(searchText: String, selectedCategory: String) {
         Text(
             message,
             style = MaterialTheme.typography.bodyMedium,
-            color = VecturaiColors.TextMuted,
+            color = Vectura AIColors.TextMuted,
             textAlign = TextAlign.Center,
         )
     }
@@ -1096,9 +1096,9 @@ private fun SkeletonDestinationRows() {
     )
     val brush = androidx.compose.ui.graphics.Brush.linearGradient(
         listOf(
-            VecturaiColors.SurfaceElevated.copy(alpha = 0.45f),
-            VecturaiColors.SurfaceOverlay.copy(alpha = 0.95f),
-            VecturaiColors.SurfaceElevated.copy(alpha = 0.45f),
+            Vectura AIColors.SurfaceElevated.copy(alpha = 0.45f),
+            Vectura AIColors.SurfaceOverlay.copy(alpha = 0.95f),
+            Vectura AIColors.SurfaceElevated.copy(alpha = 0.45f),
         ),
         start = Offset(shimmer * -500f, 0f),
         end = Offset(shimmer * 500f, 0f),
@@ -1108,7 +1108,7 @@ private fun SkeletonDestinationRows() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp)
-                .clip(VecturaiShapes.Large)
+                .clip(Vectura AIShapes.Large)
                 .background(brush),
         )
         Spacer(Modifier.height(Spacing.xs))
@@ -1117,12 +1117,12 @@ private fun SkeletonDestinationRows() {
 
 @Composable
 private fun RouteReadyCard() {
-    VecturaiCard {
+    Vectura AICard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(VecturaiShapes.Medium)
+                    .clip(Vectura AIShapes.Medium)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                 contentAlignment = Alignment.Center,
             ) {
@@ -1137,7 +1137,7 @@ private fun RouteReadyCard() {
             Column(Modifier.weight(1f)) {
                 Text(
                     text = "Ready for AR guidance",
-                    color = VecturaiColors.TextPrimary,
+                    color = Vectura AIColors.TextPrimary,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -1158,18 +1158,18 @@ private fun RouteHeroCard(
     stepCount: Int,
     routePoints: List<Pair<Double, Double>>,
 ) {
-    VecturaiCard {
+    Vectura AICard {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AnimatedGradientNumber(
                 value = walkingMinutes,
                 suffix = if (walkingTimeText.contains("min")) " min" else "",
-                style = VecturaiTypography.numericDisplay(),
+                style = Vectura AITypography.numericDisplay(),
                 textAlign = TextAlign.Center,
             )
             val floorName = session.selectedRoom?.floorName ?: "Floor"
             Text(
                 text = "$distanceText - $stepCount ${stepCount.stepLabel().lowercase()} - $floorName",
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
@@ -1186,10 +1186,10 @@ private fun RouteHeroCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text("From", color = VecturaiColors.TextMuted, style = VecturaiTypography.overline())
+                    Text("From", color = Vectura AIColors.TextMuted, style = Vectura AITypography.overline())
                     Text(
                         text = originName,
-                        color = VecturaiColors.TextPrimary,
+                        color = Vectura AIColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -1198,16 +1198,16 @@ private fun RouteHeroCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = VecturaiColors.TextDisabled,
+                    tint = Vectura AIColors.TextDisabled,
                     modifier = Modifier
                         .padding(horizontal = Spacing.sm)
                         .size(20.dp),
                 )
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                    Text("To", color = VecturaiColors.TextMuted, style = VecturaiTypography.overline())
+                    Text("To", color = Vectura AIColors.TextMuted, style = Vectura AITypography.overline())
                     Text(
                         text = destinationName,
-                        color = VecturaiColors.TextPrimary,
+                        color = Vectura AIColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -1262,9 +1262,9 @@ private fun RoutePlanView(
         modifier = Modifier
             .fillMaxWidth()
             .height(260.dp)
-            .clip(VecturaiShapes.Large)
-            .background(VecturaiColors.SurfaceElevated)
-            .border(1.dp, VecturaiColors.BorderSubtle, VecturaiShapes.Large),
+            .clip(Vectura AIShapes.Large)
+            .background(Vectura AIColors.SurfaceElevated)
+            .border(1.dp, Vectura AIColors.BorderSubtle, Vectura AIShapes.Large),
         contentAlignment = Alignment.Center
     ) {
         Canvas(
@@ -1294,7 +1294,7 @@ private fun RoutePlanView(
                 val to = config.nodes.find { it.id == edge.to }
                 if (from != null && to != null) {
                     drawLine(
-                        color = VecturaiColors.BorderStrong.copy(alpha = 0.35f),
+                        color = Vectura AIColors.BorderStrong.copy(alpha = 0.35f),
                         start = project(from.x, from.z),
                         end = project(to.x, to.z),
                         strokeWidth = 12.dp.toPx(),
@@ -1309,12 +1309,12 @@ private fun RoutePlanView(
                 when (node.type) {
                     "room" -> {
                         drawCircle(
-                            color = VecturaiColors.SurfaceElevated,
+                            color = Vectura AIColors.SurfaceElevated,
                             radius = 10.dp.toPx(),
                             center = pos
                         )
                         drawCircle(
-                            color = VecturaiColors.BorderSubtle,
+                            color = Vectura AIColors.BorderSubtle,
                             radius = 10.dp.toPx(),
                             center = pos,
                             style = Stroke(width = 1.dp.toPx())
@@ -1322,7 +1322,7 @@ private fun RoutePlanView(
                     }
                     "waypoint" -> {
                         drawCircle(
-                            color = VecturaiColors.TextMuted.copy(alpha = 0.2f),
+                            color = Vectura AIColors.TextMuted.copy(alpha = 0.2f),
                             radius = 2.dp.toPx(),
                             center = pos
                         )
@@ -1341,7 +1341,7 @@ private fun RoutePlanView(
                 // Route Glow
                 drawPath(
                     path = routePath,
-                    color = VecturaiColors.GradientMid.copy(alpha = 0.3f),
+                    color = Vectura AIColors.GradientMid.copy(alpha = 0.3f),
                     style = Stroke(width = 16.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
                 )
                 
@@ -1349,7 +1349,7 @@ private fun RoutePlanView(
                 drawPath(
                     path = routePath,
                     brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                        listOf(VecturaiColors.GradientStart, VecturaiColors.GradientEnd)
+                        listOf(Vectura AIColors.GradientStart, Vectura AIColors.GradientEnd)
                     ),
                     style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
                 )
@@ -1361,11 +1361,11 @@ private fun RoutePlanView(
                 val endPos = project(routePoints.last().first, routePoints.last().second)
                 
                 // Origin
-                drawCircle(VecturaiColors.AccentGreen, radius = 6.dp.toPx(), center = startPos)
+                drawCircle(Vectura AIColors.AccentGreen, radius = 6.dp.toPx(), center = startPos)
                 drawCircle(Color.White, radius = 2.dp.toPx(), center = startPos)
                 
                 // Destination
-                drawCircle(VecturaiColors.AccentAmber, radius = 7.dp.toPx(), center = endPos)
+                drawCircle(Vectura AIColors.AccentAmber, radius = 7.dp.toPx(), center = endPos)
                 drawCircle(Color.White, radius = 3.dp.toPx(), center = endPos)
             }
         }
@@ -1375,13 +1375,13 @@ private fun RoutePlanView(
             Icon(
                 Icons.Default.Map,
                 contentDescription = null,
-                tint = VecturaiColors.TextMuted.copy(alpha = 0.4f),
+                tint = Vectura AIColors.TextMuted.copy(alpha = 0.4f),
                 modifier = Modifier.size(20.dp).align(Alignment.TopEnd)
             )
             Text(
                 text = session.selectedRoom?.floorName ?: "Floor Plan",
                 style = MaterialTheme.typography.labelSmall,
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 modifier = Modifier.align(Alignment.BottomStart)
             )
         }
@@ -1402,8 +1402,8 @@ private fun RouteMiniStrip(routePoints: List<Pair<Double, Double>>) {
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
-            .clip(VecturaiShapes.Medium)
-            .background(VecturaiColors.SurfaceElevated),
+            .clip(Vectura AIShapes.Medium)
+            .background(Vectura AIColors.SurfaceElevated),
     ) {
         val left = 24.dp.toPx()
         val right = size.width - 24.dp.toPx()
@@ -1414,28 +1414,28 @@ private fun RouteMiniStrip(routePoints: List<Pair<Double, Double>>) {
         }
         drawPath(
             path = path,
-            color = VecturaiColors.BorderStrong,
+            color = Vectura AIColors.BorderStrong,
             style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
         )
         drawPath(
             path = path,
             brush = androidx.compose.ui.graphics.Brush.linearGradient(
                 listOf(
-                    VecturaiColors.GradientStart,
-                    VecturaiColors.GradientMid,
-                    VecturaiColors.GradientEnd,
+                    Vectura AIColors.GradientStart,
+                    Vectura AIColors.GradientMid,
+                    Vectura AIColors.GradientEnd,
                 ),
             ),
             style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round),
         )
-        drawCircle(VecturaiColors.AccentGreen, radius = 6.dp.toPx(), center = Offset(left, midY))
-        drawCircle(VecturaiColors.AccentAmber, radius = 6.dp.toPx(), center = Offset(right, midY))
+        drawCircle(Vectura AIColors.AccentGreen, radius = 6.dp.toPx(), center = Offset(left, midY))
+        drawCircle(Vectura AIColors.AccentAmber, radius = 6.dp.toPx(), center = Offset(right, midY))
         val markerX = left + (right - left) * markerProgress
         val markerY = midY + kotlin.math.sin(markerProgress * Math.PI).toFloat() * 16.dp.toPx()
         drawCircle(Color.White, radius = 4.dp.toPx(), center = Offset(markerX, markerY))
         if (routePoints.size > 1) {
             drawCircle(
-                VecturaiColors.AccentCyan.copy(alpha = 0.45f),
+                Vectura AIColors.AccentCyan.copy(alpha = 0.45f),
                 radius = 2.dp.toPx(),
                 center = Offset(size.width / 2f, midY),
             )
@@ -1449,7 +1449,7 @@ private fun RouteTimelineCard(
     destinationName: String,
     distanceText: String,
 ) {
-    VecturaiCard {
+    Vectura AICard {
         SectionHeader(title = "STEPS")
         Spacer(Modifier.height(Spacing.sm))
         TimelineStep(number = 1, title = "Start from $originName", detail = "Starting point", first = true)
@@ -1488,7 +1488,7 @@ private fun TimelineStep(
                     modifier = Modifier
                         .width(2.dp)
                         .height(12.dp)
-                        .background(VecturaiColors.BorderStrong),
+                        .background(Vectura AIColors.BorderStrong),
                 )
             }
             Box(
@@ -1514,7 +1514,7 @@ private fun TimelineStep(
                     modifier = Modifier
                         .width(2.dp)
                         .height(28.dp)
-                        .background(VecturaiColors.BorderStrong),
+                        .background(Vectura AIColors.BorderStrong),
                 )
             }
         }
@@ -1522,14 +1522,14 @@ private fun TimelineStep(
         Column(Modifier.padding(top = if (first) 2.dp else Spacing.sm)) {
             Text(
                 text = title,
-                color = VecturaiColors.TextPrimary,
+                color = Vectura AIColors.TextPrimary,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = detail,
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -1541,7 +1541,7 @@ private fun CategoryIcon(category: String?, accent: Color) {
     Box(
         modifier = Modifier
             .size(44.dp)
-            .clip(VecturaiShapes.Medium)
+            .clip(Vectura AIShapes.Medium)
             .background(accent.copy(alpha = 0.16f)),
         contentAlignment = Alignment.Center,
     ) {
@@ -1574,15 +1574,15 @@ private fun BrandMark(
                 scaleY = pulse
                 alpha = if (muted) 0.45f else 1f
             }
-            .clip(VecturaiShapes.XLarge)
-            .background(if (muted) VecturaiColors.SurfaceElevated else VecturaiColors.SurfaceOverlay)
-            .border(BorderStroke(1.dp, if (muted) VecturaiColors.BorderStrong else MaterialTheme.colorScheme.primary), VecturaiShapes.XLarge),
+            .clip(Vectura AIShapes.XLarge)
+            .background(if (muted) Vectura AIColors.SurfaceElevated else Vectura AIColors.SurfaceOverlay)
+            .border(BorderStroke(1.dp, if (muted) Vectura AIColors.BorderStrong else MaterialTheme.colorScheme.primary), Vectura AIShapes.XLarge),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = VecturaiBrandIcon,
+            imageVector = Vectura AIBrandIcon,
             contentDescription = null,
-            tint = if (muted) VecturaiColors.TextMuted else Color.White,
+            tint = if (muted) Vectura AIColors.TextMuted else Color.White,
             modifier = Modifier.size(48.dp),
         )
     }
@@ -1600,14 +1600,14 @@ private fun FeaturePill(text: String, active: Boolean, modifier: Modifier = Modi
             scaleX = scale
             scaleY = scale
         },
-        shape = VecturaiShapes.Pill,
-        color = if (active) VecturaiColors.AccentCyan.copy(alpha = 0.16f) else VecturaiColors.SurfaceElevated.copy(alpha = 0.72f),
-        border = BorderStroke(1.dp, if (active) VecturaiColors.AccentCyan.copy(alpha = 0.58f) else VecturaiColors.BorderSubtle),
+        shape = Vectura AIShapes.Pill,
+        color = if (active) Vectura AIColors.AccentCyan.copy(alpha = 0.16f) else Vectura AIColors.SurfaceElevated.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, if (active) Vectura AIColors.AccentCyan.copy(alpha = 0.58f) else Vectura AIColors.BorderSubtle),
     ) {
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
-            color = if (active) VecturaiColors.AccentCyan else VecturaiColors.TextMuted,
+            color = if (active) Vectura AIColors.AccentCyan else Vectura AIColors.TextMuted,
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -1618,9 +1618,9 @@ private fun FeaturePill(text: String, active: Boolean, modifier: Modifier = Modi
 @Composable
 private fun DemoBuildingStatus() {
     Surface(
-        shape = VecturaiShapes.Pill,
-        color = VecturaiColors.SurfaceElevated.copy(alpha = 0.75f),
-        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle),
+        shape = Vectura AIShapes.Pill,
+        color = Vectura AIColors.SurfaceElevated.copy(alpha = 0.75f),
+        border = BorderStroke(1.dp, Vectura AIColors.BorderSubtle),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
@@ -1630,12 +1630,12 @@ private fun DemoBuildingStatus() {
                 modifier = Modifier
                     .size(7.dp)
                     .clip(CircleShape)
-                    .background(VecturaiColors.AccentGreen),
+                    .background(Vectura AIColors.AccentGreen),
             )
             Spacer(Modifier.width(Spacing.xs))
             Text(
                 text = "Dynamic building data active",
-                color = VecturaiColors.TextMuted,
+                color = Vectura AIColors.TextMuted,
                 style = MaterialTheme.typography.labelMedium,
             )
         }
@@ -1652,14 +1652,14 @@ private fun FlowProgressStrip(activeStep: Int) {
         steps.forEachIndexed { index, label ->
             val active = index <= activeStep
             Surface(
-                shape = VecturaiShapes.Pill,
-                color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else VecturaiColors.SurfaceElevated.copy(alpha = 0.72f),
-                border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.48f) else VecturaiColors.BorderSubtle),
+                shape = Vectura AIShapes.Pill,
+                color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else Vectura AIColors.SurfaceElevated.copy(alpha = 0.72f),
+                border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.48f) else Vectura AIColors.BorderSubtle),
             ) {
                 Text(
                     text = if (index < activeStep) "$label done" else label,
                     modifier = Modifier.padding(horizontal = Spacing.xs, vertical = Spacing.xxs),
-                    color = if (active) VecturaiColors.TextPrimary else VecturaiColors.TextMuted,
+                    color = if (active) Vectura AIColors.TextPrimary else Vectura AIColors.TextMuted,
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
                 )
@@ -1669,7 +1669,7 @@ private fun FlowProgressStrip(activeStep: Int) {
                     modifier = Modifier
                         .weight(1f)
                         .height(1.dp)
-                        .background(if (index < activeStep) MaterialTheme.colorScheme.primary else VecturaiColors.BorderSubtle),
+                        .background(if (index < activeStep) MaterialTheme.colorScheme.primary else Vectura AIColors.BorderSubtle),
                 )
             }
         }
@@ -1692,9 +1692,9 @@ fun AnimatedCheckMark(modifier: Modifier = Modifier, size: androidx.compose.ui.u
     )
     Canvas(modifier = modifier.size(size)) {
         val center = Offset(size.toPx() / 2f, size.toPx() / 2f)
-        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.16f * (1f - ring * 0.4f)), radius = size.toPx() * 0.5f * ring, center = center)
-        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.28f), radius = size.toPx() * 0.36f, center = center)
-        drawCircle(VecturaiColors.AccentGreen.copy(alpha = 0.88f), radius = size.toPx() * 0.25f, center = center)
+        drawCircle(Vectura AIColors.AccentGreen.copy(alpha = 0.16f * (1f - ring * 0.4f)), radius = size.toPx() * 0.5f * ring, center = center)
+        drawCircle(Vectura AIColors.AccentGreen.copy(alpha = 0.28f), radius = size.toPx() * 0.36f, center = center)
+        drawCircle(Vectura AIColors.AccentGreen.copy(alpha = 0.88f), radius = size.toPx() * 0.25f, center = center)
         val start = Offset(size.toPx() * 0.36f, size.toPx() * 0.52f)
         val mid = Offset(size.toPx() * 0.47f, size.toPx() * 0.63f)
         val end = Offset(size.toPx() * 0.68f, size.toPx() * 0.39f)
@@ -1727,8 +1727,8 @@ fun AnimatedCheckMark(modifier: Modifier = Modifier, size: androidx.compose.ui.u
 
 private val HomePillLabels = listOf("Live AR", "Smart Routes", "Indoor Maps")
 
-private val VecturaiBrandIcon: ImageVector = ImageVector.Builder(
-    name = "VecturaiBrandMark",
+private val Vectura AIBrandIcon: ImageVector = ImageVector.Builder(
+    name = "Vectura AIBrandMark",
     defaultWidth = 24.dp,
     defaultHeight = 24.dp,
     viewportWidth = 24f,

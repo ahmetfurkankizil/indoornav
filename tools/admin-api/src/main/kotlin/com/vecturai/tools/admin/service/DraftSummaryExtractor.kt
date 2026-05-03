@@ -1,6 +1,6 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.model.*
+import com.Vectura AI.tools.admin.model.*
 import kotlinx.serialization.json.*
 import java.io.File
 

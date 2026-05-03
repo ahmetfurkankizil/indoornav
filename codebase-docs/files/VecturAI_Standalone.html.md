@@ -1,13 +1,13 @@
-# File Dossier: VecturAI Standalone.html
+# File Dossier: Vectura AI Standalone.html
 
 ## Path
-`VecturAI Standalone.html`
+`Vectura AI Standalone.html`
 
 ## Type
 Authored Source (UI Design Preview)
 
 ## Role
-Standalone HTML file containing the web-based UI design and asset preview for the VecturAI platform.
+Standalone HTML file containing the web-based UI design and asset preview for the Vectura AI platform.
 
 ## Main Symbols
 - HTML/CSS/JS bundled template that unpacks and renders the brutalist dark-theme design system.

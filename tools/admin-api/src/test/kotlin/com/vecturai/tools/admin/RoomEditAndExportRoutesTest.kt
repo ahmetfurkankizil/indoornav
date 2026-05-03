@@ -1,4 +1,4 @@
-package com.vecturai.tools.admin
+package com.Vectura AI.tools.admin
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

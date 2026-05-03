@@ -1,7 +1,7 @@
 # File Dossier: AuthoringConfig.kt
 
 ## Path
-`tools\nav-preprocessor\src\main\kotlin\com\vecturai\tools\preprocessor\model\AuthoringConfig.kt`
+`tools\nav-preprocessor\src\main\kotlin\com\Vectura AI\tools\preprocessor\model\AuthoringConfig.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.tools.preprocessor.model
+package com.Vectura AI.tools.preprocessor.model
 
 import kotlinx.serialization.Serializable
 

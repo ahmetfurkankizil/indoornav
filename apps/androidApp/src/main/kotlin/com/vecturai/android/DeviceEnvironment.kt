@@ -1,4 +1,4 @@
-package com.vecturai.android
+package com.Vectura AI.android
 
 import android.os.Build
 

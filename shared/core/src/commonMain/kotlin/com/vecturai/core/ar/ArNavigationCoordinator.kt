@@ -1,9 +1,9 @@
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
-import com.vecturai.core.domain.*
-import com.vecturai.core.repository.BuildingRepository
-import com.vecturai.core.routing.RouteEngine
-import com.vecturai.core.store.AppStore
+import com.Vectura AI.core.domain.*
+import com.Vectura AI.core.repository.BuildingRepository
+import com.Vectura AI.core.routing.RouteEngine
+import com.Vectura AI.core.store.AppStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

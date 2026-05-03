@@ -1,9 +1,9 @@
-package com.vecturai.tools.admin.routes
+package com.Vectura AI.tools.admin.routes
 
-import com.vecturai.tools.admin.db.tables.*
-import com.vecturai.tools.admin.model.NavPackageListItem
-import com.vecturai.tools.admin.model.SystemStats
-import com.vecturai.tools.admin.service.NavPackageGenerator
+import com.Vectura AI.tools.admin.db.tables.*
+import com.Vectura AI.tools.admin.model.NavPackageListItem
+import com.Vectura AI.tools.admin.model.SystemStats
+import com.Vectura AI.tools.admin.service.NavPackageGenerator
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*

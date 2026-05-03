@@ -1,9 +1,9 @@
-package com.vecturai.tools.admin.routes
+package com.Vectura AI.tools.admin.routes
 
-import com.vecturai.tools.admin.Env
-import com.vecturai.tools.admin.model.DbAdminAuthResponse
-import com.vecturai.tools.admin.model.DbAdminLoginRequest
-import com.vecturai.tools.admin.service.ManagerAuthService
+import com.Vectura AI.tools.admin.Env
+import com.Vectura AI.tools.admin.model.DbAdminAuthResponse
+import com.Vectura AI.tools.admin.model.DbAdminLoginRequest
+import com.Vectura AI.tools.admin.service.ManagerAuthService
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*

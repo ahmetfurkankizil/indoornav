@@ -1,7 +1,7 @@
 # File Dossier: AndroidNavigationApp.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ui/AndroidNavigationApp.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/AndroidNavigationApp.kt`
 
 ## Type
 Authored Source (Android Compose UI)
@@ -14,7 +14,7 @@ Compose root for the Android Home/PackageError surface plus reusable visitor-flo
 - `AndroidNavigationFlowModel`
 - `ArCameraFlowViewModel`
 - `AndroidReviewedPackageLoader`
-- `VecturaiTheme`
+- `Vectura AITheme`
 
 ## Exports / Public Surface
 - `AndroidNavigationApp(...)`

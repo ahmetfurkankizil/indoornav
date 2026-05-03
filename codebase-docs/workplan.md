@@ -5,7 +5,7 @@
 - **Current Phase**: Documentation Finalized
 - **Last Batch**: B10 (Mapping Pass 3: Normalization & Final Verification)
 
-This plan outlines the deterministic batches for mapping the Vecturai repository.
+This plan outlines the deterministic batches for mapping the Vectura AI repository.
 
 ## Batch Status Model
 - **pending**: Not started

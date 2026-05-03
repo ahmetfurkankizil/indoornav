@@ -1,8 +1,8 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor
-import com.vecturai.tools.preprocessor.glb.GlbParser
-import com.vecturai.tools.preprocessor.model.AuthoringConfig
+import com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor
+import com.Vectura AI.tools.preprocessor.glb.GlbParser
+import com.Vectura AI.tools.preprocessor.model.AuthoringConfig
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.ByteBuffer

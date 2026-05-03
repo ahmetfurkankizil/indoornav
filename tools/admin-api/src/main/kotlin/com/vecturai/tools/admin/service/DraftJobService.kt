@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.model.*
-import com.vecturai.tools.preprocessor.DraftPipeline
+import com.Vectura AI.tools.admin.model.*
+import com.Vectura AI.tools.preprocessor.DraftPipeline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*

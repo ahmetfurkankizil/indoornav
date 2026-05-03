@@ -1,7 +1,7 @@
-package com.vecturai.designsystem
+package com.Vectura AI.designsystem
 
 import androidx.compose.runtime.Composable
-import com.vecturai.designsystem.navigation.AppNavigation
+import com.Vectura AI.designsystem.navigation.AppNavigation
 
 /**
  * Root app content composable.
@@ -12,10 +12,10 @@ import com.vecturai.designsystem.navigation.AppNavigation
  * @param onNavigateToAr Callback to launch the native AR navigation screen
  */
 @Composable
-fun VecturaiAppContent(
+fun Vectura AIAppContent(
     onNavigateToAr: () -> Unit = {},
 ) {
-    VecturaiTheme {
+    Vectura AITheme {
         AppNavigation(
             onNavigateToAr = onNavigateToAr,
         )

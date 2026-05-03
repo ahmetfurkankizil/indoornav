@@ -25,7 +25,7 @@ Authored Source for the docs component.
 ```bash
 # Clone
 git clone <repo-url>
-cd vecturai
+cd Vectura AI
 
 # Verify build
 make test-preprocessor

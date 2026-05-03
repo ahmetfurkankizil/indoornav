@@ -1,7 +1,7 @@
 # File Dossier: GraphValidator.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/GraphValidator.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/GraphValidator.kt`
 - **Type**: Kotlin Source (Validation Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

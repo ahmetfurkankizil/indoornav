@@ -1,7 +1,7 @@
 # File Dossier: SqlDelightCacheDataSource.kt
 
 ## Path
-`shared\data-local\src\commonMain\kotlin\com\vecturai\data\local\SqlDelightCacheDataSource.kt`
+`shared\data-local\src\commonMain\kotlin\com\Vectura AI\data\local\SqlDelightCacheDataSource.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.data.local
+package com.Vectura AI.data.local
 
 /**
  * SqlDelight-based implementation of [LocalCacheDataSource].

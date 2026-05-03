@@ -14,7 +14,7 @@ Data Contract / Sample Data for the docs component.
 ```kotlin
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "VecturAI Markers",
+    "title": "Vectura AI Markers",
     "description": "Unified marker definitions for AR alignment. Supports entrance (session init) and checkpoint (mid-route correction) roles.",
     "type": "object",
     "required": [

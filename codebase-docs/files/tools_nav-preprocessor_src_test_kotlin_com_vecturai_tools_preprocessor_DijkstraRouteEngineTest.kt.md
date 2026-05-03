@@ -1,7 +1,7 @@
 # File Dossier: DijkstraRouteEngineTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/DijkstraRouteEngineTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/DijkstraRouteEngineTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `route_finding`
 - **Status**: Mapped

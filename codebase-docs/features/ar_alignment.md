@@ -3,10 +3,10 @@
 - **Feature Name**: AR Alignment & Spatial Transformation
 - **Purpose**: Bridges the gap between the AR-world coordinate system (established by ARKit/ARCore) and the building-local coordinate system (defined in the navigation graph).
 - **Implemented In**:
-    - `shared/core/src/commonMain/kotlin/com/vecturai/core/ar/`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArSession.kt`
+    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArMarkerDetector.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArSession.kt`
 - **Used By**:
     - `NavigationSessionCoordinator`
     - `ProgressEstimator`
@@ -30,10 +30,10 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [AlignmentTransform.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_ar_AlignmentTransform.kt.md)
-    - [ArNavigationBridge.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_ar_ArNavigationBridge.kt.md)
-    - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
-    - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
+    - [AlignmentTransform.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_AlignmentTransform.kt.md)
+    - [ArNavigationBridge.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArNavigationBridge.kt.md)
+    - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidArNavigationViewModel.kt.md)
+    - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArMarkerDetector.kt.md)
 - **Risks / Notes**:
     - Only supports 1D rotation (yaw) for simplicity (ADR-007); assumes floors are flat and horizontal.
     - VIO drift over long distances is corrected via `CorrectionCoordinator` (if implemented).

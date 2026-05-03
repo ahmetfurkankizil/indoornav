@@ -1,7 +1,7 @@
 # File Dossier: ArFrameQrScanner.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/qr/ArFrameQrScanner.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/qr/ArFrameQrScanner.kt`
 
 ## Type
 Authored Source (ARCore Frame QR Scanner)

@@ -1,4 +1,4 @@
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
 /**
  * User-facing messages for presentation-safe UI strings.

@@ -3,17 +3,17 @@
 - **Feature Name**: AR Navigation (Android)
 - **Purpose**: Provides the Android visitor AR navigation experience with one Activity-owned ARCore camera session, Compose overlays, AR-frame QR scanning, entrance-poster alignment, rolling 3D route arrows, next-action guidance, ETA HUD, and arrival feedback.
 - **Implemented In**:
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArSession.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArRouteRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArArrow3DRenderer.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/Arrow3DGeometry.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/qr/ArFrameQrScanner.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
-    - `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/QRScanScreen.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArSession.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArMarkerDetector.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArArrow3DRenderer.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/Arrow3DGeometry.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/qr/ArFrameQrScanner.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt`
+    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/QRScanScreen.kt`
 - **Used By**:
     - `AndroidNavigationApp.kt`
     - `MainActivity.kt`
@@ -45,17 +45,17 @@
 - **Related Tests**:
     - None.
 - **Related File Dossiers**:
-    - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_AndroidArNavigationViewModel.kt.md)
-    - [ArCameraActivity.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArCameraActivity.kt.md)
-    - [UnifiedArRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArRenderer.kt.md)
-    - [UnifiedArSession.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_UnifiedArSession.kt.md)
-    - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArMarkerDetector.kt.md)
-    - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArRouteRenderer.kt.md)
-    - [ArArrow3DRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_ArArrow3DRenderer.kt.md)
-    - [Arrow3DGeometry.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_Arrow3DGeometry.kt.md)
-    - [ArFrameQrScanner.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_qr_ArFrameQrScanner.kt.md)
-    - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md)
-    - [QRScanScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_QRScanScreen.kt.md)
+    - [AndroidArNavigationViewModel.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidArNavigationViewModel.kt.md)
+    - [ArCameraActivity.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArCameraActivity.kt.md)
+    - [UnifiedArRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArRenderer.kt.md)
+    - [UnifiedArSession.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArSession.kt.md)
+    - [ArMarkerDetector.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArMarkerDetector.kt.md)
+    - [ArRouteRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArRouteRenderer.kt.md)
+    - [ArArrow3DRenderer.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArArrow3DRenderer.kt.md)
+    - [Arrow3DGeometry.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_Arrow3DGeometry.kt.md)
+    - [ArFrameQrScanner.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_qr_ArFrameQrScanner.kt.md)
+    - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_ArNavigationScreen.kt.md)
+    - [QRScanScreen.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_QRScanScreen.kt.md)
 - **Risks / Notes**:
     - The old CameraX QR scanner and the old AR session rebuild/backoff path have been removed.
     - Camera ownership is intentionally wasteful during destination selection and route preview: ARCore remains resumed under opaque Compose overlays.

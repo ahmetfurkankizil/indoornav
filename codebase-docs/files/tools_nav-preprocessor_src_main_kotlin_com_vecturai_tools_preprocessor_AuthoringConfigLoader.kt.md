@@ -1,7 +1,7 @@
 # File Dossier: AuthoringConfigLoader.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/AuthoringConfigLoader.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/AuthoringConfigLoader.kt`
 - **Type**: Kotlin Source (Serialization Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

@@ -1,7 +1,7 @@
 # File Dossier: AssetInspector.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/AssetInspector.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/AssetInspector.kt`
 - **Type**: Kotlin Source (Utility)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

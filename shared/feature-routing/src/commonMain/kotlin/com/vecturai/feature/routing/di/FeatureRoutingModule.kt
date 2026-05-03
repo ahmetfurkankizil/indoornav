@@ -1,6 +1,6 @@
-package com.vecturai.feature.routing.di
+package com.Vectura AI.feature.routing.di
 
-import com.vecturai.feature.routing.RouteNavigationUseCase
+import com.Vectura AI.feature.routing.RouteNavigationUseCase
 import org.koin.dsl.module
 
 val featureRoutingModule = module {

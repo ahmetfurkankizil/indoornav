@@ -38,7 +38,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.vecturai.data.remote"
+    namespace = "com.Vectura AI.data.remote"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
     compileOptions {

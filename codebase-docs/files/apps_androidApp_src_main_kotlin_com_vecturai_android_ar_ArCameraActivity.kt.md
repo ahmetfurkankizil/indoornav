@@ -1,7 +1,7 @@
 # File Dossier: ArCameraActivity.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt`
 
 ## Type
 Authored Source (Android Activity / AR Camera Host)

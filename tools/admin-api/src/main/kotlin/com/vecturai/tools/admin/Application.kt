@@ -1,10 +1,10 @@
-package com.vecturai.tools.admin
+package com.Vectura AI.tools.admin
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.vecturai.tools.admin.db.DatabaseFactory
-import com.vecturai.tools.admin.routes.*
-import com.vecturai.tools.admin.service.*
+import com.Vectura AI.tools.admin.db.DatabaseFactory
+import com.Vectura AI.tools.admin.routes.*
+import com.Vectura AI.tools.admin.service.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -28,7 +28,7 @@ fun main() {
     val uploadsDir = Env.get("UPLOADS_DIR") ?: "uploads"
 
     println("╔══════════════════════════════════════════════╗")
-    println("║   VecturAI Admin API                         ║")
+    println("║   Vectura AI Admin API                         ║")
     println("╚══════════════════════════════════════════════╝")
     println("  Port:        $port")
     println("  Uploads dir: $uploadsDir")
@@ -47,7 +47,7 @@ fun Application.configureApp(
     uploadsDir: String = "uploads",
 ) {
     val jwtSecret = Env.get("JWT_SECRET") ?: "dev-secret-change-in-production"
-    val jwtIssuer = Env.get("JWT_ISSUER") ?: "vecturai"
+    val jwtIssuer = Env.get("JWT_ISSUER") ?: "Vectura AI"
 
     install(ContentNegotiation) {
         json(Json {
@@ -85,7 +85,7 @@ fun Application.configureApp(
 
     install(Authentication) {
         jwt("manager-auth") {
-            realm = "VecturAI Manager"
+            realm = "Vectura AI Manager"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)
@@ -101,7 +101,7 @@ fun Application.configureApp(
         }
 
         jwt("superadmin-auth") {
-            realm = "VecturAI DB Admin"
+            realm = "Vectura AI DB Admin"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)
@@ -118,16 +118,17 @@ fun Application.configureApp(
     }
 
     // Services
-    val authService     = ManagerAuthService(jwtSecret, jwtIssuer)
-    val qrService       = QRCodeService(uploadsDir)
-    val buildingService = BuildingService(qrService)
-    val floorService    = FloorService(uploadsDir)
-    val nodeService     = NodeService()
-    val edgeService     = EdgeService()
-    val connService     = FloorConnectionService()
-    val aiSuggester     = AiEdgeSuggester()
-    val navGen          = NavPackageGenerator()
-    val draftService    = DraftJobService(jobsDir)  // legacy
+    val authService      = ManagerAuthService(jwtSecret, jwtIssuer)
+    val qrService        = QRCodeService(uploadsDir)
+    val buildingService  = BuildingService(qrService)
+    val floorService     = FloorService(uploadsDir)
+    val nodeService      = NodeService()
+    val edgeService      = EdgeService()
+    val connService      = FloorConnectionService()
+    val navMeshService   = NavMeshAreaService()
+    val aiSuggester      = AiEdgeSuggester()
+    val navGen           = NavPackageGenerator()
+    val draftService     = DraftJobService(jobsDir)  // legacy
 
     routing {
         managerAuthRoutes(authService)
@@ -137,6 +138,7 @@ fun Application.configureApp(
         nodeRoutes(nodeService)
         edgeRoutes(edgeService, aiSuggester)
         floorConnectionRoutes(connService)
+        navMeshAreaRoutes(navMeshService)
         mobileApiRoutes()
         dbAdminRoutes(navGen)
 

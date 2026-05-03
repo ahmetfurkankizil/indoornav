@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Manager } from '../api/auth'
 
+
 interface AuthState {
   manager: Manager | null
   token: string | null

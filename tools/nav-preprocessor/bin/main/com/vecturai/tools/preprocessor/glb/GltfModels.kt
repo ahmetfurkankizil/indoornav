@@ -1,4 +1,4 @@
-package com.vecturai.tools.preprocessor.glb
+package com.Vectura AI.tools.preprocessor.glb
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

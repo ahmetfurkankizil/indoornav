@@ -1,6 +1,6 @@
-# Demo Operator Guide — VecturAI iOS MVP
+# Demo Operator Guide — Vectura AI iOS MVP
 
-Step-by-step procedure for running the VecturAI investor demo.
+Step-by-step procedure for running the Vectura AI investor demo.
 
 ## Before the Demo
 
@@ -13,7 +13,7 @@ The entrance poster is a **single printed artifact** that serves as both:
 Generate it with the provided script:
 
 ```bash
-cd /path/to/vecturai
+cd /path/to/Vectura AI
 ./scripts/generate-entrance-poster.sh
 ```
 
@@ -120,7 +120,7 @@ The AR reference image is not in the app bundle. Run:
 
 ### QR scan shows error
 
-- "QR code does not contain a valid VecturAI payload" → Wrong QR code. Scan the correct entrance poster.
+- "QR code does not contain a valid Vectura AI payload" → Wrong QR code. Scan the correct entrance poster.
 - "QR is for building X but this app has Y" → QR and app mismatch. Regenerate the poster.
 
 ### Arrows seem offset from the real path

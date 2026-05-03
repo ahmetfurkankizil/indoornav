@@ -1,4 +1,4 @@
-package com.vecturai.core.domain
+package com.Vectura AI.core.domain
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.vecturai.data.local
+package com.Vectura AI.data.local
 
 /**
  * Interface for local cache data source.

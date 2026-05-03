@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.model.ExportResult
-import com.vecturai.tools.admin.model.RoomOverrides
+import com.Vectura AI.tools.admin.model.ExportResult
+import com.Vectura AI.tools.admin.model.RoomOverrides
 import kotlinx.serialization.json.*
 import java.io.File
 import java.time.LocalDate

@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin.routes
+package com.Vectura AI.tools.admin.routes
 
-import com.vecturai.tools.admin.model.CreateFloorConnectionRequest
-import com.vecturai.tools.admin.service.FloorConnectionService
+import com.Vectura AI.tools.admin.model.CreateFloorConnectionRequest
+import com.Vectura AI.tools.admin.service.FloorConnectionService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

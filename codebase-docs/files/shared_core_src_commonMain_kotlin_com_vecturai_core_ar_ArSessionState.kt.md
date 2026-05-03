@@ -1,7 +1,7 @@
 # File Dossier: ArSessionState.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\ar\ArSessionState.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\ArSessionState.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
 import kotlinx.serialization.Serializable
 

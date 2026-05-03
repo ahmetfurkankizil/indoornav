@@ -1,4 +1,4 @@
-# VecturAI — Indoor AR Navigation
+# Vectura AI — Indoor AR Navigation
 
 > Kotlin Multiplatform indoor AR navigation for Android & iOS.
 
@@ -9,7 +9,7 @@
 ## Quick Start
 
 ```bash
-git clone <repo-url> && cd vecturai
+git clone <repo-url> && cd Vectura AI
 make help                  # show all targets
 make test-preprocessor     # run ~170 tests
 make verify-all            # full verification (tests + build + package)

@@ -1,9 +1,9 @@
-package com.vecturai.core.navigation
+package com.Vectura AI.core.navigation
 
-import com.vecturai.core.ar.AlignmentTransform
-import com.vecturai.core.ar.CameraPose
-import com.vecturai.core.ar.ProgressUpdate
-import com.vecturai.core.ar.TrackingQuality
+import com.Vectura AI.core.ar.AlignmentTransform
+import com.Vectura AI.core.ar.CameraPose
+import com.Vectura AI.core.ar.ProgressUpdate
+import com.Vectura AI.core.ar.TrackingQuality
 import kotlin.math.sqrt
 
 /**

@@ -1,7 +1,7 @@
 # File Dossier: DraftConfigGenerator.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/draft/DraftConfigGenerator.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/draft/DraftConfigGenerator.kt`
 - **Type**: Kotlin Source (Config Generation)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

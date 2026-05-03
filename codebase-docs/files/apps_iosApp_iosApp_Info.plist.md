@@ -19,7 +19,7 @@ Authored Source for the apps component.
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleName</key>
-    <string>VecturAI</string>
+    <string>Vectura AI</string>
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleVersion</key>
@@ -35,9 +35,9 @@ Authored Source for the apps component.
         <string>arkit</string>
     </array>
     <key>NSCameraUsageDescription</key>
-    <string>VecturAI needs camera access for AR indoor navigation.</string>
+    <string>Vectura AI needs camera access for AR indoor navigation.</string>
     <key>NSLocalNetworkUsageDescription</key>
-    <string>VecturAI connects to the admin API on your 
+    <string>Vectura AI connects to the admin API on your 
 ```
 
 ## Status

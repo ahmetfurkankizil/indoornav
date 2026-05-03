@@ -1,9 +1,9 @@
-package com.vecturai.data.remote
+package com.Vectura AI.data.remote
 
 /**
  * Interface for remote building data source.
  *
- * Downloads building packages from the VecturAI backend server.
+ * Downloads building packages from the Vectura AI backend server.
  * A building package contains the manifest, navigation graph,
  * rooms, entrance markers, and rendering configuration.
  *

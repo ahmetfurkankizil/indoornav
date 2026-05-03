@@ -1,4 +1,4 @@
-package com.vecturai.tools.admin.model
+package com.Vectura AI.tools.admin.model
 
 import kotlinx.serialization.Serializable
 
@@ -127,6 +127,31 @@ data class CreateFloorConnectionRequest(
     val toNodeId: String,
     val connectionType: String,
     val isBidirectional: Boolean = true,
+)
+
+// ── NavMesh Areas ──────────────────────────────────────────────────────
+
+@Serializable
+data class NavMeshAreaResponse(
+    val id: String,
+    val floorId: String,
+    val buildingId: String,
+    val label: String,
+    val vertices: List<Waypoint>,
+    val createdAt: String,
+    val updatedAt: String,
+)
+
+@Serializable
+data class CreateNavMeshAreaRequest(
+    val label: String = "Walkable Area",
+    val vertices: List<Waypoint>,
+)
+
+@Serializable
+data class UpdateNavMeshAreaRequest(
+    val label: String? = null,
+    val vertices: List<Waypoint>? = null,
 )
 
 // ── DB Admin ───────────────────────────────────────────────────────────

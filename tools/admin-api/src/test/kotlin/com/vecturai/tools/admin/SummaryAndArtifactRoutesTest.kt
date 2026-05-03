@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin
+package com.Vectura AI.tools.admin
 
-import com.vecturai.tools.admin.model.JobStatus
-import com.vecturai.tools.admin.service.DraftJobService
+import com.Vectura AI.tools.admin.model.JobStatus
+import com.Vectura AI.tools.admin.service.DraftJobService
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

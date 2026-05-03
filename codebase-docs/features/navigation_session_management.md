@@ -3,8 +3,8 @@
 - **Feature Name**: Navigation Session Management
 - **Purpose**: Orchestrates the end-to-end lifecycle of a navigation session, from building selection to destination arrival.
 - **Implemented In**:
-    - `shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/`
-    - `shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavigationState.kt`
+    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/`
+    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/domain/NavigationState.kt`
 - **Used By**:
     - Feature modules (Search, Routing, etc.)
     - Mobile App Shells (Compose UI, AR ViewModels)
@@ -28,9 +28,9 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [NavigationSessionCoordinator.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_navigation_NavigationSessionCoordinator.kt.md)
-    - [ProgressEstimator.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_navigation_ProgressEstimator.kt.md)
-    - [ArrivalDetector.kt](../files/shared_core_src_commonMain_kotlin_com_vecturai_core_navigation_ArrivalDetector.kt.md)
+    - [NavigationSessionCoordinator.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_NavigationSessionCoordinator.kt.md)
+    - [ProgressEstimator.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ProgressEstimator.kt.md)
+    - [ArrivalDetector.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ArrivalDetector.kt.md)
 - **Risks / Notes**:
     - State is held in-memory; app restarts will lose the current session state.
     - Progress estimation requires a valid `AlignmentTransform`.

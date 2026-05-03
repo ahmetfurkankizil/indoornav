@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-03-29
-**Deciders:** VecturAI team
+**Deciders:** Vectura AI team
 **Relates to:** ADR-030 (admin draft-ingestion pipeline), ADR-026 (reviewed package runtime truth)
 
 ## Context

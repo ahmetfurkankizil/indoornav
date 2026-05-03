@@ -1,7 +1,7 @@
 # File Dossier: DemoFlowSmokeTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/DemoFlowSmokeTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/DemoFlowSmokeTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`, `route_finding`
 - **Status**: Mapped

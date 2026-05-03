@@ -5,7 +5,7 @@
 
 ## Context
 
-VecturAI demos require coordinated effort: device setup, marker placement, app configuration, and live presentation. Without clear role definitions and documentation, demos are fragile and dependent on the original developer.
+Vectura AI demos require coordinated effort: device setup, marker placement, app configuration, and live presentation. Without clear role definitions and documentation, demos are fragile and dependent on the original developer.
 
 ## Decision
 

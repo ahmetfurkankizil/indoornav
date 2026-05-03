@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin.db
+package com.Vectura AI.tools.admin.db
 
-import com.vecturai.tools.admin.Env
-import com.vecturai.tools.admin.db.tables.*
+import com.Vectura AI.tools.admin.Env
+import com.Vectura AI.tools.admin.db.tables.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
@@ -13,9 +13,9 @@ object DatabaseFactory {
     fun init() {
         val host     = Env.get("POSTGRES_HOST")     ?: "localhost"
         val port     = Env.get("POSTGRES_PORT")     ?: "5432"
-        val db       = Env.get("POSTGRES_DB")       ?: "vecturai"
-        val user     = Env.get("POSTGRES_USER")     ?: "vecturai"
-        val password = Env.get("POSTGRES_PASSWORD") ?: "vecturai"
+        val db       = Env.get("POSTGRES_DB")       ?: "Vectura AI"
+        val user     = Env.get("POSTGRES_USER")     ?: "Vectura AI"
+        val password = Env.get("POSTGRES_PASSWORD") ?: "Vectura AI"
 
         val config = HikariConfig().apply {
             jdbcUrl         = "jdbc:postgresql://$host:$port/$db"
@@ -40,6 +40,7 @@ object DatabaseFactory {
                 FloorConnections,
                 NavigationPackages,
                 EntranceMarkers,
+                NavMeshAreas,
             )
         }
     }

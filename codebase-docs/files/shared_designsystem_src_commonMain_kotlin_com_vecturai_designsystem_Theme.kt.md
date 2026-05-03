@@ -1,27 +1,27 @@
-# File Dossier: shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Theme.kt
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/Theme.kt
 
-- **Path**: `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Theme.kt`
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/Theme.kt`
 - **Type**: source
 - **Role**: Root theme provider for the application, bridging custom colors with Material 3.
 - **Imports / Includes**:
     - `androidx.compose.material3.MaterialTheme`
-    - `com.vecturai.designsystem.VecturaiColors`
+    - `com.Vectura AI.designsystem.Vectura AIColors`
 - **Exports / Public Surface**:
-    - `VecturaiTheme` Composable
+    - `Vectura AITheme` Composable
 - **Main Symbols**:
-    - `VecturaiTheme`: function
+    - `Vectura AITheme`: function
     - `LightColorScheme`: private val
     - `DarkColorScheme`: private val
 - **Important Logic by Line Range**:
-    - `8-24`: Mapping of `VecturaiColors` to the Material 3 `lightColorScheme`.
+    - `8-24`: Mapping of `Vectura AIColors` to the Material 3 `lightColorScheme`.
     - `26-42`: Mapping to `darkColorScheme`.
-    - `51-62`: `VecturaiTheme` implementation; provides the `colorScheme` and `typography` to the Compose hierarchy.
+    - `51-62`: `Vectura AITheme` implementation; provides the `colorScheme` and `typography` to the Compose hierarchy.
 - **Uses**:
     - Compose Material 3
-    - `VecturaiColors`
-    - `VecturaiTypography`
+    - `Vectura AIColors`
+    - `Vectura AITypography`
 - **Used By**:
-    - `VecturaiAppContent`
+    - `Vectura AIAppContent`
     - Any preview composables
 - **Config / Constants / Protocol Details**: N/A
 - **Related Tests**: N/A

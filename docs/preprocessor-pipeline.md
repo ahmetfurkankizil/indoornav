@@ -1,4 +1,4 @@
-# VecturAI Navigation Preprocessor Pipeline
+# Vectura AI Navigation Preprocessor Pipeline
 
 The nav-preprocessor is a Kotlin CLI tool that converts a 3D building scan (`.glb`) into a navigation package for the AR app.
 

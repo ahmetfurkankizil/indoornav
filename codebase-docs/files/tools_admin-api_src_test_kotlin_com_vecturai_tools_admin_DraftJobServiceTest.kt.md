@@ -1,7 +1,7 @@
 # File Dossier: DraftJobServiceTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/vecturai/tools/admin/DraftJobServiceTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/DraftJobServiceTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

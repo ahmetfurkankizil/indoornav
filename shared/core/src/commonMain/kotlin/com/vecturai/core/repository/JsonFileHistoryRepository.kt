@@ -1,6 +1,6 @@
-package com.vecturai.core.repository
+package com.Vectura AI.core.repository
 
-import com.vecturai.core.domain.VisitRecord
+import com.Vectura AI.core.domain.VisitRecord
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

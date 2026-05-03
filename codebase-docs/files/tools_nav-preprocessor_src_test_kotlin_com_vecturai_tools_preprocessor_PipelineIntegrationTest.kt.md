@@ -1,7 +1,7 @@
 # File Dossier: PipelineIntegrationTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/PipelineIntegrationTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/PipelineIntegrationTest.kt`
 - **Type**: Kotlin Source (Integration Test)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

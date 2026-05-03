@@ -1,7 +1,7 @@
 # File Dossier: AsyncJobLifecycleTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/vecturai/tools/admin/AsyncJobLifecycleTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/AsyncJobLifecycleTest.kt`
 - **Type**: Kotlin Source (Integration Test)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

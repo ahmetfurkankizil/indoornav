@@ -1,4 +1,4 @@
-package com.vecturai.designsystem
+package com.Vectura AI.designsystem
 
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -6,8 +6,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.vecturai.designsystem.generated.resources.Res
-import com.vecturai.designsystem.generated.resources.inter_variable
+import com.Vectura AI.designsystem.generated.resources.Res
+import com.Vectura AI.designsystem.generated.resources.inter_variable
 import org.jetbrains.compose.resources.Font
 
 private fun TextStyle.withFont(fontFamily: FontFamily): TextStyle = copy(fontFamily = fontFamily)
@@ -15,7 +15,7 @@ private fun TextStyle.withFont(fontFamily: FontFamily): TextStyle = copy(fontFam
 @Composable
 private fun interFamily(): FontFamily = FontFamily(Font(Res.font.inter_variable))
 
-object VecturaiTypography {
+object Vectura AITypography {
     val NumericDisplay = TextStyle(
         fontSize = 64.sp,
         fontWeight = FontWeight.ExtraBold,

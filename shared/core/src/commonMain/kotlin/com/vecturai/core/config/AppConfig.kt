@@ -1,4 +1,4 @@
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
 /**
  * App configuration profiles.

@@ -1,7 +1,7 @@
 # File Dossier: QRScanScreen.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ui/QRScanScreen.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/QRScanScreen.kt`
 
 ## Type
 Authored Source (Android Compose QR Overlay)

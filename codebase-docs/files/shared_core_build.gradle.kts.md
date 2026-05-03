@@ -8,12 +8,12 @@
     - `libs.plugins.kotlin.serialization`
     - `libs.plugins.android.library`
 - **Exports / Public Surface**:
-    - `VecturaiCore` iOS Framework
-    - `com.vecturai.core` Android Library
+    - `Vectura AICore` iOS Framework
+    - `com.Vectura AI.core` Android Library
 - **Main Symbols**: N/A
 - **Important Logic by Line Range**:
     - `7-20`: Kotlin Multiplatform targets; configures Android and iOS (X64, Arm64, Simulator).
-    - `14-16`: Configures the `VecturaiCore` static framework for iOS integration.
+    - `14-16`: Configures the `Vectura AICore` static framework for iOS integration.
     - `23-31`: `commonMain` dependencies; includes Coroutines, Serialization, DateTime, and Koin.
     - `35-41`: Android-specific configuration (namespace, compileSdk, minSdk).
 - **Uses**:

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.vecturai.android"
+    namespace = "com.Vectura AI.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.vecturai.android"
+        applicationId = "com.Vectura AI.android"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

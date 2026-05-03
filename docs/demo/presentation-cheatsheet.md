@@ -2,7 +2,7 @@
 
 ## 30-Second Demo
 
-> "VecturAI gives you turn-by-turn AR navigation inside buildings — no beacons needed."
+> "Vectura AI gives you turn-by-turn AR navigation inside buildings — no beacons needed."
 
 1. Show the app with a building loaded
 2. Tap "Kitchen" → arrows appear

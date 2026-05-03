@@ -1,7 +1,7 @@
 # File Dossier: OccupancyGridGenerator.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/analysis/OccupancyGridGenerator.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/analysis/OccupancyGridGenerator.kt`
 - **Type**: Kotlin Source (Analysis Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

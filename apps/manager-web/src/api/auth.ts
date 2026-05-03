@@ -1,13 +1,24 @@
-import { api } from './client'
-
 export interface Manager { id: string; email: string; fullName: string; createdAt: string }
 export interface AuthResponse { token: string; manager: Manager }
 
-export const signup = (email: string, password: string, fullName: string) =>
-  api.post<AuthResponse>('/auth/signup', { email, password, fullName }).then(r => r.data)
+function makeManager(email: string, fullName: string): Manager {
+  return { id: 'local-manager', email, fullName, createdAt: new Date().toISOString() }
+}
 
-export const login = (email: string, password: string) =>
-  api.post<AuthResponse>('/auth/login', { email, password }).then(r => r.data)
+export const login = async (email: string, _password: string): Promise<AuthResponse> => ({
+  token: 'local-token',
+  manager: makeManager(email, email.split('@')[0]),
+})
 
-export const getMe = () =>
-  api.get<Manager>('/auth/me').then(r => r.data)
+export const signup = async (email: string, _password: string, fullName: string): Promise<AuthResponse> => ({
+  token: 'local-token',
+  manager: makeManager(email, fullName),
+})
+
+export const getMe = async (): Promise<Manager> => {
+  try {
+    const s = localStorage.getItem('manager_user')
+    if (s) return JSON.parse(s)
+  } catch { /* ignore */ }
+  return makeManager('local@Vectura AI.app', 'Manager')
+}

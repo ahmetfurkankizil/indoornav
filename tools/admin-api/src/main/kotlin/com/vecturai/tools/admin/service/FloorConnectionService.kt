@@ -1,8 +1,8 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.db.tables.Buildings
-import com.vecturai.tools.admin.db.tables.FloorConnections
-import com.vecturai.tools.admin.model.FloorConnectionResponse
+import com.Vectura AI.tools.admin.db.tables.Buildings
+import com.Vectura AI.tools.admin.db.tables.FloorConnections
+import com.Vectura AI.tools.admin.model.FloorConnectionResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.*

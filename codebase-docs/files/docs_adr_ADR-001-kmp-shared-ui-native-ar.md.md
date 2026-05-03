@@ -7,7 +7,7 @@
 - **Status**: Mapped
 
 ## Role
-Documents the fundamental architectural decision of the VecturAI project: using Kotlin Multiplatform (KMP) for business logic, Compose Multiplatform for shared UI, and native shells for the platform-specific AR navigation experiences.
+Documents the fundamental architectural decision of the Vectura AI project: using Kotlin Multiplatform (KMP) for business logic, Compose Multiplatform for shared UI, and native shells for the platform-specific AR navigation experiences.
 
 ## Key Decisions
 - **KMP**: Chosen for shared domain models, routing, and state management.

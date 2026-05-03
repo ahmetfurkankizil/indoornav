@@ -1,7 +1,7 @@
 # File Dossier: RouteEngine.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\routing\RouteEngine.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\routing\RouteEngine.kt`
 
 ## Type
 Authored Source
@@ -12,10 +12,10 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.routing
+package com.Vectura AI.core.routing
 
-import com.vecturai.core.domain.NavGraph
-import com.vecturai.core.domain.Route
+import com.Vectura AI.core.domain.NavGraph
+import com.Vectura AI.core.domain.Route
 
 /**
  * Interface for computing navigation routes within a building.

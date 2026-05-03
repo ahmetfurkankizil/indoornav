@@ -1,4 +1,4 @@
-package com.vecturai.designsystem.screens
+package com.Vectura AI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vecturai.designsystem.VecturaiCard
+import com.Vectura AI.designsystem.Vectura AICard
 
 /**
  * Settings screen for app configuration.
@@ -36,7 +36,7 @@ fun SettingsScreen(
         Spacer(Modifier.height(24.dp))
 
         // Cache Management
-        VecturaiCard {
+        Vectura AICard {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -64,7 +64,7 @@ fun SettingsScreen(
 
         // Dark Mode
         var darkMode by remember { mutableStateOf(false) }
-        VecturaiCard {
+        Vectura AICard {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -86,7 +86,7 @@ fun SettingsScreen(
         Spacer(Modifier.height(12.dp))
 
         // AR Settings
-        VecturaiCard {
+        Vectura AICard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.ViewInAr, contentDescription = null)
                 Spacer(Modifier.width(12.dp))
@@ -106,7 +106,7 @@ fun SettingsScreen(
 
         // App info
         Text(
-            text = "VecturAI v0.1.0 (MVP)",
+            text = "Vectura AI v0.1.0 (MVP)",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally),

@@ -1,7 +1,7 @@
 # File Dossier: CorrectionCoordinator.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\ar\CorrectionCoordinator.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\CorrectionCoordinator.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
-import com.vecturai.core.domain.CheckpointMarker
+import com.Vectura AI.core.domain.CheckpointMarker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

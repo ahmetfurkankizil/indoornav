@@ -5,10 +5,9 @@ import { Layout } from '../../components/Layout'
 import {
   getBuilding, updateBuilding, createFloor, deleteFloor, publishBuilding,
   listConnections, createConnection, deleteConnection,
-  getQrUrl, replaceFloor, listBuildingNodes,
+  replaceFloor, listBuildingNodes,
   type Floor, type FloorConnection,
 } from '../../api/buildings'
-import { api } from '../../api/client'
 import { listNodes, type Node } from '../../api/mapEditor'
 
 export function BuildingDetailPage() {
@@ -416,48 +415,13 @@ export function BuildingDetailPage() {
 }
 
 function QrModal({ buildingId, onClose }: { buildingId: string; onClose: () => void }) {
-  const [qrUrl, setQrUrl] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let active = true
-    let currentUrl: string | null = null
-
-    const fetchQr = async () => {
-      try {
-        const response = await api.get(`/api/manager/buildings/${buildingId}/qr`, { responseType: 'blob' })
-        if (!active) return
-        currentUrl = URL.createObjectURL(response.data)
-        setQrUrl(currentUrl)
-      } catch (err) {
-        console.error('Failed to load QR', err)
-      } finally {
-        if (active) setLoading(false)
-      }
-    }
-    fetchQr()
-
-    return () => {
-      active = false
-      if (currentUrl) URL.revokeObjectURL(currentUrl)
-    }
-  }, [buildingId])
-
   return (
     <Modal title="Building QR Code" onClose={onClose}>
-      <div className="flex flex-col items-center gap-4">
-        {loading ? (
-          <div className="w-64 h-64 border flex items-center justify-center text-gray-400">Loading QR...</div>
-        ) : qrUrl ? (
-          <>
-            <img src={qrUrl} alt="Building QR Code" className="w-64 h-64 border shadow-sm" />
-            <p className="text-sm text-gray-500 text-center">Scan with the VecturAI mobile app to start navigation.</p>
-            <a href={qrUrl} download={`building-${buildingId}-qr.png`}
-              className="text-sm text-blue-600 font-medium hover:underline">Download PNG</a>
-          </>
-        ) : (
-          <p className="text-red-500 text-sm">Failed to load QR code.</p>
-        )}
+      <div className="flex flex-col items-center gap-4 py-4">
+        <div className="w-48 h-48 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-sm text-center p-4">
+          QR code generation requires the backend server
+        </div>
+        <p className="text-xs text-gray-400">Building ID: {buildingId}</p>
       </div>
     </Modal>
   )

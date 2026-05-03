@@ -1,11 +1,11 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.Env
+import com.Vectura AI.tools.admin.Env
 
-import com.vecturai.tools.admin.model.AiNodeInput
-import com.vecturai.tools.admin.model.AiSuggestResponse
-import com.vecturai.tools.admin.model.SuggestedEdge
-import com.vecturai.tools.admin.model.Waypoint
+import com.Vectura AI.tools.admin.model.AiNodeInput
+import com.Vectura AI.tools.admin.model.AiSuggestResponse
+import com.Vectura AI.tools.admin.model.SuggestedEdge
+import com.Vectura AI.tools.admin.model.Waypoint
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.java.*

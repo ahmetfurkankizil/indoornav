@@ -1,7 +1,7 @@
 # File Dossier: ReviewedPackageExporter.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/vecturai/tools/admin/service/ReviewedPackageExporter.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/service/ReviewedPackageExporter.kt`
 - **Type**: Kotlin Source (Service)
 - **Feature**: `admin_orchestration`, `navigation_data_format`
 - **Status**: Mapped

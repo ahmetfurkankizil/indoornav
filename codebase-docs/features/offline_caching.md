@@ -3,8 +3,8 @@
 - **Feature Name**: Offline Data & Caching
 - **Purpose**: Ensures the application remains functional in areas with poor connectivity (e.g., building basements) by caching navigation packages locally.
 - **Implemented In**:
-    - `shared/data-local/src/commonMain/kotlin/com/vecturai/data/local/LocalCacheDataSource.kt`
-    - `shared/core/src/commonMain/kotlin/com/vecturai/core/repository/BuildingRepository.kt` (Orchestration)
+    - `shared/data-local/src/commonMain/kotlin/com/Vectura AI/data/local/LocalCacheDataSource.kt`
+    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/repository/BuildingRepository.kt` (Orchestration)
 - **Used By**:
     - `DefaultBuildingRepository`
     - Pre-download / Sync managers
@@ -22,7 +22,7 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [LocalCacheDataSource.kt](../files/shared_data-local_src_commonMain_kotlin_com_vecturai_data_local_LocalCacheDataSource.kt.md)
+    - [LocalCacheDataSource.kt](../files/shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_LocalCacheDataSource.kt.md)
 - **Risks / Notes**:
     - Currently in stub phase; persistent storage logic via SqlDelight is pending.
     - Version management is critical to ensure users don't navigate with outdated building graphs.

@@ -1,7 +1,7 @@
 # File Dossier: GltfModels.kt
 
 ## Path
-`tools\nav-preprocessor\src\main\kotlin\com\vecturai\tools\preprocessor\glb\GltfModels.kt`
+`tools\nav-preprocessor\src\main\kotlin\com\Vectura AI\tools\preprocessor\glb\GltfModels.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.tools.preprocessor.glb
+package com.Vectura AI.tools.preprocessor.glb
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

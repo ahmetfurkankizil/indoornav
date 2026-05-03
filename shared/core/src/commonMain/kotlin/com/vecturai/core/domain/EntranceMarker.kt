@@ -1,4 +1,4 @@
-package com.vecturai.core.domain
+package com.Vectura AI.core.domain
 
 import kotlinx.serialization.Serializable
 
@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  * 3. Uses the known marker pose in building coords to compute the transform
  *
  * @property id Unique marker identifier
- * @property qrPayload QR code content (typically "vecturai://building/{buildingId}/marker/{id}")
+ * @property qrPayload QR code content (typically "Vectura AI://building/{buildingId}/marker/{id}")
  * @property positionX Marker X in building-local coords (meters)
  * @property positionY Marker Y in building-local coords (meters)
  * @property positionZ Marker Z in building-local coords (meters)

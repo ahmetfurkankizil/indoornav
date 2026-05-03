@@ -1,7 +1,7 @@
 # File Dossier: HistoryRepository.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\repository\HistoryRepository.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\repository\HistoryRepository.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.repository
+package com.Vectura AI.core.repository
 
-import com.vecturai.core.domain.VisitRecord
+import com.Vectura AI.core.domain.VisitRecord
 
 /**
  * Repository for user visit history.

@@ -28,7 +28,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.vecturai.designsystem"
+    namespace = "com.Vectura AI.designsystem"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
     compileOptions {

@@ -1,4 +1,4 @@
-package com.vecturai.data.remote
+package com.Vectura AI.data.remote
 
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -32,18 +32,18 @@ class KtorBuildingDataSource(
 
     override suspend fun fetchBuildingPackageByToken(token: String): String? {
         val url = "$baseUrl/mobile/buildings/$token/nav-package"
-        println("VECTURAI_DEBUG: Requesting URL: $url")
+        println("Vectura AI_DEBUG: Requesting URL: $url")
         return try {
             val response = httpClient.get(url)
-            println("VECTURAI_DEBUG: Status: ${response.status}")
+            println("Vectura AI_DEBUG: Status: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
                 response.bodyAsText()
             } else {
-                println("VECTURAI_DEBUG: Failed with status ${response.status}")
+                println("Vectura AI_DEBUG: Failed with status ${response.status}")
                 null
             }
         } catch (e: Exception) {
-            println("VECTURAI_DEBUG: Network Error: ${e.message}")
+            println("Vectura AI_DEBUG: Network Error: ${e.message}")
             e.printStackTrace()
             null
         }

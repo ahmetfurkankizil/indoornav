@@ -1,7 +1,7 @@
 # File Dossier: GlbParser.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/glb/GlbParser.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/glb/GlbParser.kt`
 - **Type**: Kotlin Source (Parser)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

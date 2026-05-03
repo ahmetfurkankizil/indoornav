@@ -10,7 +10,7 @@
 Defines the build configuration, dependencies, and entrypoint for the Admin API tool. It configures a Ktor-based JVM application that orchestrates navigation graph preprocessing.
 
 ## Public Surface
-- `mainClass`: `com.vecturai.tools.admin.ApplicationKt` (L8)
+- `mainClass`: `com.Vectura AI.tools.admin.ApplicationKt` (L8)
 
 ## Important Logic
 - **Framework Stack** (L11-22): Uses Ktor Server (Netty) for the web layer, with JSON content negotiation and serialization.

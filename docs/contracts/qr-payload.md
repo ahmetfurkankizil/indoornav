@@ -13,7 +13,7 @@ The entrance poster contains a QR code encoding a small JSON payload identifying
 
 ```json
 {
-  "type": "vecturai-entrance",
+  "type": "Vectura AI-entrance",
   "buildingId": "house-demo-01",
   "entranceId": "marker-entrance-a",
   "v": 1
@@ -22,7 +22,7 @@ The entrance poster contains a QR code encoding a small JSON payload identifying
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `type` | string | yes | Always `"vecturai-entrance"`. Rejects any other value. |
+| `type` | string | yes | Always `"Vectura AI-entrance"`. Rejects any other value. |
 | `buildingId` | string | yes | Must match `buildingId` in `manifest.json`. |
 | `entranceId` | string | yes | Must match an `id` in `entrance_markers.json`. |
 | `v` | int | yes | Payload version. Currently `1`. |
@@ -30,7 +30,7 @@ The entrance poster contains a QR code encoding a small JSON payload identifying
 ## Validation Rules
 
 1. The raw QR string must be valid UTF-8 JSON decodable to the above shape.
-2. `type` must equal `"vecturai-entrance"`.
+2. `type` must equal `"Vectura AI-entrance"`.
 3. `v` must be `>= 1` and `<= 1` (current version).
 4. `buildingId` must exactly match `manifest.buildingId` in the bundled reviewed package.
 5. `entranceId` must match the `id` field of an entry in `entranceMarkers` in the bundled reviewed package.
@@ -41,7 +41,7 @@ Any validation failure produces a user-facing error message and a retry opportun
 
 | Condition | Message shown |
 |---|---|
-| Not valid JSON / not VecturAI QR | "QR code does not contain a valid VecturAI payload" |
+| Not valid JSON / not Vectura AI QR | "QR code does not contain a valid Vectura AI payload" |
 | Wrong `type` | "Unknown QR type: <type>" |
 | Unsupported version | "Unsupported QR version: <v>" |
 | Building mismatch | "QR is for building \"<got>\" but this app has \"<expected>\"" |

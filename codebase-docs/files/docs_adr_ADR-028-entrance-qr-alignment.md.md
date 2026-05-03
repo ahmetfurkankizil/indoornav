@@ -16,7 +16,7 @@ Authored Source for the docs component.
 
 **Status:** Accepted
 **Date:** 2026-03-23
-**Deciders:** VecturAI iOS team
+**Deciders:** Vectura AI iOS team
 **Relates to:** ADR-026, ADR-027, ADR-025
 
 ## Context
@@ -36,7 +36,7 @@ The QR code encodes a small JSON payload:
 
 ```json
 {
-  "type": "vecturai-entrance",
+  "type": "Vectura AI-entrance",
   "buildingId": "house-demo-01",
   "entranceId": "marker-entrance-a
 ```

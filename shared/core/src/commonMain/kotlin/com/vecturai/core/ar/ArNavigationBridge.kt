@@ -1,7 +1,7 @@
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
-import com.vecturai.core.domain.BuildingPackage
-import com.vecturai.core.domain.Room
+import com.Vectura AI.core.domain.BuildingPackage
+import com.Vectura AI.core.domain.Room
 
 /**
  * Bridge interface between shared navigation logic and native AR layer.

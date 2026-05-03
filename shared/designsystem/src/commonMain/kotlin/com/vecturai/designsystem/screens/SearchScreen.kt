@@ -1,4 +1,4 @@
-package com.vecturai.designsystem.screens
+package com.Vectura AI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,8 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vecturai.designsystem.VecturaiCard
-import com.vecturai.designsystem.VecturaiEmptyState
+import com.Vectura AI.designsystem.Vectura AICard
+import com.Vectura AI.designsystem.Vectura AIEmptyState
 
 /**
  * Search screen for finding rooms within the building.
@@ -50,7 +50,7 @@ fun SearchScreen(
 
         if (searchQuery.isEmpty()) {
             // Show categories when not searching
-            VecturaiEmptyState(
+            Vectura AIEmptyState(
                 icon = Icons.Default.SearchOff,
                 title = "Search for a destination",
                 description = "Type a room name, office number, or facility type to find your way.",
@@ -65,7 +65,7 @@ fun SearchScreen(
             ) {
                 // Placeholder results
                 items(3) { index ->
-                    VecturaiCard(onClick = { /* TODO: Navigate to route preview */ }) {
+                    Vectura AICard(onClick = { /* TODO: Navigate to route preview */ }) {
                         Text(
                             text = "Room ${index + 101}",
                             style = MaterialTheme.typography.titleMedium,

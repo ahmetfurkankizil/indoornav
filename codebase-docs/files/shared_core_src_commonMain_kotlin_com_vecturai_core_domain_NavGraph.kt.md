@@ -1,6 +1,6 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavGraph.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/domain/NavGraph.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/domain/NavGraph.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/domain/NavGraph.kt`
 - **Type**: source
 - **Role**: Defines the data structures for the indoor navigation graph (Nodes and Edges).
 - **Imports / Includes**:

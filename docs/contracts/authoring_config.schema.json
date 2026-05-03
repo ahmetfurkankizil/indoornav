@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "VecturAI Authoring Config",
+    "title": "Vectura AI Authoring Config",
     "description": "Human-authored building annotation file. Input to the nav-preprocessor CLI.",
     "type": "object",
     "required": [

@@ -1,7 +1,7 @@
 # File Dossier: RouteSegment.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\domain\RouteSegment.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\domain\RouteSegment.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.domain
+package com.Vectura AI.core.domain
 
 import kotlinx.serialization.Serializable
 

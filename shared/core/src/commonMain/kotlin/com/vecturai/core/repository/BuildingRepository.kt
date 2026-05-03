@@ -1,8 +1,8 @@
-package com.vecturai.core.repository
+package com.Vectura AI.core.repository
 
-import com.vecturai.core.domain.EntranceMarker
-import com.vecturai.core.domain.NavGraph
-import com.vecturai.core.domain.Room
+import com.Vectura AI.core.domain.EntranceMarker
+import com.Vectura AI.core.domain.NavGraph
+import com.Vectura AI.core.domain.Room
 
 /**
  * Repository for building data access.

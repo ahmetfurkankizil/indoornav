@@ -1,4 +1,4 @@
-import { api } from './client'
+import { lsListNodes, lsCreateNode, lsUpdateNode, lsDeleteNode, lsGetBuildingIdForFloor } from './localDb'
 
 export interface Waypoint { x: number; y: number }
 
@@ -10,12 +10,10 @@ export interface Node {
   metadata: string; createdAt: string; updatedAt: string
 }
 
-export interface Edge {
+export interface NavMeshArea {
   id: string; floorId: string; buildingId: string
-  fromNodeId: string; toNodeId: string
-  isBidirectional: boolean; distance?: number
-  edgeType: string; waypoints: Waypoint[]
-  createdBy: string; createdAt: string; updatedAt: string
+  label: string; vertices: Waypoint[]
+  createdAt: string; updatedAt: string
 }
 
 export interface SuggestedEdge {
@@ -28,49 +26,21 @@ export interface SuggestedNode {
   canvasX: number; canvasY: number
 }
 
-// ── Nodes ──────────────────────────────────────────────────────────────────────
+// ── Nodes ───────────────────────────────────────────────────────────────────────
 
-export const listNodes = (floorId: string) =>
-  api.get<Node[]>(`/api/manager/floors/${floorId}/nodes`).then(r => r.data)
+export const listNodes = async (floorId: string): Promise<Node[]> =>
+  lsListNodes(floorId)
 
-export const createNode = (floorId: string, data: {
+export const createNode = async (floorId: string, data: {
   label: string; nodeType: string; canvasX: number; canvasY: number; metadata?: string
-}) =>
-  api.post<Node>(`/api/manager/floors/${floorId}/nodes`, data).then(r => r.data)
+}): Promise<Node> => {
+  const buildingId = lsGetBuildingIdForFloor(floorId) ?? ''
+  return lsCreateNode(floorId, buildingId, data)
+}
 
-export const updateNode = (floorId: string, nodeId: string, data: {
+export const updateNode = async (floorId: string, nodeId: string, data: {
   label?: string; nodeType?: string; canvasX?: number; canvasY?: number; metadata?: string
-}) =>
-  api.put<Node>(`/api/manager/floors/${floorId}/nodes/${nodeId}`, data).then(r => r.data)
+}): Promise<Node> => lsUpdateNode(nodeId, data)
 
-export const deleteNode = (floorId: string, nodeId: string) =>
-  api.delete(`/api/manager/floors/${floorId}/nodes/${nodeId}`)
-
-// ── Edges ──────────────────────────────────────────────────────────────────────
-
-export const listEdges = (floorId: string) =>
-  api.get<Edge[]>(`/api/manager/floors/${floorId}/edges`).then(r => r.data)
-
-export const createEdge = (floorId: string, data: {
-  fromNodeId: string; toNodeId: string
-  edgeType?: string; isBidirectional?: boolean
-  waypoints?: Waypoint[]; createdBy?: string
-}) =>
-  api.post<Edge>(`/api/manager/floors/${floorId}/edges`, data).then(r => r.data)
-
-export const updateEdge = (floorId: string, edgeId: string, data: {
-  edgeType?: string; isBidirectional?: boolean; waypoints?: Waypoint[]
-}) =>
-  api.put<Edge>(`/api/manager/floors/${floorId}/edges/${edgeId}`, data).then(r => r.data)
-
-export const deleteEdge = (floorId: string, edgeId: string) =>
-  api.delete(`/api/manager/floors/${floorId}/edges/${edgeId}`)
-
-export const aiSuggestEdges = (floorId: string, floorPlanImageBase64: string, nodes: Node[]) =>
-  api.post<{ nodes?: SuggestedNode[], edges: SuggestedEdge[] }>(`/api/manager/floors/${floorId}/edges/ai-suggest`, {
-    floorPlanImageBase64,
-    nodes: nodes.map(n => ({
-      id: n.id, label: n.label, nodeType: n.nodeType,
-      canvasX: n.canvasX, canvasY: n.canvasY,
-    })),
-  }).then(r => r.data)
+export const deleteNode = async (_floorId: string, nodeId: string): Promise<void> =>
+  lsDeleteNode(nodeId)

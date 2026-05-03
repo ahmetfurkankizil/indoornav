@@ -5,10 +5,12 @@
       "Bash(xargs grep *)",
       "Bash(npm install *)",
       "Bash(npx tsc *)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\holym\\\\vecturai\" -Directory)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\holym\\\\Vectura AI\" -Directory)",
       "Bash(Select-Object Name)",
       "Bash(git checkout *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\holym\\\\Vectura AI\\\\tools\\\\admin-api\\\\src\\\\main\\\\kotlin\\\\com\\\\Vectura AI\\\\tools\\\\admin\" -Recurse -Filter \"*.kt\")",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

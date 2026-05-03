@@ -34,7 +34,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.vecturai.feature.search"
+    namespace = "com.Vectura AI.feature.search"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
 }

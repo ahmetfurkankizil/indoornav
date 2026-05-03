@@ -1,7 +1,7 @@
 # File Dossier: AppDiagnostics.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\config\AppDiagnostics.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\config\AppDiagnostics.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
-import com.vecturai.core.navigation.NavigationSession
+import com.Vectura AI.core.navigation.NavigationSession
 import kotlinx.serialization.Serializable
 
 /**

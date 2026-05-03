@@ -1,4 +1,4 @@
-package com.vecturai.core.ar
+package com.Vectura AI.core.ar
 
 import kotlin.math.abs
 import kotlin.math.sqrt

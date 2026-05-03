@@ -19,7 +19,7 @@ Manual QA checklist for verifying the demo flow before presentation.
 ## Pre-flight
 - [ ] App launches without crash
 - [ ] Version string visible (Settings / Debug panel)
-- [ ] Demo building package loaded (check diagnostics: "VecturAI Demo Office")
+- [ ] Demo building package loaded (check diagnostics: "Vectura AI Demo Office")
 
 ## Search Flow
 - [ ] Search screen accessible from home

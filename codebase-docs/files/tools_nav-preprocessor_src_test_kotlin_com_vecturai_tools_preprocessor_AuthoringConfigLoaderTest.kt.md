@@ -1,7 +1,7 @@
 # File Dossier: AuthoringConfigLoaderTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/AuthoringConfigLoaderTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/AuthoringConfigLoaderTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`, `navigation_data_format`
 - **Status**: Mapped

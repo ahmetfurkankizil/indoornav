@@ -4,7 +4,7 @@
        verify-all verify-package verify-ios
 
 # ═══════════════════════════════════════════════
-# VecturAI — Build Targets
+# Vectura AI — Build Targets
 # ═══════════════════════════════════════════════
 
 help: ## Show available targets

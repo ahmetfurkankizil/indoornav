@@ -1,7 +1,7 @@
 # File Dossier: AndroidHapticManager.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidHapticManager.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidHapticManager.kt`
 
 ## Type
 Authored Source (Android Haptics)

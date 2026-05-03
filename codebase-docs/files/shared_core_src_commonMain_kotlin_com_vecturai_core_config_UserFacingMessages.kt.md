@@ -1,7 +1,7 @@
 # File Dossier: UserFacingMessages.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\config\UserFacingMessages.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\config\UserFacingMessages.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
 /**
  * User-facing messages for presentation-safe UI strings.

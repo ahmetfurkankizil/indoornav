@@ -1,7 +1,7 @@
 # File Dossier: QRPayload.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/qr/QRPayload.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/qr/QRPayload.kt`
 
 ## Type
 Authored Source (QR Protocol)
@@ -10,7 +10,7 @@ Authored Source (QR Protocol)
 Parses and validates the Android QR entrance payload contract.
 
 ## Imports / Includes
-- `com.vecturai.android.data.AndroidReviewedPackageLoader`
+- `com.Vectura AI.android.data.AndroidReviewedPackageLoader`
 - `kotlinx.serialization.Serializable`
 - `kotlinx.serialization.json.Json`
 
@@ -24,7 +24,7 @@ Parses and validates the Android QR entrance payload contract.
 
 ## Protocol
 - JSON object with `type`, `buildingId`, `entranceId`, and `v`.
-- Expected type: `vecturai-entrance`.
+- Expected type: `Vectura AI-entrance`.
 - Supported version: `1`.
 - Building id and entrance id must match the bundled reviewed package.
 

@@ -1,4 +1,4 @@
-package com.vecturai.android.qr
+package com.Vectura AI.android.qr
 
 import android.media.Image
 import com.google.ar.core.Frame

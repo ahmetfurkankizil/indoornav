@@ -1,11 +1,11 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
-import com.vecturai.tools.admin.db.tables.Buildings
-import com.vecturai.tools.admin.db.tables.Edges
-import com.vecturai.tools.admin.db.tables.Floors
-import com.vecturai.tools.admin.db.tables.Nodes
-import com.vecturai.tools.admin.model.EdgeResponse
-import com.vecturai.tools.admin.model.Waypoint
+import com.Vectura AI.tools.admin.db.tables.Buildings
+import com.Vectura AI.tools.admin.db.tables.Edges
+import com.Vectura AI.tools.admin.db.tables.Floors
+import com.Vectura AI.tools.admin.db.tables.Nodes
+import com.Vectura AI.tools.admin.model.EdgeResponse
+import com.Vectura AI.tools.admin.model.Waypoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString

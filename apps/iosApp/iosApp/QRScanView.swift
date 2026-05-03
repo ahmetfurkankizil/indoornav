@@ -144,7 +144,7 @@ struct QRScanView: View {
     #if targetEnvironment(simulator)
     private func simulateScan() {
         let demoPayload = """
-        {"type":"vecturai-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}
+        {"type":"Vectura AI-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}
         """
         handleScannedCode(demoPayload)
     }

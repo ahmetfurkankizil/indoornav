@@ -1,6 +1,6 @@
 # Android AR Navigation Fixes (Fix 1-7)
 
-This walkthrough covers the 7 critical fixes applied to the `VecturAI` Android AR navigation experience:
+This walkthrough covers the 7 critical fixes applied to the `Vectura AI` Android AR navigation experience:
 
 ## What Was Fixed
 
@@ -26,7 +26,7 @@ This walkthrough covers the 7 critical fixes applied to the `VecturAI` Android A
 
 ---
 
-# VecturAI Web Admin — Running Guide
+# Vectura AI Web Admin — Running Guide
 
 The system has **two servers** that must both be running:
 
@@ -47,16 +47,16 @@ You need a running PostgreSQL instance. The defaults are:
 |---|---|---|
 | Host | `localhost` | `POSTGRES_HOST` |
 | Port | `5432` | `POSTGRES_PORT` |
-| Database | `vecturai` | `POSTGRES_DB` |
-| User | `vecturai` | `POSTGRES_USER` |
-| Password | `vecturai` | `POSTGRES_PASSWORD` |
+| Database | `Vectura AI` | `POSTGRES_DB` |
+| User | `Vectura AI` | `POSTGRES_USER` |
+| Password | `Vectura AI` | `POSTGRES_PASSWORD` |
 
 ### Quick setup (one-time)
 
 ```sql
 -- Run as postgres superuser
-CREATE USER vecturai WITH PASSWORD 'vecturai';
-CREATE DATABASE vecturai OWNER vecturai;
+CREATE USER Vectura AI WITH PASSWORD 'Vectura AI';
+CREATE DATABASE Vectura AI OWNER Vectura AI;
 ```
 
 > **Note**: The Ktor server auto-creates all tables on first startup via Exposed `SchemaUtils.createMissingTablesAndColumns`. No migrations to run manually.
@@ -66,10 +66,10 @@ CREATE DATABASE vecturai OWNER vecturai;
 **For PowerShell:**
 ```powershell
 docker run -d `
-  --name vecturai-pg `
-  -e POSTGRES_USER=vecturai `
-  -e POSTGRES_PASSWORD=vecturai `
-  -e POSTGRES_DB=vecturai `
+  --name Vectura AI-pg `
+  -e POSTGRES_USER=Vectura AI `
+  -e POSTGRES_PASSWORD=Vectura AI `
+  -e POSTGRES_DB=Vectura AI `
   -p 5432:5432 `
   postgres:16
 ```
@@ -77,10 +77,10 @@ docker run -d `
 **For Command Prompt (cmd):**
 ```cmd
 docker run -d ^
-  --name vecturai-pg ^
-  -e POSTGRES_USER=vecturai ^
-  -e POSTGRES_PASSWORD=vecturai ^
-  -e POSTGRES_DB=vecturai ^
+  --name Vectura AI-pg ^
+  -e POSTGRES_USER=Vectura AI ^
+  -e POSTGRES_PASSWORD=Vectura AI ^
+  -e POSTGRES_DB=Vectura AI ^
   -p 5432:5432 ^
   postgres:16
 ```
@@ -89,7 +89,7 @@ docker run -d ^
 
 ### Step 2 — Start the Backend (Admin API)
 
-From the **project root** (`c:\Users\holym\vecturai`):
+From the **project root** (`c:\Users\holym\Vectura AI`):
 
 1. **Configure Environment**: A `.env` file has been created in `tools/admin-api/.env`. Open it and set your `DB_ADMIN_PASS` and other settings.
 2. **Run Server**:
@@ -118,7 +118,7 @@ The backend now automatically loads configuration from `tools/admin-api/.env`.
 DB_ADMIN_USER=sysadmin
 DB_ADMIN_PASS=supersecret    # MUST SET THIS
 JWT_SECRET=change-me
-POSTGRES_PASSWORD=vecturai
+POSTGRES_PASSWORD=Vectura AI
 ...
 ```
 
@@ -129,7 +129,7 @@ POSTGRES_PASSWORD=vecturai
 
 ```
 ╔══════════════════════════════════════════════╗
-║   VecturAI Admin API                         ║
+║   Vectura AI Admin API                         ║
 ╚══════════════════════════════════════════════╝
   Port:        8080
   Uploads dir: uploads

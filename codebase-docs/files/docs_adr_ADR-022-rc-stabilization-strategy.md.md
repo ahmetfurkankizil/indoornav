@@ -19,7 +19,7 @@ Authored Source for the docs component.
 
 ## Context
 
-VecturAI has evolved through 7 development phases, adding features progressively. The codebase is functional but lacks formal release processes, CI automation, and team-ready handoff documentation. A release-candidate process is needed for reliable demo deployments.
+Vectura AI has evolved through 7 development phases, adding features progressively. The codebase is functional but lacks formal release processes, CI automation, and team-ready handoff documentation. A release-candidate process is needed for reliable demo deployments.
 
 ## Decision
 

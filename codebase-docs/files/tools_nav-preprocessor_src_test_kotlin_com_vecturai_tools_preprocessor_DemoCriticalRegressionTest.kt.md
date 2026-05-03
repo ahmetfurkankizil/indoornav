@@ -1,7 +1,7 @@
 # File Dossier: DemoCriticalRegressionTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/vecturai/tools/preprocessor/DemoCriticalRegressionTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/DemoCriticalRegressionTest.kt`
 - **Type**: Kotlin Source (Integration Test)
 - **Feature**: `preprocessing`, `route_finding`, `navigation_session_management`
 - **Status**: Mapped

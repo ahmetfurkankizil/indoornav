@@ -14,7 +14,7 @@ Authored Source for the docs component.
 ```kotlin
 # First-Day Setup Guide
 
-Get VecturAI building and running in ~15 minutes.
+Get Vectura AI building and running in ~15 minutes.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Get VecturAI building and running in ~15 minutes.
 
 ```bash
 git clone <repo-url>
-cd vecturai
+cd Vectura AI
 make help           # see all available targets
 ```
 

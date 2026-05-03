@@ -1,7 +1,7 @@
-package com.vecturai.tools.admin
+package com.Vectura AI.tools.admin
 
-import com.vecturai.tools.admin.model.RoomPatchRequest
-import com.vecturai.tools.admin.service.RoomOverrideService
+import com.Vectura AI.tools.admin.model.RoomPatchRequest
+import com.Vectura AI.tools.admin.service.RoomOverrideService
 import java.io.File
 import kotlin.test.*
 

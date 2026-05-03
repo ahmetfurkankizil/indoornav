@@ -1,4 +1,4 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
 import kotlin.math.sqrt
 import kotlin.test.*

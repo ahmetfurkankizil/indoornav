@@ -1,7 +1,7 @@
-package com.vecturai.core.routing
+package com.Vectura AI.core.routing
 
-import com.vecturai.core.domain.NavGraph
-import com.vecturai.core.domain.Route
+import com.Vectura AI.core.domain.NavGraph
+import com.Vectura AI.core.domain.Route
 
 /**
  * Interface for computing navigation routes within a building.

@@ -1,8 +1,8 @@
 import os
 import json
 
-repo_root = r"c:\Users\emirh\Desktop\bitirme\vecturai"
-docs_root = r"c:\Users\emirh\Desktop\bitirme\vecturai\codebase-docs"
+repo_root = r"c:\Users\emirh\Desktop\bitirme\Vectura AI"
+docs_root = r"c:\Users\emirh\Desktop\bitirme\Vectura AI\codebase-docs"
 
 exclude_dirs = {".git", ".gradle", "build", ".kotlin", "bin"}
 
@@ -52,7 +52,7 @@ def get_reason(path, category, status):
 
 inventory = {
     "metadata": {
-        "repository": "vecturai",
+        "repository": "Vectura AI",
         "root": repo_root,
         "description": "Indoor navigation system with AR support"
     },

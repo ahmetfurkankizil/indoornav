@@ -18,7 +18,7 @@ Data Contract / Sample Data for the sample component.
     "buildingName": "Rectorate Building",
     "floorId": "1",
     "reviewStatus": "reviewed",
-    "reviewedBy": "vecturai-team",
+    "reviewedBy": "Vectura AI-team",
     "reviewedDate": "2026-04-14",
     "notes": "Main floor navigation package for Rectorate Building. 10 destinations, 1 entrance. Converted from rectorate_main_floor_navigation.json.",
     "files": {

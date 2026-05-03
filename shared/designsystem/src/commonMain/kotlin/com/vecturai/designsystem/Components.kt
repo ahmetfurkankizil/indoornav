@@ -1,4 +1,4 @@
-package com.vecturai.designsystem
+package com.Vectura AI.designsystem
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -61,15 +61,15 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-val LocalVecturaiHapticsEnabled = staticCompositionLocalOf { true }
+val LocalVectura AIHapticsEnabled = staticCompositionLocalOf { true }
 
 @Composable
-fun VecturaiHapticsGate(enabled: Boolean, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalVecturaiHapticsEnabled provides enabled, content = content)
+fun Vectura AIHapticsGate(enabled: Boolean, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalVectura AIHapticsEnabled provides enabled, content = content)
 }
 
 @Composable
-fun VecturaiPrimaryButton(
+fun Vectura AIPrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +78,7 @@ fun VecturaiPrimaryButton(
     loading: Boolean = false,
 ) {
     val haptic = LocalHapticFeedback.current
-    val hapticsEnabled = LocalVecturaiHapticsEnabled.current
+    val hapticsEnabled = LocalVectura AIHapticsEnabled.current
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by androidx.compose.animation.core.animateFloatAsState(
@@ -99,9 +99,9 @@ fun VecturaiPrimaryButton(
                 scaleY = scale
                 alpha = if (enabled) 1f else 0.5f
             }
-            .clip(VecturaiShapes.Medium),
+            .clip(Vectura AIShapes.Medium),
         enabled = enabled && !loading,
-        shape = VecturaiShapes.Medium,
+        shape = Vectura AIShapes.Medium,
         interactionSource = interactionSource,
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
@@ -114,7 +114,7 @@ fun VecturaiPrimaryButton(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(VecturaiBrush.Primary),
+                .background(Vectura AIBrush.Primary),
             contentAlignment = Alignment.Center,
         ) {
             if (loading) {
@@ -146,7 +146,7 @@ fun VecturaiPrimaryButton(
 }
 
 @Composable
-fun VecturaiSecondaryButton(
+fun Vectura AISecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -157,10 +157,10 @@ fun VecturaiSecondaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(52.dp)
-            .clip(VecturaiShapes.Medium)
-            .background(VecturaiColors.SurfaceElevated.copy(alpha = if (enabled) 0.96f else 0.55f))
-            .border(BorderStroke(1.dp, VecturaiColors.BorderStrong), VecturaiShapes.Medium)
-            .vecturaiTap(enabled = enabled, onClick = onClick)
+            .clip(Vectura AIShapes.Medium)
+            .background(Vectura AIColors.SurfaceElevated.copy(alpha = if (enabled) 0.96f else 0.55f))
+            .border(BorderStroke(1.dp, Vectura AIColors.BorderStrong), Vectura AIShapes.Medium)
+            .Vectura AITap(enabled = enabled, onClick = onClick)
             .padding(horizontal = Spacing.md),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -174,12 +174,12 @@ fun VecturaiSecondaryButton(
             )
             Spacer(Modifier.width(Spacing.xs))
         }
-        Text(text = text, color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.titleMedium)
+        Text(text = text, color = Vectura AIColors.TextSecondary, style = MaterialTheme.typography.titleMedium)
     }
 }
 
 @Composable
-fun VecturaiGhostButton(
+fun Vectura AIGhostButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -190,8 +190,8 @@ fun VecturaiGhostButton(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .clip(VecturaiShapes.Medium)
-            .vecturaiTap(enabled = enabled, onClick = onClick)
+            .clip(Vectura AIShapes.Medium)
+            .Vectura AITap(enabled = enabled, onClick = onClick)
             .padding(horizontal = Spacing.md),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -205,7 +205,7 @@ fun VecturaiGhostButton(
             )
             Spacer(Modifier.width(Spacing.xs))
         }
-        Text(text = text, color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.titleMedium)
+        Text(text = text, color = Vectura AIColors.TextSecondary, style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -220,10 +220,10 @@ fun IconChip(
     Box(
         modifier = modifier
             .size(48.dp)
-            .clip(VecturaiShapes.Medium)
-            .background(VecturaiColors.SurfaceElevated.copy(alpha = 0.94f))
-            .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle), VecturaiShapes.Medium)
-            .vecturaiTap(onClick = onClick),
+            .clip(Vectura AIShapes.Medium)
+            .background(Vectura AIColors.SurfaceElevated.copy(alpha = 0.94f))
+            .border(BorderStroke(1.dp, Vectura AIColors.BorderSubtle), Vectura AIShapes.Medium)
+            .Vectura AITap(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -236,23 +236,23 @@ fun IconChip(
 }
 
 @Composable
-fun VecturaiCard(
+fun Vectura AICard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     glass: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val tapModifier = if (onClick != null) Modifier.vecturaiTap(onClick = onClick) else Modifier
+    val tapModifier = if (onClick != null) Modifier.Vectura AITap(onClick = onClick) else Modifier
     // Compose has no native backdrop blur; a graphicsLayer BlurEffect would smear the
     // panel's own text. The "glass" variant simulates frosted glass with a translucent
     // fill and a brighter inset border so it reads against camera/AR backdrops.
-    val fill = if (glass) VecturaiColors.SurfaceCard.copy(alpha = 0.55f) else VecturaiColors.SurfaceCard.copy(alpha = 0.96f)
-    val borderColor = if (glass) VecturaiColors.BorderStrong else VecturaiColors.BorderSubtle
+    val fill = if (glass) Vectura AIColors.SurfaceCard.copy(alpha = 0.55f) else Vectura AIColors.SurfaceCard.copy(alpha = 0.96f)
+    val borderColor = if (glass) Vectura AIColors.BorderStrong else Vectura AIColors.BorderSubtle
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .then(tapModifier),
-        shape = VecturaiShapes.Large,
+        shape = Vectura AIShapes.Large,
         color = fill,
         border = BorderStroke(1.dp, borderColor),
     ) {
@@ -272,7 +272,7 @@ fun StatPill(
 ) {
     Surface(
         modifier = modifier,
-        shape = VecturaiShapes.Pill,
+        shape = Vectura AIShapes.Pill,
         color = color.copy(alpha = containerAlpha),
         border = BorderStroke(1.dp, color.copy(alpha = 0.42f)),
     ) {
@@ -280,7 +280,7 @@ fun StatPill(
             text = text,
             modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
             color = color,
-            style = VecturaiTypography.overline(),
+            style = Vectura AITypography.overline(),
             maxLines = 1,
         )
     }
@@ -296,7 +296,7 @@ fun CategoryBadge(
 }
 
 @Composable
-fun VecturaiFilterChip(
+fun Vectura AIFilterChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,
@@ -304,18 +304,18 @@ fun VecturaiFilterChip(
 ) {
     val haptic = HapticFeedbackType.TextHandleMove
     val hapticFeedback = LocalHapticFeedback.current
-    val hapticsEnabled = LocalVecturaiHapticsEnabled.current
+    val hapticsEnabled = LocalVectura AIHapticsEnabled.current
     Box(
         modifier = modifier
             .height(48.dp)
-            .clip(VecturaiShapes.Pill)
+            .clip(Vectura AIShapes.Pill)
             .then(
                 if (selected) {
-                    Modifier.background(VecturaiBrush.Primary)
+                    Modifier.background(Vectura AIBrush.Primary)
                 } else {
                     Modifier
-                        .background(VecturaiColors.SurfaceElevated)
-                        .border(BorderStroke(1.dp, VecturaiColors.BorderSubtle), VecturaiShapes.Pill)
+                        .background(Vectura AIColors.SurfaceElevated)
+                        .border(BorderStroke(1.dp, Vectura AIColors.BorderSubtle), Vectura AIShapes.Pill)
                 },
             )
     ) {
@@ -328,17 +328,17 @@ fun VecturaiFilterChip(
             label = {
                 Text(
                     text = text,
-                    color = if (selected) Color.White else VecturaiColors.TextSecondary,
+                    color = if (selected) Color.White else Vectura AIColors.TextSecondary,
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                 )
             },
             modifier = Modifier.height(48.dp),
-            shape = VecturaiShapes.Pill,
+            shape = Vectura AIShapes.Pill,
             border = FilterChipDefaults.filterChipBorder(
                 enabled = true,
                 selected = selected,
-                borderColor = VecturaiColors.BorderSubtle,
+                borderColor = Vectura AIColors.BorderSubtle,
                 selectedBorderColor = Color.Transparent,
                 borderWidth = 1.dp,
                 selectedBorderWidth = 0.dp,
@@ -346,7 +346,7 @@ fun VecturaiFilterChip(
             colors = FilterChipDefaults.filterChipColors(
                 containerColor = Color.Transparent,
                 selectedContainerColor = Color.Transparent,
-                labelColor = VecturaiColors.TextSecondary,
+                labelColor = Vectura AIColors.TextSecondary,
                 selectedLabelColor = Color.White,
             ),
         )
@@ -365,14 +365,14 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
-            color = VecturaiColors.TextMuted,
-            style = VecturaiTypography.overline(),
+            color = Vectura AIColors.TextMuted,
+            style = Vectura AITypography.overline(),
         )
         if (trailing != null) {
             Spacer(Modifier.weight(1f))
             Text(
                 text = trailing,
-                color = VecturaiColors.TextDisabled,
+                color = Vectura AIColors.TextDisabled,
                 style = MaterialTheme.typography.labelMedium,
             )
         }
@@ -393,7 +393,7 @@ fun AuroraBackground(
         label = "auroraPhase",
     )
     Canvas(modifier = modifier.fillMaxSize()) {
-        drawRect(VecturaiColors.SurfaceCanvas)
+        drawRect(Vectura AIColors.SurfaceCanvas)
         val motion = intensity.coerceIn(0f, 1f)
         val p = phase * 2f * PI.toFloat()
         val cyanCenter = Offset(
@@ -406,14 +406,14 @@ fun AuroraBackground(
         )
         drawRect(
             brush = Brush.radialGradient(
-                colors = listOf(VecturaiColors.AccentCyan.copy(alpha = 0.16f), Color.Transparent),
+                colors = listOf(Vectura AIColors.AccentCyan.copy(alpha = 0.16f), Color.Transparent),
                 center = cyanCenter,
                 radius = size.minDimension * 0.7f,
             ),
         )
         drawRect(
             brush = Brush.radialGradient(
-                colors = listOf(VecturaiColors.Primary.copy(alpha = 0.16f), Color.Transparent),
+                colors = listOf(Vectura AIColors.Primary.copy(alpha = 0.16f), Color.Transparent),
                 center = blueCenter,
                 radius = size.minDimension * 0.75f,
             ),
@@ -426,7 +426,7 @@ fun AuroraBackground(
                 var y = 14.dp.toPx()
                 while (y < size.height) {
                     drawCircle(
-                        color = VecturaiColors.BorderStrong.copy(alpha = 0.34f),
+                        color = Vectura AIColors.BorderStrong.copy(alpha = 0.34f),
                         radius = radius,
                         center = Offset(x, y),
                     )
@@ -438,22 +438,22 @@ fun AuroraBackground(
         drawRect(
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    VecturaiColors.SurfaceCanvas.copy(alpha = 0.74f),
+                    Vectura AIColors.SurfaceCanvas.copy(alpha = 0.74f),
                     Color.Transparent,
-                    VecturaiColors.SurfaceCanvas.copy(alpha = 0.88f),
+                    Vectura AIColors.SurfaceCanvas.copy(alpha = 0.88f),
                 ),
             ),
         )
     }
 }
 
-fun Modifier.vecturaiTap(
+fun Modifier.Vectura AITap(
     enabled: Boolean = true,
     haptic: HapticFeedbackType = HapticFeedbackType.LongPress,
     onClick: () -> Unit,
 ): Modifier = composed {
     val hapticFeedback = LocalHapticFeedback.current
-    val hapticsEnabled = LocalVecturaiHapticsEnabled.current
+    val hapticsEnabled = LocalVectura AIHapticsEnabled.current
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by androidx.compose.animation.core.animateFloatAsState(
@@ -479,7 +479,7 @@ fun Modifier.vecturaiTap(
 fun AnimatedNumber(
     value: Int,
     modifier: Modifier = Modifier,
-    style: TextStyle = VecturaiTypography.numericLarge(),
+    style: TextStyle = Vectura AITypography.numericLarge(),
     color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     val animated by animateIntAsState(
@@ -501,7 +501,7 @@ fun AnimatedGradientNumber(
     value: Int,
     suffix: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = VecturaiTypography.numericDisplay(),
+    style: TextStyle = Vectura AITypography.numericDisplay(),
     textAlign: TextAlign? = null,
 ) {
     val animated by animateIntAsState(
@@ -527,20 +527,20 @@ fun GradientText(
     Text(
         text = text,
         modifier = modifier,
-        style = style.copy(brush = VecturaiBrush.Primary),
+        style = style.copy(brush = Vectura AIBrush.Primary),
         textAlign = textAlign,
     )
 }
 
 @Composable
-fun VecturaiButton(
+fun Vectura AIButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: ImageVector? = null,
 ) {
-    VecturaiPrimaryButton(
+    Vectura AIPrimaryButton(
         text = text,
         onClick = onClick,
         modifier = modifier,
@@ -550,7 +550,7 @@ fun VecturaiButton(
 }
 
 @Composable
-fun VecturaiEmptyState(
+fun Vectura AIEmptyState(
     icon: ImageVector,
     title: String,
     description: String,
@@ -587,7 +587,7 @@ fun VecturaiEmptyState(
 }
 
 @Composable
-fun VecturaiSectionHeader(
+fun Vectura AISectionHeader(
     title: String,
     modifier: Modifier = Modifier,
 ) {

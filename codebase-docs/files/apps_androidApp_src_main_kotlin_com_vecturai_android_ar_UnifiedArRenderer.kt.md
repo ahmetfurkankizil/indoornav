@@ -1,7 +1,7 @@
 # File Dossier: UnifiedArRenderer.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ar/UnifiedArRenderer.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt`
 
 ## Type
 Authored Source (ARCore Camera Rendering)

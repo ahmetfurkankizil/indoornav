@@ -1,6 +1,6 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.model.*
+import com.Vectura AI.tools.preprocessor.model.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlin.math.sqrt

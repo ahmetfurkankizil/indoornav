@@ -1,6 +1,6 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.model.AuthoringConfig
+import com.Vectura AI.tools.preprocessor.model.AuthoringConfig
 
 /**
  * Validates the navigation graph for structural integrity.

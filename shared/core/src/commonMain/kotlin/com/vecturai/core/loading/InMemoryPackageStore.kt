@@ -1,6 +1,6 @@
-package com.vecturai.core.loading
+package com.Vectura AI.core.loading
 
-import com.vecturai.core.domain.BuildingPackage
+import com.Vectura AI.core.domain.BuildingPackage
 
 /**
  * Simple in-memory store for loaded building packages.

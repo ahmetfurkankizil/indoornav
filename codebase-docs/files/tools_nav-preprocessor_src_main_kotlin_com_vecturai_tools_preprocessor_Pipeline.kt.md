@@ -1,7 +1,7 @@
 # File Dossier: Pipeline.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/vecturai/tools/preprocessor/Pipeline.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/Pipeline.kt`
 - **Type**: Kotlin Source (Orchestrator)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

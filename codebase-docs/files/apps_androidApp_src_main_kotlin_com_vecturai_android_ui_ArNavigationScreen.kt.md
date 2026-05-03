@@ -1,7 +1,7 @@
 # File Dossier: ArNavigationScreen.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt`
+`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt`
 
 ## Type
 Authored Source (Android Compose AR Overlay)

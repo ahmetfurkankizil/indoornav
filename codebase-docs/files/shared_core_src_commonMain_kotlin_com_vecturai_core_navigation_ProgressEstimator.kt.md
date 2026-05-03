@@ -1,12 +1,12 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ProgressEstimator.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/ProgressEstimator.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/vecturai/core/navigation/ProgressEstimator.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/ProgressEstimator.kt`
 - **Type**: source
 - **Role**: Calculates the user's progress along a route by projecting their 3D position onto the route polyline.
 - **Imports / Includes**:
-    - `com.vecturai.core.ar.AlignmentTransform`
-    - `com.vecturai.core.ar.CameraPose`
-    - `com.vecturai.core.ar.ProgressUpdate`
+    - `com.Vectura AI.core.ar.AlignmentTransform`
+    - `com.Vectura AI.core.ar.CameraPose`
+    - `com.Vectura AI.core.ar.ProgressUpdate`
 - **Exports / Public Surface**:
     - `ProgressEstimator` class
     - `configure(waypoints, alignment)`

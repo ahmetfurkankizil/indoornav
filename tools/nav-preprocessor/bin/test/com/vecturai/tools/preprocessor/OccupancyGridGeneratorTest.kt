@@ -1,7 +1,7 @@
-package com.vecturai.tools.preprocessor
+package com.Vectura AI.tools.preprocessor
 
-import com.vecturai.tools.preprocessor.analysis.OccupancyGridGenerator
-import com.vecturai.tools.preprocessor.glb.Vec3
+import com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator
+import com.Vectura AI.tools.preprocessor.glb.Vec3
 import kotlin.test.*
 
 /**

@@ -1,9 +1,9 @@
-package com.vecturai.feature.preview
+package com.Vectura AI.feature.preview
 
-import com.vecturai.core.domain.Room
-import com.vecturai.core.domain.Route
-import com.vecturai.core.repository.BuildingRepository
-import com.vecturai.core.routing.RouteEngine
+import com.Vectura AI.core.domain.Room
+import com.Vectura AI.core.domain.Route
+import com.Vectura AI.core.repository.BuildingRepository
+import com.Vectura AI.core.routing.RouteEngine
 
 /**
  * Use case for previewing a route before starting AR navigation.

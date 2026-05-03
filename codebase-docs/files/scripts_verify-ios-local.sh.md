@@ -14,7 +14,7 @@ Authored Source for the scripts component.
 ```kotlin
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────
-# VecturAI — iOS Local Build Verification
+# Vectura AI — iOS Local Build Verification
 # Requires Xcode and macOS.
 # ─────────────────────────────────────────────────
 set -euo pipefail

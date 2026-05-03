@@ -1,7 +1,7 @@
-package com.vecturai.data.local.di
+package com.Vectura AI.data.local.di
 
-import com.vecturai.data.local.LocalCacheDataSource
-import com.vecturai.data.local.SqlDelightCacheDataSource
+import com.Vectura AI.data.local.LocalCacheDataSource
+import com.Vectura AI.data.local.SqlDelightCacheDataSource
 import org.koin.dsl.module
 
 val dataLocalModule = module {

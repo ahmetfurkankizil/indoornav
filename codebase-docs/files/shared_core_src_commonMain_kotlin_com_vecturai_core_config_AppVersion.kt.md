@@ -1,7 +1,7 @@
 # File Dossier: AppVersion.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\vecturai\core\config\AppVersion.kt`
+`shared\core\src\commonMain\kotlin\com\Vectura AI\core\config\AppVersion.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.vecturai.core.config
+package com.Vectura AI.core.config
 
 /**
  * App version and build metadata.
@@ -21,7 +21,7 @@ package com.vecturai.core.config
  * Update this file when cutting a release or RC.
  */
 object AppVersion {
-    const val NAME = "VecturAI"
+    const val NAME = "Vectura AI"
     const val VERSION = "1.7.0-rc1"
     const val BUILD_PHASE = "Phase 8 — RC"
     const val BUILD_DATE = "2026-03-10"

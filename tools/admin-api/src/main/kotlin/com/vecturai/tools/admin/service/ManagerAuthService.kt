@@ -1,10 +1,10 @@
-package com.vecturai.tools.admin.service
+package com.Vectura AI.tools.admin.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.vecturai.tools.admin.db.tables.Managers
-import com.vecturai.tools.admin.model.AuthResponse
-import com.vecturai.tools.admin.model.ManagerResponse
+import com.Vectura AI.tools.admin.db.tables.Managers
+import com.Vectura AI.tools.admin.model.AuthResponse
+import com.Vectura AI.tools.admin.model.ManagerResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.insertAndGetId

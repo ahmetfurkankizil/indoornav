@@ -4,14 +4,14 @@ import { useAuthStore, useDbAdminStore } from '../stores/authStore'
 interface Props { children: React.ReactNode }
 
 export function Layout({ children }: Props) {
-  const manager   = useAuthStore((s) => s.manager)
+  const manager = useAuthStore((s) => s.manager)
   const clearAuth = useAuthStore((s) => s.clearAuth)
-  const navigate  = useNavigate()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <Link to="/dashboard" className="text-xl font-bold text-blue-600">VecturAI</Link>
+        <Link to="/dashboard" className="text-xl font-bold text-blue-600">Vectura AI</Link>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">{manager?.email}</span>
           <button
@@ -29,17 +29,17 @@ export function Layout({ children }: Props) {
 
 export function DbAdminLayout({ children }: Props) {
   const clearToken = useDbAdminStore((s) => s.clearToken)
-  const navigate   = useNavigate()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <span className="text-lg font-bold text-red-400">VecturAI DB Admin</span>
+          <span className="text-lg font-bold text-red-400">Vectura AI DB Admin</span>
           <nav className="flex gap-4 text-sm">
-            <Link to="/db-admin"              className="hover:text-white">Dashboard</Link>
-            <Link to="/db-admin/managers"     className="hover:text-white">Managers</Link>
-            <Link to="/db-admin/buildings"    className="hover:text-white">Buildings</Link>
+            <Link to="/db-admin" className="hover:text-white">Dashboard</Link>
+            <Link to="/db-admin/managers" className="hover:text-white">Managers</Link>
+            <Link to="/db-admin/buildings" className="hover:text-white">Buildings</Link>
             <Link to="/db-admin/nav-packages" className="hover:text-white">Nav Packages</Link>
           </nav>
         </div>
