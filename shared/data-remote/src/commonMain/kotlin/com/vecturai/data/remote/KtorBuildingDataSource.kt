@@ -2,24 +2,17 @@ package com.vecturai.data.remote
 
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 /**
  * Ktor-based implementation of [RemoteBuildingDataSource].
- *
- * Uses Ktor's multiplatform HTTP client for network requests.
- * The actual HTTP engine is provided platform-specifically:
- * - Android: OkHttp
- * - iOS: Darwin (URLSession)
- *
- * TODO: Configure base URL from app configuration
- * TODO: Implement actual API calls
- * TODO: Add proper error handling and retry logic
- * TODO: Support request caching headers (ETag, If-None-Match)
  */
 class KtorBuildingDataSource(
-    private val baseUrl: String = "https://api.vecturai.com/v1",
+    private val baseUrl: String = "http://localhost:8080",
 ) : RemoteBuildingDataSource {
 
     private val httpClient = HttpClient {
@@ -30,29 +23,29 @@ class KtorBuildingDataSource(
                 prettyPrint = false
             })
         }
-        // TODO: Add logging plugin for debugging
-        // TODO: Add auth plugin if needed
-        // TODO: Configure timeouts
     }
 
-    override suspend fun fetchManifest(buildingId: String): String? {
-        // TODO: GET $baseUrl/buildings/$buildingId/manifest.json
-        return null
-    }
+    override suspend fun fetchManifest(buildingId: String): String? = null
+    override suspend fun fetchBuildingData(buildingId: String, fileName: String): String? = null
+    override suspend fun fetchBuildingPackage(buildingId: String): Map<String, String>? = null
+    override suspend fun getLatestVersion(buildingId: String): Int = -1
 
-    override suspend fun fetchBuildingData(buildingId: String, fileName: String): String? {
-        // TODO: GET $baseUrl/buildings/$buildingId/data/$fileName
-        return null
-    }
-
-    override suspend fun fetchBuildingPackage(buildingId: String): Map<String, String>? {
-        // TODO: GET $baseUrl/buildings/$buildingId/package
-        // Parse response into map of filename → content
-        return null
-    }
-
-    override suspend fun getLatestVersion(buildingId: String): Int {
-        // TODO: GET $baseUrl/buildings/$buildingId/version
-        return -1
+    override suspend fun fetchBuildingPackageByToken(token: String): String? {
+        val url = "$baseUrl/mobile/buildings/$token/nav-package"
+        println("VECTURAI_DEBUG: Requesting URL: $url")
+        return try {
+            val response = httpClient.get(url)
+            println("VECTURAI_DEBUG: Status: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                response.bodyAsText()
+            } else {
+                println("VECTURAI_DEBUG: Failed with status ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("VECTURAI_DEBUG: Network Error: ${e.message}")
+            e.printStackTrace()
+            null
+        }
     }
 }

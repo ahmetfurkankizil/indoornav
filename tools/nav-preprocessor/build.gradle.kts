@@ -4,6 +4,10 @@ plugins {
     application
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 application {
     mainClass.set("com.vecturai.tools.preprocessor.MainKt")
 }
