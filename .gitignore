@@ -49,5 +49,6 @@ output/
 
 node_modules/
 android/node_modules/
+apps/manager-web/node_modules/
 .env
 **/.env
