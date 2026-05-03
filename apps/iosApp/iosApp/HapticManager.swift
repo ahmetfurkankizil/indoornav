@@ -23,23 +23,27 @@ final class HapticManager {
     func routeStarted() {
         guard isEnabled else { return }
         mediumImpact.impactOccurred()
+        WatchNavigationBridge.shared.sendHaptic(.routeStarted)
     }
 
     /// Warning notification when the user is within ~2 m of a turn.
     func turnImminent() {
         guard isEnabled else { return }
         notification.notificationOccurred(.warning)
+        WatchNavigationBridge.shared.sendHaptic(.turnImminent)
     }
 
     /// Light impact when tracking degrades and the system is re-centering.
     func recentering() {
         guard isEnabled else { return }
         lightImpact.impactOccurred()
+        WatchNavigationBridge.shared.sendHaptic(.recentering)
     }
 
     /// Success notification when the user arrives at the destination.
     func arrived() {
         guard isEnabled else { return }
         notification.notificationOccurred(.success)
+        WatchNavigationBridge.shared.sendHaptic(.arrived)
     }
 }

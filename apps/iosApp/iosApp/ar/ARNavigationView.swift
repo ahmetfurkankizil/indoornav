@@ -52,9 +52,17 @@ struct ARNavigationView: View {
             }
         }
         .onAppear {
+            WatchNavigationBridge.shared.configureIfNeeded()
+            WatchNavigationBridge.shared.onEndRouteRequested = {
+                viewModel.endNavigation()
+                isPresented = false
+            }
             // configure + startSession are called from ARViewContainer.makeUIView
             // to guarantee arView is non-nil. onAppear can fire before makeUIView
             // in some SwiftUI layout scenarios, causing a black screen.
+        }
+        .onDisappear {
+            WatchNavigationBridge.shared.onEndRouteRequested = nil
         }
     }
 
@@ -738,6 +746,7 @@ class ARNavigationViewModel: ObservableObject {
             lookaheadDistanceMeters: renderConfig.lookaheadDistanceMeters,
             arrowHeightOffsetMeters: renderConfig.arrowHeightOffsetMeters
         )
+        sendWatchState(force: true)
     }
 
     func setupARView(_ arView: ARView) {
@@ -1004,6 +1013,7 @@ class ARNavigationViewModel: ObservableObject {
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
         updateNextAction()
+        sendWatchState(force: true)
 
         print("[ARNav] Markerless alignment locked — route starts \(startDistanceInFrontOfCamera)m ahead, guidance height: \(markerlessGuidanceHeight)m, first segment rotation: \(alignmentRotYDeg)°")
         startPoseUpdates()
@@ -1044,6 +1054,7 @@ class ARNavigationViewModel: ObservableObject {
 
         updateNextAction()
         checkArrival(distToDest: distanceToDestination)
+        sendWatchState()
     }
 
     // MARK: - Next-Action Guidance (Phase 11)
@@ -1097,6 +1108,8 @@ class ARNavigationViewModel: ObservableObject {
             nextActionText = "You're almost there"
             stateColor = .green
         }
+
+        sendWatchState()
     }
 
     func endNavigation() {
@@ -1110,6 +1123,7 @@ class ARNavigationViewModel: ObservableObject {
         }
         sessionStateLabel = "Ended"
         stateColor = .gray
+        WatchNavigationBridge.shared.endNavigation()
     }
 
     // MARK: - Marker Detection → Alignment Lock
@@ -1154,6 +1168,8 @@ class ARNavigationViewModel: ObservableObject {
         routeRenderer.placeAllArrows(in: arView, arrows: pkg.arrows)
         routeRenderer.updateVisibility(userCumulativeDistance: userCumulativeDistance)
         arrowCount = routeRenderer.renderedArrowCount
+        updateNextAction()
+        sendWatchState(force: true)
 
         print("[ARNav] Alignment locked — offset: (\(alignmentOffsetX), \(alignmentOffsetY), \(alignmentOffsetZ)), rotation: \(alignmentRotYDeg)°")
 
@@ -1252,6 +1268,7 @@ class ARNavigationViewModel: ObservableObject {
             self.updateNextAction()
 
             self.checkArrival(distToDest: destDist)
+            self.sendWatchState()
         }
     }
 
@@ -1282,10 +1299,29 @@ class ARNavigationViewModel: ObservableObject {
         stateColor = .green
         currentInstruction = "You've reached \(destinationLabel)"
         HapticManager.shared.arrived()
+        sendWatchState(force: true)
 
         // Hide all guidance arrows on arrival
         routeRenderer.hideAllArrows()
         arrowCount = 0
+    }
+
+    private func sendWatchState(force: Bool = false) {
+        let eta = remainingDistance > 0 ? remainingDistance / 1.2 : 0
+        let payload = WatchNavigationPayload(
+            isActive: isAligned && !hasArrived,
+            hasArrived: hasArrived,
+            destinationName: destinationLabel,
+            nextActionText: hasArrived ? "You've arrived" : nextActionText,
+            nextActionIcon: hasArrived ? "checkmark.circle.fill" : nextActionIcon,
+            nextActionDistanceMeters: hasArrived ? nil : nextActionDistance,
+            remainingDistanceMeters: max(0, remainingDistance),
+            etaSeconds: eta,
+            progress: progress,
+            trackingStatus: trackingStatusLabel,
+            isLowConfidence: isLowConfidence
+        )
+        WatchNavigationBridge.shared.sendNavigationState(payload, force: force)
     }
 }
 
