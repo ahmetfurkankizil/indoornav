@@ -18,7 +18,7 @@ import kotlinx.serialization.json.*
 
 class AiEdgeSuggester {
     private val ollamaBaseUrl = Env.get("OLLAMA_BASE_URL", "http://localhost:11434")
-    private val model = Env.get("OLLAMA_MODEL", "gpt-oss:latest")
+    private val model = Env.get("OLLAMA_MODEL", "llava:latest")
 
     private val json = Json { 
         ignoreUnknownKeys = true 
@@ -198,8 +198,11 @@ class AiEdgeSuggester {
                 // Actually, let's just use regex for better accuracy
                 l = l.replace(Regex("\"canvas_x\":"), "\"canvasX\":")
                 l = l.replace(Regex("\"canvas_y\":"), "\"canvasY\":")
-                l = l.replace(Regex("\"x\":"), "\"canvasX\":")
-                l = l.replace(Regex("\"y\":"), "\"canvasY\":")
+                // Only replace x/y if it's clearly a node definition (has label or nodeType)
+                // This prevents breaking Waypoints which MUST use x/y
+                if (l.contains("\"nodeType\"") || l.contains("\"label\"")) {
+                    l = l.replace("\"x\":", "\"canvasX\":").replace("\"y\":", "\"canvasY\":")
+                }
                 
                 // Map connections/Nodes/Edges to correct keys
                 l = l.replace("\"Nodes\":", "\"nodes\":")
@@ -207,20 +210,6 @@ class AiEdgeSuggester {
                 l = l.replace("\"connections\":", "\"edges\":")
                 l
             }
-            
-            // Final check: if waypoints were broken by x/y replacement, fix them back
-            // (Wait, Waypoints use x/y, so if we replaced all x/y, we might have broken them)
-            // But SuggestedEdge waypoints are usually empty in AI suggest.
-            // If they are not empty, they should be x/y.
-            // Our replacement above is global, so it BROKE waypoints. Let's fix them back.
-            val fixedJson = resilientJson.replace("\"canvasX\":", "\"x\":").replace("\"canvasY\":", "\"y\":")
-                // ... wait, this would revert nodes too. 
-                // Better approach: only replace x/y if the line DOES NOT contain fromNodeId or toNodeId or waypoints
-                // but waypoints are on different lines often.
-                
-            // Let's use a simpler fix: if we find "canvasX" and "canvasY" inside a "waypoints" array, we revert it.
-            // This is getting complex. Let's just use the fact that AI suggests usually have empty waypoints.
-            // If they have them, we'll try to handle it.
             
             val result = json.decodeFromString<AiSuggestResponse>(resilientJson)
             println("AI Suggest: Parsed ${result.edges.size} edges and ${result.nodes.size} nodes")
