@@ -4,6 +4,51 @@
 
 VecturAI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
 
+## Phase 12 — Android UI Polish (2026-05-03)
+
+### What Changed
+
+Phase 12 brings the Android visitor flow to visual and motion parity with the iOS Phase 11 polish while keeping the existing ARCore ownership model intact.
+
+1. **Design-system foundation**: Shared dark visitor tokens, gradient brush, spacing, shape scale, Inter font resource, numeric/overline text styles, and reusable buttons, cards, chips, badges, section headers, aurora background, gradient text, animated numbers, and tap motion.
+2. **Home and flow polish**: Android Home now uses the aurora background, custom VecturAI mark, gradient wordmark, rotating feature pills, gradient CTA, demo-building status row, and animated admin gear.
+3. **Destination and route screens**: Destination selection uses larger filter chips, grouped room sections, recent destination carousel, left-edge category accents, animated walk-time pills, and stronger empty/skeleton states. Route preview adds a gradient ETA hero, mini route strip, vertical timeline, and polished CTA.
+4. **QR and entrance polish**: QR scan shows the live ARCore camera underlay with vignette, animated scan reticle, glass-style status card, haptic error/success handling, and the entrance confirmation screen uses an animated check plus progress strip.
+5. **AR overlay polish**: Alignment uses radar sweep, marker counters, and mini illustration. Active navigation uses a glass guidance banner, urgency treatment, compass strip, progress arc, tracking badge, and swipe-to-end route. Arrival adds animated success, confetti, count-up stats, and "Navigate somewhere else".
+6. **Haptics and accessibility**: `AndroidHapticManager` now exposes global haptic gating and interaction tiers. Custom clickables use role-aware tap behavior, touch targets are raised to 48dp, and low-contrast muted text is replaced by AA-friendly tokens.
+7. **ADR-034**: Documents Android visual polish parity decisions and constraints.
+
+### New Files
+
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/MotionUtils.kt` — reduce-motion and battery-saver helpers
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Spacing.kt` — shared spacing scale
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Shapes.kt` — shared shape scale
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/ComponentGalleryPreview.kt` — component gallery composable
+- `shared/designsystem/src/commonMain/composeResources/font/inter_variable.ttf` — Inter variable font
+- `docs/adr/ADR-034-android-visual-polish-parity.md`
+
+### Modified Files
+
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/AndroidNavigationApp.kt` — Home, destination, route preview, entrance confirmation, errors
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/QRScanScreen.kt` — transparent camera underlay, animated reticle, status/error panel
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ui/ArNavigationScreen.kt` — alignment, active guidance, bottom HUD, arrival, AR errors
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArCameraActivity.kt` — animated phase transitions and "navigate somewhere else"
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidArNavigationViewModel.kt` — marker counters and compass bearing state
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/ArMarkerDetector.kt` — frames-analyzed counter
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/ar/AndroidHapticManager.kt` — interaction haptic tiers and global enable gate
+- `apps/androidApp/src/main/kotlin/com/vecturai/android/navigation/AndroidNavigationFlowModel.kt` — QR success/error haptics
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Color.kt`
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Theme.kt`
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Typography.kt`
+- `shared/designsystem/src/commonMain/kotlin/com/vecturai/designsystem/Components.kt`
+
+### Verification
+
+1. `:shared:designsystem:build` passes with the local JDK 21 runtime.
+2. `:apps:androidApp:assembleDebug` passes with the local JDK 21 runtime.
+3. Static UI checks for `Color(0xFF`, `fontSize =`, and `fontWeight = FontWeight` are near-empty; remaining color literals are category accent colors.
+4. Device-only checks remain required for ARCore camera, marker detection, haptics, and performance.
+
 ## Phase 11 — Client-Facing Polish (2026-04-13)
 
 ### What Changed

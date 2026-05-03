@@ -10,30 +10,31 @@
     - Android app UI
     - iOS app UI (via Compose integration)
 - **Main Flow**:
-    1. UI code uses `VecturaiTheme` as the root wrapper.
-    2. Components like `VecturaiButton`, `VecturaiCard`, and `VecturaiSectionHeader` are used to build screens.
-    3. Navigation is orchestrated by `AppNavigation` within the `designsystem` module.
-    4. Android's modernized visitor flow now uses app-local Compose screens to mirror iOS Phase 11 polish for home, destination selection, route preview, QR scan, and AR overlays.
+    1. UI code uses `VecturaiTheme` as the root wrapper, defaulting to a dark visitor flow.
+    2. Shared tokens (`VecturaiColors.SurfaceCanvas`, `Spacing.md`, `VecturaiShapes.Medium`) provide the visual foundation.
+    3. Polished components (`VecturaiPrimaryButton`, `VecturaiCard`, `AuroraBackground`) are used to build immersive screens.
+    4. Android-specific `MotionUtils` and `AndroidHapticManager` provide platform-appropriate animations and tactile feedback.
 - **Key Symbols**:
-    - `VecturaiTheme`
-    - `VecturaiColors`
-    - `VecturaiTypography`
-    - `VecturaiAppContent`
-    - `AndroidNavigationApp`
-    - `GradientPrimaryButton`
-    - `ArNavigationScreen`
+    - `VecturaiTheme` / `VecturaiColors` / `VecturaiTypography` / `VecturaiShapes` / `Spacing`
+    - `AuroraBackground`: Animated backdrop with radial gradients and dot grid.
+    - `VecturaiPrimaryButton`: CTA button with brand gradient and haptic integration.
+    - `GradientText` / `AnimatedNumber`: Typographic enhancements for premium feel.
+    - `Modifier.vecturaiTap()`: Centralized tap behavior (scale + haptics).
 - **Config / Env / Flags**:
     - `darkTheme`: Boolean flag for theme switching.
+    - `reduceMotion`: Detected via `Settings.Global.TRANSITION_ANIMATION_SCALE` to gate heavy animations.
 - **Data Structures / Protocols**:
-    - Material 3 Color Schemes.
+    - Material 3 dark/light color schemes.
+    - `VecturaiHapticsGate`: Context-based toggle for haptic feedback.
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [Theme.kt](../files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Theme.kt.md)
     - [Color.kt](../files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Color.kt.md)
+    - [Shapes.kt](../files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Shapes.kt.md)
+    - [Spacing.kt](../files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Spacing.kt.md)
     - [Components.kt](../files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Components.kt.md)
-    - [AndroidNavigationApp.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_AndroidNavigationApp.kt.md)
-    - [ArNavigationScreen.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md)
+    - [MotionUtils.kt](../files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_MotionUtils.kt.md)
 - **Risks / Notes**:
-    - The design system module also hosts the common screen implementations, making it a "Feature UI" module as well as a "Design System" module.
-    - Android AR overlay is now Compose-based over an ARCore `GLSurfaceView`; iOS AR remains SwiftUI/ARKit.
+    - **Platform Parity**: The Android UI is now visually synchronized with the iOS Phase 11 polish, using Inter font and glassmorphic overlays.
+    - **Accessibility**: All components target a minimum 48dp touch area and support system reduce-motion settings.
+    - **Performance**: `AuroraBackground` intensity is automatically throttled in battery saver mode to conserve power.

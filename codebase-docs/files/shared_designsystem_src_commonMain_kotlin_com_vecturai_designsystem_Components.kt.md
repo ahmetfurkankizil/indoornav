@@ -6,23 +6,36 @@
 - **Imports / Includes**:
     - `androidx.compose.material3.*`
 - **Exports / Public Surface**:
-    - `VecturaiButton`
+    - `VecturaiPrimaryButton`
+    - `VecturaiSecondaryButton`
+    - `VecturaiGhostButton`
+    - `IconChip`
     - `VecturaiCard`
-    - `VecturaiEmptyState`
-    - `VecturaiSectionHeader`
+    - `StatPill`
+    - `CategoryBadge`
+    - `VecturaiFilterChip`
+    - `SectionHeader`
+    - `AuroraBackground`
+    - `AnimatedNumber`
+    - `GradientText`
+    - `Modifier.vecturaiTap()`
 - **Main Symbols**:
-    - `VecturaiButton`: composable
-    - `VecturaiCard`: composable
+    - `VecturaiPrimaryButton`: Main CTA button with gradient background and haptic feedback.
+    - `AuroraBackground`: Complex animated background with radial gradients and dot grid.
+    - `vecturaiTap`: Modifier for consistent tap behavior (scale + haptic).
 - **Important Logic by Line Range**:
-    - `21-50`: `VecturaiButton`; custom button with 14dp rounded corners and integrated icon support.
-    - `56-93`: `VecturaiCard`; card component with consistent padding, elevation, and 16dp rounded corners.
-    - `99-133`: `VecturaiEmptyState`; helper for showing "no results" or "loading" placeholders.
+    - `72-146`: `VecturaiPrimaryButton`; uses `VecturaiBrush.Primary` and `interactionSource` for scale animation.
+    - `213-236`: `IconChip`; 48dp touch target back/action button.
+    - `299-354`: `VecturaiFilterChip`; custom selection state with gradient background.
+    - `383-448`: `AuroraBackground`; uses `infiniteRepeatable` for drifting gradients and `Canvas` for dot grid.
+    - `450-476`: `Modifier.vecturaiTap`; centralizes haptic and scale-down effect.
 - **Uses**:
-    - Compose Material 3
+    - `VecturaiColors`, `VecturaiShapes`, `Spacing`, `VecturaiBrush`
 - **Used By**:
-    - All screens (`HomeScreen`, `SearchScreen`, etc.)
+    - `AndroidNavigationApp.kt`, `ArNavigationScreen.kt`, `QRScanScreen.kt`
 - **Config / Constants / Protocol Details**:
-    - Uses hardcoded DP values for corner radii to ensure consistency across the app.
+    - Uses `LocalVecturaiHapticsEnabled` to gate haptic feedback.
+    - Standard touch target size is 48dp.
 - **Related Tests**: N/A
 - **Notes / Risks**:
     - Component density is optimized for mobile touch targets (e.g., 52dp button height).

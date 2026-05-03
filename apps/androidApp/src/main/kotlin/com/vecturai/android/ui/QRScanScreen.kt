@@ -1,10 +1,20 @@
 package com.vecturai.android.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,15 +29,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,14 +45,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vecturai.android.navigation.ArCameraFlowViewModel
+import com.vecturai.designsystem.IconChip
+import com.vecturai.designsystem.Spacing
+import com.vecturai.designsystem.VecturaiBrush
+import com.vecturai.designsystem.VecturaiCard
+import com.vecturai.designsystem.VecturaiColors
+import com.vecturai.designsystem.VecturaiPrimaryButton
+import com.vecturai.designsystem.VecturaiSecondaryButton
+import com.vecturai.designsystem.VecturaiShapes
 
 @Composable
 fun QRScanScreen(
@@ -55,14 +70,12 @@ fun QRScanScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
+            .background(Color.Transparent),
     ) {
-        ScanDotBackground()
+        ScanVignette()
         QRScanChrome(
             flowModel = flowModel,
-            onRetry = {
-                flowModel.clearQRError()
-            },
+            onRetry = flowModel::clearQRError,
             onCancel = onCancel,
             onSimulateScan = onSimulateScan,
         )
@@ -77,192 +90,289 @@ private fun QRScanChrome(
     onSimulateScan: (() -> Unit)?,
 ) {
     val error by flowModel.qrError.collectAsState()
+    val detected by flowModel.qrDetected.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 22.dp, vertical = 14.dp),
+            .padding(horizontal = Spacing.xl, vertical = Spacing.md),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(13.dp))
-                    .background(Color(0xFF121A28))
-                    .border(1.dp, Color(0xFF24334A), RoundedCornerShape(13.dp))
-                    .clickable(role = Role.Button, onClick = onCancel),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color(0xFF168BFF),
-                    modifier = Modifier.size(21.dp),
-                )
-            }
-            Spacer(Modifier.width(12.dp))
+            IconChip(
+                icon = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                onClick = onCancel,
+            )
+            Spacer(Modifier.width(Spacing.sm))
             Column(Modifier.weight(1f)) {
                 Text(
                     "Scanning...",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    lineHeight = 24.sp,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.headlineMedium,
                 )
                 Text(
                     "Find the entrance poster",
-                    color = Color(0xFF7F8A9D),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
 
         Spacer(Modifier.weight(1f))
 
-        Box(
+        AnimatedScanReticle(
+            hasError = error != null,
+            hasDetected = detected,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .size(240.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .background(Color(0xFF071C33).copy(alpha = 0.48f))
-                .border(2.dp, Color(0xFF168BFF), RoundedCornerShape(28.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(184.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .border(1.dp, Color(0xFF2C96FF).copy(alpha = 0.5f), RoundedCornerShape(24.dp)),
-            )
-            Icon(
-                Icons.Default.QrCodeScanner,
-                contentDescription = null,
-                tint = Color(0xFF168BFF),
-                modifier = Modifier.size(64.dp),
-            )
-        }
+                .size(252.dp),
+        )
 
         Spacer(Modifier.weight(1f))
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                if (error == null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(28.dp),
-                            strokeWidth = 3.dp,
-                            color = Color(0xFF168BFF),
-                        )
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Looking for entrance code",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                "Point your camera at the entrance poster",
-                                color = Color(0xFF8A95A8),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                lineHeight = 18.sp,
-                            )
-                        }
-                    }
-                    if (onSimulateScan != null) {
-                        Button(
-                            onClick = onSimulateScan,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                        ) {
-                            Text("Simulate Entrance Scan", fontWeight = FontWeight.ExtraBold)
-                        }
-                    }
-                } else {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(42.dp)
-                                .clip(RoundedCornerShape(13.dp))
-                                .background(Color(0xFF3B2A08)),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = Color(0xFFF59E0B),
-                                modifier = Modifier.size(24.dp),
-                            )
-                        }
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Code not recognized",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                            )
-                            Text(
-                                error.orEmpty(),
-                                color = Color(0xFF8A95A8),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                lineHeight = 18.sp,
-                                maxLines = 3,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    }
-                    Button(
-                        onClick = onRetry,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                    ) {
-                        Text("Try Again", fontWeight = FontWeight.ExtraBold)
-                    }
+        AnimatedContent(
+            targetState = QRPanelState(error = error, detected = detected),
+            transitionSpec = {
+                fadeIn(tween(180, easing = FastOutSlowInEasing)) togetherWith
+                    fadeOut(tween(120, easing = FastOutSlowInEasing))
+            },
+            label = "qrStatus",
+        ) { state ->
+            QRStatusPanel(
+                error = state.error,
+                detected = state.detected,
+                onRetry = onRetry,
+                onSimulateScan = onSimulateScan,
+            )
+        }
+    }
+}
+
+private data class QRPanelState(
+    val error: String?,
+    val detected: Boolean,
+)
+
+@Composable
+private fun QRStatusPanel(
+    error: String?,
+    detected: Boolean,
+    onRetry: () -> Unit,
+    onSimulateScan: (() -> Unit)?,
+) {
+    VecturaiCard(glass = true) {
+        if (detected) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(VecturaiShapes.Medium)
+                        .background(VecturaiColors.AccentGreen.copy(alpha = 0.18f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.QrCodeScanner,
+                        contentDescription = "Entrance code found",
+                        tint = VecturaiColors.AccentGreen,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+                Spacer(Modifier.width(Spacing.sm))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Entrance code found",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        "Confirming your starting point",
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
             }
+        } else if (error == null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(28.dp),
+                    strokeWidth = 3.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.width(Spacing.sm))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Looking for entrance code",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        "Point your camera at the entrance poster",
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+            if (onSimulateScan != null) {
+                Spacer(Modifier.height(Spacing.md))
+                VecturaiSecondaryButton(
+                    text = "Simulate Entrance Scan",
+                    onClick = onSimulateScan,
+                    leadingIcon = Icons.Default.QrCodeScanner,
+                )
+            }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(VecturaiShapes.Medium)
+                        .background(VecturaiColors.AccentAmber.copy(alpha = 0.16f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = "Code not recognized",
+                        tint = VecturaiColors.AccentAmber,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+                Spacer(Modifier.width(Spacing.sm))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Code not recognized",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        error,
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            Spacer(Modifier.height(Spacing.md))
+            VecturaiPrimaryButton(text = "Try Again", onClick = onRetry)
         }
     }
 }
 
 @Composable
-private fun ScanDotBackground() {
-    Canvas(Modifier.fillMaxSize()) {
-        val spacing = 22.dp.toPx()
-        val radius = 0.85.dp.toPx()
-        var x = 10.dp.toPx()
-        while (x < size.width) {
-            var y = 14.dp.toPx()
-            while (y < size.height) {
+private fun AnimatedScanReticle(
+    hasError: Boolean,
+    hasDetected: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val reduceMotion = rememberReduceMotion()
+    val transition = rememberInfiniteTransition(label = "scanReticle")
+    val breath by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = if (reduceMotion) 1f else 1.04f,
+        animationSpec = infiniteRepeatable(tween(1_600, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "scanBreath",
+    )
+    val sweep by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = if (reduceMotion || hasDetected) 0f else 1f,
+        animationSpec = infiniteRepeatable(tween(2_000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "scanSweep",
+    )
+    val successRipple by animateFloatAsState(
+        targetValue = if (hasDetected) 1f else 0f,
+        animationSpec = tween(520, easing = FastOutSlowInEasing),
+        label = "qrSuccessRipple",
+    )
+    val accent = when {
+        hasDetected -> VecturaiColors.AccentGreen
+        hasError -> VecturaiColors.AccentAmber
+        else -> VecturaiColors.AccentCyan
+    }
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(VecturaiShapes.XLarge)
+                .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.18f))
+                .border(BorderStroke(1.dp, accent.copy(alpha = 0.34f)), VecturaiShapes.XLarge),
+        ) {
+            val margin = 22.dp.toPx()
+            val bracket = 54.dp.toPx() * breath
+            val stroke = 4.dp.toPx()
+            val top = margin
+            val left = margin
+            val right = size.width - margin
+            val bottom = size.height - margin
+            drawLine(accent, Offset(left, top), Offset(left + bracket, top), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(left, top), Offset(left, top + bracket), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(right, top), Offset(right - bracket, top), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(right, top), Offset(right, top + bracket), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(left, bottom), Offset(left + bracket, bottom), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(left, bottom), Offset(left, bottom - bracket), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(right, bottom), Offset(right - bracket, bottom), stroke, StrokeCap.Round)
+            drawLine(accent, Offset(right, bottom), Offset(right, bottom - bracket), stroke, StrokeCap.Round)
+
+            val sweepY = top + (bottom - top) * sweep
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    listOf(Color.Transparent, accent.copy(alpha = 0.9f), Color.Transparent),
+                ),
+                topLeft = Offset(left, sweepY),
+                size = androidx.compose.ui.geometry.Size(right - left, 2.dp.toPx()),
+            )
+            if (hasError) {
                 drawCircle(
-                    color = Color(0xFF263750).copy(alpha = 0.36f),
-                    radius = radius,
-                    center = Offset(x, y),
+                    color = accent.copy(alpha = 0.14f),
+                    radius = size.minDimension * 0.35f,
+                    center = Offset(size.width / 2f, size.height / 2f),
+                    style = Stroke(width = 2.dp.toPx()),
                 )
-                y += spacing
             }
-            x += spacing
+            if (hasDetected) {
+                repeat(3) { index ->
+                    val local = (successRipple - index * 0.18f).coerceIn(0f, 1f)
+                    drawCircle(
+                        color = VecturaiColors.AccentGreen.copy(alpha = (1f - local) * 0.28f),
+                        radius = size.minDimension * (0.18f + local * 0.36f),
+                        center = Offset(size.width / 2f, size.height / 2f),
+                        style = Stroke(width = 2.dp.toPx()),
+                    )
+                }
+            }
         }
+        Icon(
+            Icons.Default.QrCodeScanner,
+            contentDescription = null,
+            tint = accent.copy(alpha = 0.82f),
+            modifier = Modifier.size(56.dp),
+        )
+    }
+}
+
+@Composable
+private fun ScanVignette() {
+    Canvas(Modifier.fillMaxSize()) {
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color.Black.copy(alpha = 0.74f),
+                    Color.Transparent,
+                    Color.Black.copy(alpha = 0.78f),
+                ),
+            ),
+        )
+        drawCircle(
+            color = Color.Black.copy(alpha = 0.18f),
+            radius = size.maxDimension * 0.62f,
+            center = Offset(size.width / 2f, size.height / 2f),
+            style = Stroke(width = size.maxDimension * 0.24f),
+        )
     }
 }

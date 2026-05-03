@@ -3,10 +3,10 @@
     "repository": "vecturai",
     "root": "c:\\Users\\emirh\\Desktop\\bitirme\\vecturai",
     "description": "Indoor navigation system with AR support",
-    "generated_at": "2026-04-30T11:23:08+03:00",
-    "generated_from_range": "1107758a431e6e9c1c2a07c0281223b9b60830bf..d268813baba577afb4495dae08de6e11f737f4eb",
+    "generated_at": "2026-05-02T23:11:37+03:00",
+    "generated_from_range": "55f561b2cd3d707272e06bf9ee02147486deefe1..774b1f7b7622e7f3474902cc42245e0b60897ec6",
     "coverage_verdict": "COMPLETE",
-    "last_incremental_update": "2026-04-30T11:23:08+03:00"
+    "last_incremental_update": "2026-05-02T23:11:37+03:00"
   },
   "folders": [
     {
@@ -1041,6 +1041,17 @@
         "android-app"
       ],
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_ArNavigationScreen.kt.md"
+    },
+    {
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui\\MotionUtils.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "design-system",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ui_MotionUtils.kt.md"
     },
     {
       "path": "apps\\androidApp\\src\\main\\kotlin\\com\\vecturai\\android\\ui\\QRScanScreen.kt",
@@ -6206,6 +6217,26 @@
       "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Components.kt.md"
     },
     {
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\vecturai\\designsystem\\Shapes.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "design-system"
+      ],
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Shapes.kt.md"
+    },
+    {
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\vecturai\\designsystem\\Spacing.kt",
+      "category": "source",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "design-system"
+      ],
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_vecturai_designsystem_Spacing.kt.md"
+    },
+    {
       "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\vecturai\\designsystem\\Theme.kt",
       "category": "source",
       "status": "mapped",
@@ -7130,7 +7161,29 @@
         "rendering"
       ],
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_vecturai_android_ar_Arrow3DGeometry.kt.md"
+    },
+    {
+      "path": "docs\\adr\\ADR-034-android-visual-polish-parity.md",
+      "category": "docs",
+      "status": "mapped",
+      "reason": null,
+      "feature_tags": [
+        "design-system",
+        "android-app"
+      ],
+      "artifact_link": "codebase-docs/files/docs_adr_ADR-034-android-visual-polish-parity.md.md"
+    },
+    {
+      "path": "polish.md",
+      "category": "docs",
+      "status": "indexed_minimal",
+      "reason": "Temporary implementation handoff document",
+      "feature_tags": [
+        "android-app",
+        "design-system"
+      ],
+      "artifact_link": null
     }
   ],
-  "generated_from_commit": "d43c184651b8efe8bb7e2a3aa358d0f44b63bb96"
+  "generated_from_commit": "55f561b2cd3d707272e06bf9ee02147486deefe1"
 }

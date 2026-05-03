@@ -545,6 +545,9 @@ class AndroidArNavigationViewModel(
                 nextActionIcon = NavigationActionIcon.Straight,
                 nextActionText = "Follow the path",
                 nextActionDistance = null,
+                markerFramesAnalyzed = 0,
+                markerCandidatesDetected = 0,
+                relativeBearingDegrees = 0f,
             )
         }
     }
@@ -722,5 +725,12 @@ class AndroidArNavigationViewModel(
         return listOf(building, floorLabel)
             .filter { it.isNotBlank() }
             .joinToString(" - ")
+    }
+
+    private fun normalizeDegrees(value: Double): Double {
+        var degrees = value
+        while (degrees > 180.0) degrees -= 360.0
+        while (degrees < -180.0) degrees += 360.0
+        return degrees
     }
 }

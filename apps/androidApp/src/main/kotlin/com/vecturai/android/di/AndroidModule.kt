@@ -33,7 +33,7 @@ val androidModule = module {
     factory { ArMarkerDetector() }
     factory { ArRouteRenderer() }
 
-    viewModel { AndroidNavigationFlowModel(get(), get()) }
+    viewModel { AndroidNavigationFlowModel(get()) }
     viewModel { ArCameraFlowViewModel(get(), get()) }
     viewModel { AndroidArNavigationViewModel(get(), get(), get()) }
 

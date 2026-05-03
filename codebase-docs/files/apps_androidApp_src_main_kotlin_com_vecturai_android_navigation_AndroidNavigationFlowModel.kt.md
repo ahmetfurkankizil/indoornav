@@ -38,7 +38,8 @@ Defines the Android visitor flow state split between MainActivity and the dedica
 - QR scan, entrance confirmation, destination selection, route preview, and AR navigation are scoped to `ArCameraActivity`.
 - `SessionData` preserves `confirmedEntrance` and `validatedEntranceMarker` across phases.
 - Route summary logic estimates time based on total distance and typical walking speed.
-- QR scanning accepts only valid `vecturai-entrance` payloads matching the loaded manifest building id and entrance marker id.
+- QR scanning: accepts only valid `vecturai-entrance` payloads matching the loaded manifest building id and entrance marker id. Fires success/error haptics via `AndroidHapticManager`.
+- Delayed Transition: When a QR is detected, `qrDetected` state is set, and a 650ms delay is introduced before advancing to `EntranceConfirmed` phase, allowing for a better user experience.
 - Route computation still happens immediately when a destination is selected so route preview and AR navigation share the same `LoadedPackage`.
 
 ## Uses

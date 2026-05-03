@@ -17,7 +17,7 @@ Build configuration for the Android mobile application.
 
 ## Dependencies
 - Project modules: `:shared:core`, `:shared:designsystem`, `:shared:feature-*`, `:shared:data-*`.
-- Compose: runtime, foundation, Material3, UI, material icons extended.
+- Compose: runtime, foundation, animation, Material3, UI, material icons extended.
 - Android: Activity Compose, Lifecycle runtime/ViewModel/runtime Compose.
 - QR: ML Kit barcode scanning over ARCore camera frames.
 - AR: `libs.arcore`.

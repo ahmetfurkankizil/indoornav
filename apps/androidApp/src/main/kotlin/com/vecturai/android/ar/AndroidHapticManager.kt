@@ -23,7 +23,7 @@ class AndroidHapticManager(context: Context) {
     fun warning() = vibrate(100, 150)
 
     private fun vibrate(durationMs: Long, amplitude: Int) {
-        if (!isEnabled) return
+        if (!isEnabled || !HapticsEnabled) return
         val vib = vibrator ?: return
         if (!vib.hasVibrator()) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -32,5 +32,12 @@ class AndroidHapticManager(context: Context) {
             @Suppress("DEPRECATION")
             vib.vibrate(durationMs)
         }
+    }
+
+    companion object {
+        var HapticsEnabled: Boolean =
+            System.getProperty("vecturai.haptics.enabled")?.toBooleanStrictOrNull()
+                ?: System.getenv("VECTURAI_HAPTICS_ENABLED")?.toBooleanStrictOrNull()
+                ?: true
     }
 }

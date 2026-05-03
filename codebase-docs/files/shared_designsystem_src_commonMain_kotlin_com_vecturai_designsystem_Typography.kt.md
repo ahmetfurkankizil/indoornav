@@ -10,44 +10,46 @@ Authored Source
 Authored Source for the shared component.
 
 ## Logic Overview
-(Inferred from first 50 lines)
 ```kotlin
 package com.vecturai.designsystem
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/**
- * VecturAI typography scale.
- *
- * Uses the system default font family (which maps to Roboto on Android
- * and SF Pro on iOS) for a native feel on each platform.
- *
- * TODO: Consider loading Inter or custom brand font via Compose Resources
- */
-val VecturaiTypography = Typography(
-    displayLarge = TextStyle(
-        fontSize = 34.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 40.sp,
-        letterSpacing = (-0.25).sp,
-    ),
-    displayMedium = TextStyle(
+object VecturaiTypography {
+    val NumericDisplay = TextStyle(
+        fontSize = 64.sp,
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 64.sp,
+        fontFeatureSettings = "tnum",
+    )
+
+    val NumericLarge = TextStyle(
         fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 34.sp,
-    ),
-    headlineLarge = TextStyle(
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 30.sp,
-    ),
-    headlineMedium = TextStyle(
-        fontSize = 20.sp,
-        fontWeight = 
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 32.sp,
+        fontFeatureSettings = "tnum",
+    )
+
+    val Overline = TextStyle(
+        fontSize = 11.sp,
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 14.sp,
+        letterSpacing = 1.4.sp,
+    )
+
+    @Composable
+    fun material(): Typography {
+        // Loads Inter font family via Compose Resources
+        // and applies it to all Material 3 typography slots.
+    }
+}
 ```
+
 
 ## Status
 Mapped (Pass 3 Normalization)

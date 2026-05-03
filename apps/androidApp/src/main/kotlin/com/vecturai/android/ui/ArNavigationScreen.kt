@@ -1,18 +1,34 @@
 package com.vecturai.android.ui
 
+import android.os.SystemClock
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,8 +38,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -37,9 +54,9 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.PanTool
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Straight
 import androidx.compose.material.icons.filled.SubdirectoryArrowLeft
 import androidx.compose.material.icons.filled.SubdirectoryArrowRight
@@ -47,17 +64,17 @@ import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.UTurnLeft
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,21 +82,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vecturai.android.ar.AndroidArNavigationViewModel
 import com.vecturai.android.ar.ArNavigationUiState
 import com.vecturai.android.ar.NavigationActionIcon
 import com.vecturai.android.ar.TrackingStatusIcon
+import com.vecturai.designsystem.AnimatedNumber
+import com.vecturai.designsystem.GradientText
+import com.vecturai.designsystem.IconChip
+import com.vecturai.designsystem.Spacing
+import com.vecturai.designsystem.StatPill
+import com.vecturai.designsystem.VecturaiBrush
+import com.vecturai.designsystem.VecturaiCard
+import com.vecturai.designsystem.VecturaiColors
+import com.vecturai.designsystem.VecturaiPrimaryButton
+import com.vecturai.designsystem.VecturaiSecondaryButton
+import com.vecturai.designsystem.VecturaiShapes
+import com.vecturai.designsystem.VecturaiTypography
+import com.vecturai.designsystem.vecturaiTap
+import kotlinx.coroutines.delay
 import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun ArNavigationScreen(
@@ -87,109 +124,55 @@ fun ArNavigationScreen(
     isEmulator: Boolean,
     onEnd: () -> Unit,
     onRetryActivity: () -> Unit,
+    onNavigateElsewhere: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var pendingLegPreview by remember { mutableStateOf<com.vecturai.android.data.AndroidReviewedPackageLoader.RouteLeg?>(null) }
 
     Box(Modifier.fillMaxSize()) {
-        val transition = uiState.pendingTransition
-        val previewLeg = pendingLegPreview
-
-        if (uiState.hasArrived) {
-            ArrivalOverlay(uiState, onEnd)
-        } else if (transition != null) {
-            FloorTransitionOverlay(transition) {
-                val pkg = viewModel.getRoutePackage()
-                val nextIndex = viewModel.currentLegIndex + 1
-                pendingLegPreview = pkg?.legs?.getOrNull(nextIndex)
-                viewModel.advanceToNextLeg()
-            }
-        } else if (previewLeg != null) {
-            val pkg = viewModel.getRoutePackage()
-            RoutePreviewContent(
-                config = pkg?.config,
-                routeLeg = previewLeg,
-                originName = "Elevator/Stairs",
-                onBack = { pendingLegPreview = null },
-                onStart = { pendingLegPreview = null },
-                buttonText = "CONTINUE NAVIGATION"
-            )
-        } else {
-            when {
-                uiState.sessionErrorMessage != null ->
-                    SessionErrorOverlay(
-                        message = uiState.sessionErrorMessage.orEmpty(),
-                        isArCoreInstall = uiState.sessionErrorIsArCoreInstall,
-                        onRetry = onRetryActivity,
-                        onEnd = onEnd,
-                    )
-                !uiState.isAligned && !uiState.isAnyToAny -> Box(Modifier.fillMaxSize()) {
-                    // Central Target Frame
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(260.dp)
-                            .border(2.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                    )
-                    
-                    Column(Modifier.fillMaxSize()) {
-                        ArTopBar(uiState = uiState, onEnd = onEnd)
-                        Spacer(Modifier.weight(1f))
-                        if (!viewModel.isPendingSimulatedAlignment()) {
-                            AlignmentOverlay(
-                                uiState = uiState,
-                                onRetry = onRetryActivity,
-                                onCancel = onEnd,
-                                onSimulate = viewModel::requestSimulatedAlignment,
-                                allowSimulation = isEmulator,
-                            )
-                        } else {
-                            // Minimal "Initializing" UI while we wait for the first frame
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(Color.Black.copy(alpha = 0.4f))
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.White)
-                                    Spacer(Modifier.width(12.dp))
-                                    Text("Initializing AR...", color = Color.White, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-                    }
-                }
-                else -> {
-                    ActiveNavigationOverlay(
+        AnimatedContent(
+            targetState = when {
+                uiState.hasArrived -> "arrival"
+                uiState.markerAssetError != null -> "config"
+                uiState.sessionErrorMessage != null -> "session"
+                !uiState.isAligned -> "aligning"
+                else -> "active"
+            },
+            transitionSpec = {
+                slideInVertically(
+                    animationSpec = tween(220, easing = FastOutSlowInEasing),
+                ) { it / 12 } + fadeIn(tween(220, easing = FastOutSlowInEasing)) togetherWith
+                    slideOutVertically(
+                        animationSpec = tween(220, easing = FastOutSlowInEasing),
+                    ) { -it / 12 } + fadeOut(tween(220, easing = FastOutSlowInEasing))
+            },
+            label = "arOverlayPhase",
+        ) { phase ->
+            when (phase) {
+                "arrival" -> ArrivalOverlay(uiState, onEnd, onNavigateElsewhere)
+                "config" -> ConfigErrorOverlay(uiState.markerAssetError.orEmpty(), onEnd)
+                "session" -> SessionErrorOverlay(
+                    message = uiState.sessionErrorMessage.orEmpty(),
+                    isArCoreInstall = uiState.sessionErrorIsArCoreInstall,
+                    onRetry = onRetryActivity,
+                    onEnd = onEnd,
+                )
+                "aligning" -> Column(Modifier.fillMaxSize()) {
+                    ArTopBar(uiState = uiState, onEnd = onEnd)
+                    Spacer(Modifier.weight(1f))
+                    AlignmentOverlay(
                         uiState = uiState,
-                        onEnd = onEnd,
+                        onRetry = onRetryActivity,
+                        onCancel = onEnd,
+                        onSimulate = viewModel::simulateAlignment,
+                        allowSimulation = isEmulator,
                     )
-                    
-                    // FIX 7: AR Minimap Overlay (Top-Right)
-                    val pkg = viewModel.getRoutePackage()
-                    if (pkg != null) {
-                        val currentLeg = pkg.legs.getOrNull(viewModel.currentLegIndex)
-                        if (currentLeg != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .statusBarsPadding()
-                                    .padding(top = 70.dp, end = 16.dp),
-                                contentAlignment = Alignment.TopEnd
-                            ) {
-                                ArMinimapOverlay(
-                                    uiState = uiState,
-                                    config = pkg.config,
-                                    routePoints = currentLeg.routePoints
-                                )
-                            }
-                        }
-                    }
                 }
+                else -> ActiveNavigationOverlay(
+                    uiState = uiState,
+                    onEnd = onEnd,
+                    onAdvance = viewModel::advanceProgress,
+                )
             }
         }
     }
@@ -201,63 +184,27 @@ private fun ArTopBar(uiState: ArNavigationUiState, onEnd: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = Spacing.md, vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (!uiState.isAligned) {
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color(0xFF121A28).copy(alpha = 0.92f),
-                border = BorderStroke(1.dp, Color(0xFF253149)),
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(
-                        Modifier
-                            .size(7.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF59E0B))
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        uiState.sessionStateLabel,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
+            StatPill(
+                text = uiState.sessionStateLabel,
+                color = if (uiState.markerAssetError == null) VecturaiColors.AccentAmber else VecturaiColors.AccentRed,
+            )
         }
         if (uiState.isSimulated) {
-            Spacer(Modifier.width(8.dp))
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color(0xFF3B2A08),
-                border = BorderStroke(1.dp, Color(0xFF7A4B04)),
-            ) {
-                Text(
-                    "DEMO",
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                    color = Color(0xFFF59E0B),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+            Spacer(Modifier.width(Spacing.xs))
+            StatPill(text = "DEMO", color = VecturaiColors.AccentAmber)
         }
         Spacer(Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF121A28).copy(alpha = 0.92f))
-                .border(1.dp, Color(0xFF253149), CircleShape)
-                .clickable(role = Role.Button, onClick = onEnd),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(Icons.Default.Close, contentDescription = "End Route", tint = Color(0xFFB6BFCE), modifier = Modifier.size(19.dp))
-        }
+        IconChip(
+            icon = Icons.Default.Close,
+            contentDescription = "End route",
+            onClick = onEnd,
+            tint = VecturaiColors.TextSecondary,
+            modifier = Modifier.clip(CircleShape),
+        )
     }
 }
 
@@ -269,85 +216,70 @@ private fun AlignmentOverlay(
     onSimulate: () -> Unit,
     allowSimulation: Boolean,
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 32.dp),
-        shape = RoundedCornerShape(20.dp),
-        color = Color(0xFF151F31).copy(alpha = 0.96f),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
+    VecturaiCard(
+        modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xxl),
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (uiState.alignmentTimedOut) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(28.dp))
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = "Alignment timed out",
+                        tint = VecturaiColors.AccentAmber,
+                        modifier = Modifier.size(32.dp),
+                    )
                 } else {
-                    CircularProgressIndicator(modifier = Modifier.size(28.dp), strokeWidth = 3.dp, color = Color(0xFF168BFF))
+                    RadarSweep(modifier = Modifier.size(48.dp))
                 }
-                Spacer(Modifier.width(14.dp))
+                Spacer(Modifier.width(Spacing.md))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        if (uiState.alignmentTimedOut) uiState.timeoutReasonMessage else "Waiting for Alignment",
-                        color = Color.White,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        maxLines = 1,
+                        if (uiState.alignmentTimedOut) uiState.timeoutReasonMessage else "Looking for entrance sign...",
+                        color = VecturaiColors.TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else (uiState.timeoutHintMessage.ifBlank { "Point your camera at a known marker to align." }),
-                        color = Color(0xFFB6BFCE),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        lineHeight = 18.sp,
+                        if (uiState.alignmentTimedOut) uiState.timeoutHintMessage else "Point your camera at the entrance poster",
+                        color = VecturaiColors.TextMuted,
+                        style = MaterialTheme.typography.bodyMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
 
+            AlignmentMiniIllustration()
+
+            Text(
+                "Frames analyzed: ${uiState.markerFramesAnalyzed} - Markers detected: ${uiState.markerCandidatesDetected}",
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.labelMedium,
+            )
+
             if (uiState.alignmentTimedOut) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    VecturaiPrimaryButton(
+                        text = "Retry",
                         onClick = onRetry,
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text("Retry", fontWeight = FontWeight.ExtraBold)
-                    }
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .clickable(role = Role.Button, onClick = onCancel),
-                        shape = RoundedCornerShape(14.dp),
-                        color = Color(0xFF121A28),
-                        border = BorderStroke(1.dp, Color(0xFF2B3952)),
-                    ) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("Cancel", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
-                        }
-                    }
+                        leadingIcon = Icons.Default.Refresh,
+                        modifier = Modifier.weight(1f),
+                    )
+                    VecturaiSecondaryButton(
+                        text = "Cancel",
+                        onClick = onCancel,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
 
             if (allowSimulation) {
-                Button(
+                VecturaiPrimaryButton(
+                    text = "Simulate Scan",
                     onClick = onSimulate,
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                ) {
-                    Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Simulate Scan", fontWeight = FontWeight.ExtraBold)
-                }
+                    leadingIcon = Icons.Default.Navigation,
+                )
             }
         }
     }
@@ -363,7 +295,11 @@ private fun ActiveNavigationOverlay(
             uiState,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(start = 12.dp, top = 8.dp, end = 12.dp),
+                .padding(start = Spacing.sm, top = Spacing.xs, end = Spacing.sm),
+        )
+        CompassStrip(
+            bearingDegrees = uiState.relativeBearingDegrees,
+            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
         )
         
         // DEVIATION WARNING OVERLAY
@@ -521,148 +457,224 @@ private fun ArMinimapOverlay(
 
 @Composable
 private fun InstructionBanner(uiState: ArNavigationUiState, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFF151F31).copy(alpha = 0.96f),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
+    val urgent = (uiState.nextActionDistance ?: Double.MAX_VALUE) < 5.0
+    val height by animateFloatAsState(
+        targetValue = if (urgent) 88f else 76f,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "instructionHeight",
+    )
+    VecturaiCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height.dp),
+        glass = true,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF0A3A66)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    actionIcon(uiState.nextActionIcon),
-                    contentDescription = null,
-                    modifier = Modifier.size(28.dp),
-                    tint = Color(0xFF168BFF),
-                )
-            }
-            Spacer(Modifier.width(16.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TurnGlyph(
+                icon = uiState.nextActionIcon,
+                contentDescription = uiState.nextActionText,
+                urgent = urgent,
+                modifier = Modifier.size(56.dp),
+            )
+            Spacer(Modifier.width(Spacing.md))
             Column(Modifier.weight(1f)) {
                 Text(
                     uiState.nextActionText,
-                    color = Color.White,
-                    fontSize = 17.sp,
-                    lineHeight = 20.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 val distance = uiState.nextActionDistance
                 if (distance != null && distance < 30.0) {
-                    Text(
-                        "in ${distance.roundMeters()} m",
-                        color = Color(0xFF8A95A8),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            }
-            if (uiState.isLowConfidence) {
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = Color(0xFF3B2A08),
-                    border = BorderStroke(1.dp, Color(0xFF7A4B04)),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            trackingIcon(uiState.trackingStatusIcon),
-                            contentDescription = uiState.trackingStatusLabel,
-                            tint = Color(0xFFF59E0B),
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            uiState.trackingStatusLabel,
-                            color = Color(0xFFF59E0B),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text("in ", color = VecturaiColors.TextMuted, style = MaterialTheme.typography.bodyMedium)
+                        GradientText("${distance.roundMeters()} m", style = MaterialTheme.typography.titleMedium)
                     }
                 }
             }
+            TrackingBadge(uiState)
         }
     }
 }
 
 @Composable
-private fun BottomHud(uiState: ArNavigationUiState, onEnd: () -> Unit) {
-    Surface(
+private fun TrackingBadge(uiState: ArNavigationUiState) {
+    val targetColor = when {
+        !uiState.isLowConfidence -> VecturaiColors.AccentGreen
+        uiState.trackingStatusIcon == TrackingStatusIcon.HoldSteady -> VecturaiColors.AccentAmber
+        else -> VecturaiColors.AccentRed
+    }
+    val color by animateColorAsState(
+        targetValue = targetColor,
+        animationSpec = tween(220, easing = FastOutSlowInEasing),
+        label = "trackingBadgeColor",
+    )
+    StatPill(
+        text = uiState.trackingStatusLabel,
+        color = color,
+    )
+}
+
+@Composable
+private fun BottomHud(uiState: ArNavigationUiState, onEnd: () -> Unit, onAdvance: () -> Unit) {
+    VecturaiCard(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 12.dp, vertical = 24.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFF151F31).copy(alpha = 0.96f),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
+            .padding(horizontal = Spacing.sm, vertical = Spacing.xl),
+        glass = true,
     ) {
-        Row(
-            modifier = Modifier.padding(vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 20.dp),
-            ) {
-                if (uiState.remainingDistance > 0.0) {
-                    Text(
-                        formatEta(uiState.remainingDistance / 1.2),
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                    Text(
-                        "${uiState.remainingDistance.roundMeters()} m - ${uiState.destinationLabel}",
-                        color = Color(0xFF8A95A8),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                } else {
-                    Text(uiState.destinationLabel, color = Color.White, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ProgressEtaCluster(uiState)
+
+            if (uiState.isSimulated) {
+                IconButton(onClick = onAdvance) {
+                    Icon(Icons.Default.FastForward, contentDescription = "Advance", tint = MaterialTheme.colorScheme.primary)
                 }
             }
 
-
-            Box(
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFEF4444))
-                    .clickable(role = Role.Button, onClick = onEnd),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    Icons.Default.Stop,
-                    contentDescription = "End Route",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
+            SwipeToEndRoute(
+                onEnd = onEnd,
+                modifier = Modifier.width(148.dp),
+            )
         }
     }
 }
 
 @Composable
-private fun ArrivalOverlay(uiState: ArNavigationUiState, onEnd: () -> Unit) {
-    var appeared by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        appeared = true
+private fun RowScope.ProgressEtaCluster(uiState: ArNavigationUiState) {
+    val progress = if (uiState.totalDistance > 0.0) {
+        (1.0 - uiState.remainingDistance / uiState.totalDistance).coerceIn(0.0, 1.0).toFloat()
+    } else {
+        0f
     }
+    var displayedProgress by remember { mutableFloatStateOf(progress) }
+    var lastProgressUpdateMs by remember { mutableStateOf(0L) }
+    LaunchedEffect(progress) {
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastProgressUpdateMs >= 200L || progress == 0f || progress == 1f) {
+            displayedProgress = progress
+            lastProgressUpdateMs = now
+        }
+    }
+    val arcProgress by animateFloatAsState(
+        targetValue = displayedProgress,
+        animationSpec = tween(180, easing = FastOutSlowInEasing),
+        label = "progressArc",
+    )
+    Box(
+        modifier = Modifier
+            .size(78.dp)
+            .padding(end = Spacing.sm),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.fillMaxSize()) {
+            drawArc(
+                color = VecturaiColors.BorderStrong,
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round),
+            )
+            drawArc(
+                color = VecturaiColors.AccentCyan,
+                startAngle = -90f,
+                sweepAngle = 360f * arcProgress,
+                useCenter = false,
+                style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round),
+            )
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (uiState.remainingDistance > 0.0) {
+                Text(
+                    formatEta(uiState.remainingDistance / 1.2),
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                )
+                Text(
+                    "${uiState.remainingDistance.roundMeters()} m",
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                )
+            } else {
+                Text(uiState.destinationLabel, color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.labelMedium)
+            }
+        }
+    }
+    Column(Modifier.weight(1f)) {
+        Text(
+            uiState.destinationLabel,
+            color = VecturaiColors.TextPrimary,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            "Follow the path",
+            color = VecturaiColors.TextMuted,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Composable
+private fun SwipeToEndRoute(onEnd: () -> Unit, modifier: Modifier = Modifier) {
+    BoxWithConstraints(
+        modifier = modifier
+            .height(48.dp)
+            .clip(VecturaiShapes.Medium)
+            .background(VecturaiColors.AccentRed.copy(alpha = 0.14f))
+            .border(BorderStroke(1.dp, VecturaiColors.AccentRed.copy(alpha = 0.34f)), VecturaiShapes.Medium),
+    ) {
+        val density = LocalDensity.current
+        val maxPx = with(density) { maxWidth.toPx() }
+        var dragPx by remember { mutableFloatStateOf(0f) }
+        val state = rememberDraggableState { delta ->
+            dragPx = (dragPx + delta).coerceIn(0f, maxPx)
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .draggable(
+                    state = state,
+                    orientation = Orientation.Horizontal,
+                    onDragStopped = {
+                        if (dragPx >= maxPx * 0.6f) {
+                            onEnd()
+                        }
+                        dragPx = 0f
+                    },
+                )
+                .padding(horizontal = Spacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .graphicsLayer { translationX = dragPx.coerceAtMost(maxPx - 40f) }
+                    .clip(CircleShape)
+                    .background(VecturaiColors.AccentRed),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Default.Close, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+            }
+            Spacer(Modifier.width(Spacing.xs))
+            Text("Swipe to end", color = VecturaiColors.TextSecondary, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+        }
+    }
+}
+
+@Composable
+private fun ArrivalOverlay(
+    uiState: ArNavigationUiState,
+    onEnd: () -> Unit,
+    onNavigateElsewhere: () -> Unit,
+) {
+    var appeared by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { appeared = true }
     val scale by animateFloatAsState(
         targetValue = if (appeared) 1f else 0.5f,
         animationSpec = spring(dampingRatio = 0.6f),
@@ -671,114 +683,82 @@ private fun ArrivalOverlay(uiState: ArNavigationUiState, onEnd: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF020711)),
+            .background(VecturaiColors.SurfaceCanvas),
     ) {
-        ArrivalDotBackground()
+        com.vecturai.designsystem.AuroraBackground(intensity = rememberAuroraIntensity())
+        ConfettiBurst()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(start = 22.dp, top = 24.dp, end = 22.dp, bottom = 128.dp)
+                .padding(start = Spacing.xl, top = Spacing.xl, end = Spacing.xl, bottom = 140.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
-                modifier = Modifier
-                    .size(124.dp)
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    },
-                contentAlignment = Alignment.Center,
+                modifier = Modifier.graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                },
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(124.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF06351F).copy(alpha = 0.55f))
-                        .border(1.dp, Color(0xFF0D5E37).copy(alpha = 0.7f), CircleShape),
-                )
-                Box(
-                    modifier = Modifier
-                        .size(92.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF073D25).copy(alpha = 0.85f))
-                        .border(1.5.dp, Color(0xFF0B7C45), CircleShape),
-                )
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF0A5A37))
-                        .border(2.dp, Color(0xFF19C56D), CircleShape),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color(0xFF24E37A),
-                        modifier = Modifier.size(32.dp),
-                    )
-                }
+                AnimatedCheckMark(size = 124.dp)
             }
 
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(Spacing.lg))
 
             Text(
                 text = "ARRIVAL CONFIRMED",
-                color = Color(0xFF12C86A),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 1.6.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                color = VecturaiColors.AccentGreen,
+                style = VecturaiTypography.overline(),
+                textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Spacing.sm))
             Text(
                 text = "You've arrived",
-                color = Color.White,
-                fontSize = 30.sp,
-                lineHeight = 34.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                color = VecturaiColors.TextPrimary,
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = uiState.destinationLabel,
-                color = Color(0xFFB6BFCE),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
+                color = VecturaiColors.TextSecondary,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                textAlign = TextAlign.Center,
             )
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(Spacing.xl))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 ArrivalStatCard(
-                    value = if (uiState.totalDistance > 0.0) "${uiState.totalDistance.roundMeters()} m" else "--",
+                    value = if (uiState.totalDistance > 0.0) uiState.totalDistance.roundMeters().toIntOrNull() ?: 0 else 0,
+                    suffix = " m",
                     label = "Distance",
                     modifier = Modifier.weight(1f),
                 )
                 ArrivalStatCard(
-                    value = if (uiState.totalDistance > 0.0) formatEta(uiState.totalDistance / 1.2) else "--",
+                    value = if (uiState.totalDistance > 0.0) ceil((uiState.totalDistance / 1.2) / 60.0).toInt().coerceAtLeast(1) else 0,
+                    suffix = " min",
                     label = "Time",
                     modifier = Modifier.weight(1f),
                 )
                 ArrivalStatCard(
-                    value = uiState.routeStepCount.coerceAtLeast(1).toString(),
+                    value = uiState.routeStepCount.coerceAtLeast(1),
+                    suffix = "",
                     label = uiState.routeStepCount.coerceAtLeast(1).stepLabel(),
                     modifier = Modifier.weight(1f),
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Spacing.sm))
 
             ArrivalDestinationCard(
                 destination = uiState.destinationLabel,
@@ -791,116 +771,67 @@ private fun ArrivalOverlay(uiState: ArNavigationUiState, onEnd: () -> Unit) {
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(start = 22.dp, end = 22.dp, bottom = 24.dp),
+                .padding(start = Spacing.xl, end = Spacing.xl, bottom = Spacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Surface(
+            VecturaiPrimaryButton(
+                text = "Done",
+                leadingIcon = Icons.Default.Done,
                 onClick = onEnd,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF168BFF),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(Modifier.width(9.dp))
-                    Text(
-                        text = "Done",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-            }
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = "Return home to start a new route",
-                color = Color(0xFF566173),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+            Spacer(Modifier.height(Spacing.sm))
+            VecturaiSecondaryButton(
+                text = "Navigate somewhere else",
+                leadingIcon = Icons.Default.PlayArrow,
+                onClick = onNavigateElsewhere,
             )
         }
 
-        Box(
+        IconChip(
+            icon = Icons.Default.Close,
+            contentDescription = "Close",
+            onClick = onEnd,
+            tint = VecturaiColors.TextSecondary,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
-                .padding(top = 10.dp, end = 16.dp)
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF121722))
-                .border(1.dp, Color(0xFF202735), CircleShape)
-                .clickable(role = Role.Button, onClick = onEnd),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
-                tint = Color(0xFFB6BFCE),
-                modifier = Modifier.size(18.dp),
-            )
-        }
+                .padding(top = Spacing.sm, end = Spacing.md)
+                .clip(CircleShape),
+        )
     }
 }
 
 @Composable
-private fun ArrivalDotBackground() {
-    Canvas(Modifier.fillMaxSize()) {
-        val step = 18.dp.toPx()
-        val dotRadius = 1.05.dp.toPx()
-        var y = 0f
-        while (y <= size.height) {
-            var x = 0f
-            while (x <= size.width) {
-                drawCircle(
-                    color = Color(0xFF102033).copy(alpha = 0.38f),
-                    radius = dotRadius,
-                    center = Offset(x, y),
-                )
-                x += step
-            }
-            y += step
-        }
-    }
-}
-
-@Composable
-private fun ArrivalStatCard(value: String, label: String, modifier: Modifier = Modifier) {
+private fun ArrivalStatCard(
+    value: Int,
+    suffix: String,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        modifier = modifier.height(64.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = Color(0xFF151F31),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
+        modifier = modifier.height(72.dp),
+        shape = VecturaiShapes.Medium,
+        color = VecturaiColors.SurfaceCard,
+        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(
-                text = value,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1,
-            )
-            Spacer(Modifier.height(3.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
+                AnimatedNumber(
+                    value = value,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = VecturaiColors.TextPrimary,
+                )
+                Text(suffix, color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.labelLarge)
+            }
+            Spacer(Modifier.height(Spacing.xxs))
             Text(
                 text = label,
-                color = Color(0xFF6F7B8E),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
+                color = VecturaiColors.TextMuted,
+                style = MaterialTheme.typography.labelMedium,
                 maxLines = 1,
             )
         }
@@ -909,70 +840,65 @@ private fun ArrivalStatCard(value: String, label: String, modifier: Modifier = M
 
 @Composable
 private fun ArrivalDestinationCard(destination: String, location: String) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFF151F31),
-        border = BorderStroke(1.dp, Color(0xFF233149)),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    VecturaiCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(13.dp))
-                    .background(Color(0xFF3B2A08)),
+                    .size(44.dp)
+                    .clip(VecturaiShapes.Medium)
+                    .background(VecturaiColors.AccentAmber.copy(alpha = 0.16f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = if (destination.contains("Cafe", ignoreCase = true)) {
-                        Icons.Default.Restaurant
-                    } else {
-                        Icons.Default.Flag
-                    },
+                    imageVector = if (destination.contains("Cafe", ignoreCase = true)) Icons.Default.Restaurant else Icons.Default.Flag,
                     contentDescription = null,
-                    tint = Color(0xFFF4A515),
+                    tint = VecturaiColors.AccentAmber,
                     modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(Modifier.width(13.dp))
+            Spacer(Modifier.width(Spacing.sm))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = destination,
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    color = VecturaiColors.TextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(Modifier.height(2.dp))
                 Text(
                     text = location,
-                    color = Color(0xFF7B8698),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    color = VecturaiColors.TextMuted,
+                    style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color(0xFF0A5A37),
-            ) {
-                Text(
-                    text = "Arrived",
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                    color = Color(0xFF24E37A),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-            }
+            StatPill(text = "Arrived", color = VecturaiColors.AccentGreen)
         }
     }
 }
 
+@Composable
+private fun ConfigErrorOverlay(message: String, onEnd: () -> Unit) {
+    ErrorScaffold {
+        VecturaiCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            ) {
+                Icon(Icons.Default.Warning, contentDescription = "Setup needed", modifier = Modifier.size(56.dp), tint = VecturaiColors.AccentRed)
+                Text("Setup needed", color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    message,
+                    color = VecturaiColors.TextSecondary,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                VecturaiPrimaryButton(text = "Go Back", onClick = onEnd)
+            }
+        }
+    }
+}
 
 @Composable
 private fun SessionErrorOverlay(
@@ -981,58 +907,214 @@ private fun SessionErrorOverlay(
     onRetry: () -> Unit,
     onEnd: () -> Unit,
 ) {
+    val uriHandler = LocalUriHandler.current
+    ErrorScaffold {
+        VecturaiCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            ) {
+                Icon(Icons.Default.Warning, contentDescription = "Camera starting", modifier = Modifier.size(52.dp), tint = VecturaiColors.AccentAmber)
+                Text("Camera Starting", color = VecturaiColors.TextPrimary, style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    message,
+                    color = VecturaiColors.TextSecondary,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                VecturaiPrimaryButton(
+                    text = if (isArCoreInstall) "Install / Update ARCore" else "Try Again",
+                    onClick = {
+                        if (isArCoreInstall) {
+                            uriHandler.openUri("market://details?id=com.google.ar.core")
+                        } else {
+                            onRetry()
+                        }
+                    },
+                )
+                VecturaiSecondaryButton(text = "Go Back", onClick = onEnd)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorScaffold(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF070D18).copy(alpha = 0.94f))
+            .background(VecturaiColors.SurfaceCanvas.copy(alpha = 0.94f))
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(32.dp),
+            .padding(Spacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            color = Color(0xFF151F31),
-            border = BorderStroke(1.dp, Color(0xFF233149)),
-        ) {
-            Column(
-                modifier = Modifier.padding(22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(52.dp), tint = Color(0xFFF59E0B))
-                Text("Camera Starting", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                Text(
-                    message,
-                    color = Color(0xFFB6BFCE),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp,
+        content()
+    }
+}
+
+@Composable
+private fun TurnGlyph(
+    icon: NavigationActionIcon,
+    contentDescription: String,
+    urgent: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val color = if (urgent) VecturaiColors.AccentAmber else MaterialTheme.colorScheme.primary
+    Box(
+        modifier = modifier
+            .clip(VecturaiShapes.Medium)
+            .background(color.copy(alpha = 0.16f))
+            .border(BorderStroke(1.dp, color.copy(alpha = 0.36f)), VecturaiShapes.Medium),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            actionIcon(icon),
+            contentDescription = contentDescription,
+            modifier = Modifier.size(34.dp),
+            tint = color,
+        )
+    }
+}
+
+@Composable
+private fun CompassStrip(bearingDegrees: Float, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(24.dp),
+        shape = VecturaiShapes.Pill,
+        color = VecturaiColors.SurfaceCard.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, VecturaiColors.BorderSubtle.copy(alpha = 0.62f)),
+    ) {
+        Canvas(Modifier.fillMaxSize()) {
+            val centerY = size.height / 2f
+            val offset = (bearingDegrees / 180f) * size.width * 0.35f
+            for (i in -6..6) {
+                val x = size.width / 2f + i * 28.dp.toPx() - offset
+                drawLine(
+                    color = if (i == 0) VecturaiColors.AccentCyan else VecturaiColors.TextDisabled,
+                    start = Offset(x, centerY - 5.dp.toPx()),
+                    end = Offset(x, centerY + 5.dp.toPx()),
+                    strokeWidth = if (i == 0) 2.dp.toPx() else 1.dp.toPx(),
+                    cap = StrokeCap.Round,
                 )
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168BFF)),
-                ) {
-                    Text(if (isArCoreInstall) "Install / Update ARCore" else "Try Again", fontWeight = FontWeight.ExtraBold)
-                }
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clickable(role = Role.Button, onClick = onEnd),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFF121A28),
-                    border = BorderStroke(1.dp, Color(0xFF2B3952)),
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Go Back", color = Color(0xFFB6BFCE), fontWeight = FontWeight.ExtraBold)
-                    }
-                }
             }
+            drawCircle(VecturaiColors.AccentCyan, radius = 3.dp.toPx(), center = Offset(size.width / 2f, centerY))
+        }
+    }
+}
+
+@Composable
+private fun RadarSweep(modifier: Modifier = Modifier) {
+    val reduceMotion = rememberReduceMotion()
+    val transition = rememberInfiniteTransition(label = "radar")
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = if (reduceMotion) 0f else 360f,
+        animationSpec = infiniteRepeatable(tween(2_000, easing = FastOutSlowInEasing), RepeatMode.Restart),
+        label = "radarRotation",
+    )
+    Canvas(modifier) {
+        drawCircle(VecturaiColors.AccentCyan.copy(alpha = 0.12f), radius = size.minDimension / 2f)
+        drawCircle(
+            VecturaiColors.AccentCyan.copy(alpha = 0.42f),
+            radius = size.minDimension / 2.2f,
+            style = Stroke(width = 2.dp.toPx()),
+        )
+        drawArc(
+            color = VecturaiColors.AccentCyan,
+            startAngle = rotation,
+            sweepAngle = 72f,
+            useCenter = false,
+            style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round),
+        )
+    }
+}
+
+@Composable
+private fun AlignmentMiniIllustration() {
+    val reduceMotion = rememberReduceMotion()
+    val transition = rememberInfiniteTransition(label = "alignmentIllustration")
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = if (reduceMotion) 0f else 1f,
+        animationSpec = infiniteRepeatable(tween(2_400, easing = FastOutSlowInEasing), RepeatMode.Restart),
+        label = "alignmentPhase",
+    )
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(76.dp)
+            .clip(VecturaiShapes.Medium)
+            .background(VecturaiColors.SurfaceElevated.copy(alpha = 0.72f)),
+    ) {
+        val phoneX = size.width * 0.2f + sin(phase * Math.PI * 2).toFloat() * 14.dp.toPx()
+        val posterX = size.width * 0.7f
+        drawRoundRect(
+            color = VecturaiColors.BorderStrong,
+            topLeft = Offset(posterX, 16.dp.toPx()),
+            size = Size(54.dp.toPx(), 44.dp.toPx()),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()),
+        )
+        drawRoundRect(
+            brush = Brush.linearGradient(
+                listOf(
+                    VecturaiColors.GradientStart,
+                    VecturaiColors.GradientMid,
+                    VecturaiColors.GradientEnd,
+                ),
+            ),
+            topLeft = Offset(posterX + 8.dp.toPx(), 24.dp.toPx()),
+            size = Size(38.dp.toPx(), 28.dp.toPx()),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx()),
+        )
+        drawRoundRect(
+            color = VecturaiColors.SurfaceOverlay,
+            topLeft = Offset(phoneX, 22.dp.toPx()),
+            size = Size(34.dp.toPx(), 46.dp.toPx()),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(10.dp.toPx()),
+        )
+        drawCircle(
+            VecturaiColors.AccentCyan.copy(alpha = 0.28f),
+            radius = 28.dp.toPx(),
+            center = Offset(phoneX + 17.dp.toPx(), 45.dp.toPx()),
+            style = Stroke(width = 2.dp.toPx()),
+        )
+    }
+}
+
+@Composable
+private fun ConfettiBurst() {
+    if (rememberReduceMotion()) return
+    var started by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { started = true }
+    val particles = remember {
+        mutableStateListOf<Offset>().apply {
+            repeat(30) { index ->
+                add(Offset((index * 37 % 100) / 100f, (index * 19 % 100) / 100f))
+            }
+        }
+    }
+    val progress by animateFloatAsState(
+        targetValue = if (started) 1f else 0f,
+        animationSpec = tween(1_500, easing = FastOutSlowInEasing),
+        label = "confettiProgress",
+    )
+    Canvas(Modifier.fillMaxSize()) {
+        particles.forEachIndexed { index, seed ->
+            val angle = index * 0.61f
+            val radius = progress * size.minDimension * 0.42f
+            val center = Offset(size.width / 2f, size.height * 0.34f)
+            drawCircle(
+                color = if (index % 3 == 0) VecturaiColors.AccentAmber.copy(alpha = 1f - progress) else VecturaiColors.AccentCyan.copy(alpha = 1f - progress),
+                radius = 2.dp.toPx(),
+                center = Offset(
+                    center.x + cos(angle) * radius + seed.x * 8.dp.toPx(),
+                    center.y + sin(angle) * radius + seed.y * 8.dp.toPx(),
+                ),
+            )
         }
     }
 }

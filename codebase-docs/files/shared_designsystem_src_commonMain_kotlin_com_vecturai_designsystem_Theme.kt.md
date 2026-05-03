@@ -13,6 +13,9 @@
     - `LightColorScheme`: private val
     - `DarkColorScheme`: private val
 - **Important Logic by Line Range**:
+    - `DarkColorScheme`: Primary theme for the visitor flow, using `SurfaceCanvas`, `SurfaceCard`, and brand accent colors.
+    - `LightColorScheme`: Secondary theme (legacy).
+    - `VecturaiTheme`: Composable wrapper that defaults to `darkTheme = true` for the visitor flow.
     - `8-24`: Mapping of `VecturaiColors` to the Material 3 `lightColorScheme`.
     - `26-42`: Mapping to `darkColorScheme`.
     - `51-62`: `VecturaiTheme` implementation; provides the `colorScheme` and `typography` to the Compose hierarchy.

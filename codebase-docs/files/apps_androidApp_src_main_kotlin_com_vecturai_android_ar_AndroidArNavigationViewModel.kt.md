@@ -36,7 +36,7 @@ Android ViewModel for route configuration, entrance-poster alignment, next-actio
 - `UnifiedArSession` and `UnifiedArRenderer` now own all session lifecycle and frame delivery.
 - Refined tracking labels: "Tracking", "Hold steady", "Re-centering..." based on ARCore `TrackingState` and failure reasons.
 - Route progress: tracks total distance, current node, and ETA (at 1.2 m/s).
-- Next-action card: derives guidance text and icons (straight, left, right, arrival) from the lookahead arrow.
+- Next-action card: derives guidance text and icons (straight, left, right, arrival) from the lookahead arrow. Uses `VecturaiColors` and `VecturaiTypography` for high-fidelity rendering.
 - Haptics: `AndroidHapticManager` fires events for alignment lock (medium), turn warning (notification), re-centering (light), and arrival (success).
 
 ## Uses

@@ -2,7 +2,9 @@ package com.vecturai.android.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewModelScope
 import com.google.ar.core.Frame
+import com.vecturai.android.ar.AndroidHapticManager
 import com.vecturai.android.data.AndroidReviewedPackageLoader
 import com.vecturai.android.qr.ArFrameQrScanner
 import com.vecturai.android.qr.QRPayload
@@ -10,6 +12,7 @@ import com.vecturai.data.remote.RemoteBuildingDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AndroidNavigationFlowModel(
@@ -48,7 +51,7 @@ class AndroidNavigationFlowModel(
 
 class ArCameraFlowViewModel(
     private val packageLoader: AndroidReviewedPackageLoader,
-    private val remoteSource: RemoteBuildingDataSource,
+    private val haptics: AndroidHapticManager,
 ) : ViewModel() {
 
     sealed interface Phase {
@@ -85,6 +88,9 @@ class ArCameraFlowViewModel(
     private val _qrError = MutableStateFlow<String?>(null)
     val qrError: StateFlow<String?> = _qrError.asStateFlow()
 
+    private val _qrDetected = MutableStateFlow(false)
+    val qrDetected: StateFlow<Boolean> = _qrDetected.asStateFlow()
+
     private val qrScanner = ArFrameQrScanner { rawValue ->
         onQRScanned(rawValue)
     }
@@ -110,46 +116,38 @@ class ArCameraFlowViewModel(
         _session.value.reviewedConfig?.entranceMarkers?.firstOrNull()
 
     fun onQrFrame(frame: Frame, rotationDegrees: Int) {
-        if (_phase.value == Phase.QrScan) {
+        if (_phase.value == Phase.QrScan && !_qrDetected.value) {
             qrScanner.scan(frame, rotationDegrees)
         }
     }
 
     fun clearQRError() {
         _qrError.value = null
+        _qrDetected.value = false
         qrScanner.reset()
     }
 
     fun onQRScanned(rawValue: String): Boolean {
+        if (_qrDetected.value) return true
         val payload = QRPayload.parse(rawValue).getOrElse { error ->
             _qrError.value = error.message
+            haptics.error()
             return false
         }
 
-        // Token-based dynamic fetch
-        viewModelScope.launch {
-            _phase.value = Phase.Loading
-            val jsonString = remoteSource.fetchBuildingPackageByToken(payload.token)
-            if (jsonString == null) {
-                _qrError.value = "Building data not found on server"
-                _phase.value = Phase.QrScan
-                return@launch
-            }
-
-            packageLoader.parseUnifiedPackage(jsonString)
-                .onSuccess { config ->
-                    _session.value = _session.value.copy(
-                        reviewedConfig = config,
-                        qrToken = payload.token
-                    )
-                    confirmEntrance(payload)
-                }
-                .onFailure { error ->
-                    _qrError.value = "Failed to parse package: ${error.message}"
-                    _phase.value = Phase.QrScan
-                }
+        val config = _session.value.reviewedConfig ?: run {
+            _qrError.value = QRPayload.PayloadError.NotJSON.message
+            haptics.error()
+            return false
         }
 
+        payload.validate(config)?.let { error ->
+            _qrError.value = error.message
+            haptics.error()
+            return false
+        }
+
+        confirmEntrance(payload)
         return true
     }
 
@@ -209,6 +207,13 @@ class ArCameraFlowViewModel(
             confirmedEntrance = displayName,
             validatedEntranceMarker = marker,
         )
-        _phase.value = Phase.EntranceConfirmed(displayName)
+        haptics.success()
+        _qrDetected.value = true
+        viewModelScope.launch {
+            delay(650)
+            if (_phase.value == Phase.QrScan) {
+                _phase.value = Phase.EntranceConfirmed(displayName)
+            }
+        }
     }
 }

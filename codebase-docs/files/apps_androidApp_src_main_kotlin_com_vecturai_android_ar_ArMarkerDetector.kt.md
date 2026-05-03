@@ -25,8 +25,8 @@ Detects ARCore Augmented Images and converts strictly accepted entrance/checkpoi
 ## Main Symbols
 - `configure(...)`: Resets detector state and registers the expected entrance marker name/metadata.
 - `registerMarker(index, name, marker)`: Binds an ARCore image database index and image name to marker metadata.
-- `processFrame(frame)`: Scans fully tracking augmented images, rejects unknown names/indices, computes marker yaw, and emits callbacks.
-- `reset()` / `fullReset()`: Clear detection counters and optionally known marker registrations.
+- `processFrame(frame)`: Scans fully tracking augmented images, rejects unknown names/indices, computes marker yaw, and emits callbacks. Increments `framesAnalyzed` counter.
+- `reset()` / `fullReset()`: Clear detection counters (including `framesAnalyzed`) and optionally known marker registrations.
 - `onMarkerDetected`, `onCheckpointDetected`: Alignment/correction callbacks.
 
 ## Important Logic

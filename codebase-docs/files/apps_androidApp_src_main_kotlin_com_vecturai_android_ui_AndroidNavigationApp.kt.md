@@ -17,34 +17,36 @@ Compose root for the Android Home/PackageError surface plus reusable visitor-flo
 - `VecturaiTheme`
 
 ## Exports / Public Surface
-- `AndroidNavigationApp(...)`
-- `DestinationSelectScreen(...)`
-- `RoutePreviewScreen(...)`
-- `EntranceConfirmedSheet(...)`
-- `DotGridBackground(...)`
+- `AndroidNavigationApp`: Entry point with `VecturaiTheme` and `VecturaiHapticsGate`.
+- `HomeScreen`: Premium landing with `AuroraBackground` and animated feature pills.
+- `DestinationSelectScreen`: Grouped rooms with search, filtering, and recent locations.
+- `RoutePreviewScreen`: Comprehensive summary with `RouteHeroCard` and `RouteTimelineCard`.
+- `EntranceConfirmedSheet`: Full-screen success state with `AnimatedCheckMark`.
+- `BrandMark`: Animated brand identity component.
 
 ## Main Symbols
-- `AndroidNavigationApp`: Renders MainActivity's Home or PackageError only.
-- `HomeScreen`: Dark welcome screen with `DotGridBackground`, `FeaturePill` labels, and a gear icon for admin tools.
-- `DestinationSelectScreen`: Activity-scoped destination picker with `SearchField`, `DestinationFilter` chips, and `RecentDestinationCard`.
-- `RoutePreviewScreen`: Activity-scoped summary showing walking ETA, distance, and origin-to-destination path info.
-- `EntranceConfirmedSheet`: Camera-flow bottom sheet shown over the still-running ARCore preview.
-- `DotGridBackground`: Custom Canvas drawing for the dark theme aesthetics.
+- `AndroidNavigationApp`: Manages the root home/error state; provides the design system context.
+- `HomeScreen`: Implements the "dark visitor flow" with `AuroraBackground`, `GradientText`, and a `VecturaiPrimaryButton` for scanning.
+- `DestinationSelectScreen`: Uses `LazyColumn` with sticky-like headers for categories; features a collapsing search header.
+- `RoutePreviewScreen`: Renders the route geometry preview and walking stats; includes a scrollable timeline of the journey.
+- `EntranceConfirmedSheet`: High-confidence confirmation overlay shown after a successful QR/Marker scan.
 
 ## Important Logic
-- The welcome screen implements a premium "dark mode" aesthetic with vibrant primary colors and micro-animations (dotted backgrounds).
-- Destination selection uses category-based grouping (`classroom`, `lab`, `cafe`, etc.) and pre-calculated route summaries.
-- `RouteSummary` integration: room cards and the preview screen show estimated walking time (distance / 1.2 m/s).
-- Admin tools accessibility is moved to a top-right settings icon, separating management from the visitor flow.
+- **Shared Design System**: Migrated from ad-hoc styling to `VecturaiTheme` and centralized components (`VecturaiPrimaryButton`, `VecturaiCard`).
+- **Motion Policy**: Uses `MotionUtils` (`rememberAuroraIntensity`) to disable or dampen animations based on system settings or battery saver mode.
+- **Haptic Feedback**: Integrates `VecturaiHapticsGate` and `AndroidHapticManager` to provide tactile feedback on interactions (via `vecturaiTap`).
+- **Category Grouping**: Rooms are grouped by semantic categories (e.g., "Rooms", "Labs", "Food") in the destination picker for better UX.
+- **Route Hero**: The preview screen features a "Hero Card" that combines walking time, distance, and a mini-map visualization.
 
 ## Uses
-- `AndroidNavigationFlowModel`
-- `ArCameraFlowViewModel`
-- `AndroidReviewedPackageLoader`
+- `VecturaiTheme`, `VecturaiColors`, `VecturaiBrush`, `VecturaiShapes`, `Spacing`, `VecturaiTypography`
+- `AuroraBackground`, `VecturaiPrimaryButton`, `IconChip`, `GradientText`, `StatPill`, `VecturaiCard`
+- `MotionUtils` (`rememberReduceMotion`, `rememberAuroraIntensity`)
+- `AndroidNavigationFlowModel`, `ArCameraFlowViewModel`
 
 ## Used By
 - `MainActivity.kt`: Root home content.
-- `ArCameraActivity.kt`: Reuses destination, route preview, and entrance-confirmed overlays.
+- `ArCameraActivity.kt`: Overlays for destination selection, route preview, and confirmation.
 
 ## Related Tests
 - None.
