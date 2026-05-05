@@ -65,7 +65,7 @@ package "VecturAI Mobile App" {
   usecase "Follow AR Guidance" as UC4
 }
 
-package "VecturAI Manager Panel" {
+package "Vectura AI Manager Panel" {
   usecase "Upload 3D Map (GLB)" as UC5
   usecase "Review Draft Navigation" as UC6
   usecase "Edit Room Details" as UC7

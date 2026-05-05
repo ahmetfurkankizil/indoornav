@@ -6,6 +6,7 @@ import { useEditorStore, type EditorMode } from '../../stores/editorStore'
 import { renderMapBlob } from '../../three/MapRenderer'
 import {
   listNodes, createNode, updateNode, deleteNode,
+  listNavMeshAreas, createNavMeshArea, updateNavMeshArea, deleteNavMeshArea,
   type Node, type NavMeshArea,
 } from '../../api/mapEditor'
 import { getBuilding, updateFloorBounds } from '../../api/buildings'
@@ -176,8 +177,12 @@ export function MapEditorPage() {
 
   const loadData = useCallback(async () => {
     if (!floorId) return
-    const nodes = await listNodes(floorId)
+    const [nodes, areas] = await Promise.all([
+      listNodes(floorId),
+      listNavMeshAreas(floorId)
+    ])
     store.setNodes(nodes)
+    store.setNavMeshAreas(areas)
     store.setDirty(false)
   }, [floorId])
 
@@ -235,7 +240,9 @@ export function MapEditorPage() {
     for (const id of nodeIds) {
       try { await deleteNode(floorId, id) } catch { /* continue */ }
     }
-    areaIds.forEach(id => store.removeNavMeshArea(id))
+    for (const id of areaIds) {
+      try { await deleteNavMeshArea(floorId, id) } catch { /* continue */ }
+    }
     store.removeSelectedItems()
     const count = nodeIds.length + areaIds.length
     showToast(`Deleted ${count} item${count !== 1 ? 's' : ''}`)
@@ -247,8 +254,10 @@ export function MapEditorPage() {
     catch { showToast('Delete failed') }
   }
 
-  const handleDeleteArea = (areaId: string) => {
-    store.removeNavMeshArea(areaId)
+  const handleDeleteArea = async (areaId: string) => {
+    if (!floorId) return
+    try { await deleteNavMeshArea(floorId, areaId); store.removeNavMeshArea(areaId) }
+    catch { showToast('Delete failed') }
   }
 
   const handleUpdateNode = async (nodeId: string, patch: Partial<Node>) => {
@@ -257,26 +266,24 @@ export function MapEditorPage() {
     catch { showToast('Update failed') }
   }
 
-  const handleUpdateAreaLabel = (areaId: string, label: string) => {
-    const area = store.navMeshAreas.find(a => a.id === areaId)
-    if (area) store.updateNavMeshAreaInStore({ ...area, label })
+  const handleUpdateAreaLabel = async (areaId: string, label: string) => {
+    if (!floorId) return
+    try { const a = await updateNavMeshArea(floorId, areaId, { label }); store.updateNavMeshAreaInStore(a) }
+    catch { showToast('Update failed') }
   }
 
-  const handleCloseArea = () => {
-    if (store.pendingAreaVertices.length < 3) return
-    const area: NavMeshArea = {
-      id:         crypto.randomUUID(),
-      floorId:    floorId ?? '',
-      buildingId: '',
-      label:      'Walkable Area',
-      vertices:   store.pendingAreaVertices,
-      createdAt:  new Date().toISOString(),
-      updatedAt:  new Date().toISOString(),
-    }
-    store.addNavMeshArea(area)
-    store.clearPendingVertices()
-    store.toggleAreaSelection(area.id, false)
-    showToast('Walkable area created')
+  const handleCloseArea = async () => {
+    if (store.pendingAreaVertices.length < 3 || !floorId) return
+    try {
+      const area = await createNavMeshArea(floorId, {
+        label:    'Walkable Area',
+        vertices:  store.pendingAreaVertices,
+      })
+      store.addNavMeshArea(area)
+      store.clearPendingVertices()
+      store.toggleAreaSelection(area.id, false)
+      showToast('Walkable area created')
+    } catch { showToast('Failed to create area') }
   }
 
   const handleStartAiGeneration = () => {
@@ -430,7 +437,8 @@ export function MapEditorPage() {
 
   // ── Area drag ────────────────────────────────────────────────────────────────
 
-  const handleAreaDragEnd = (e: any, area: NavMeshArea) => {
+  const handleAreaDragEnd = async (e: any, area: NavMeshArea) => {
+    if (!floorId) return
     const shape = e.target
     const dx    = px2norm(shape.x())
     const dy    = px2norm(shape.y())
@@ -439,7 +447,10 @@ export function MapEditorPage() {
       x: Math.max(0, Math.min(1, v.x + dx)),
       y: Math.max(0, Math.min(1, v.y + dy)),
     }))
-    store.updateNavMeshAreaInStore({ ...area, vertices: newVertices })
+    try {
+      const a = await updateNavMeshArea(floorId, area.id, { vertices: newVertices })
+      store.updateNavMeshAreaInStore(a)
+    } catch { showToast('Move failed') }
   }
 
   // ── HTML5 drag-and-drop from right panel ──────────────────────────────────────

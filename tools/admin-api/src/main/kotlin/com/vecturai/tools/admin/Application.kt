@@ -85,7 +85,7 @@ fun Application.configureApp(
 
     install(Authentication) {
         jwt("manager-auth") {
-            realm = "VecturAI Manager"
+            realm = "Vectura AI Manager"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)

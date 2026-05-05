@@ -4,6 +4,7 @@ import type { Node } from './mapEditor'
 const LS_BUILDINGS = 'VecturAI_buildings'
 const LS_NODES = 'VecturAI_nodes'
 const LS_CONNS = 'VecturAI_connections'
+const LS_AREAS = 'VecturAI_areas'
 
 function uid() { return crypto.randomUUID() }
 function now() { return new Date().toISOString() }
@@ -43,6 +44,7 @@ export function lsDeleteBuilding(id: string): void {
   save(LS_BUILDINGS, lsListBuildings().filter(b => b.id !== id))
   save(LS_NODES, load<Node>(LS_NODES).filter(n => n.buildingId !== id))
   save(LS_CONNS, load<FloorConnection>(LS_CONNS).filter(c => c.buildingId !== id))
+  save(LS_AREAS, load<any>(LS_AREAS).filter((a: any) => a.buildingId !== id))
 }
 
 // ── Floors (nested inside Building.floors) ─────────────────────────────────────
@@ -83,6 +85,7 @@ export function lsDeleteFloor(buildingId: string, floorId: string): void {
   all[i] = { ...all[i], floors: (all[i].floors ?? []).filter(f => f.id !== floorId), updatedAt: now() }
   save(LS_BUILDINGS, all)
   save(LS_NODES, load<Node>(LS_NODES).filter(n => n.floorId !== floorId))
+  save(LS_AREAS, load<any>(LS_AREAS).filter((a: any) => a.floorId !== floorId))
 }
 
 export function lsGetBuildingIdForFloor(floorId: string): string | null {
@@ -128,6 +131,36 @@ export function lsUpdateNode(nodeId: string, data: Partial<Node>): Node {
 
 export function lsDeleteNode(nodeId: string): void {
   save(LS_NODES, load<Node>(LS_NODES).filter(n => n.id !== nodeId))
+}
+
+// ── NavMesh Areas ───────────────────────────────────────────────────────────────
+
+export function lsListAreas(floorId: string): any[] {
+  return load<any>(LS_AREAS).filter(a => a.floorId === floorId)
+}
+
+export function lsCreateArea(floorId: string, buildingId: string, data: any): any {
+  const area = {
+    ...data,
+    id: data.id || uid(),
+    floorId, buildingId,
+    createdAt: now(), updatedAt: now(),
+  }
+  save(LS_AREAS, [...load<any>(LS_AREAS), area])
+  return area
+}
+
+export function lsUpdateArea(areaId: string, data: any): any {
+  const all = load<any>(LS_AREAS)
+  const i = all.findIndex(a => a.id === areaId)
+  if (i === -1) throw new Error('Area not found')
+  all[i] = { ...all[i], ...data, updatedAt: now() }
+  save(LS_AREAS, all)
+  return all[i]
+}
+
+export function lsDeleteArea(areaId: string): void {
+  save(LS_AREAS, load<any>(LS_AREAS).filter(a => a.id !== areaId))
 }
 
 // ── Floor connections ───────────────────────────────────────────────────────────

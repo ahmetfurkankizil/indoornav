@@ -1,4 +1,7 @@
-import { lsListNodes, lsCreateNode, lsUpdateNode, lsDeleteNode, lsGetBuildingIdForFloor } from './localDb'
+import {
+  lsListNodes, lsCreateNode, lsUpdateNode, lsDeleteNode, lsGetBuildingIdForFloor,
+  lsListAreas, lsCreateArea, lsUpdateArea, lsDeleteArea
+} from './localDb'
 
 export interface Waypoint { x: number; y: number }
 
@@ -44,3 +47,19 @@ export const updateNode = async (floorId: string, nodeId: string, data: {
 
 export const deleteNode = async (_floorId: string, nodeId: string): Promise<void> =>
   lsDeleteNode(nodeId)
+
+// ── NavMesh Areas ───────────────────────────────────────────────────────────────
+
+export const listNavMeshAreas = async (floorId: string): Promise<NavMeshArea[]> =>
+  lsListAreas(floorId)
+
+export const createNavMeshArea = async (floorId: string, data: Partial<NavMeshArea>): Promise<NavMeshArea> => {
+  const buildingId = lsGetBuildingIdForFloor(floorId) ?? ''
+  return lsCreateArea(floorId, buildingId, data)
+}
+
+export const updateNavMeshArea = async (floorId: string, areaId: string, data: Partial<NavMeshArea>): Promise<NavMeshArea> =>
+  lsUpdateArea(areaId, data)
+
+export const deleteNavMeshArea = async (_floorId: string, areaId: string): Promise<void> =>
+  lsDeleteArea(areaId)
