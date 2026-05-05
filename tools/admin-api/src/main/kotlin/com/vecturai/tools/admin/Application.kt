@@ -28,7 +28,7 @@ fun main() {
     val uploadsDir = Env.get("UPLOADS_DIR") ?: "uploads"
 
     println("╔══════════════════════════════════════════════╗")
-    println("║   VecturAI Admin API                         ║")
+    println("║   Vectura AI Admin API                       ║")
     println("╚══════════════════════════════════════════════╝")
     println("  Port:        $port")
     println("  Uploads dir: $uploadsDir")
@@ -85,7 +85,7 @@ fun Application.configureApp(
 
     install(Authentication) {
         jwt("manager-auth") {
-            realm = "VecturAI Manager"
+            realm = "Vectura AI Manager"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)
@@ -101,7 +101,7 @@ fun Application.configureApp(
         }
 
         jwt("superadmin-auth") {
-            realm = "VecturAI DB Admin"
+            realm = "Vectura AI DB Admin"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)

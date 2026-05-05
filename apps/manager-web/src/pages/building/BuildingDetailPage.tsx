@@ -530,7 +530,7 @@ function QrModal({ buildingId, onClose }: { buildingId: string; onClose: () => v
         ) : qrUrl ? (
           <>
             <img src={qrUrl} alt="Building QR Code" className="w-64 h-64 border shadow-sm" />
-            <p className="text-sm text-gray-500 text-center">Scan with the VecturAI mobile app to start navigation.</p>
+            <p className="text-sm text-gray-500 text-center">Scan with the Vectura AI mobile app to start navigation.</p>
             <a href={qrUrl} download={`building-${buildingId}-qr.png`}
               className="text-sm text-blue-600 font-medium hover:underline">Download PNG</a>
           </>

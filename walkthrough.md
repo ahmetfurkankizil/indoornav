@@ -1,6 +1,6 @@
 # Android AR Navigation Fixes (Fix 1-7)
 
-This walkthrough covers the 7 critical fixes applied to the `VecturAI` Android AR navigation experience:
+This walkthrough covers the 7 critical fixes applied to the `Vectura AI` Android AR navigation experience:
 
 ## What Was Fixed
 
@@ -26,7 +26,7 @@ This walkthrough covers the 7 critical fixes applied to the `VecturAI` Android A
 
 ---
 
-# VecturAI Web Admin — Running Guide
+# Vectura AI Web Admin — Running Guide
 
 The system has **two servers** that must both be running:
 
@@ -129,7 +129,7 @@ POSTGRES_PASSWORD=vecturai
 
 ```
 ╔══════════════════════════════════════════════╗
-║   VecturAI Admin API                         ║
+║   Vectura AI Admin API                       ║
 ╚══════════════════════════════════════════════╝
   Port:        8080
   Uploads dir: uploads

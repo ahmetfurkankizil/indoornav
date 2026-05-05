@@ -29,7 +29,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Sign in to VecturAI</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Sign in to Vectura AI</h1>
         {error && <p className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
