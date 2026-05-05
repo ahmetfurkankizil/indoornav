@@ -29,6 +29,9 @@ export function DashboardPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteBuilding(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['buildings'] }); setDeleteId(null) },
+    onError: (err: any) => {
+      alert(`Failed to delete building: ${err.response?.data?.message || err.message}`)
+    }
   })
 
   return (
@@ -111,7 +114,9 @@ export function DashboardPage() {
           <p className="text-gray-600 mb-4">This will permanently delete the building and all its floors, nodes, and edges.</p>
           <div className="flex gap-2 justify-end">
             <button onClick={() => setDeleteId(null)} className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
-            <button onClick={() => deleteMut.mutate(deleteId)} disabled={deleteMut.isPending}
+            <button onClick={() => {
+              if (deleteId) deleteMut.mutate(deleteId)
+            }} disabled={deleteMut.isPending}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50">
               {deleteMut.isPending ? 'Deleting...' : 'Delete'}
             </button>

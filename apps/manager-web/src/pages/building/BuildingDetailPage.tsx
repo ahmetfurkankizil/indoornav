@@ -28,12 +28,24 @@ export function BuildingDetailPage() {
   const [connTo, setConnTo]             = useState('')
   const [connType, setConnType]         = useState('elevator')
   const [errorPopup, setErrorPopup]     = useState<string | null>(null)
+  const [isEditingInfo, setIsEditingInfo] = useState(false)
+  const [editName, setEditName]         = useState('')
+  const [editDesc, setEditDesc]         = useState('')
+  const [editAddr, setEditAddr]         = useState('')
 
   const { data: building, isLoading } = useQuery({
     queryKey: ['building', buildingId],
     queryFn: () => getBuilding(buildingId!),
     enabled: !!buildingId,
   })
+
+  useEffect(() => {
+    if (building) {
+      setEditName(building.name)
+      setEditDesc(building.description || '')
+      setEditAddr(building.address || '')
+    }
+  }, [building])
 
   const { data: connections = [] } = useQuery({
     queryKey: ['connections', buildingId],
@@ -93,8 +105,15 @@ export function BuildingDetailPage() {
   })
 
   const updateBuildingMut = useMutation({
-    mutationFn: (data: { widthMeters: number }) => updateBuilding(buildingId!, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['building', buildingId] }),
+    mutationFn: (data: { name?: string; description?: string; address?: string; widthMeters?: number }) => 
+      updateBuilding(buildingId!, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['building', buildingId] })
+      setIsEditingInfo(false)
+    },
+    onError: (err: any) => {
+      alert(`Failed to update building: ${err.response?.data?.message || err.message}`)
+    }
   })
 
   const addConnMut = useMutation({
@@ -145,23 +164,83 @@ export function BuildingDetailPage() {
         </nav>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">{building.name}</h1>
-            {building.description && <p className="text-gray-500 mt-1">{building.description}</p>}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex-1 mr-4">
+            {isEditingInfo ? (
+              <div className="space-y-3 bg-white p-4 border rounded-xl shadow-sm">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Building Name</label>
+                  <input 
+                    value={editName} onChange={e => setEditName(e.target.value)}
+                    className="w-full text-xl font-bold border-b focus:border-blue-500 outline-none pb-1"
+                    placeholder="Enter building name..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Description</label>
+                  <textarea 
+                    value={editDesc} onChange={e => setEditDesc(e.target.value)}
+                    className="w-full text-sm text-gray-600 border rounded p-2 focus:ring-1 focus:ring-blue-500 outline-none"
+                    placeholder="Add a description (optional)"
+                    rows={2}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      updateBuildingMut.mutate({ name: editName, description: editDesc })
+                    }}
+                    disabled={updateBuildingMut.isPending || !editName.trim()}
+                    className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {updateBuildingMut.isPending ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIsEditingInfo(false)
+                      setEditName(building.name)
+                      setEditDesc(building.description || '')
+                    }}
+                    className="text-xs border px-3 py-1.5 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="group relative">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-gray-900">{building.name}</h1>
+                  <button 
+                    onClick={() => setIsEditingInfo(true)}
+                    className="p-1 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Edit name and description"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </button>
+                </div>
+                {building.description && <p className="text-gray-500 mt-1 leading-relaxed">{building.description}</p>}
+                {!building.description && (
+                  <button onClick={() => setIsEditingInfo(true)} className="text-sm text-blue-500 hover:underline mt-1">
+                    + Add description
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+          
+          <div className="flex items-center gap-2 shrink-0">
             <span className={`text-sm px-3 py-1 rounded-full font-medium ${
               building.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
             }`}>{building.status}</span>
             <button type="button" onClick={() => setShowQr(true)}
-              className="text-sm px-3 py-2 border rounded-lg hover:bg-gray-50">
+              className="text-sm px-3 py-2 border rounded-lg hover:bg-gray-50 bg-white">
               View QR
             </button>
             <button
               onClick={() => publishMut.mutate()}
               disabled={publishMut.isPending || floors.length === 0}
-              className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 shadow-sm"
             >
               {publishMut.isPending ? 'Publishing...' : 'Publish'}
             </button>

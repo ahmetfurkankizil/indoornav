@@ -1,7 +1,6 @@
 package com.vecturai.tools.admin.service
 
-import com.vecturai.tools.admin.db.tables.Buildings
-import com.vecturai.tools.admin.db.tables.Floors
+import com.vecturai.tools.admin.db.tables.*
 import com.vecturai.tools.admin.model.BuildingResponse
 import com.vecturai.tools.admin.model.FloorResponse
 import kotlinx.coroutines.Dispatchers
@@ -116,10 +115,26 @@ class BuildingService(private val qrService: QRCodeService) {
     suspend fun delete(buildingId: String, managerId: String): Boolean =
         withContext(Dispatchers.IO) {
             transaction {
-                Buildings.deleteWhere {
-                    (id eq UUID.fromString(buildingId)) and
-                        (Buildings.managerId eq UUID.fromString(managerId))
-                } > 0
+                val bId = UUID.fromString(buildingId)
+                val mId = UUID.fromString(managerId)
+
+                // Verify ownership first
+                val exists = Buildings.selectAll().where { 
+                    (Buildings.id eq bId) and (Buildings.managerId eq mId) 
+                }.any()
+                
+                if (!exists) return@transaction false
+
+                // Manually delete related entities in order to satisfy FK constraints
+                // (Using manual delete instead of Cascade for immediate effect on existing DB)
+                NavigationPackages.deleteWhere { NavigationPackages.buildingId eq bId }
+                FloorConnections.deleteWhere { FloorConnections.buildingId eq bId }
+                Edges.deleteWhere { Edges.buildingId eq bId }
+                EntranceMarkers.deleteWhere { EntranceMarkers.buildingId eq bId }
+                Nodes.deleteWhere { Nodes.buildingId eq bId }
+                Floors.deleteWhere { Floors.buildingId eq bId }
+
+                Buildings.deleteWhere { (Buildings.id eq bId) and (Buildings.managerId eq mId) } > 0
             }
         }
 
