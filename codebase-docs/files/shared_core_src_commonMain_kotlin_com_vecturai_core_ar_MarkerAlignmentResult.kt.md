@@ -1,7 +1,7 @@
 # File Dossier: MarkerAlignmentResult.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\MarkerAlignmentResult.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\ar\MarkerAlignmentResult.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.ar
+package com.VecturAI.core.ar
 
 import kotlinx.serialization.Serializable
 

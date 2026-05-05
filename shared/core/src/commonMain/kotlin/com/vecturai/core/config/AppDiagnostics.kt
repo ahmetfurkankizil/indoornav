@@ -1,6 +1,6 @@
-package com.Vectura AI.core.config
+package com.VecturAI.core.config
 
-import com.Vectura AI.core.navigation.NavigationSession
+import com.VecturAI.core.navigation.NavigationSession
 import kotlinx.serialization.Serializable
 
 /**

@@ -2,7 +2,7 @@
 #
 # Demo Readiness Check
 #
-# Validates that the Vectura AI iOS MVP is ready for a demo.
+# Validates that the VecturAI iOS MVP is ready for a demo.
 # Runs all checks needed before presenting to investors.
 #
 # Usage:
@@ -24,7 +24,7 @@ fail() { red   "  FAIL: $1"; ERRORS=$((ERRORS + 1)); }
 warn() { yellow "  WARN: $1"; WARNINGS=$((WARNINGS + 1)); }
 
 echo ""
-blue "=== Vectura AI Demo Readiness Check ==="
+blue "=== VecturAI Demo Readiness Check ==="
 echo ""
 
 # --- 1. Reviewed Package Validation ---
@@ -162,7 +162,7 @@ fi
 
 echo ""
 echo "  Expected QR payload (embedded in the entrance poster):"
-echo "  {\"type\":\"Vectura AI-entrance\",\"buildingId\":\"$BUILDING_ID\",\"entranceId\":\"$ENTRANCE_ID\",\"v\":1}"
+echo "  {\"type\":\"VecturAI-entrance\",\"buildingId\":\"$BUILDING_ID\",\"entranceId\":\"$ENTRANCE_ID\",\"v\":1}"
 echo ""
 echo "  NOTE: The entrance poster is a single artifact containing this QR code."
 echo "  It also serves as the AR reference image. Generate with: ./scripts/generate-entrance-poster.sh"

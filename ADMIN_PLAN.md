@@ -1,4 +1,4 @@
-# Vectura AI Web Admin Panel — Implementation Plan (Revised)
+# VecturAI Web Admin Panel — Implementation Plan (Revised)
 
 > Status: **DRAFT v2 — incorporating feedback 2026-04-30**
 > Author: Claude Code
@@ -66,7 +66,7 @@ Same React app, separate route namespace (`/db-admin/*`), separate auth context.
 ### 3.4 Mobile Changes
 
 - Remove all `apps/iosApp/iosApp/admin/` files and admin gear icon
-- Update QR scan to `Vectura AI-building` contract
+- Update QR scan to `VecturAI-building` contract
 - Add nav package download + checksum-based disk cache
 - Multi-floor Dijkstra
 
@@ -434,7 +434,7 @@ GET    /api/db-admin/stats                        → { managerCount, buildingCo
 ### QR Payload (updated v2 contract)
 
 ```json
-{ "type": "Vectura AI-building", "token": "abc123xyz", "v": 2 }
+{ "type": "VecturAI-building", "token": "abc123xyz", "v": 2 }
 ```
 
 Mobile scans QR → extracts `token` → calls `/mobile/buildings/{token}/nav-package`.
@@ -643,12 +643,12 @@ Nodes:
 
 ### Updated QR Flow
 
-**Old payload** (v1): `{ "type": "Vectura AI-entrance", "buildingId": "...", "entranceId": "...", "v": 1 }`
+**Old payload** (v1): `{ "type": "VecturAI-entrance", "buildingId": "...", "entranceId": "...", "v": 1 }`
 
-**New payload** (v2): `{ "type": "Vectura AI-building", "token": "abc123xyz", "v": 2 }`
+**New payload** (v2): `{ "type": "VecturAI-building", "token": "abc123xyz", "v": 2 }`
 
 Mobile logic after QR scan:
-1. Parse QR → read `type == "Vectura AI-building"`, extract `token`
+1. Parse QR → read `type == "VecturAI-building"`, extract `token`
 2. Check disk cache: `{cacheDir}/{token}/nav-package.json` + `{token}/checksum.txt`
 3. Fetch `GET /mobile/buildings/{token}/nav-package`
 4. Compare `response.checksum` with cached checksum
@@ -673,7 +673,7 @@ Mobile logic after QR scan:
 ## 12. File Structure (New / Changed)
 
 ```
-Vectura AI/
+VecturAI/
 ├── apps/
 │   ├── manager-web/                         ← NEW: React SPA (manager + db-admin panels)
 │   │   ├── src/
@@ -697,7 +697,7 @@ Vectura AI/
 │           └── QRScanView.swift             ← Update to parse v2 payload
 ├── tools/
 │   └── admin-api/
-│       └── src/main/kotlin/com/Vectura AI/tools/admin/
+│       └── src/main/kotlin/com/VecturAI/tools/admin/
 │           ├── Application.kt               ← Add CORS for manager-web origin
 │           │                                   Add PostgreSQL datasource config
 │           ├── db/

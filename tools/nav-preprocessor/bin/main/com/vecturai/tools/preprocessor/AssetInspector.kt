@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
 import java.io.File
 

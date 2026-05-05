@@ -1,7 +1,7 @@
 # File Dossier: DraftSummaryExtractor.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/service/DraftSummaryExtractor.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/VecturAI/tools/admin/service/DraftSummaryExtractor.kt`
 - **Type**: Kotlin Source (Service)
 - **Feature**: `admin_orchestration`, `preprocessing`
 - **Status**: Mapped

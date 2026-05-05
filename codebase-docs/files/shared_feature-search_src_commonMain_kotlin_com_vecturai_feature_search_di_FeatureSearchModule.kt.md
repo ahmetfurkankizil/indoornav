@@ -1,10 +1,10 @@
-# File Dossier: shared/feature-search/src/commonMain/kotlin/com/Vectura AI/feature/search/di/FeatureSearchModule.kt
+# File Dossier: shared/feature-search/src/commonMain/kotlin/com/VecturAI/feature/search/di/FeatureSearchModule.kt
 
-- **Path**: `shared/feature-search/src/commonMain/kotlin/com/Vectura AI/feature/search/di/FeatureSearchModule.kt`
+- **Path**: `shared/feature-search/src/commonMain/kotlin/com/VecturAI/feature/search/di/FeatureSearchModule.kt`
 - **Type**: source
 - **Role**: Koin DI module for the search feature.
 - **Imports / Includes**:
-    - `com.Vectura AI.feature.search.SearchUseCase`
+    - `com.VecturAI.feature.search.SearchUseCase`
     - `org.koin.dsl.module`
 - **Exports / Public Surface**:
     - `featureSearchModule`: Koin Module

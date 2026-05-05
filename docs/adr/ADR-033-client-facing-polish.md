@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-04-13
-**Deciders:** Vectura AI team
+**Deciders:** VecturAI team
 **Relates to:** ADR-025 (iOS truth-path navigation flow), ADR-027 (rolling lookahead AR guidance), ADR-012 (demo-first UX)
 
 ## Context

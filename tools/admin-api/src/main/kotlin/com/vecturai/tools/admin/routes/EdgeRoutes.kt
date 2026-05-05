@@ -1,10 +1,10 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.model.AiSuggestRequest
-import com.Vectura AI.tools.admin.model.CreateEdgeRequest
-import com.Vectura AI.tools.admin.model.UpdateEdgeRequest
-import com.Vectura AI.tools.admin.service.AiEdgeSuggester
-import com.Vectura AI.tools.admin.service.EdgeService
+import com.vecturai.tools.admin.model.AiSuggestRequest
+import com.vecturai.tools.admin.model.CreateEdgeRequest
+import com.vecturai.tools.admin.model.UpdateEdgeRequest
+import com.vecturai.tools.admin.service.AiEdgeSuggester
+import com.vecturai.tools.admin.service.EdgeService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

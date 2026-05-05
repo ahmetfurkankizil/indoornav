@@ -19,7 +19,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.Vectura AI.data.local"
+    namespace = "com.VecturAI.data.local"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
     compileOptions {

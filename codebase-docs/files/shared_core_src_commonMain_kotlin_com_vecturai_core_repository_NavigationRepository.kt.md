@@ -1,7 +1,7 @@
 # File Dossier: NavigationRepository.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\repository\NavigationRepository.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\repository\NavigationRepository.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.repository
+package com.VecturAI.core.repository
 
-import com.Vectura AI.core.domain.Route
+import com.VecturAI.core.domain.Route
 
 /**
  * Repository for navigation-related data operations.

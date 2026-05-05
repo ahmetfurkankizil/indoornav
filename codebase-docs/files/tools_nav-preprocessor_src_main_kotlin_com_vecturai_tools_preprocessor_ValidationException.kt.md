@@ -1,7 +1,7 @@
 # File Dossier: ValidationException.kt
 
 ## Path
-`tools\nav-preprocessor\src\main\kotlin\com\Vectura AI\tools\preprocessor\ValidationException.kt`
+`tools\nav-preprocessor\src\main\kotlin\com\VecturAI\tools\preprocessor\ValidationException.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.tools.preprocessor
+package com.VecturAI.tools.preprocessor
 
 /**
  * Exception thrown during pipeline validation steps.

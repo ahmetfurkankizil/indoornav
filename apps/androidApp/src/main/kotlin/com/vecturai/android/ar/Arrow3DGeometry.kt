@@ -1,6 +1,6 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
-import com.Vectura AI.android.data.ArrowPlacementType
+import com.VecturAI.android.data.ArrowPlacementType
 import kotlin.math.sqrt
 
 internal object Arrow3DGeometry {

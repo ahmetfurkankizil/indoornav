@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor.analysis
+package com.vecturai.tools.preprocessor.analysis
 
-import com.Vectura AI.tools.preprocessor.glb.Vec3
+import com.vecturai.tools.preprocessor.glb.Vec3
 import kotlin.math.roundToInt
 
 /**

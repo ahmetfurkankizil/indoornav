@@ -1,6 +1,6 @@
-package com.Vectura AI.core.repository
+package com.VecturAI.core.repository
 
-import com.Vectura AI.core.domain.VisitRecord
+import com.VecturAI.core.domain.VisitRecord
 
 /**
  * In-memory implementation of [HistoryRepository].

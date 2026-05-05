@@ -1,10 +1,10 @@
-package com.Vectura AI.core.store
+package com.VecturAI.core.store
 
-import com.Vectura AI.core.ar.ArSessionState
-import com.Vectura AI.core.domain.NavigationState
-import com.Vectura AI.core.domain.Room
-import com.Vectura AI.core.navigation.ArrivalStatus
-import com.Vectura AI.core.navigation.NavigationSession
+import com.VecturAI.core.ar.ArSessionState
+import com.VecturAI.core.domain.NavigationState
+import com.VecturAI.core.domain.Room
+import com.VecturAI.core.navigation.ArrivalStatus
+import com.VecturAI.core.navigation.NavigationSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

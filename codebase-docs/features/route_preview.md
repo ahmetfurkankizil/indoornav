@@ -3,10 +3,10 @@
 - **Feature Name**: Route Preview
 - **Purpose**: Provides users with a summary of the path and instructions before they commit to an AR navigation session.
 - **Implemented In**:
-    - `shared/feature-preview/src/commonMain/kotlin/com/Vectura AI/feature/preview/RoutePreviewUseCase.kt`
-    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/AndroidNavigationApp.kt`
-    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt`
-    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt`
+    - `shared/feature-preview/src/commonMain/kotlin/com/VecturAI/feature/preview/RoutePreviewUseCase.kt`
+    - `apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/AndroidNavigationApp.kt`
+    - `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt`
+    - `apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt`
 - **Used By**:
     - Destination Detail Screen
     - Route Preview Screen
@@ -28,8 +28,8 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [RoutePreviewUseCase.kt](../files/shared_feature-preview_src_commonMain_kotlin_com_Vectura AI_feature_preview_RoutePreviewUseCase.kt.md)
-    - [AndroidNavigationApp.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_AndroidNavigationApp.kt.md)
+    - [RoutePreviewUseCase.kt](../files/shared_feature-preview_src_commonMain_kotlin_com_VecturAI_feature_preview_RoutePreviewUseCase.kt.md)
+    - [AndroidNavigationApp.kt](../files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_AndroidNavigationApp.kt.md)
 - **Risks / Notes**:
     - Does not include a visual 2D map yet.
     - Purely instructional preview.

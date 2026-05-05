@@ -1,7 +1,7 @@
 # File Dossier: AndroidNavigationFlowModel.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/navigation/AndroidNavigationFlowModel.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/navigation/AndroidNavigationFlowModel.kt`
 
 ## Type
 Authored Source (Android Flow State)
@@ -29,7 +29,7 @@ Defines the Android visitor flow state split between MainActivity and the dedica
 - `ArCameraFlowViewModel`: Activity-scoped QR-to-AR state machine.
 - `RouteSummary`: Data class for walking time (at 1.2 m/s), distance, and floor info.
 - `ArCameraFlowViewModel.onQrFrame(frame, rotationDegrees)`: Sends ARCore camera frames to ML Kit QR scanning.
-- `ArCameraFlowViewModel.onQRScanned(rawValue)`: Parses and validates Vectura AI entrance QR payloads.
+- `ArCameraFlowViewModel.onQRScanned(rawValue)`: Parses and validates VecturAI entrance QR payloads.
 - `selectDestination(room)` / `startNavigation()`: Computes the route package and advances to AR navigation.
 - `routeSummaryFor(room)`: Pre-computes route stats for destination selection.
 
@@ -38,7 +38,7 @@ Defines the Android visitor flow state split between MainActivity and the dedica
 - QR scan, entrance confirmation, destination selection, route preview, and AR navigation are scoped to `ArCameraActivity`.
 - `SessionData` preserves `confirmedEntrance` and `validatedEntranceMarker` across phases.
 - Route summary logic estimates time based on total distance and typical walking speed.
-- QR scanning accepts only valid `Vectura AI-entrance` payloads matching the loaded manifest building id and entrance marker id.
+- QR scanning accepts only valid `VecturAI-entrance` payloads matching the loaded manifest building id and entrance marker id.
 - Route computation still happens immediately when a destination is selected so route preview and AR navigation share the same `LoadedPackage`.
 
 ## Uses

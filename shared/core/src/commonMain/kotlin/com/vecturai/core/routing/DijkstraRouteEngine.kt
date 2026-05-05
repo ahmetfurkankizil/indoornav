@@ -1,9 +1,9 @@
-package com.Vectura AI.core.routing
+package com.VecturAI.core.routing
 
-import com.Vectura AI.core.domain.NavGraph
-import com.Vectura AI.core.domain.NavNode
-import com.Vectura AI.core.domain.Route
-import com.Vectura AI.core.domain.RouteSegment
+import com.VecturAI.core.domain.NavGraph
+import com.VecturAI.core.domain.NavNode
+import com.VecturAI.core.domain.Route
+import com.VecturAI.core.domain.RouteSegment
 import kotlin.math.*
 
 /**

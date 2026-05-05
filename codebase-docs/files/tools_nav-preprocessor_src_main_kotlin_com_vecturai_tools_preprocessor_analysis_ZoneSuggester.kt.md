@@ -1,7 +1,7 @@
 # File Dossier: ZoneSuggester.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/analysis/ZoneSuggester.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/VecturAI/tools/preprocessor/analysis/ZoneSuggester.kt`
 - **Type**: Kotlin Source (Analysis Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

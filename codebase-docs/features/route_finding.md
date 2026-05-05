@@ -3,7 +3,7 @@
 - **Feature Name**: Route Finding & Navigation
 - **Purpose**: High-level orchestration of the navigation experience, from destination selection to arrival.
 - **Implemented In**:
-    - `shared/feature-routing/src/commonMain/kotlin/com/Vectura AI/feature/routing/RouteNavigationUseCase.kt`
+    - `shared/feature-routing/src/commonMain/kotlin/com/VecturAI/feature/routing/RouteNavigationUseCase.kt`
 - **Used By**:
     - Navigation Screen UI
     - AR View Controller
@@ -21,8 +21,8 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [RouteNavigationUseCase.kt](../files/shared_feature-routing_src_commonMain_kotlin_com_Vectura AI_feature_routing_RouteNavigationUseCase.kt.md)
-    - [DijkstraRouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_DijkstraRouteEngine.kt.md) (Core)
+    - [RouteNavigationUseCase.kt](../files/shared_feature-routing_src_commonMain_kotlin_com_VecturAI_feature_routing_RouteNavigationUseCase.kt.md)
+    - [DijkstraRouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_DijkstraRouteEngine.kt.md) (Core)
 - **Risks / Notes**:
     - Dependent on `RouteEngine` for the actual pathfinding.
     - Assumes the first entry node of a room is the preferred one.

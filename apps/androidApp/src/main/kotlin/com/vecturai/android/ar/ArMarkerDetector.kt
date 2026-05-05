@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.Frame

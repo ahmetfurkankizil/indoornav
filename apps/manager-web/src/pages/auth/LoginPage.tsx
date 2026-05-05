@@ -17,7 +17,7 @@ export function LoginPage() {
     // Smooth transition
     await new Promise(r => setTimeout(r, 600))
 
-    const data = await login(email || 'admin@Vectura AI.app', password)
+    const data = await login(email || 'admin@VecturAI.app', password)
     setAuth(data.manager, data.token)
 
     navigate('/dashboard')
@@ -40,7 +40,7 @@ export function LoginPage() {
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="admin@Vectura AI.app"
+              placeholder="admin@VecturAI.app"
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>

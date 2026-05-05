@@ -3,8 +3,8 @@
 - **Feature Name**: Building Data Repository & Lifecycle
 - **Purpose**: Manages the retrieval, parsing, and caching of building navigation packages.
 - **Implemented In**:
-    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/`
-    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/repository/`
+    - `shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/`
+    - `shared/core/src/commonMain/kotlin/com/VecturAI/core/repository/`
 - **Used By**:
     - `NavigationSessionCoordinator`
     - Feature: Search
@@ -24,7 +24,7 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [BuildingPackageLoader.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_BuildingPackageLoader.kt.md)
-    - [BuildingRepository.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_BuildingRepository.kt.md)
+    - [BuildingPackageLoader.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_BuildingPackageLoader.kt.md)
+    - [BuildingRepository.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_BuildingRepository.kt.md)
 - **Risks / Notes**:
     - MVP uses synchronous loading for demo assets; future versions should use asynchronous Ktor-based fetching.

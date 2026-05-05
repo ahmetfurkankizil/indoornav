@@ -1,6 +1,6 @@
-# File Dossier: shared/data-local/src/commonMain/kotlin/com/Vectura AI/data/local/LocalCacheDataSource.kt
+# File Dossier: shared/data-local/src/commonMain/kotlin/com/VecturAI/data/local/LocalCacheDataSource.kt
 
-- **Path**: `shared/data-local/src/commonMain/kotlin/com/Vectura AI/data/local/LocalCacheDataSource.kt`
+- **Path**: `shared/data-local/src/commonMain/kotlin/com/VecturAI/data/local/LocalCacheDataSource.kt`
 - **Type**: source
 - **Role**: Interface defining the contract for local persistent caching of building navigation data.
 - **Imports / Includes**: N/A

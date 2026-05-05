@@ -34,7 +34,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.Vectura AI.feature.routing"
+    namespace = "com.VecturAI.feature.routing"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
 }

@@ -1,12 +1,12 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.Env
+import com.vecturai.tools.admin.Env
 
-import com.Vectura AI.tools.admin.model.CreateBuildingRequest
-import com.Vectura AI.tools.admin.model.UpdateBuildingRequest
-import com.Vectura AI.tools.admin.service.BuildingService
-import com.Vectura AI.tools.admin.service.NodeService
-import com.Vectura AI.tools.admin.service.NavPackageGenerator
+import com.vecturai.tools.admin.model.CreateBuildingRequest
+import com.vecturai.tools.admin.model.UpdateBuildingRequest
+import com.vecturai.tools.admin.service.BuildingService
+import com.vecturai.tools.admin.service.NodeService
+import com.vecturai.tools.admin.service.NavPackageGenerator
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -68,7 +68,7 @@ fun Route.buildingRoutes(service: BuildingService, nodeService: NodeService, nav
                 service.getById(buildingId, managerId)
                     ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("Building not found"))
 
-                val qrService = com.Vectura AI.tools.admin.service.QRCodeService(
+                val qrService = com.vecturai.tools.admin.service.QRCodeService(
                     Env.get("UPLOADS_DIR") ?: "uploads"
                 )
                 val bytes = qrService.getQrImageBytes(buildingId)

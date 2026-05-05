@@ -1,7 +1,7 @@
-package com.Vectura AI.data.remote.di
+package com.VecturAI.data.remote.di
 
-import com.Vectura AI.data.remote.KtorBuildingDataSource
-import com.Vectura AI.data.remote.RemoteBuildingDataSource
+import com.VecturAI.data.remote.KtorBuildingDataSource
+import com.VecturAI.data.remote.RemoteBuildingDataSource
 import org.koin.dsl.module
 
 val dataRemoteModule = module {

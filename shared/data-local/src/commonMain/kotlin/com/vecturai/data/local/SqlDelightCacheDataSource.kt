@@ -1,4 +1,4 @@
-package com.Vectura AI.data.local
+package com.VecturAI.data.local
 
 /**
  * SqlDelight-based implementation of [LocalCacheDataSource].

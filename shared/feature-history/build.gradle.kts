@@ -23,7 +23,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.Vectura AI.feature.history"
+    namespace = "com.VecturAI.feature.history"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
     compileOptions {

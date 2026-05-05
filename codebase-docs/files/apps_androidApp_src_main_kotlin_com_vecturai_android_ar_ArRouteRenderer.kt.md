@@ -1,7 +1,7 @@
 # File Dossier: ArRouteRenderer.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt`
 
 ## Type
 Authored Source (AR Visuals)
@@ -11,8 +11,8 @@ Manages Android AR route arrow state after alignment. Converts building-local ar
 
 ## Imports / Includes
 - `android.opengl.Matrix`
-- `com.Vectura AI.android.data.ArrowPlacementData`
-- `com.Vectura AI.android.data.ArrowPlacementType`
+- `com.VecturAI.android.data.ArrowPlacementData`
+- `com.VecturAI.android.data.ArrowPlacementType`
 - `kotlin.math.cos`, `kotlin.math.sin`
 
 ## Exports / Public Surface

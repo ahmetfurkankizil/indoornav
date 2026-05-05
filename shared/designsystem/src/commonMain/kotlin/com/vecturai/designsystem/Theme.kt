@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem
+package com.VecturAI.designsystem
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -6,51 +6,51 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val LightColorScheme = lightColorScheme(
-    primary = Vectura AIColors.Primary,
-    onPrimary = Vectura AIColors.OnPrimary,
-    primaryContainer = Vectura AIColors.PrimaryLight,
-    secondary = Vectura AIColors.Secondary,
-    onSecondary = Vectura AIColors.OnSecondary,
-    secondaryContainer = Vectura AIColors.SecondaryLight,
-    tertiary = Vectura AIColors.Accent,
-    onTertiary = Vectura AIColors.OnAccent,
-    background = Vectura AIColors.Background,
-    onBackground = Vectura AIColors.OnBackground,
-    surface = Vectura AIColors.Surface,
-    onSurface = Vectura AIColors.OnSurface,
-    surfaceVariant = Vectura AIColors.SurfaceVariant,
-    onSurfaceVariant = Vectura AIColors.OnSurfaceVariant,
-    outline = Vectura AIColors.BorderSubtle,
-    error = Vectura AIColors.Error,
+    primary = VecturAIColors.Primary,
+    onPrimary = VecturAIColors.OnPrimary,
+    primaryContainer = VecturAIColors.PrimaryLight,
+    secondary = VecturAIColors.Secondary,
+    onSecondary = VecturAIColors.OnSecondary,
+    secondaryContainer = VecturAIColors.SecondaryLight,
+    tertiary = VecturAIColors.Accent,
+    onTertiary = VecturAIColors.OnAccent,
+    background = VecturAIColors.Background,
+    onBackground = VecturAIColors.OnBackground,
+    surface = VecturAIColors.Surface,
+    onSurface = VecturAIColors.OnSurface,
+    surfaceVariant = VecturAIColors.SurfaceVariant,
+    onSurfaceVariant = VecturAIColors.OnSurfaceVariant,
+    outline = VecturAIColors.BorderSubtle,
+    error = VecturAIColors.Error,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Vectura AIColors.Primary,
-    onPrimary = Vectura AIColors.OnPrimary,
-    primaryContainer = Vectura AIColors.PrimaryDark,
-    secondary = Vectura AIColors.AccentCyan,
-    onSecondary = Vectura AIColors.SurfaceCanvas,
-    secondaryContainer = Vectura AIColors.Secondary,
-    tertiary = Vectura AIColors.AccentAmber,
-    onTertiary = Vectura AIColors.OnAccent,
-    background = Vectura AIColors.SurfaceCanvas,
-    onBackground = Vectura AIColors.TextPrimary,
-    surface = Vectura AIColors.SurfaceCard,
-    onSurface = Vectura AIColors.TextPrimary,
-    surfaceVariant = Vectura AIColors.SurfaceElevated,
-    onSurfaceVariant = Vectura AIColors.TextMuted,
-    outline = Vectura AIColors.BorderSubtle,
-    error = Vectura AIColors.AccentRed,
+    primary = VecturAIColors.Primary,
+    onPrimary = VecturAIColors.OnPrimary,
+    primaryContainer = VecturAIColors.PrimaryDark,
+    secondary = VecturAIColors.AccentCyan,
+    onSecondary = VecturAIColors.SurfaceCanvas,
+    secondaryContainer = VecturAIColors.Secondary,
+    tertiary = VecturAIColors.AccentAmber,
+    onTertiary = VecturAIColors.OnAccent,
+    background = VecturAIColors.SurfaceCanvas,
+    onBackground = VecturAIColors.TextPrimary,
+    surface = VecturAIColors.SurfaceCard,
+    onSurface = VecturAIColors.TextPrimary,
+    surfaceVariant = VecturAIColors.SurfaceElevated,
+    onSurfaceVariant = VecturAIColors.TextMuted,
+    outline = VecturAIColors.BorderSubtle,
+    error = VecturAIColors.AccentRed,
 )
 
 @Composable
-fun Vectura AITheme(
+fun VecturAITheme(
     darkTheme: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
-        typography = Vectura AITypography.material(),
+        typography = VecturAITypography.material(),
         content = content,
     )
 }

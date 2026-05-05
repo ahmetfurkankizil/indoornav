@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem
+package com.VecturAI.designsystem
 
 import androidx.compose.ui.unit.dp
 

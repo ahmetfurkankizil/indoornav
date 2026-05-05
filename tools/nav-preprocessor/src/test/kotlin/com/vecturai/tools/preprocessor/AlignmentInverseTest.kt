@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
 import kotlin.math.cos
 import kotlin.math.sin

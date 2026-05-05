@@ -1,7 +1,7 @@
 # File Dossier: OffRouteDetector.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\OffRouteDetector.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\ar\OffRouteDetector.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.ar
+package com.VecturAI.core.ar
 
 import kotlin.math.abs
 import kotlin.math.sqrt

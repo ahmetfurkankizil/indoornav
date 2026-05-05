@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ui
+package com.VecturAI.android.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -51,15 +51,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.android.navigation.ArCameraFlowViewModel
-import com.Vectura AI.designsystem.IconChip
-import com.Vectura AI.designsystem.Spacing
-import com.Vectura AI.designsystem.Vectura AIBrush
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AIColors
-import com.Vectura AI.designsystem.Vectura AIPrimaryButton
-import com.Vectura AI.designsystem.Vectura AISecondaryButton
-import com.Vectura AI.designsystem.Vectura AIShapes
+import com.VecturAI.android.navigation.ArCameraFlowViewModel
+import com.VecturAI.designsystem.IconChip
+import com.VecturAI.designsystem.Spacing
+import com.VecturAI.designsystem.VecturAIBrush
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAIColors
+import com.VecturAI.designsystem.VecturAIPrimaryButton
+import com.VecturAI.designsystem.VecturAISecondaryButton
+import com.VecturAI.designsystem.VecturAIShapes
 
 @Composable
 fun QRScanScreen(
@@ -109,12 +109,12 @@ private fun QRScanChrome(
             Column(Modifier.weight(1f)) {
                 Text(
                     "Scanning...",
-                    color = Vectura AIColors.TextPrimary,
+                    color = VecturAIColors.TextPrimary,
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 Text(
                     "Find the entrance poster",
-                    color = Vectura AIColors.TextMuted,
+                    color = VecturAIColors.TextMuted,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -162,20 +162,20 @@ private fun QRStatusPanel(
     onRetry: () -> Unit,
     onSimulateScan: (() -> Unit)?,
 ) {
-    Vectura AICard(glass = true) {
+    VecturAICard(glass = true) {
         if (detected) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(44.dp)
-                        .clip(Vectura AIShapes.Medium)
-                        .background(Vectura AIColors.AccentGreen.copy(alpha = 0.18f)),
+                        .clip(VecturAIShapes.Medium)
+                        .background(VecturAIColors.AccentGreen.copy(alpha = 0.18f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Default.QrCodeScanner,
                         contentDescription = "Entrance code found",
-                        tint = Vectura AIColors.AccentGreen,
+                        tint = VecturAIColors.AccentGreen,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -183,12 +183,12 @@ private fun QRStatusPanel(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Entrance code found",
-                        color = Vectura AIColors.TextPrimary,
+                        color = VecturAIColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
                         "Confirming your starting point",
-                        color = Vectura AIColors.TextMuted,
+                        color = VecturAIColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -204,21 +204,21 @@ private fun QRStatusPanel(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Looking for entrance code",
-                        color = Vectura AIColors.TextPrimary,
+                        color = VecturAIColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         "Point your camera at the entrance poster",
-                        color = Vectura AIColors.TextMuted,
+                        color = VecturAIColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
             if (onSimulateScan != null) {
                 Spacer(Modifier.height(Spacing.md))
-                Vectura AISecondaryButton(
+                VecturAISecondaryButton(
                     text = "Simulate Entrance Scan",
                     onClick = onSimulateScan,
                     leadingIcon = Icons.Default.QrCodeScanner,
@@ -229,14 +229,14 @@ private fun QRStatusPanel(
                 Box(
                     modifier = Modifier
                         .size(44.dp)
-                        .clip(Vectura AIShapes.Medium)
-                        .background(Vectura AIColors.AccentAmber.copy(alpha = 0.16f)),
+                        .clip(VecturAIShapes.Medium)
+                        .background(VecturAIColors.AccentAmber.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Default.Warning,
                         contentDescription = "Code not recognized",
-                        tint = Vectura AIColors.AccentAmber,
+                        tint = VecturAIColors.AccentAmber,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -244,12 +244,12 @@ private fun QRStatusPanel(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Code not recognized",
-                        color = Vectura AIColors.TextPrimary,
+                        color = VecturAIColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
                         error,
-                        color = Vectura AIColors.TextMuted,
+                        color = VecturAIColors.TextMuted,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
@@ -257,7 +257,7 @@ private fun QRStatusPanel(
                 }
             }
             Spacer(Modifier.height(Spacing.md))
-            Vectura AIPrimaryButton(text = "Try Again", onClick = onRetry)
+            VecturAIPrimaryButton(text = "Try Again", onClick = onRetry)
         }
     }
 }
@@ -288,9 +288,9 @@ private fun AnimatedScanReticle(
         label = "qrSuccessRipple",
     )
     val accent = when {
-        hasDetected -> Vectura AIColors.AccentGreen
-        hasError -> Vectura AIColors.AccentAmber
-        else -> Vectura AIColors.AccentCyan
+        hasDetected -> VecturAIColors.AccentGreen
+        hasError -> VecturAIColors.AccentAmber
+        else -> VecturAIColors.AccentCyan
     }
     Box(
         modifier = modifier,
@@ -299,9 +299,9 @@ private fun AnimatedScanReticle(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(Vectura AIShapes.XLarge)
-                .background(Vectura AIColors.SurfaceCanvas.copy(alpha = 0.18f))
-                .border(BorderStroke(1.dp, accent.copy(alpha = 0.34f)), Vectura AIShapes.XLarge),
+                .clip(VecturAIShapes.XLarge)
+                .background(VecturAIColors.SurfaceCanvas.copy(alpha = 0.18f))
+                .border(BorderStroke(1.dp, accent.copy(alpha = 0.34f)), VecturAIShapes.XLarge),
         ) {
             val margin = 22.dp.toPx()
             val bracket = 54.dp.toPx() * breath
@@ -339,7 +339,7 @@ private fun AnimatedScanReticle(
                 repeat(3) { index ->
                     val local = (successRipple - index * 0.18f).coerceIn(0f, 1f)
                     drawCircle(
-                        color = Vectura AIColors.AccentGreen.copy(alpha = (1f - local) * 0.28f),
+                        color = VecturAIColors.AccentGreen.copy(alpha = (1f - local) * 0.28f),
                         radius = size.minDimension * (0.18f + local * 0.36f),
                         center = Offset(size.width / 2f, size.height / 2f),
                         style = Stroke(width = 2.dp.toPx()),

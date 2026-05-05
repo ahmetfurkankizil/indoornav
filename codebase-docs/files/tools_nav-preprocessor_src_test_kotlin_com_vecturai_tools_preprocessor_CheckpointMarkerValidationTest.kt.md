@@ -1,7 +1,7 @@
 # File Dossier: CheckpointMarkerValidationTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/CheckpointMarkerValidationTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/CheckpointMarkerValidationTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`, `navigation_data_format`
 - **Status**: Mapped

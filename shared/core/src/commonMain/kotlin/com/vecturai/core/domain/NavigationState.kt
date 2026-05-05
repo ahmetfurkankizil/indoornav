@@ -1,4 +1,4 @@
-package com.Vectura AI.core.domain
+package com.VecturAI.core.domain
 
 /**
  * Represents the current state of the navigation flow.

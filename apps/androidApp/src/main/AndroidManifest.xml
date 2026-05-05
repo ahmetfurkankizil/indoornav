@@ -11,9 +11,9 @@
         android:required="true" />
 
     <application
-        android:name=".Vectura AIApp"
+        android:name=".VecturAIApp"
         android:allowBackup="false"
-        android:label="Vectura AI"
+        android:label="VecturAI"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">

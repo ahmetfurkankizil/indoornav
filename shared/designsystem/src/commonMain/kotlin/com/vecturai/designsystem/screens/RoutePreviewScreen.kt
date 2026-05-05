@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem.screens
+package com.VecturAI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.designsystem.Vectura AIButton
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AIEmptyState
-import com.Vectura AI.designsystem.Vectura AISectionHeader
+import com.VecturAI.designsystem.VecturAIButton
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAIEmptyState
+import com.VecturAI.designsystem.VecturAISectionHeader
 
 /**
  * Route Preview screen showing a 2D preview of the navigation route.
@@ -51,7 +51,7 @@ fun RoutePreviewScreen(
         }
 
         // TODO: Replace with actual route data
-        Vectura AIEmptyState(
+        VecturAIEmptyState(
             icon = Icons.Default.Route,
             title = "No route selected",
             description = "Search for a destination first to preview the navigation route.",
@@ -59,7 +59,7 @@ fun RoutePreviewScreen(
         )
 
         // Start Navigation button (always visible at bottom)
-        Vectura AIButton(
+        VecturAIButton(
             text = "Start AR Navigation",
             onClick = { /* TODO: Launch AR navigation */ },
             modifier = Modifier

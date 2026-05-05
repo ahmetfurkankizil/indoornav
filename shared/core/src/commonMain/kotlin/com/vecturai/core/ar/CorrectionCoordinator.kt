@@ -1,6 +1,6 @@
-package com.Vectura AI.core.ar
+package com.VecturAI.core.ar
 
-import com.Vectura AI.core.domain.CheckpointMarker
+import com.VecturAI.core.domain.CheckpointMarker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

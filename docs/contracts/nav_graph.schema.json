@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Vectura AI Navigation Graph",
+    "title": "VecturAI Navigation Graph",
     "description": "Indoor navigation graph with nodes (waypoints) and edges (connections) for pathfinding.",
     "type": "object",
     "required": [

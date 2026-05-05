@@ -44,8 +44,8 @@ The iOS AR Navigation subsystem is composed of several key components:
 - **Simulator Support**: Includes a "Simulate Alignment" feature to allow UI/logic testing without a physical AR environment.
 
 ## Related Files
-- [ARNavigationView.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_ar_ARNavigationView.swift.md)
-- [ARSessionManager.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_ar_ARSessionManager.swift.md)
-- [ARMarkerDetector.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_ar_ARMarkerDetector.swift.md)
-- [ARRouteRenderer.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_ar_ARRouteRenderer.swift.md)
-- [BuildingPackageLoader.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_ar_BuildingPackageLoader.swift.md)
+- [ARNavigationView.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_ar_ARNavigationView.swift.md)
+- [ARSessionManager.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_ar_ARSessionManager.swift.md)
+- [ARMarkerDetector.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_ar_ARMarkerDetector.swift.md)
+- [ARRouteRenderer.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_ar_ARRouteRenderer.swift.md)
+- [BuildingPackageLoader.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_ar_BuildingPackageLoader.swift.md)

@@ -1,7 +1,7 @@
 # File Dossier: FeatureHistoryModule.kt
 
 ## Path
-`shared\feature-history\src\commonMain\kotlin\com\Vectura AI\feature\history\di\FeatureHistoryModule.kt`
+`shared\feature-history\src\commonMain\kotlin\com\VecturAI\feature\history\di\FeatureHistoryModule.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.feature.history.di
+package com.VecturAI.feature.history.di
 
-import com.Vectura AI.feature.history.HistoryUseCase
+import com.VecturAI.feature.history.HistoryUseCase
 import org.koin.dsl.module
 
 val featureHistoryModule = module {

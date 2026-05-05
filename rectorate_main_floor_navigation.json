@@ -559,7 +559,7 @@
     "arrowHeightOffsetMeters": 0.05
   },
   "graphMetadata": {
-    "authorName": "Vectura AI",
+    "authorName": "VecturAI",
     "authoredDate": "2026-04-14",
     "notes": "Main Floor of Rectorate Building. Coordinates use x=right, z=down on the user-provided 2D sketch. Long corridor distances come directly from the measured annotations. Room-entry offsets inside the service core and classroom doorway offsets were inferred from the drawn door positions where no explicit numeric offset was provided. Point 1 and Point 12 are entrances/checkpoints rather than rooms."
   }

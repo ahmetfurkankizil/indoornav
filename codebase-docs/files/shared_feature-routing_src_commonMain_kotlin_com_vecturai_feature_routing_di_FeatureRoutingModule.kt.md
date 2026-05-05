@@ -1,7 +1,7 @@
 # File Dossier: FeatureRoutingModule.kt
 
 ## Path
-`shared\feature-routing\src\commonMain\kotlin\com\Vectura AI\feature\routing\di\FeatureRoutingModule.kt`
+`shared\feature-routing\src\commonMain\kotlin\com\VecturAI\feature\routing\di\FeatureRoutingModule.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.feature.routing.di
+package com.VecturAI.feature.routing.di
 
-import com.Vectura AI.feature.routing.RouteNavigationUseCase
+import com.VecturAI.feature.routing.RouteNavigationUseCase
 import org.koin.dsl.module
 
 val featureRoutingModule = module {

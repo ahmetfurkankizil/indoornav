@@ -1,7 +1,7 @@
 # Feature: Developer Experience & Samples
 
 ## Overview
-Vectura AI includes a robust set of developer tools, automated scripts, and sample data to ensure consistent development, testing, and demonstration of the system. This ecosystem supports the full lifecycle from raw GLB ingestion to mobile app deployment.
+VecturAI includes a robust set of developer tools, automated scripts, and sample data to ensure consistent development, testing, and demonstration of the system. This ecosystem supports the full lifecycle from raw GLB ingestion to mobile app deployment.
 
 ## Components
 

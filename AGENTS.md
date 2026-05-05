@@ -1,8 +1,8 @@
-# Vectura AI — AGENTS.md
+# VecturAI — AGENTS.md
 
 ## Project Overview
 
-Vectura AI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
+VecturAI is an AR indoor navigation app built with KMP (Kotlin Multiplatform) for shared logic and native Swift/ARKit for the iOS AR experience. The project uses a preprocessor pipeline to convert 3D scans into navigation graphs.
 
 ## Phase 11 — Client-Facing Polish (2026-04-13)
 
@@ -347,7 +347,7 @@ Phase 6 fixes the real-device AR alignment deadlock caused by a QR/marker contra
                     │   │  QR code with    │   │
                     │   │  JSON payload    │   │
                     │   └─────────────────┘   │
-                    │   + Vectura AI branding    │
+                    │   + VecturAI branding    │
                     └────────────┬────────────┘
                                  │
               ┌──────────────────┼──────────────────┐
@@ -463,7 +463,7 @@ Phase 5 makes the app demo-ready on a real iOS device with strict marker validat
 Phase 4 replaces the simulated QR scan with a real iOS camera-backed scanner and grounds the initial AR alignment in the entrance marker metadata from the reviewed package.
 
 1. **Real QR scanner**: `QRScanView` now uses `AVCaptureSession` with `AVCaptureMetadataOutput` on device. Simulator keeps a "Simulate Entrance Scan" fallback button.
-2. **QR payload contract**: Explicit JSON format: `{"type":"Vectura AI-entrance","buildingId":"house-demo-01","entranceId":"marker-entrance-a","v":1}`. Decoded by `QRPayload.swift`.
+2. **QR payload contract**: Explicit JSON format: `{"type":"VecturAI-entrance","buildingId":"house-demo-01","entranceId":"marker-entrance-a","v":1}`. Decoded by `QRPayload.swift`.
 3. **Payload validation**: QR `buildingId` is checked against `manifest.json`; `entranceId` is checked against `entrance_markers.json`. Invalid/mismatched QR shows a clear error with retry.
 4. **Validated entrance marker through the flow**: `NavigationFlowModel.validatedEntranceMarker` carries the reviewed-package marker from QR confirmation through to AR startup. No hardcoded marker metadata.
 5. **Alignment-gated AR rendering**: Navigation arrows are not placed until the entrance marker is detected. Pre-alignment overlay: "Point the camera at the entrance QR."

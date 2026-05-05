@@ -16,7 +16,7 @@
     - `:tools:nav-preprocessor`
     - `:tools:admin-api`
 - **Exports / Public Surface**:
-    - Root project name: `Vectura AI`
+    - Root project name: `VecturAI`
 - **Main Symbols**: N/A
 - **Important Logic by Line Range**:
     - `1-7`: `pluginManagement` (repositories: google, mavenCentral, gradlePluginPortal).

@@ -14,7 +14,7 @@ Data Contract / Sample Data for the docs component.
 ```kotlin
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Vectura AI Rooms",
+    "title": "VecturAI Rooms",
     "description": "Room/POI definitions for a building, used for search and navigation targets.",
     "type": "object",
     "required": [

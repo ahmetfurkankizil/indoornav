@@ -1,10 +1,10 @@
-package com.Vectura AI.tools.admin.service
+package com.vecturai.tools.admin.service
 
-import com.Vectura AI.tools.admin.db.tables.Buildings
-import com.Vectura AI.tools.admin.db.tables.Floors
-import com.Vectura AI.tools.admin.db.tables.NavMeshAreas
-import com.Vectura AI.tools.admin.model.NavMeshAreaResponse
-import com.Vectura AI.tools.admin.model.Waypoint
+import com.vecturai.tools.admin.db.tables.Buildings
+import com.vecturai.tools.admin.db.tables.Floors
+import com.vecturai.tools.admin.db.tables.NavMeshAreas
+import com.vecturai.tools.admin.model.NavMeshAreaResponse
+import com.vecturai.tools.admin.model.Waypoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString

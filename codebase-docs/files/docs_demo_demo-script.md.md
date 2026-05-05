@@ -28,14 +28,14 @@ Authored Source for the docs component.
 ## Setup (before meeting)
 1. Install app on demo device (see [demo-setup.md](demo-setup.md))
 2. For live path: print and mount marker (see [marker-guide.md](marker-guide.md))
-3. Verify app shows "Vectura AI Demo Office"
+3. Verify app shows "VecturAI Demo Office"
 
 ---
 
 ## Script
 
 ### Act 1: "The Problem" (30 sec)
-> *"Finding rooms in large buildings wastes 5–10 minutes. Vectura AI solves this with AR-guided indoor navigation."*
+> *"Finding rooms in large buildings wastes 5–10 minutes. VecturAI solves this with AR-guided indoor navigation."*
 
 ### Act 2: "Find Your Room" (30 sec)
 1. Tap **Search** → type **"Conference"** → select **Conference Room**

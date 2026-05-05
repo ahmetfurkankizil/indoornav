@@ -1,12 +1,12 @@
-package com.Vectura AI.android
+package com.VecturAI.android
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.Vectura AI.android.ar.ArCameraActivity
-import com.Vectura AI.android.navigation.AndroidNavigationFlowModel
-import com.Vectura AI.android.ui.AndroidNavigationApp
+import com.VecturAI.android.ar.ArCameraActivity
+import com.VecturAI.android.navigation.AndroidNavigationFlowModel
+import com.VecturAI.android.ui.AndroidNavigationApp
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {

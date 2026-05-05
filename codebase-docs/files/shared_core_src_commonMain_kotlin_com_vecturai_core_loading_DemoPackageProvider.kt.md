@@ -1,10 +1,10 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/DemoPackageProvider.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/DemoPackageProvider.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/DemoPackageProvider.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/DemoPackageProvider.kt`
 - **Type**: source
 - **Role**: Provides hardcoded building data for the demo environment.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.*`
+    - `com.VecturAI.core.domain.*`
     - `kotlinx.serialization.json.Json`
 - **Exports / Public Surface**:
     - `DemoPackageProvider` object

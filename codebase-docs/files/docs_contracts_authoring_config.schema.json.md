@@ -14,7 +14,7 @@ Data Contract / Sample Data for the docs component.
 ```kotlin
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Vectura AI Authoring Config",
+    "title": "VecturAI Authoring Config",
     "description": "Human-authored building annotation file. Input to the nav-preprocessor CLI.",
     "type": "object",
     "required": [

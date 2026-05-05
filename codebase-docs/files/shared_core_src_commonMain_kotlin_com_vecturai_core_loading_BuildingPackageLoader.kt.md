@@ -1,10 +1,10 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/BuildingPackageLoader.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/BuildingPackageLoader.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/BuildingPackageLoader.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/BuildingPackageLoader.kt`
 - **Type**: source
 - **Role**: Handles the deserialization of raw JSON strings into building domain models.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.*`
+    - `com.VecturAI.core.domain.*`
     - `kotlinx.serialization.json.Json`
 - **Exports / Public Surface**:
     - `BuildingPackageLoader` class

@@ -1,22 +1,22 @@
-# File Dossier: shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/Components.kt
+# File Dossier: shared/designsystem/src/commonMain/kotlin/com/VecturAI/designsystem/Components.kt
 
-- **Path**: `shared/designsystem/src/commonMain/kotlin/com/Vectura AI/designsystem/Components.kt`
+- **Path**: `shared/designsystem/src/commonMain/kotlin/com/VecturAI/designsystem/Components.kt`
 - **Type**: source
-- **Role**: Collection of reusable UI components following the Vectura AI design language.
+- **Role**: Collection of reusable UI components following the VecturAI design language.
 - **Imports / Includes**:
     - `androidx.compose.material3.*`
 - **Exports / Public Surface**:
-    - `Vectura AIButton`
-    - `Vectura AICard`
-    - `Vectura AIEmptyState`
-    - `Vectura AISectionHeader`
+    - `VecturAIButton`
+    - `VecturAICard`
+    - `VecturAIEmptyState`
+    - `VecturAISectionHeader`
 - **Main Symbols**:
-    - `Vectura AIButton`: composable
-    - `Vectura AICard`: composable
+    - `VecturAIButton`: composable
+    - `VecturAICard`: composable
 - **Important Logic by Line Range**:
-    - `21-50`: `Vectura AIButton`; custom button with 14dp rounded corners and integrated icon support.
-    - `56-93`: `Vectura AICard`; card component with consistent padding, elevation, and 16dp rounded corners.
-    - `99-133`: `Vectura AIEmptyState`; helper for showing "no results" or "loading" placeholders.
+    - `21-50`: `VecturAIButton`; custom button with 14dp rounded corners and integrated icon support.
+    - `56-93`: `VecturAICard`; card component with consistent padding, elevation, and 16dp rounded corners.
+    - `99-133`: `VecturAIEmptyState`; helper for showing "no results" or "loading" placeholders.
 - **Uses**:
     - Compose Material 3
 - **Used By**:

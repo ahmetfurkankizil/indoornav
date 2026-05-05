@@ -1,7 +1,7 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.model.FloorBoundsRequest
-import com.Vectura AI.tools.admin.service.FloorService
+import com.vecturai.tools.admin.model.FloorBoundsRequest
+import com.vecturai.tools.admin.service.FloorService
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.auth.*

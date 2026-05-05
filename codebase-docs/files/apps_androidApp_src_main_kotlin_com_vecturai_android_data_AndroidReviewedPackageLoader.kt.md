@@ -1,7 +1,7 @@
 # File Dossier: AndroidReviewedPackageLoader.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt`
 
 ## Type
 Authored Source (Android Navigation Data)

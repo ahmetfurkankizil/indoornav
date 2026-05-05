@@ -9,7 +9,7 @@ Categories:
 - `docs/`: Project documentation
 
 ```text
-- Vectura AI/
+- VecturAI/
   - build.gradle.kts
   - CLAUDE.md
   - gradle.properties
@@ -40,10 +40,10 @@ Categories:
               - route_rendering.json
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - android/
                   - MainActivity.kt
-                  - Vectura AIApp.kt
+                  - VecturAIApp.kt
                   - ar/
                     - AndroidArNavigationViewModel.kt
                     - AndroidHapticManager.kt
@@ -232,7 +232,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - core/
                   - ar/
                     - AlignmentTransform.kt
@@ -293,7 +293,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - data/
                   - local/
                     - LocalCacheDataSource.kt
@@ -306,7 +306,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - data/
                   - remote/
                     - KtorBuildingDataSource.kt
@@ -319,13 +319,13 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - designsystem/
                   - Color.kt
                   - Components.kt
                   - Theme.kt
                   - Typography.kt
-                  - Vectura AIAppContent.kt
+                  - VecturAIAppContent.kt
                   - navigation/
                     - AppNavigation.kt
                     - Screen.kt
@@ -341,7 +341,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - feature/
                   - history/
                     - HistoryUseCase.kt
@@ -354,7 +354,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - feature/
                   - preview/
                     - RoutePreviewUseCase.kt
@@ -366,7 +366,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - feature/
                   - routing/
                     - RouteNavigationUseCase.kt
@@ -378,7 +378,7 @@ Categories:
         - commonMain/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - feature/
                   - search/
                     - SearchUseCase.kt
@@ -391,7 +391,7 @@ Categories:
         - main/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - tools/
                   - admin/
                     - Application.kt
@@ -409,7 +409,7 @@ Categories:
         - test/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - tools/
                   - admin/
                     - AsyncJobLifecycleTest.kt
@@ -426,7 +426,7 @@ Categories:
         - main/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - tools/
                   - preprocessor/
                     - AssetInspector.kt
@@ -454,7 +454,7 @@ Categories:
         - test/
           - kotlin/
             - com/
-              - Vectura AI/
+              - VecturAI/
                 - tools/
                   - preprocessor/
                     - AlignmentInverseTest.kt

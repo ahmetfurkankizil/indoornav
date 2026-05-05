@@ -1,7 +1,7 @@
 # File Dossier: DemoMode.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\navigation\DemoMode.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\navigation\DemoMode.kt`
 
 ## Type
 Authored Source
@@ -12,10 +12,10 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.navigation
+package com.VecturAI.core.navigation
 
-import com.Vectura AI.core.domain.BuildingPackage
-import com.Vectura AI.core.domain.Room
+import com.VecturAI.core.domain.BuildingPackage
+import com.VecturAI.core.domain.Room
 
 /**
  * Demo mode helper for investor-style presentations.

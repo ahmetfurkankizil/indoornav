@@ -1,8 +1,8 @@
-package com.Vectura AI.tools.admin.service
+package com.vecturai.tools.admin.service
 
-import com.Vectura AI.tools.admin.model.RoomOverride
-import com.Vectura AI.tools.admin.model.RoomOverrides
-import com.Vectura AI.tools.admin.model.RoomPatchRequest
+import com.vecturai.tools.admin.model.RoomOverride
+import com.vecturai.tools.admin.model.RoomOverrides
+import com.vecturai.tools.admin.model.RoomPatchRequest
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.Instant

@@ -1,9 +1,9 @@
-package com.Vectura AI.tools.admin.service
+package com.vecturai.tools.admin.service
 
-import com.Vectura AI.tools.admin.db.tables.Buildings
-import com.Vectura AI.tools.admin.db.tables.Floors
-import com.Vectura AI.tools.admin.db.tables.Nodes
-import com.Vectura AI.tools.admin.model.NodeResponse
+import com.vecturai.tools.admin.db.tables.Buildings
+import com.vecturai.tools.admin.db.tables.Floors
+import com.vecturai.tools.admin.db.tables.Nodes
+import com.vecturai.tools.admin.model.NodeResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.*

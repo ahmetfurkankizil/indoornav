@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.model.*
+import com.vecturai.tools.preprocessor.model.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,7 +10,7 @@ import kotlin.test.*
  * Tests for the Dijkstra shortest-path routing engine.
  *
  * Note: These tests directly use the shared domain models from
- * com.Vectura AI.core.domain, brought in as source dependencies.
+ * com.vecturai.core.domain, brought in as source dependencies.
  * For the preprocessor module (JVM-only), we replicate the logic
  * to test independently without requiring KMP compilation.
  */

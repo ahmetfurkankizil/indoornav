@@ -1,7 +1,7 @@
 # File Dossier: RemoteBuildingDataSource.kt
 
 ## Path
-`shared\data-remote\src\commonMain\kotlin\com\Vectura AI\data\remote\RemoteBuildingDataSource.kt`
+`shared\data-remote\src\commonMain\kotlin\com\VecturAI\data\remote\RemoteBuildingDataSource.kt`
 
 ## Type
 Authored Source
@@ -12,12 +12,12 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.data.remote
+package com.VecturAI.data.remote
 
 /**
  * Interface for remote building data source.
  *
- * Downloads building packages from the Vectura AI backend server.
+ * Downloads building packages from the VecturAI backend server.
  * A building package contains the manifest, navigation graph,
  * rooms, entrance markers, and rendering configuration.
  *

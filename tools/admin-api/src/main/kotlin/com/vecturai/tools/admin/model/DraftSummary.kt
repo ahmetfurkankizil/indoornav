@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.admin.model
+package com.vecturai.tools.admin.model
 
 import kotlinx.serialization.Serializable
 

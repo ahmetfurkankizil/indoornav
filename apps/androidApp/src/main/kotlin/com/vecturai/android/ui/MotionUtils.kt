@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ui
+package com.VecturAI.android.ui
 
 import android.content.Context
 import android.os.PowerManager

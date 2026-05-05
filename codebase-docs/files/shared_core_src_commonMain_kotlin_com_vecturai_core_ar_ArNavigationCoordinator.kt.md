@@ -1,13 +1,13 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/ArNavigationCoordinator.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/ar/ArNavigationCoordinator.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/ArNavigationCoordinator.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/ar/ArNavigationCoordinator.kt`
 - **Type**: source
 - **Role**: Orchestrates the communication between the shared core and the platform-specific native AR layers.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.*`
-    - `com.Vectura AI.core.navigation.NavigationState`
-    - `com.Vectura AI.core.routing.RouteEngine`
-    - `com.Vectura AI.core.store.AppStore`
+    - `com.VecturAI.core.domain.*`
+    - `com.VecturAI.core.navigation.NavigationState`
+    - `com.VecturAI.core.routing.RouteEngine`
+    - `com.VecturAI.core.store.AppStore`
 - **Exports / Public Surface**:
     - `ArNavigationCoordinator` class
     - `prepareNavigation(buildingPackage, destination, startNodeId)`

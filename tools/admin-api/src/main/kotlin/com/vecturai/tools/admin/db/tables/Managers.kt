@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.admin.db.tables
+package com.vecturai.tools.admin.db.tables
 
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.javatime.timestamp

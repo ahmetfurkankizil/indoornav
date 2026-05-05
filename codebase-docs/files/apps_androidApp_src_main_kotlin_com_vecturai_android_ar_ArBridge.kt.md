@@ -1,7 +1,7 @@
 # File Dossier: ArBridge.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArBridge.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArBridge.kt`
 
 ## Type
 Authored Source (Platform Adapter)
@@ -10,7 +10,7 @@ Authored Source (Platform Adapter)
 Coordinates state between the Android AR UI and the shared KMP domain logic. Acts as a bridge for session lifecycle and navigation events.
 
 ## Imports / Includes
-- `com.Vectura AI.core.store.AppStore`
+- `com.VecturAI.core.store.AppStore`
 - `kotlinx.coroutines.flow.StateFlow`
 
 ## Exports / Public Surface

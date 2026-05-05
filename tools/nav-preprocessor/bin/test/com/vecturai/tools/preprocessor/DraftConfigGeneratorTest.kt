@@ -1,12 +1,12 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator
-import com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester
-import com.Vectura AI.tools.preprocessor.draft.DraftConfigGenerator
-import com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter
-import com.Vectura AI.tools.preprocessor.glb.BoundingBox3D
-import com.Vectura AI.tools.preprocessor.glb.Vec3
-import com.Vectura AI.tools.preprocessor.model.AuthoringConfig
+import com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator
+import com.vecturai.tools.preprocessor.analysis.ZoneSuggester
+import com.vecturai.tools.preprocessor.draft.DraftConfigGenerator
+import com.vecturai.tools.preprocessor.draft.NavigationGraphDrafter
+import com.vecturai.tools.preprocessor.glb.BoundingBox3D
+import com.vecturai.tools.preprocessor.glb.Vec3
+import com.vecturai.tools.preprocessor.model.AuthoringConfig
 import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.test.*

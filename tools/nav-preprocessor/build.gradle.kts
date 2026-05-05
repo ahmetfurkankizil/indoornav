@@ -9,7 +9,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("com.Vectura AI.tools.preprocessor.MainKt")
+    mainClass.set("com.VecturAI.tools.preprocessor.MainKt")
 }
 
 dependencies {

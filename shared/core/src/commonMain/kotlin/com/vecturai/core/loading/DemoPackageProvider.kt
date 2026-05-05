@@ -1,6 +1,6 @@
-package com.Vectura AI.core.loading
+package com.VecturAI.core.loading
 
-import com.Vectura AI.core.domain.*
+import com.VecturAI.core.domain.*
 import kotlinx.serialization.json.Json
 
 /**
@@ -17,7 +17,7 @@ object DemoPackageProvider {
     /** Demo building manifest. */
     fun manifest(): BuildingManifest = BuildingManifest(
         buildingId = "demo-office-01",
-        buildingName = "Vectura AI Demo Office",
+        buildingName = "VecturAI Demo Office",
         version = 1,
     )
 
@@ -98,7 +98,7 @@ object DemoPackageProvider {
     fun entranceMarkers(): List<EntranceMarker> = listOf(
         EntranceMarker(
             id = "marker-main",
-            qrPayload = "Vectura AI://demo-office-01/marker-main",
+            qrPayload = "VecturAI://demo-office-01/marker-main",
             positionX = 0.0,
             positionY = 1.2,
             positionZ = 0.0,

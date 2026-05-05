@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem.navigation
+package com.VecturAI.designsystem.navigation
 
 /**
  * Sealed class defining all navigable screens in the app.
@@ -7,7 +7,7 @@ package com.Vectura AI.designsystem.navigation
  * activity/view and does not participate in Compose navigation.
  */
 sealed class Screen(val route: String, val title: String) {
-    data object Home : Screen("home", "Vectura AI")
+    data object Home : Screen("home", "VecturAI")
     data object Search : Screen("search", "Search")
     data object RoutePreview : Screen("route_preview", "Route Preview")
     data object History : Screen("history", "History")

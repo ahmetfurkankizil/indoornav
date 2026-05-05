@@ -11,7 +11,7 @@
 ```bash
 # Clone
 git clone <repo-url>
-cd Vectura AI
+cd VecturAI
 
 # Verify build
 make test-preprocessor

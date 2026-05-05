@@ -1,8 +1,8 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import android.opengl.Matrix
-import com.Vectura AI.android.data.ArrowPlacementData
-import com.Vectura AI.android.data.ArrowPlacementType
+import com.VecturAI.android.data.ArrowPlacementData
+import com.VecturAI.android.data.ArrowPlacementType
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.atan2
 import kotlin.math.cos

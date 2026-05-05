@@ -1,7 +1,8 @@
-package com.Vectura AI.tools.admin.service
+package com.VecturAI.tools.admin.service
 
-import com.Vectura AI.tools.admin.model.*
-import com.Vectura AI.tools.preprocessor.DraftPipeline
+import com.VecturAI.tools.admin.model.*
+import com.VecturAI.tools.preprocessor.MainKt
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
@@ -55,7 +56,7 @@ class DraftJobService(
 
         return withContext(Dispatchers.IO) {
             try {
-                val pipeline = DraftPipeline()
+                val pipeline = com.VecturAI.tools.preprocessor.DraftPipeline()
                 val exitCode = pipeline.execute(glbPath, outputDir)
 
                 if (exitCode == 0) {

@@ -1,12 +1,12 @@
-package com.Vectura AI.tools.preprocessor
+package com.VecturAI.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator
-import com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator
-import com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester
-import com.Vectura AI.tools.preprocessor.draft.DraftConfigGenerator
-import com.Vectura AI.tools.preprocessor.draft.NavigationGraphDrafter
-import com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor
-import com.Vectura AI.tools.preprocessor.glb.GlbParser
+import com.VecturAI.tools.preprocessor.analysis.FloorPlaneEstimator
+import com.VecturAI.tools.preprocessor.analysis.OccupancyGridGenerator
+import com.VecturAI.tools.preprocessor.analysis.ZoneSuggester
+import com.VecturAI.tools.preprocessor.draft.DraftConfigGenerator
+import com.VecturAI.tools.preprocessor.draft.NavigationGraphDrafter
+import com.VecturAI.tools.preprocessor.glb.GlbGeometryExtractor
+import com.VecturAI.tools.preprocessor.glb.GlbParser
 import java.io.File
 
 /**
@@ -22,7 +22,7 @@ import java.io.File
  * 7. Generate draft config
  * 8. Export debug artifacts
  */
-class DraftPipeline {
+class DraftPipelineV2 {
 
     private val glbParser = GlbParser()
     private val geometryExtractor = GlbGeometryExtractor()

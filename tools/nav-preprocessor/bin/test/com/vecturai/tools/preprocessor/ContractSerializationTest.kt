@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.model.*
+import com.vecturai.tools.preprocessor.model.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.*
@@ -100,7 +100,7 @@ class ContractSerializationTest {
             buildingId = "b1",
             schemaVersion = 1,
             markers = listOf(
-                PackageMarker("m1", "Vectura AI://test", 0.0, 1.2, 0.0, 0.0, "-z", "n1", 0.21, 0.21, "img"),
+                PackageMarker("m1", "VecturAI://test", 0.0, 1.2, 0.0, 0.0, "-z", "n1", 0.21, 0.21, "img"),
             ),
         )
         val encoded = json.encodeToString(markers)

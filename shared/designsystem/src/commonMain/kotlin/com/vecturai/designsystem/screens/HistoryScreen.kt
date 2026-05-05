@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem.screens
+package com.VecturAI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AIEmptyState
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAIEmptyState
 
 /**
  * History screen showing past navigation visits.
@@ -47,7 +47,7 @@ fun HistoryScreen(
         }
 
         // TODO: Replace with real history data from HistoryUseCase
-        Vectura AIEmptyState(
+        VecturAIEmptyState(
             icon = Icons.Default.History,
             title = "No visits yet",
             description = "Your navigation history will appear here after you visit destinations.",

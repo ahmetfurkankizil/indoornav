@@ -1,7 +1,7 @@
 # File Dossier: ProgressContinuityAfterCorrectionTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/ProgressContinuityAfterCorrectionTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/ProgressContinuityAfterCorrectionTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `ar_alignment`, `navigation_session_management`
 - **Status**: Mapped

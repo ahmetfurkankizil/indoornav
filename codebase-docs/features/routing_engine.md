@@ -3,7 +3,7 @@
 - **Feature Name**: Navigation Routing Engine
 - **Purpose**: Calculates optimal paths between points in a building's navigation graph.
 - **Implemented In**:
-    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/routing/`
+    - `shared/core/src/commonMain/kotlin/com/VecturAI/core/routing/`
 - **Used By**:
     - `NavigationSessionCoordinator`
     - `NavigationRepository`
@@ -22,10 +22,10 @@
     - `NavGraph`: Adjacency list representation of the building's floor plan.
     - `Route`: The resulting ordered list of segments and metadata.
 - **Related Tests**:
-    - `shared/core/src/commonTest/kotlin/com/Vectura AI/core/routing/DijkstraRouteEngineTest.kt` (TBD in Batch B09 or similar)
+    - `shared/core/src/commonTest/kotlin/com/VecturAI/core/routing/DijkstraRouteEngineTest.kt` (TBD in Batch B09 or similar)
 - **Related File Dossiers**:
-    - [DijkstraRouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_DijkstraRouteEngine.kt.md)
-    - [RouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_RouteEngine.kt.md)
+    - [DijkstraRouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_DijkstraRouteEngine.kt.md)
+    - [RouteEngine.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_RouteEngine.kt.md)
 - **Risks / Notes**:
     - Assumes the graph is small enough for a simple Dijkstra implementation without a priority queue (uses `minByOrNull` on a filtered map).
     - Heading calculations assume a plan-view orientation (X/Z plane).

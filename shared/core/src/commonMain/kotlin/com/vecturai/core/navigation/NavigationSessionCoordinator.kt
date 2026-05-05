@@ -1,13 +1,13 @@
-package com.Vectura AI.core.navigation
+package com.VecturAI.core.navigation
 
-import com.Vectura AI.core.ar.ArNavigationCoordinator
-import com.Vectura AI.core.ar.ArSessionState
-import com.Vectura AI.core.domain.NavigationState
-import com.Vectura AI.core.domain.Room
-import com.Vectura AI.core.domain.BuildingPackage
-import com.Vectura AI.core.repository.HistoryRepository
-import com.Vectura AI.core.store.AppStore
-import com.Vectura AI.core.domain.VisitRecord
+import com.VecturAI.core.ar.ArNavigationCoordinator
+import com.VecturAI.core.ar.ArSessionState
+import com.VecturAI.core.domain.NavigationState
+import com.VecturAI.core.domain.Room
+import com.VecturAI.core.domain.BuildingPackage
+import com.VecturAI.core.repository.HistoryRepository
+import com.VecturAI.core.store.AppStore
+import com.VecturAI.core.domain.VisitRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -146,21 +146,21 @@ class NavigationSessionCoordinator(
             if (status == CompletionStatus.COMPLETED_AT_DESTINATION || status == CompletionStatus.DEMO_COMPLETED) {
                 NavigationState.Arrived(
                     route = arCoordinator.renderableRoute.value?.let { renderable ->
-                        com.Vectura AI.core.domain.Route(
+                        com.VecturAI.core.domain.Route(
                             originNodeId = "",
                             destinationNodeId = completed.destinationRoomId,
                             segments = emptyList(),
                             totalDistanceMeters = completed.routeDistanceMeters,
                             estimatedTimeSeconds = 0,
                         )
-                    } ?: com.Vectura AI.core.domain.Route(
+                    } ?: com.VecturAI.core.domain.Route(
                         originNodeId = "",
                         destinationNodeId = completed.destinationRoomId,
                         segments = emptyList(),
                         totalDistanceMeters = 0.0,
                         estimatedTimeSeconds = 0,
                     ),
-                    destinationRoom = com.Vectura AI.core.domain.Room(
+                    destinationRoom = com.VecturAI.core.domain.Room(
                         id = completed.destinationRoomId,
                         name = completed.destinationDisplayName,
                     ),

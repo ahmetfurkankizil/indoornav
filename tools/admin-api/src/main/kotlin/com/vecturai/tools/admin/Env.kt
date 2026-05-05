@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.admin
+package com.vecturai.tools.admin
 
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv

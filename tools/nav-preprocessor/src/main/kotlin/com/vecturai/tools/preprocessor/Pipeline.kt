@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
 /**
  * Orchestrates the v1 preprocessing pipeline.

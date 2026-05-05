@@ -1,7 +1,7 @@
-package com.Vectura AI.feature.search
+package com.VecturAI.feature.search
 
-import com.Vectura AI.core.domain.Room
-import com.Vectura AI.core.repository.BuildingRepository
+import com.VecturAI.core.domain.Room
+import com.VecturAI.core.repository.BuildingRepository
 
 /**
  * Use case for searching rooms within a building.

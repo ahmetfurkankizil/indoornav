@@ -39,9 +39,9 @@ The Admin Orchestration feature provides a management layer for the navigation d
 - `DraftJobServiceTest.kt`: Logic tests for job management.
 
 ## Related File Dossiers
-- [Application.kt](../files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_Application.kt.md)
-- [DraftJobService.kt](../files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_DraftJobService.kt.md)
-- [DraftJobRoutes.kt](../files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_routes_DraftJobRoutes.kt.md)
+- [Application.kt](../files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_Application.kt.md)
+- [DraftJobService.kt](../files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_DraftJobService.kt.md)
+- [DraftJobRoutes.kt](../files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_routes_DraftJobRoutes.kt.md)
 
 ## Risks / Notes
 - **Statefulness**: Job data is stored on the local file system; the service is not stateless.

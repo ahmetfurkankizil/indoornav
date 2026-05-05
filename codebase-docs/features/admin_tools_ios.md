@@ -35,7 +35,7 @@ The Admin Tools are isolated from the visitor navigation flow and are accessed v
 - **Local IP Configuration**: Currently requires manual IP configuration in `AdminAPIClient.swift` to connect to a development Mac on the same network.
 
 ## Related Files
-- [AdminAPIClient.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminAPIClient.swift.md)
-- [AdminDraftJobsView.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminDraftJobsView.swift.md)
-- [AdminDraftReviewView.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminDraftReviewView.swift.md)
-- [AdminJobDetailView.swift](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminJobDetailView.swift.md)
+- [AdminAPIClient.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminAPIClient.swift.md)
+- [AdminDraftJobsView.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminDraftJobsView.swift.md)
+- [AdminDraftReviewView.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminDraftReviewView.swift.md)
+- [AdminJobDetailView.swift](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/apps_iosApp_iosApp_admin_AdminJobDetailView.swift.md)

@@ -1,7 +1,7 @@
 # File Dossier: HistoryRepositoryTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/HistoryRepositoryTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/HistoryRepositoryTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `visit_history`
 - **Status**: Mapped

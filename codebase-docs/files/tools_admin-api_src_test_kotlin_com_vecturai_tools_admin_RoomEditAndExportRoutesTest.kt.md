@@ -1,7 +1,7 @@
 # File Dossier: RoomEditAndExportRoutesTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/RoomEditAndExportRoutesTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/VecturAI/tools/admin/RoomEditAndExportRoutesTest.kt`
 - **Type**: Kotlin Source (Integration Test)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

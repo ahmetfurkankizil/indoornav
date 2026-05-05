@@ -1,13 +1,13 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/NavigationSessionCoordinator.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/navigation/NavigationSessionCoordinator.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/NavigationSessionCoordinator.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/navigation/NavigationSessionCoordinator.kt`
 - **Type**: source
 - **Role**: Central orchestrator for the navigation state machine and session lifecycle.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.NavigationState`
-    - `com.Vectura AI.core.domain.Route`
-    - `com.Vectura AI.core.ar.AlignmentTransform`
-    - `com.Vectura AI.core.repository.HistoryRepository`
+    - `com.VecturAI.core.domain.NavigationState`
+    - `com.VecturAI.core.domain.Route`
+    - `com.VecturAI.core.ar.AlignmentTransform`
+    - `com.VecturAI.core.repository.HistoryRepository`
 - **Exports / Public Surface**:
     - `NavigationSessionCoordinator` class
     - `state`: StateFlow<NavigationState>

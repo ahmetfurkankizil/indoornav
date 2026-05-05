@@ -1,8 +1,8 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.model.CreateNavMeshAreaRequest
-import com.Vectura AI.tools.admin.model.UpdateNavMeshAreaRequest
-import com.Vectura AI.tools.admin.service.NavMeshAreaService
+import com.vecturai.tools.admin.model.CreateNavMeshAreaRequest
+import com.vecturai.tools.admin.model.UpdateNavMeshAreaRequest
+import com.vecturai.tools.admin.service.NavMeshAreaService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

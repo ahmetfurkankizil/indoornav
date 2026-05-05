@@ -1,23 +1,23 @@
-package com.Vectura AI.core.di
+package com.VecturAI.core.di
 
-import com.Vectura AI.core.ar.ArNavigationCoordinator
-import com.Vectura AI.core.ar.CorrectionCoordinator
-import com.Vectura AI.core.ar.OffRouteDetector
-import com.Vectura AI.core.ar.RouteToArrowMapper
-import com.Vectura AI.core.config.AppConfig
-import com.Vectura AI.core.loading.BuildingPackageLoader
-import com.Vectura AI.core.loading.DefaultBuildingRepository
-import com.Vectura AI.core.loading.DemoPackageProvider
-import com.Vectura AI.core.loading.InMemoryPackageStore
-import com.Vectura AI.core.navigation.ArrivalDetector
-import com.Vectura AI.core.navigation.DemoMode
-import com.Vectura AI.core.navigation.NavigationSessionCoordinator
-import com.Vectura AI.core.repository.BuildingRepository
-import com.Vectura AI.core.repository.HistoryRepository
-import com.Vectura AI.core.repository.InMemoryHistoryRepository
-import com.Vectura AI.core.routing.DijkstraRouteEngine
-import com.Vectura AI.core.routing.RouteEngine
-import com.Vectura AI.core.store.AppStore
+import com.VecturAI.core.ar.ArNavigationCoordinator
+import com.VecturAI.core.ar.CorrectionCoordinator
+import com.VecturAI.core.ar.OffRouteDetector
+import com.VecturAI.core.ar.RouteToArrowMapper
+import com.VecturAI.core.config.AppConfig
+import com.VecturAI.core.loading.BuildingPackageLoader
+import com.VecturAI.core.loading.DefaultBuildingRepository
+import com.VecturAI.core.loading.DemoPackageProvider
+import com.VecturAI.core.loading.InMemoryPackageStore
+import com.VecturAI.core.navigation.ArrivalDetector
+import com.VecturAI.core.navigation.DemoMode
+import com.VecturAI.core.navigation.NavigationSessionCoordinator
+import com.VecturAI.core.repository.BuildingRepository
+import com.VecturAI.core.repository.HistoryRepository
+import com.VecturAI.core.repository.InMemoryHistoryRepository
+import com.VecturAI.core.routing.DijkstraRouteEngine
+import com.VecturAI.core.routing.RouteEngine
+import com.VecturAI.core.store.AppStore
 import org.koin.dsl.module
 
 /**

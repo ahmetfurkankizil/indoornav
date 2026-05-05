@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,8 +6,8 @@ import com.google.ar.core.Frame
 import com.google.ar.core.Pose
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
-import com.Vectura AI.android.data.AndroidReviewedPackageLoader
-import com.Vectura AI.android.data.ArrowPlacementType
+import com.VecturAI.android.data.AndroidReviewedPackageLoader
+import com.VecturAI.android.data.ArrowPlacementType
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

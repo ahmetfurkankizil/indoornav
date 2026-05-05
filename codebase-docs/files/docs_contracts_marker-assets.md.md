@@ -34,7 +34,7 @@ This document defines the controlled entrance marker: artwork, physical requirem
 ┌────────────────────────┐
 │   ┌──────────────┐     │
 │   │  QR Code     │     │
-│   │  (Vectura AI   │     │
+│   │  (VecturAI   │     │
 │   │   ://b1/m1)  │     │
 │   └──────────────┘     │
 │                        │
@@ -44,7 +44,7 @@ This document defines the controlled entrance marker: artwork, physical requirem
 │   │  Pattern     │     │
 │   └──────────────┘     │
 │                        │
-│   Vectura AI             │
+│   VecturAI             │
 │   Scan to
 ```
 

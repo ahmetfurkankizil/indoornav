@@ -27,7 +27,7 @@ The entrance poster contains a QR code encoding a small JSON payload identifying
 
 ```json
 {
-  "type": "Vectura AI-entrance",
+  "type": "VecturAI-entrance",
   "buildingId": "house-demo-01",
   "entranceId": "marker-entrance-a",
   "v": 1
@@ -36,7 +36,7 @@ The entrance poster contains a QR code encoding a small JSON payload identifying
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `type` | string | yes | Always `"Vectura AI-entrance"`. Rejects any other value. |
+| `type` | string | yes | Always `"VecturAI-entrance"`. Rejects any other value. |
 | `buildingId` | string | yes | Must match `buildingId` in `manifest.json`. |
 | `entranceId` | string | yes | Must match an `id` in `entrance_markers.json`. |
 ```

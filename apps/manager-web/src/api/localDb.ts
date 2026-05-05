@@ -1,9 +1,9 @@
 import type { Building, Floor, FloorConnection } from './buildings'
 import type { Node } from './mapEditor'
 
-const LS_BUILDINGS = 'Vectura AI_buildings'
-const LS_NODES = 'Vectura AI_nodes'
-const LS_CONNS = 'Vectura AI_connections'
+const LS_BUILDINGS = 'VecturAI_buildings'
+const LS_NODES = 'VecturAI_nodes'
+const LS_CONNS = 'VecturAI_connections'
 
 function uid() { return crypto.randomUUID() }
 function now() { return new Date().toISOString() }
@@ -154,7 +154,7 @@ export function lsDeleteConnection(id: string): void {
 
 // ── IndexedDB — map file blobs ──────────────────────────────────────────────────
 
-const IDB_NAME = 'Vectura AI_files'
+const IDB_NAME = 'VecturAI_files'
 const IDB_STORE = 'map_files'
 
 function openIdb(): Promise<IDBDatabase> {

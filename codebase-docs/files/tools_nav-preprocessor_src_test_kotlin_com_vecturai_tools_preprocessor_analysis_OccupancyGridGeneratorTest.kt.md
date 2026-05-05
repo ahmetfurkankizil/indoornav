@@ -1,7 +1,7 @@
 # File Dossier: OccupancyGridGeneratorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/analysis/OccupancyGridGeneratorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/analysis/OccupancyGridGeneratorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

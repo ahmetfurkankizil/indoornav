@@ -1,10 +1,10 @@
-package com.Vectura AI.designsystem
+package com.VecturAI.designsystem
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-object Vectura AIColors {
+object VecturAIColors {
     val Primary = Color(0xFF2563EB)
     val PrimaryLight = Color(0xFF60A5FA)
     val PrimaryDark = Color(0xFF1D4ED8)
@@ -64,14 +64,14 @@ object Vectura AIColors {
     val GradientEnd = Color(0xFF06B6D4)
 }
 
-object Vectura AIBrush {
+object VecturAIBrush {
     val Primary: Brush
         @Composable
         get() = Brush.linearGradient(
             colors = listOf(
-                Vectura AIColors.GradientStart,
-                Vectura AIColors.GradientMid,
-                Vectura AIColors.GradientEnd,
+                VecturAIColors.GradientStart,
+                VecturAIColors.GradientMid,
+                VecturAIColors.GradientEnd,
             ),
         )
 }

@@ -20,7 +20,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.Vectura AI.feature.preview"
+    namespace = "com.VecturAI.feature.preview"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
     compileOptions {

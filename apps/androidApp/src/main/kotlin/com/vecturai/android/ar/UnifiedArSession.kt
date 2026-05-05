@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import android.app.Activity
 import android.widget.Toast

@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Vectura AI Route Rendering Configuration",
+    "title": "VecturAI Route Rendering Configuration",
     "description": "Configuration for how navigation routes are rendered in AR and on the 2D map.",
     "type": "object",
     "required": [

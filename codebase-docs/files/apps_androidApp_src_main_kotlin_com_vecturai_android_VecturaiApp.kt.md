@@ -1,7 +1,7 @@
-# File Dossier: Vectura AIApp.kt
+# File Dossier: VecturAIApp.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/Vectura AIApp.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/VecturAIApp.kt`
 
 ## Type
 Authored Source (Android Application)
@@ -15,7 +15,7 @@ Initializes global application state, specifically the Koin DI framework.
 - All KMP and platform modules.
 
 ## Exports / Public Surface
-- `Vectura AIApp`: Application class.
+- `VecturAIApp`: Application class.
 
 ## Logic
 - `onCreate()`: Starts Koin and loads all relevant modules (Core, Data, Features, Android).

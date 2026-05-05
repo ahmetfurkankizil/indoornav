@@ -1,7 +1,7 @@
 # File Dossier: MainActivity.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/MainActivity.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/MainActivity.kt`
 
 ## Type
 Authored Source (Android Activity)
@@ -13,7 +13,7 @@ Launcher Activity for the Android app. Hosts only the Home/PackageError Compose 
 - `android.content.Intent`
 - `androidx.activity.ComponentActivity`
 - `androidx.activity.compose.setContent`
-- `com.Vectura AI.android.ar.ArCameraActivity`
+- `com.VecturAI.android.ar.ArCameraActivity`
 - `AndroidNavigationFlowModel`
 - `AndroidNavigationApp`
 - Koin `viewModel`

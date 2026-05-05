@@ -1,4 +1,4 @@
-package com.Vectura AI.android.data
+package com.VecturAI.android.data
 
 import android.content.Context
 import kotlinx.serialization.Serializable

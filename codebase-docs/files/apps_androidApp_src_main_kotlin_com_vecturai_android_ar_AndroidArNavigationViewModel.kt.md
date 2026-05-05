@@ -1,7 +1,7 @@
 # File Dossier: AndroidArNavigationViewModel.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt`
 
 ## Type
 Authored Source (Android AR Navigation State)

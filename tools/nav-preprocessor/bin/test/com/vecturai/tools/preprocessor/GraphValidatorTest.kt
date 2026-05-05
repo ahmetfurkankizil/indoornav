@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.model.*
+import com.vecturai.tools.preprocessor.model.*
 import kotlin.test.*
 
 /**

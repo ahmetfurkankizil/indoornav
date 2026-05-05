@@ -1,7 +1,7 @@
 import json
 import os
 
-docs_root = r"c:\Users\emirh\Desktop\bitirme\Vectura AI\codebase-docs"
+docs_root = r"c:\Users\emirh\Desktop\bitirme\VecturAI\codebase-docs"
 
 with open(os.path.join(docs_root, "codebase-index.json"), "r") as f:
     inventory = json.load(f)

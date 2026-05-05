@@ -1,7 +1,7 @@
 import os
 
-repo_root = r"c:\Users\emirh\Desktop\bitirme\Vectura AI"
-docs_root = r"c:\Users\emirh\Desktop\bitirme\Vectura AI\codebase-docs"
+repo_root = r"c:\Users\emirh\Desktop\bitirme\VecturAI"
+docs_root = r"c:\Users\emirh\Desktop\bitirme\VecturAI\codebase-docs"
 
 exclude_dirs = {".git", ".gradle", "build", ".kotlin", "codebase-docs", "bin"}
 

@@ -1,4 +1,4 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.widget.Toast
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.Vectura AI.android.Vectura AIConfig
+import com.VecturAI.android.VecturAIConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
@@ -60,14 +60,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.Frame
-import com.Vectura AI.android.DeviceEnvironment
-import com.Vectura AI.android.navigation.ArCameraFlowViewModel
-import com.Vectura AI.android.ui.ArNavigationScreen
-import com.Vectura AI.android.ui.DestinationSelectScreen
-import com.Vectura AI.android.ui.EntranceConfirmedSheet
-import com.Vectura AI.android.ui.QRScanScreen
-import com.Vectura AI.android.ui.RoutePreviewScreen
-import com.Vectura AI.designsystem.Vectura AITheme
+import com.VecturAI.android.DeviceEnvironment
+import com.VecturAI.android.navigation.ArCameraFlowViewModel
+import com.VecturAI.android.ui.ArNavigationScreen
+import com.VecturAI.android.ui.DestinationSelectScreen
+import com.VecturAI.android.ui.EntranceConfirmedSheet
+import com.VecturAI.android.ui.QRScanScreen
+import com.VecturAI.android.ui.RoutePreviewScreen
+import com.VecturAI.designsystem.VecturAITheme
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -118,7 +118,7 @@ class ArCameraActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Vectura AITheme {
+            VecturAITheme {
                 ArCameraContent()
             }
         }
@@ -126,7 +126,7 @@ class ArCameraActivity : ComponentActivity() {
 
     private suspend fun downloadMarkerImage(token: String): Bitmap? = withContext(Dispatchers.IO) {
         try {
-            val url = "${Vectura AIConfig.API_BASE_URL}/mobile/buildings/$token/qr"
+            val url = "${VecturAIConfig.API_BASE_URL}/mobile/buildings/$token/qr"
             val bytes = java.net.URL(url).readBytes()
             BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         } catch (e: Exception) {
@@ -304,7 +304,7 @@ class ArCameraActivity : ComponentActivity() {
 
     private companion object {
         const val DEMO_QR_PAYLOAD =
-            """{"type":"Vectura AI-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}"""
+            """{"type":"VecturAI-entrance","buildingId":"19","entranceId":"marker-main-entrance","v":1}"""
     }
 }
 
@@ -381,7 +381,7 @@ private fun CameraPermissionOverlay(
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    "Camera access lets Vectura AI scan the entrance code and show AR guidance.",
+                    "Camera access lets VecturAI scan the entrance code and show AR guidance.",
                     textAlign = TextAlign.Center,
                     color = Color(0xFFB6BFCE),
                     fontSize = 14.sp,

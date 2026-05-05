@@ -1,7 +1,7 @@
 # File Dossier: ArContractSerializationTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/ArContractSerializationTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/ArContractSerializationTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `ar_alignment`, `navigation_data_format`
 - **Status**: Mapped

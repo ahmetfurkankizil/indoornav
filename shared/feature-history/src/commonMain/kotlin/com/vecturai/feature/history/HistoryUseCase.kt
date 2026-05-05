@@ -1,6 +1,6 @@
-package com.Vectura AI.feature.history
+package com.VecturAI.feature.history
 
-import com.Vectura AI.core.repository.HistoryRepository
+import com.VecturAI.core.repository.HistoryRepository
 
 /**
  * Use case for managing visit history.

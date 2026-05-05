@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────
-# Vectura AI — iOS Local Build Verification
+# VecturAI — iOS Local Build Verification
 # Requires Xcode and macOS.
 # ─────────────────────────────────────────────────
 set -euo pipefail

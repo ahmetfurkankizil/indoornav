@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

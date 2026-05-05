@@ -1,6 +1,6 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/ArrivalDetector.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/navigation/ArrivalDetector.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/navigation/ArrivalDetector.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/navigation/ArrivalDetector.kt`
 - **Type**: source
 - **Role**: Logic for determining when the user has reached their destination or is approaching it.
 - **Imports / Includes**:

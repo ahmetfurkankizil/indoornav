@@ -1,9 +1,9 @@
-package com.Vectura AI.tools.preprocessor.draft
+package com.vecturai.tools.preprocessor.draft
 
-import com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator
-import com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester
-import com.Vectura AI.tools.preprocessor.glb.BoundingBox3D
-import com.Vectura AI.tools.preprocessor.model.*
+import com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator
+import com.vecturai.tools.preprocessor.analysis.ZoneSuggester
+import com.vecturai.tools.preprocessor.glb.BoundingBox3D
+import com.vecturai.tools.preprocessor.model.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

@@ -1,7 +1,7 @@
 # File Dossier: EntranceMarker.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\domain\EntranceMarker.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\domain\EntranceMarker.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.domain
+package com.VecturAI.core.domain
 
 import kotlinx.serialization.Serializable
 
@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
  * 3. Uses the known marker pose in building coords to compute the transform
  *
  * @property id Unique marker identifier
- * @property qrPayload QR code content (typically "Vectura AI://building/{buildingId}/marker/{id}")
+ * @property qrPayload QR code content (typically "VecturAI://building/{buildingId}/marker/{id}")
  * @property positionX Marker X in building-local coords (meters)
  * @property positionY Marker Y in building-local coords (meters)
  * @property positionZ Marker Z in building-local coords (meters)

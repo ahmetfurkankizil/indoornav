@@ -1,7 +1,7 @@
 # File Dossier: RoomOverride.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/model/RoomOverride.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/VecturAI/tools/admin/model/RoomOverride.kt`
 - **Type**: Kotlin Source (Data Model)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

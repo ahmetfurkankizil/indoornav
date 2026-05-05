@@ -20,7 +20,7 @@ This document defines the controlled entrance marker: artwork, physical requirem
 ┌────────────────────────┐
 │   ┌──────────────┐     │
 │   │  QR Code     │     │
-│   │  (Vectura AI   │     │
+│   │  (VecturAI   │     │
 │   │   ://b1/m1)  │     │
 │   └──────────────┘     │
 │                        │
@@ -30,13 +30,13 @@ This document defines the controlled entrance marker: artwork, physical requirem
 │   │  Pattern     │     │
 │   └──────────────┘     │
 │                        │
-│   Vectura AI             │
+│   VecturAI             │
 │   Scan to Navigate     │
 └────────────────────────┘
 ```
 
 The marker serves dual purpose:
-1. **QR code**: Carries `Vectura AI://{buildingId}/{markerId}` payload for building identification
+1. **QR code**: Carries `VecturAI://{buildingId}/{markerId}` payload for building identification
 2. **Visual pattern**: High-contrast image used as ARKit/ARCore reference image for pose detection
 
 ## Metadata Mapping
@@ -46,7 +46,7 @@ The marker's properties map to `entrance_markers.json` fields:
 | Marker property | JSON field |
 |----------------|-----------|
 | Marker ID | `id` |
-| QR payload | `qrPayload` (auto-generated: `Vectura AI://{buildingId}/{markerId}`) |
+| QR payload | `qrPayload` (auto-generated: `VecturAI://{buildingId}/{markerId}`) |
 | Position in building | `positionX`, `positionY`, `positionZ` |
 | Y-rotation | `rotationYDegrees` |
 | Forward direction | `forwardBasis` (e.g., `-z`) |

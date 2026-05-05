@@ -3,7 +3,7 @@
 - **Feature Name**: Search & Discovery
 - **Purpose**: Allows users to find rooms, amenities, and workspaces within a building through text search or category browsing.
 - **Implemented In**:
-    - `shared/feature-search/src/commonMain/kotlin/com/Vectura AI/feature/search/SearchUseCase.kt`
+    - `shared/feature-search/src/commonMain/kotlin/com/VecturAI/feature/search/SearchUseCase.kt`
 - **Used By**:
     - Search Screen UI
     - Quick-search components
@@ -20,7 +20,7 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [SearchUseCase.kt](../files/shared_feature-search_src_commonMain_kotlin_com_Vectura AI_feature_search_SearchUseCase.kt.md)
+    - [SearchUseCase.kt](../files/shared_feature-search_src_commonMain_kotlin_com_VecturAI_feature_search_SearchUseCase.kt.md)
 - **Risks / Notes**:
     - Minimal ranking logic; doesn't support fuzzy matching or typo correction yet.
     - Dependent on high-quality metadata (keywords, aliases) in the building data package.

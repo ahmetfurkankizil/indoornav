@@ -6,7 +6,7 @@
     - `rectorate_main_floor_navigation.json` (Ground truth sample)
     - [TBD] shared logic classes for serialization.
     - `apps/androidApp/src/main/assets/reviewed-package/` (Android bundled runtime package)
-    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt`
+    - `apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt`
 - **Used By**:
     - `nav-preprocessor` (Tooling)
     - `shared/core` (Routing & Logic)
@@ -28,7 +28,7 @@
 - **Related Tests**: N/A (Data validation is done by preprocessor tools).
 - **Related File Dossiers**:
     - [rectorate_main_floor_navigation.json](../files/rectorate_main_floor_navigation.json.md)
-    - [AndroidReviewedPackageLoader.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_data_AndroidReviewedPackageLoader.kt.md)
+    - [AndroidReviewedPackageLoader.kt](../files/apps_androidApp_src_main_kotlin_com_VecturAI_android_data_AndroidReviewedPackageLoader.kt.md)
     - [Android manifest.json](../files/apps_androidApp_src_main_assets_reviewed-package_manifest.json.md)
     - [Android nav_graph.json](../files/apps_androidApp_src_main_assets_reviewed-package_nav_graph.json.md)
 - **Risks / Notes**:

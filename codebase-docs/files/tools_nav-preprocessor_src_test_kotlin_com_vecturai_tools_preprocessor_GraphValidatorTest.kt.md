@@ -1,7 +1,7 @@
 # File Dossier: GraphValidatorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/GraphValidatorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/GraphValidatorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

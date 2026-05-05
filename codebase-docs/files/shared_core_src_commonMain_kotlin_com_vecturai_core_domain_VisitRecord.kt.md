@@ -1,7 +1,7 @@
 # File Dossier: VisitRecord.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\domain\VisitRecord.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\domain\VisitRecord.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.domain
+package com.VecturAI.core.domain
 
 import kotlinx.serialization.Serializable
 

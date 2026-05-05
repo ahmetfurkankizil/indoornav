@@ -3,7 +3,7 @@
 - **Feature Name**: Visit History
 - **Purpose**: Tracks previously visited rooms and locations for quick re-navigation.
 - **Implemented In**:
-    - `shared/feature-history/src/commonMain/kotlin/com/Vectura AI/feature/history/HistoryUseCase.kt`
+    - `shared/feature-history/src/commonMain/kotlin/com/VecturAI/feature/history/HistoryUseCase.kt`
 - **Used By**:
     - History Screen
     - Search Screen (Recent items)
@@ -20,7 +20,7 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [HistoryUseCase.kt](../files/shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_HistoryUseCase.kt.md)
-    - [InMemoryHistoryRepository.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_InMemoryHistoryRepository.kt.md) (Core)
+    - [HistoryUseCase.kt](../files/shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_HistoryUseCase.kt.md)
+    - [InMemoryHistoryRepository.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_InMemoryHistoryRepository.kt.md) (Core)
 - **Risks / Notes**:
     - Persistence depends on the `HistoryRepository` implementation (currently in-memory for MVP).

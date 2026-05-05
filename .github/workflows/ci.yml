@@ -1,4 +1,4 @@
-name: Vectura AI CI
+name: VecturAI CI
 
 on:
   push:

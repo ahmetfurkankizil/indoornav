@@ -1,7 +1,7 @@
 # File Dossier: DraftSummary.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/model/DraftSummary.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/VecturAI/tools/admin/model/DraftSummary.kt`
 - **Type**: Kotlin Source (Data Model)
 - **Feature**: `admin_orchestration`, `preprocessing`
 - **Status**: Mapped

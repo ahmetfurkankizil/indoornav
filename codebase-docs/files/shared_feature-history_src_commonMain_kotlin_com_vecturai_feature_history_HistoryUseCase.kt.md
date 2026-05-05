@@ -1,10 +1,10 @@
-# File Dossier: shared/feature-history/src/commonMain/kotlin/com/Vectura AI/feature/history/HistoryUseCase.kt
+# File Dossier: shared/feature-history/src/commonMain/kotlin/com/VecturAI/feature/history/HistoryUseCase.kt
 
-- **Path**: `shared/feature-history/src/commonMain/kotlin/com/Vectura AI/feature/history/HistoryUseCase.kt`
+- **Path**: `shared/feature-history/src/commonMain/kotlin/com/VecturAI/feature/history/HistoryUseCase.kt`
 - **Type**: source
 - **Role**: Business logic for managing the history of visited locations.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.repository.HistoryRepository`
+    - `com.VecturAI.core.repository.HistoryRepository`
 - **Exports / Public Surface**:
     - `HistoryUseCase` class
     - `getRecentVisits(limit)`

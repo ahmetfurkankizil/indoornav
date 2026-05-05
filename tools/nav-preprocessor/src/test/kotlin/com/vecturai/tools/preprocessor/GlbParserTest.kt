@@ -1,7 +1,7 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.glb.GlbParser
-import com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor
+import com.vecturai.tools.preprocessor.glb.GlbParser
+import com.vecturai.tools.preprocessor.glb.GlbGeometryExtractor
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

@@ -1,7 +1,7 @@
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
-import com.Vectura AI.core.domain.NavigationState
-import com.Vectura AI.core.store.AppStore
+import com.VecturAI.core.domain.NavigationState
+import com.VecturAI.core.store.AppStore
 import kotlinx.coroutines.flow.StateFlow
 
 /**

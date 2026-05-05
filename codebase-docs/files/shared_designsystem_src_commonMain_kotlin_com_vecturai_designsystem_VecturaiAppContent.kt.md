@@ -1,7 +1,7 @@
-# File Dossier: Vectura AIAppContent.kt
+# File Dossier: VecturAIAppContent.kt
 
 ## Path
-`shared\designsystem\src\commonMain\kotlin\com\Vectura AI\designsystem\Vectura AIAppContent.kt`
+`shared\designsystem\src\commonMain\kotlin\com\VecturAI\designsystem\VecturAIAppContent.kt`
 
 ## Type
 Authored Source
@@ -12,10 +12,10 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.designsystem
+package com.VecturAI.designsystem
 
 import androidx.compose.runtime.Composable
-import com.Vectura AI.designsystem.navigation.AppNavigation
+import com.VecturAI.designsystem.navigation.AppNavigation
 
 /**
  * Root app content composable.
@@ -26,10 +26,10 @@ import com.Vectura AI.designsystem.navigation.AppNavigation
  * @param onNavigateToAr Callback to launch the native AR navigation screen
  */
 @Composable
-fun Vectura AIAppContent(
+fun VecturAIAppContent(
     onNavigateToAr: () -> Unit = {},
 ) {
-    Vectura AITheme {
+    VecturAITheme {
         AppNavigation(
             onNavigateToAr = onNavigateToAr,
         )

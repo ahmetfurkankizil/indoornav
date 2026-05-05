@@ -1,7 +1,7 @@
 # File Dossier: RoomOverrideServiceTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/RoomOverrideServiceTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/VecturAI/tools/admin/RoomOverrideServiceTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

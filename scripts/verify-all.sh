@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────
-# Vectura AI — Unified Local Verification
+# VecturAI — Unified Local Verification
 # Runs all automated checks in sequence.
 # ─────────────────────────────────────────────────
 set -euo pipefail

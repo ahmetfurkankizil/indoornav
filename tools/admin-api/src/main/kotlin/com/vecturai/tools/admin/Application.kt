@@ -1,10 +1,10 @@
-package com.Vectura AI.tools.admin
+package com.vecturai.tools.admin
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.Vectura AI.tools.admin.db.DatabaseFactory
-import com.Vectura AI.tools.admin.routes.*
-import com.Vectura AI.tools.admin.service.*
+import com.vecturai.tools.admin.db.DatabaseFactory
+import com.vecturai.tools.admin.routes.*
+import com.vecturai.tools.admin.service.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -28,7 +28,7 @@ fun main() {
     val uploadsDir = Env.get("UPLOADS_DIR") ?: "uploads"
 
     println("╔══════════════════════════════════════════════╗")
-    println("║   Vectura AI Admin API                         ║")
+    println("║   VecturAI Admin API                         ║")
     println("╚══════════════════════════════════════════════╝")
     println("  Port:        $port")
     println("  Uploads dir: $uploadsDir")
@@ -47,7 +47,7 @@ fun Application.configureApp(
     uploadsDir: String = "uploads",
 ) {
     val jwtSecret = Env.get("JWT_SECRET") ?: "dev-secret-change-in-production"
-    val jwtIssuer = Env.get("JWT_ISSUER") ?: "Vectura AI"
+    val jwtIssuer = Env.get("JWT_ISSUER") ?: "VecturAI"
 
     install(ContentNegotiation) {
         json(Json {
@@ -85,7 +85,7 @@ fun Application.configureApp(
 
     install(Authentication) {
         jwt("manager-auth") {
-            realm = "Vectura AI Manager"
+            realm = "VecturAI Manager"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)
@@ -101,7 +101,7 @@ fun Application.configureApp(
         }
 
         jwt("superadmin-auth") {
-            realm = "Vectura AI DB Admin"
+            realm = "VecturAI DB Admin"
             verifier(
                 JWT.require(Algorithm.HMAC256(jwtSecret))
                     .withIssuer(jwtIssuer)

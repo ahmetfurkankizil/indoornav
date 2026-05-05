@@ -1,7 +1,7 @@
 # File Dossier: NavigationSessionCoordinatorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/NavigationSessionCoordinatorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/NavigationSessionCoordinatorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `navigation_session_management`
 - **Status**: Mapped

@@ -1,7 +1,7 @@
 # File Dossier: CorrectionCoordinatorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/CorrectionCoordinatorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/CorrectionCoordinatorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `ar_alignment`, `navigation_session_management`
 - **Status**: Mapped

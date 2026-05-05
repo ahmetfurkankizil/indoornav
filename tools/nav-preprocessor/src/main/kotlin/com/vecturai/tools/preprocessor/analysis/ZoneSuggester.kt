@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor.analysis
+package com.vecturai.tools.preprocessor.analysis
 
 /**
  * Discovers walkable zones by connected-component labeling of the occupancy grid.

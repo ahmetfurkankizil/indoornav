@@ -1,7 +1,7 @@
 # File Dossier: ProgressEstimatorTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/ProgressEstimatorTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/ProgressEstimatorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `navigation_session_management`
 - **Status**: Mapped

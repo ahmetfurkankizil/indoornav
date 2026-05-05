@@ -1,11 +1,11 @@
-# File Dossier: shared/feature-search/src/commonMain/kotlin/com/Vectura AI/feature/search/SearchUseCase.kt
+# File Dossier: shared/feature-search/src/commonMain/kotlin/com/VecturAI/feature/search/SearchUseCase.kt
 
-- **Path**: `shared/feature-search/src/commonMain/kotlin/com/Vectura AI/feature/search/SearchUseCase.kt`
+- **Path**: `shared/feature-search/src/commonMain/kotlin/com/VecturAI/feature/search/SearchUseCase.kt`
 - **Type**: source
 - **Role**: Business logic for searching rooms and points of interest within a building.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.Room`
-    - `com.Vectura AI.core.repository.BuildingRepository`
+    - `com.VecturAI.core.domain.Room`
+    - `com.VecturAI.core.repository.BuildingRepository`
 - **Exports / Public Surface**:
     - `SearchUseCase` class
     - `searchRooms(buildingId, query)`: List<Room>

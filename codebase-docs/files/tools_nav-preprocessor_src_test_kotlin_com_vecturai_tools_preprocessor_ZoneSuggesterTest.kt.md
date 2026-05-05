@@ -1,7 +1,7 @@
 # File Dossier: ZoneSuggesterTest.kt
 
 ## Path
-`tools\nav-preprocessor\src\test\kotlin\com\Vectura AI\tools\preprocessor\ZoneSuggesterTest.kt`
+`tools\nav-preprocessor\src\test\kotlin\com\VecturAI\tools\preprocessor\ZoneSuggesterTest.kt`
 
 ## Type
 Unit/Integration Test
@@ -12,10 +12,10 @@ Unit/Integration Test for the tools component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.tools.preprocessor
+package com.VecturAI.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.analysis.OccupancyGridGenerator
-import com.Vectura AI.tools.preprocessor.analysis.ZoneSuggester
+import com.VecturAI.tools.preprocessor.analysis.OccupancyGridGenerator
+import com.VecturAI.tools.preprocessor.analysis.ZoneSuggester
 import kotlin.test.*
 
 /**

@@ -1,7 +1,7 @@
 # File Dossier: DataRemoteModule.kt
 
 ## Path
-`shared\data-remote\src\commonMain\kotlin\com\Vectura AI\data\remote\di\DataRemoteModule.kt`
+`shared\data-remote\src\commonMain\kotlin\com\VecturAI\data\remote\di\DataRemoteModule.kt`
 
 ## Type
 Authored Source
@@ -12,10 +12,10 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.data.remote.di
+package com.VecturAI.data.remote.di
 
-import com.Vectura AI.data.remote.KtorBuildingDataSource
-import com.Vectura AI.data.remote.RemoteBuildingDataSource
+import com.VecturAI.data.remote.KtorBuildingDataSource
+import com.VecturAI.data.remote.RemoteBuildingDataSource
 import org.koin.dsl.module
 
 val dataRemoteModule = module {

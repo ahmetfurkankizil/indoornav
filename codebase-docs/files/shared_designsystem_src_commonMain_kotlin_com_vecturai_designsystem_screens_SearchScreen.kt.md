@@ -1,7 +1,7 @@
 # File Dossier: SearchScreen.kt
 
 ## Path
-`shared\designsystem\src\commonMain\kotlin\com\Vectura AI\designsystem\screens\SearchScreen.kt`
+`shared\designsystem\src\commonMain\kotlin\com\VecturAI\designsystem\screens\SearchScreen.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.designsystem.screens
+package com.VecturAI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,8 +22,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AIEmptyState
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAIEmptyState
 
 /**
  * Search screen for finding rooms within the building.

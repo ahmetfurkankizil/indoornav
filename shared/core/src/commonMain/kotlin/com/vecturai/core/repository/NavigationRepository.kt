@@ -1,6 +1,6 @@
-package com.Vectura AI.core.repository
+package com.VecturAI.core.repository
 
-import com.Vectura AI.core.domain.Route
+import com.VecturAI.core.domain.Route
 
 /**
  * Repository for navigation-related data operations.

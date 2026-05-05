@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.model.AuthoringConfig
+import com.vecturai.tools.preprocessor.model.AuthoringConfig
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -89,7 +89,7 @@ class PackageExporter {
             markers = config.entranceMarkers.map { m ->
                 PackageMarker(
                     id = m.id,
-                    qrPayload = "Vectura AI://building/${config.buildingId}/marker/${m.id}",
+                    qrPayload = "VecturAI://building/${config.buildingId}/marker/${m.id}",
                     positionX = m.position.x,
                     positionY = m.position.y,
                     positionZ = m.position.z,

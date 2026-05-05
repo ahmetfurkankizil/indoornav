@@ -1,12 +1,12 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/RouteToArrowMapper.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/ar/RouteToArrowMapper.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/ar/RouteToArrowMapper.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/ar/RouteToArrowMapper.kt`
 - **Type**: source
 - **Role**: Logic for generating 3D arrow placements along a computed navigation route.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.NavGraph`
-    - `com.Vectura AI.core.domain.Route`
-    - `com.Vectura AI.core.domain.RouteRenderingConfig`
+    - `com.VecturAI.core.domain.NavGraph`
+    - `com.VecturAI.core.domain.Route`
+    - `com.VecturAI.core.domain.RouteRenderingConfig`
 - **Exports / Public Surface**:
     - `RouteToArrowMapper` class
     - `map(route, graph, config)`

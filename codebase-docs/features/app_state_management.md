@@ -3,9 +3,9 @@
 - **Feature Name**: App State & Event Bus
 - **Purpose**: Provides a unified, reactive source of truth for the application's global state and screen-level Android visitor flow phases.
 - **Implemented In**:
-    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/store/AppStore.kt`
-    - `shared/core/src/commonMain/kotlin/com/Vectura AI/core/domain/NavigationState.kt`
-    - `apps/androidApp/src/main/kotlin/com/Vectura AI/android/navigation/AndroidNavigationFlowModel.kt`
+    - `shared/core/src/commonMain/kotlin/com/VecturAI/core/store/AppStore.kt`
+    - `shared/core/src/commonMain/kotlin/com/VecturAI/core/domain/NavigationState.kt`
+    - `apps/androidApp/src/main/kotlin/com/VecturAI/android/navigation/AndroidNavigationFlowModel.kt`
 - **Used By**:
     - All feature modules (Search, History, etc.)
     - UI Layer (Compose/SwiftUI)
@@ -27,8 +27,8 @@
 - **Related Tests**:
     - [TBD]
 - **Related File Dossiers**:
-    - [AppStore.kt](../files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_store_AppStore.kt.md)
-    - [AndroidNavigationFlowModel.kt](../files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_navigation_AndroidNavigationFlowModel.kt.md)
+    - [AppStore.kt](../files/shared_core_src_commonMain_kotlin_com_VecturAI_core_store_AppStore.kt.md)
+    - [AndroidNavigationFlowModel.kt](../files/apps_androidApp_src_main_kotlin_com_VecturAI_android_navigation_AndroidNavigationFlowModel.kt.md)
 - **Risks / Notes**:
     - Thread-safety is managed by `MutableStateFlow`.
     - Excessive state in the global store can lead to unnecessary UI recompositions; keep state granular where possible.

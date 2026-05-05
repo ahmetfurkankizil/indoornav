@@ -1,13 +1,13 @@
-# File Dossier: shared/feature-preview/src/commonMain/kotlin/com/Vectura AI/feature/preview/RoutePreviewUseCase.kt
+# File Dossier: shared/feature-preview/src/commonMain/kotlin/com/VecturAI/feature/preview/RoutePreviewUseCase.kt
 
-- **Path**: `shared/feature-preview/src/commonMain/kotlin/com/Vectura AI/feature/preview/RoutePreviewUseCase.kt`
+- **Path**: `shared/feature-preview/src/commonMain/kotlin/com/VecturAI/feature/preview/RoutePreviewUseCase.kt`
 - **Type**: source
 - **Role**: Logic for generating a step-by-step route summary without requiring an active AR session.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.Room`
-    - `com.Vectura AI.core.domain.Route`
-    - `com.Vectura AI.core.repository.BuildingRepository`
-    - `com.Vectura AI.core.routing.RouteEngine`
+    - `com.VecturAI.core.domain.Room`
+    - `com.VecturAI.core.domain.Route`
+    - `com.VecturAI.core.repository.BuildingRepository`
+    - `com.VecturAI.core.routing.RouteEngine`
 - **Exports / Public Surface**:
     - `RoutePreviewUseCase` class
     - `getRoutePreview(buildingId, fromNodeId, destination)`

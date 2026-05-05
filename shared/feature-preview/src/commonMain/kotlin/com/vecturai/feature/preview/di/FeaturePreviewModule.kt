@@ -1,6 +1,6 @@
-package com.Vectura AI.feature.preview.di
+package com.VecturAI.feature.preview.di
 
-import com.Vectura AI.feature.preview.RoutePreviewUseCase
+import com.VecturAI.feature.preview.RoutePreviewUseCase
 import org.koin.dsl.module
 
 val featurePreviewModule = module {

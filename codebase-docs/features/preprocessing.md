@@ -48,17 +48,17 @@ The Data Preprocessing system is a backend CLI tool responsible for transforming
 - `OccupancyGrid`: 2D representation of the walkable environment.
 
 ## Related File Dossiers
-- [Main.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Main.kt.md)
-- [DraftPipeline.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DraftPipeline.kt.md)
-- [Pipeline.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Pipeline.kt.md)
-- [GlbParser.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbParser.kt.md)
-- [FloorPlaneEstimator.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md)
-- [OccupancyGridGenerator.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md)
-- [ZoneSuggester.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_ZoneSuggester.kt.md)
-- [NavigationGraphDrafter.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md)
-- [GraphValidator.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_GraphValidator.kt.md)
-- [PackageExporter.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_PackageExporter.kt.md)
-- [DebugExporter.kt](file:///c:/Users/emirh/Desktop/bitirme/Vectura AI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DebugExporter.kt.md)
+- [Main.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Main.kt.md)
+- [DraftPipeline.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DraftPipeline.kt.md)
+- [Pipeline.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Pipeline.kt.md)
+- [GlbParser.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GlbParser.kt.md)
+- [FloorPlaneEstimator.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md)
+- [OccupancyGridGenerator.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md)
+- [ZoneSuggester.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_ZoneSuggester.kt.md)
+- [NavigationGraphDrafter.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md)
+- [GraphValidator.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_GraphValidator.kt.md)
+- [PackageExporter.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_PackageExporter.kt.md)
+- [DebugExporter.kt](file:///c:/Users/emirh/Desktop/bitirme/VecturAI/codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DebugExporter.kt.md)
 
 ## Risks / Notes
 - **Coordinate System**: Assumes a Y-up coordinate system (standard for GLTF/Polycam).

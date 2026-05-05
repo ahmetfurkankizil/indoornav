@@ -1,6 +1,6 @@
 # Final Architecture and Design Details
 
-Vectura AI is an end-to-end, local-first indoor navigation platform designed to guide users through complex building environments using precise Augmented Reality (AR) overlays. The core of its design is centered around a decoupled preprocessing pipeline and robust cross-platform shared logic. 
+VecturAI is an end-to-end, local-first indoor navigation platform designed to guide users through complex building environments using precise Augmented Reality (AR) overlays. The core of its design is centered around a decoupled preprocessing pipeline and robust cross-platform shared logic. 
 
 The architecture is divided into three primary phases: preprocessing, distribution, and runtime localization. In the preprocessing phase, 3D building scans (provided in GLB format) are ingested by a CLI-based tool (`tools/nav-preprocessor`) which extracts building geometry and structural metadata to generate optimized, navigable graphs in JSON format. For distribution, these navigation packages are served by a Ktor-based backend service (`tools/admin-api`) or bundled directly within the mobile applications.
 

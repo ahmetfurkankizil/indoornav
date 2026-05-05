@@ -12,11 +12,11 @@ Authored Source for the docs component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-# Vectura AI Building Package — Contract Reference
+# VecturAI Building Package — Contract Reference
 
 ## Coordinate Conventions
 
-All spatial data in Vectura AI uses a single, consistent coordinate system:
+All spatial data in VecturAI uses a single, consistent coordinate system:
 
 | Property | Convention |
 |----------|-----------|

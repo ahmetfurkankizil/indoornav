@@ -1,8 +1,8 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.model.LoginRequest
-import com.Vectura AI.tools.admin.model.SignupRequest
-import com.Vectura AI.tools.admin.service.ManagerAuthService
+import com.vecturai.tools.admin.model.LoginRequest
+import com.vecturai.tools.admin.model.SignupRequest
+import com.vecturai.tools.admin.service.ManagerAuthService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

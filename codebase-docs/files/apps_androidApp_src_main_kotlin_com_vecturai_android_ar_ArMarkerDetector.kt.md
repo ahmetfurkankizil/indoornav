@@ -1,7 +1,7 @@
 # File Dossier: ArMarkerDetector.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArMarkerDetector.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArMarkerDetector.kt`
 
 ## Type
 Authored Source (AR Engine Logic)

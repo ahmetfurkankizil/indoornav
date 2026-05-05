@@ -40,9 +40,9 @@ ASSET_CATALOG_DIR="${REPO_ROOT}/apps/iosApp/iosApp/Assets.xcassets/AR Resources.
 ASSET_IMAGE="${ASSET_CATALOG_DIR}/entrance_marker.png"
 
 # QR payload
-QR_PAYLOAD="{\"type\":\"Vectura AI-entrance\",\"buildingId\":\"${BUILDING_ID}\",\"entranceId\":\"${ENTRANCE_ID}\",\"v\":${QR_VERSION}}"
+QR_PAYLOAD="{\"type\":\"VecturAI-entrance\",\"buildingId\":\"${BUILDING_ID}\",\"entranceId\":\"${ENTRANCE_ID}\",\"v\":${QR_VERSION}}"
 
-echo "=== Vectura AI Entrance Poster Generator ==="
+echo "=== VecturAI Entrance Poster Generator ==="
 echo ""
 echo "QR Payload: ${QR_PAYLOAD}"
 echo "Physical size: ${PHYSICAL_WIDTH_CM}cm × ${PHYSICAL_WIDTH_CM}cm"
@@ -100,7 +100,7 @@ try:
     font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 18)
 except:
     font = ImageFont.load_default()
-label = "Vectura AI Entrance"
+label = "VecturAI Entrance"
 bbox = draw.textbbox((0, 0), label, font=font)
 tw = bbox[2] - bbox[0]
 draw.text(((target_size - tw) // 2, target_size - border + 5), label, fill="black", font=font)

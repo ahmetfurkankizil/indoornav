@@ -1,7 +1,7 @@
 # File Dossier: SummaryAndArtifactRoutesTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/SummaryAndArtifactRoutesTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/VecturAI/tools/admin/SummaryAndArtifactRoutesTest.kt`
 - **Type**: Kotlin Source (Integration Test)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

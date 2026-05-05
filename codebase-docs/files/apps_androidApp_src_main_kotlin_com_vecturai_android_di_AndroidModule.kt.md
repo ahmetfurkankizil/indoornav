@@ -1,7 +1,7 @@
 # File Dossier: AndroidModule.kt
 
 ## Path
-`apps/androidApp/src/main/kotlin/com/Vectura AI/android/di/AndroidModule.kt`
+`apps/androidApp/src/main/kotlin/com/VecturAI/android/di/AndroidModule.kt`
 
 ## Type
 Authored Source (DI Configuration)
@@ -37,7 +37,7 @@ Defines the Koin module for Android-specific dependencies, haptics, reviewed-pac
 - `ArRouteRenderer`
 
 ## Used By
-- `Vectura AIApp.kt`: Loaded into the global Koin context.
+- `VecturAIApp.kt`: Loaded into the global Koin context.
 - `MainActivity.kt`: Resolves the home ViewModel.
 - `ArCameraActivity.kt`: Resolves the camera-flow and AR navigation ViewModels.
 

@@ -1,7 +1,7 @@
 # File Dossier: JsonFileHistoryPersistenceTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/JsonFileHistoryPersistenceTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/JsonFileHistoryPersistenceTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `visit_history`, `offline_caching`
 - **Status**: Mapped

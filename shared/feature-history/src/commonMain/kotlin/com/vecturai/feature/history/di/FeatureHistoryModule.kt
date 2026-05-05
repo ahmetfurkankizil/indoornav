@@ -1,6 +1,6 @@
-package com.Vectura AI.feature.history.di
+package com.VecturAI.feature.history.di
 
-import com.Vectura AI.feature.history.HistoryUseCase
+import com.VecturAI.feature.history.HistoryUseCase
 import org.koin.dsl.module
 
 val featureHistoryModule = module {

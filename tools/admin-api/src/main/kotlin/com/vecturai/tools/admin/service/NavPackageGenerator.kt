@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.admin.service
+package com.vecturai.tools.admin.service
 
-import com.Vectura AI.tools.admin.db.tables.*
+import com.vecturai.tools.admin.db.tables.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable

@@ -1,7 +1,7 @@
 # File Dossier: JsonFileHistoryRepository.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\repository\JsonFileHistoryRepository.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\repository\JsonFileHistoryRepository.kt`
 
 ## Type
 Authored Source
@@ -12,9 +12,9 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.repository
+package com.VecturAI.core.repository
 
-import com.Vectura AI.core.domain.VisitRecord
+import com.VecturAI.core.domain.VisitRecord
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

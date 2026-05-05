@@ -1,7 +1,7 @@
 # File Dossier: Color.kt
 
 ## Path
-`shared\designsystem\src\commonMain\kotlin\com\Vectura AI\designsystem\Color.kt`
+`shared\designsystem\src\commonMain\kotlin\com\VecturAI\designsystem\Color.kt`
 
 ## Type
 Authored Source
@@ -12,17 +12,17 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.designsystem
+package com.VecturAI.designsystem
 
 import androidx.compose.ui.graphics.Color
 
 /**
- * Vectura AI color palette.
+ * VecturAI color palette.
  *
  * A curated, premium color system designed for indoor navigation.
  * Uses a cool blue primary with warm accents for wayfinding elements.
  */
-object Vectura AIColors {
+object VecturAIColors {
     // Primary — Cool blue for trust and wayfinding
     val Primary = Color(0xFF2563EB)
     val PrimaryLight = Color(0xFF60A5FA)

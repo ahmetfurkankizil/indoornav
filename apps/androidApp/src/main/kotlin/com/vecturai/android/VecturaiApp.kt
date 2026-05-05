@@ -1,22 +1,22 @@
-package com.Vectura AI.android
+package com.VecturAI.android
 
 import android.app.Application
-import com.Vectura AI.android.di.androidModule
-import com.Vectura AI.core.di.coreModule
-import com.Vectura AI.data.local.di.dataLocalModule
-import com.Vectura AI.data.remote.di.dataRemoteModule
-import com.Vectura AI.feature.history.di.featureHistoryModule
-import com.Vectura AI.feature.preview.di.featurePreviewModule
-import com.Vectura AI.feature.routing.di.featureRoutingModule
-import com.Vectura AI.feature.search.di.featureSearchModule
+import com.VecturAI.android.di.androidModule
+import com.VecturAI.core.di.coreModule
+import com.VecturAI.data.local.di.dataLocalModule
+import com.VecturAI.data.remote.di.dataRemoteModule
+import com.VecturAI.feature.history.di.featureHistoryModule
+import com.VecturAI.feature.preview.di.featurePreviewModule
+import com.VecturAI.feature.routing.di.featureRoutingModule
+import com.VecturAI.feature.search.di.featureSearchModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class Vectura AIApp : Application() {
+class VecturAIApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            androidContext(this@Vectura AIApp)
+            androidContext(this@VecturAIApp)
             modules(
                 coreModule,
                 dataLocalModule,

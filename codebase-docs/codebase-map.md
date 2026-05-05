@@ -1,7 +1,7 @@
-# Codebase Map - Vectura AI
+# Codebase Map - VecturAI
 
 ## Repository Purpose
-Vectura AI is an end-to-end indoor navigation platform that enables users to navigate complex buildings using AR overlays. The system includes a Kotlin Multiplatform core for shared logic, native mobile applications for AR visualization, and a suite of backend tools for processing 3D building scans (GLB) into navigable navigation graphs.
+VecturAI is an end-to-end indoor navigation platform that enables users to navigate complex buildings using AR overlays. The system includes a Kotlin Multiplatform core for shared logic, native mobile applications for AR visualization, and a suite of backend tools for processing 3D building scans (GLB) into navigable navigation graphs.
 
 ## Tech Stack
 - **Languages**: Kotlin (2.1.10), Swift (Native iOS)
@@ -11,13 +11,13 @@ Vectura AI is an end-to-end indoor navigation platform that enables users to nav
 - **Dependency Injection**: Koin
 
 ## Entrypoints
-- **Android**: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/MainActivity.kt` (Home/PackageError), `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt` (QR-to-AR camera flow)
+- **Android**: `apps/androidApp/src/main/kotlin/com/VecturAI/android/MainActivity.kt` (Home/PackageError), `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt` (QR-to-AR camera flow)
 - **iOS**: `apps/iosApp/iosApp/iOSApp.swift`
-- **Admin API**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/Application.kt`
-- **CLI Tools**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/Main.kt`
+- **Admin API**: `tools/admin-api/src/main/kotlin/com/VecturAI/tools/admin/Application.kt`
+- **CLI Tools**: `tools/nav-preprocessor/src/main/kotlin/com/VecturAI/tools/preprocessor/Main.kt`
 
 ## Runtime Architecture
-Vectura AI follows a **Local-First AR architecture**. 
+VecturAI follows a **Local-First AR architecture**. 
 1. **Preprocessing**: Building geometry (GLB) is processed into a navigation graph (JSON) by the `nav-preprocessor`.
 2. **Distribution**: Nav packages are served via `admin-api` or bundled into mobile apps.
 3. **Localization**: Mobile apps use ARCore/ARKit to detect a physical marker (QR/Image) and establish a coordinate transform between AR space and building space.

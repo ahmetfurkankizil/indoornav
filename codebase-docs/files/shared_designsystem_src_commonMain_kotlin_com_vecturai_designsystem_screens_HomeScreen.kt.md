@@ -1,7 +1,7 @@
 # File Dossier: HomeScreen.kt
 
 ## Path
-`shared\designsystem\src\commonMain\kotlin\com\Vectura AI\designsystem\screens\HomeScreen.kt`
+`shared\designsystem\src\commonMain\kotlin\com\VecturAI\designsystem\screens\HomeScreen.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.designsystem.screens
+package com.VecturAI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -23,12 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.designsystem.Vectura AIButton
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AISectionHeader
+import com.VecturAI.designsystem.VecturAIButton
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAISectionHeader
 
 /**
- * Home screen — the main landing screen of Vectura AI.
+ * Home screen — the main landing screen of VecturAI.
  *
  * Displays a welcome message, quick actions, and building information.
  *

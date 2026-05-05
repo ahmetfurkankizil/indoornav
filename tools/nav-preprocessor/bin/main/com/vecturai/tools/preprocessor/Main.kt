@@ -1,4 +1,4 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
@@ -6,12 +6,12 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.Vectura AI.tools.preprocessor.glb.GlbGeometryExtractor
-import com.Vectura AI.tools.preprocessor.glb.GlbParser
+import com.VecturAI.tools.preprocessor.glb.GlbGeometryExtractor
+import com.VecturAI.tools.preprocessor.glb.GlbParser
 import kotlin.system.exitProcess
 
 /**
- * Vectura AI Navigation Preprocessor CLI v2.0.
+ * VecturAI Navigation Preprocessor CLI v2.0.
  *
  * Subcommands:
  * - inspect:         Inspect a .glb file and print geometry stats
@@ -23,7 +23,7 @@ class NavPreprocessorCommand : CliktCommand(
 ) {
     override fun run() {
         echo("╔══════════════════════════════════════════════╗")
-        echo("║   Vectura AI Navigation Preprocessor v2.0     ║")
+        echo("║   VecturAI Navigation Preprocessor v2.0     ║")
         echo("╚══════════════════════════════════════════════╝")
         echo("")
     }
@@ -66,7 +66,7 @@ class InspectCommand : CliktCommand(
 
             // Floor estimate
             echo("[3/3] Estimating floor plane... ")
-            val floorEstimator = com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator()
+            val floorEstimator = com.VecturAI.tools.preprocessor.analysis.FloorPlaneEstimator()
             val floorEstimate = floorEstimator.estimate(geometry.vertices)
             if (floorEstimate != null) {
                 echo("  ✓ Floor Y = %.3f (confidence: %.1f%%, %d vertices)".format(

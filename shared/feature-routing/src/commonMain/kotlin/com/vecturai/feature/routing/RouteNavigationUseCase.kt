@@ -1,11 +1,11 @@
-package com.Vectura AI.feature.routing
+package com.VecturAI.feature.routing
 
-import com.Vectura AI.core.domain.NavigationState
-import com.Vectura AI.core.domain.Room
-import com.Vectura AI.core.domain.Route
-import com.Vectura AI.core.repository.BuildingRepository
-import com.Vectura AI.core.routing.RouteEngine
-import com.Vectura AI.core.store.AppStore
+import com.VecturAI.core.domain.NavigationState
+import com.VecturAI.core.domain.Room
+import com.VecturAI.core.domain.Route
+import com.VecturAI.core.repository.BuildingRepository
+import com.VecturAI.core.routing.RouteEngine
+import com.VecturAI.core.store.AppStore
 
 /**
  * Use case orchestrating the route navigation flow.

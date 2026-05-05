@@ -1,6 +1,6 @@
-package com.Vectura AI.tools.preprocessor.glb
+package com.vecturai.tools.preprocessor.glb
 
-import com.Vectura AI.tools.preprocessor.ValidationException
+import com.vecturai.tools.preprocessor.ValidationException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

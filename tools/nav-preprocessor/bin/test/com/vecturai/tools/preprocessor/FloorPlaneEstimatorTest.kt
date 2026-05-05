@@ -1,7 +1,7 @@
-package com.Vectura AI.tools.preprocessor
+package com.vecturai.tools.preprocessor
 
-import com.Vectura AI.tools.preprocessor.analysis.FloorPlaneEstimator
-import com.Vectura AI.tools.preprocessor.glb.Vec3
+import com.vecturai.tools.preprocessor.analysis.FloorPlaneEstimator
+import com.vecturai.tools.preprocessor.glb.Vec3
 import kotlin.test.*
 
 /**

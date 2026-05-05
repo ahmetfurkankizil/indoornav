@@ -1,8 +1,8 @@
-package com.Vectura AI.tools.admin.routes
+package com.vecturai.tools.admin.routes
 
-import com.Vectura AI.tools.admin.model.CreateNodeRequest
-import com.Vectura AI.tools.admin.model.UpdateNodeRequest
-import com.Vectura AI.tools.admin.service.NodeService
+import com.vecturai.tools.admin.model.CreateNodeRequest
+import com.vecturai.tools.admin.model.UpdateNodeRequest
+import com.vecturai.tools.admin.service.NodeService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

@@ -1,7 +1,7 @@
 # File Dossier: DebugExporter.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/DebugExporter.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/VecturAI/tools/preprocessor/DebugExporter.kt`
 - **Type**: Kotlin Source (Export Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

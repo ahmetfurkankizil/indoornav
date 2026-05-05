@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Vectura AI Building Manifest",
+    "title": "VecturAI Building Manifest",
     "description": "Top-level manifest describing a building package with version and file references.",
     "type": "object",
     "required": [

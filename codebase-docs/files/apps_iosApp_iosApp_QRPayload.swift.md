@@ -20,7 +20,7 @@
     - `NavigationFlowModel`
     - `QRScanView`
 - **Config / Constants / Protocol Details**:
-    - Protocol `type`: "Vectura AI-entrance"
+    - Protocol `type`: "VecturAI-entrance"
     - Current version: 1
 - **Related Tests**: N/A
 - **Notes / Risks**:

@@ -1,7 +1,7 @@
 # File Dossier: DraftSummaryExtractorTest.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/test/kotlin/com/Vectura AI/tools/admin/DraftSummaryExtractorTest.kt`
+- **Path**: `tools/admin-api/src/test/kotlin/com/VecturAI/tools/admin/DraftSummaryExtractorTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `admin_orchestration`, `preprocessing`
 - **Status**: Mapped

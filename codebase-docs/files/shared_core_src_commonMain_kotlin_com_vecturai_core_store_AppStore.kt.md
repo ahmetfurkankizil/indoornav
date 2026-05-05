@@ -1,12 +1,12 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/store/AppStore.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/store/AppStore.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/store/AppStore.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/store/AppStore.kt`
 - **Type**: source
 - **Role**: Central application state store using Kotlin flows for reactive updates.
 - **Imports / Includes**:
     - `kotlinx.coroutines.flow.MutableStateFlow`
-    - `com.Vectura AI.core.domain.NavigationState`
-    - `com.Vectura AI.core.ar.ArSessionState`
+    - `com.VecturAI.core.domain.NavigationState`
+    - `com.VecturAI.core.ar.ArSessionState`
 - **Exports / Public Surface**:
     - `AppStore` class
     - `navigationState`: StateFlow<NavigationState>

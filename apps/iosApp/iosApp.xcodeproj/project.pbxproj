@@ -37,7 +37,7 @@
 /* Begin PBXFileReference section */
 		07D6408498264552AAB2BBED /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = iosApp/ContentView.swift; sourceTree = "<group>"; };
 		0FD511EB06B44B0BB2E61FDF /* ARBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARBridge.swift; path = iosApp/ar/ARBridge.swift; sourceTree = "<group>"; };
-		2F16739FAFF54C7588146007 /* Vectura AICore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vectura AICore.framework; path = /Users/ahmetfurkankizil/Documents/Vectura AI/shared/core/build/bin/iosArm64/debugFramework/Vectura AICore.framework; sourceTree = "<absolute>"; };
+		2F16739FAFF54C7588146007 /* VecturAICore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VecturAICore.framework; path = /Users/ahmetfurkankizil/Documents/VecturAI/shared/core/build/bin/iosArm64/debugFramework/VecturAICore.framework; sourceTree = "<absolute>"; };
 		49272C0B47044B29A4AFF748 /* ARNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ARNavigationView.swift; path = iosApp/ar/ARNavigationView.swift; sourceTree = "<group>"; };
 		98997B31EEE0464D9E4C8A54 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = iOSApp.swift; path = iosApp/iOSApp.swift; sourceTree = "<group>"; };
 		A57DC81635104117870158E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = iosApp/Info.plist; sourceTree = "<group>"; };
@@ -87,7 +87,7 @@
 		AA000003AA000003AA000003 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2F16739FAFF54C7588146007 /* Vectura AICore.framework */,
+				2F16739FAFF54C7588146007 /* VecturAICore.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -383,7 +383,7 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Vectura AI.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.VecturAI.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;
@@ -409,7 +409,7 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Vectura AI.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.VecturAI.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;

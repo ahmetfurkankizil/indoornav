@@ -1,10 +1,10 @@
-# File Dossier: shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/InMemoryPackageStore.kt
+# File Dossier: shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/InMemoryPackageStore.kt
 
-- **Path**: `shared/core/src/commonMain/kotlin/com/Vectura AI/core/loading/InMemoryPackageStore.kt`
+- **Path**: `shared/core/src/commonMain/kotlin/com/VecturAI/core/loading/InMemoryPackageStore.kt`
 - **Type**: source
 - **Role**: In-memory cache for loaded building navigation packages.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.BuildingPackage`
+    - `com.VecturAI.core.domain.BuildingPackage`
 - **Exports / Public Surface**:
     - `InMemoryPackageStore` class
     - `put(buildingId, pkg)`

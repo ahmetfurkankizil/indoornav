@@ -1,7 +1,7 @@
 # File Dossier: ContractBackwardCompatTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/ContractBackwardCompatTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/ContractBackwardCompatTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `navigation_data_format`
 - **Status**: Mapped

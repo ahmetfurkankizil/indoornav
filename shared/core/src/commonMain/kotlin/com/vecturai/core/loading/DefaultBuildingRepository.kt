@@ -1,10 +1,10 @@
-package com.Vectura AI.core.loading
+package com.VecturAI.core.loading
 
-import com.Vectura AI.core.domain.EntranceMarker
-import com.Vectura AI.core.domain.NavGraph
-import com.Vectura AI.core.domain.Room
-import com.Vectura AI.core.repository.BuildingInfo
-import com.Vectura AI.core.repository.BuildingRepository
+import com.VecturAI.core.domain.EntranceMarker
+import com.VecturAI.core.domain.NavGraph
+import com.VecturAI.core.domain.Room
+import com.VecturAI.core.repository.BuildingInfo
+import com.VecturAI.core.repository.BuildingRepository
 
 /**
  * Default implementation of [BuildingRepository] backed by [InMemoryPackageStore].

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "repository": "Vectura AI",
-    "root": "c:\\Users\\emirh\\Desktop\\bitirme\\Vectura AI",
+    "repository": "VecturAI",
+    "root": "c:\\Users\\emirh\\Desktop\\bitirme\\VecturAI",
     "description": "Indoor navigation system with AR support",
     "generated_at": "2026-04-30T11:23:08+03:00",
     "generated_from_range": "1107758a431e6e9c1c2a07c0281223b9b60830bf..d268813baba577afb4495dae08de6e11f737f4eb",
@@ -58,35 +58,35 @@
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\data",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\data",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\di",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\di",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\navigation",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\navigation",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\qr",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\qr",
       "status": "mapped"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ui",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ui",
       "status": "mapped"
     },
     {
@@ -258,47 +258,47 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\config",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\config",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\di",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\di",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\loading",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\loading",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\routing",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\routing",
       "status": "mapped"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\store",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\store",
       "status": "mapped"
     },
     {
@@ -322,19 +322,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\local",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\local",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\local\\di",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\local\\di",
       "status": "mapped"
     },
     {
@@ -358,19 +358,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\remote",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\remote",
       "status": "mapped"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\remote\\di",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\remote\\di",
       "status": "mapped"
     },
     {
@@ -394,19 +394,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem",
       "status": "mapped"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\navigation",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\navigation",
       "status": "mapped"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens",
       "status": "mapped"
     },
     {
@@ -430,19 +430,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\history",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\history",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\history\\di",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\history\\di",
       "status": "mapped"
     },
     {
@@ -466,19 +466,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI\\feature",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\preview",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\preview",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\preview\\di",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\preview\\di",
       "status": "mapped"
     },
     {
@@ -502,19 +502,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI\\feature",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\routing",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\routing",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\routing\\di",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\routing\\di",
       "status": "mapped"
     },
     {
@@ -538,19 +538,19 @@
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI\\feature",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\search",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\search",
       "status": "mapped"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\search\\di",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\search\\di",
       "status": "mapped"
     },
     {
@@ -578,27 +578,27 @@
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\model",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\model",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\routes",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\routes",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\service",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\service",
       "status": "mapped"
     },
     {
@@ -614,15 +614,15 @@
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools",
       "status": "mapped"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin",
       "status": "mapped"
     },
     {
@@ -646,31 +646,31 @@
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\analysis",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\analysis",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\draft",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\draft",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\glb",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\glb",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\model",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\model",
       "status": "mapped"
     },
     {
@@ -686,15 +686,15 @@
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools",
       "status": "mapped"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor",
       "status": "mapped"
     }
   ],
@@ -752,14 +752,14 @@
       "artifact_link": "codebase-docs/files/README.md.md"
     },
     {
-      "path": "Vectura AI Standalone.html",
+      "path": "VecturAI Standalone.html",
       "category": "docs",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design_system"
       ],
-      "artifact_link": "codebase-docs/files/Vectura AI_Standalone.html.md"
+      "artifact_link": "codebase-docs/files/VecturAI_Standalone.html.md"
     },
     {
       "path": "apps\\androidApp\\build.gradle.kts",
@@ -853,17 +853,17 @@
       "artifact_link": "codebase-docs/files/apps_androidApp_src_main_assets_reviewed-package_route_rendering.json.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\MainActivity.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\MainActivity.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_MainActivity.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_MainActivity.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\Vectura AIApp.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\VecturAIApp.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -871,20 +871,20 @@
         "infrastructure",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_Vectura AIApp.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_VecturAIApp.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\ArBridge.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\ArBridge.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-navigation"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArBridge.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArBridge.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\ArMarkerDetector.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\ArMarkerDetector.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -892,10 +892,10 @@
         "ar-navigation",
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArMarkerDetector.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArMarkerDetector.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\AndroidArNavigationViewModel.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\AndroidArNavigationViewModel.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -904,10 +904,10 @@
         "ar-alignment",
         "navigation-session-management"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidArNavigationViewModel.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_AndroidArNavigationViewModel.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\AndroidHapticManager.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\AndroidHapticManager.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -915,10 +915,10 @@
         "ar-navigation",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidHapticManager.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_AndroidHapticManager.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\ArCameraActivity.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\ArCameraActivity.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -926,20 +926,20 @@
         "ar-navigation",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArCameraActivity.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArCameraActivity.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\ArRouteRenderer.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\ArRouteRenderer.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-navigation"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArRouteRenderer.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArRouteRenderer.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\UnifiedArRenderer.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\UnifiedArRenderer.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -947,10 +947,10 @@
         "ar-navigation",
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArRenderer.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_UnifiedArRenderer.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\UnifiedArSession.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\UnifiedArSession.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -958,10 +958,10 @@
         "ar-navigation",
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArSession.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_UnifiedArSession.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\data\\AndroidReviewedPackageLoader.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\data\\AndroidReviewedPackageLoader.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -970,10 +970,10 @@
         "route-finding",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_data_AndroidReviewedPackageLoader.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_data_AndroidReviewedPackageLoader.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\di\\AndroidModule.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\di\\AndroidModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -981,10 +981,10 @@
         "infrastructure",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_di_AndroidModule.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_di_AndroidModule.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\navigation\\AndroidNavigationFlowModel.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\navigation\\AndroidNavigationFlowModel.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -993,10 +993,10 @@
         "navigation-session-management",
         "app-state"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_navigation_AndroidNavigationFlowModel.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_navigation_AndroidNavigationFlowModel.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\qr\\QRPayload.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\qr\\QRPayload.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1004,10 +1004,10 @@
         "navigation-data",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_qr_QRPayload.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_qr_QRPayload.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\qr\\ArFrameQrScanner.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\qr\\ArFrameQrScanner.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1015,10 +1015,10 @@
         "ar-navigation",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_qr_ArFrameQrScanner.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_qr_ArFrameQrScanner.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ui\\AndroidNavigationApp.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ui\\AndroidNavigationApp.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1028,10 +1028,10 @@
         "route-preview",
         "search-discovery"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_AndroidNavigationApp.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_AndroidNavigationApp.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ui\\ArNavigationScreen.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ui\\ArNavigationScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1040,10 +1040,10 @@
         "design-system",
         "android-app"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_ArNavigationScreen.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_ArNavigationScreen.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ui\\QRScanScreen.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ui\\QRScanScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -1051,7 +1051,7 @@
         "android-app",
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_QRScanScreen.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_QRScanScreen.kt.md"
     },
     {
       "path": "apps\\iosApp\\iosApp.xcodeproj\\project.pbxproj",
@@ -1744,7 +1744,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_MainActivity.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_MainActivity.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1754,7 +1754,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_Vectura AIApp.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_VecturAIApp.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1764,7 +1764,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArBridge.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArBridge.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1774,7 +1774,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArMarkerDetector.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArMarkerDetector.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1784,7 +1784,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidArNavigationViewModel.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_AndroidArNavigationViewModel.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1794,7 +1794,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_AndroidHapticManager.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_AndroidHapticManager.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1804,7 +1804,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArCameraActivity.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArCameraActivity.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1814,7 +1814,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArRouteRenderer.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArRouteRenderer.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1824,7 +1824,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArRenderer.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_UnifiedArRenderer.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1834,7 +1834,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_UnifiedArSession.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_UnifiedArSession.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1844,7 +1844,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_data_AndroidReviewedPackageLoader.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_data_AndroidReviewedPackageLoader.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1854,7 +1854,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_di_AndroidModule.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_di_AndroidModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1864,7 +1864,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_navigation_AndroidNavigationFlowModel.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_navigation_AndroidNavigationFlowModel.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1874,7 +1874,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_qr_QRPayload.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_qr_QRPayload.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1884,7 +1884,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_qr_ArFrameQrScanner.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_qr_ArFrameQrScanner.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1894,7 +1894,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_AndroidNavigationApp.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_AndroidNavigationApp.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1904,7 +1904,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_ArNavigationScreen.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_ArNavigationScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -1914,7 +1914,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_Vectura AI_android_ui_QRScanScreen.kt.md",
+      "path": "codebase-docs\\files\\apps_androidApp_src_main_kotlin_com_VecturAI_android_ui_QRScanScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3184,7 +3184,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_AlignmentTransform.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_AlignmentTransform.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3194,7 +3194,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArNavigationBridge.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArNavigationBridge.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3204,7 +3204,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArNavigationCoordinator.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArNavigationCoordinator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3214,7 +3214,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArSessionState.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArSessionState.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3224,7 +3224,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArrowPlacement.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArrowPlacement.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3234,7 +3234,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_CorrectionCoordinator.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_CorrectionCoordinator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3244,7 +3244,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_CorrectionEvent.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_CorrectionEvent.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3254,7 +3254,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_MarkerAlignmentResult.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_MarkerAlignmentResult.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3264,7 +3264,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_NavigationConfidence.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_NavigationConfidence.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3274,7 +3274,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_OffRouteDetector.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_OffRouteDetector.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3284,7 +3284,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_PoseModels.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_PoseModels.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3294,7 +3294,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_RouteToArrowMapper.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_RouteToArrowMapper.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3304,7 +3304,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppConfig.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppConfig.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3314,7 +3314,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppDiagnostics.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppDiagnostics.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3324,7 +3324,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppVersion.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppVersion.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3334,7 +3334,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_UserFacingMessages.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_config_UserFacingMessages.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3344,7 +3344,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_di_CoreModule.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_di_CoreModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3354,7 +3354,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_BuildingPackage.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_BuildingPackage.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3364,7 +3364,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_CheckpointMarker.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_CheckpointMarker.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3374,7 +3374,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_EntranceMarker.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_EntranceMarker.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3384,7 +3384,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_NavGraph.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_NavGraph.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3394,7 +3394,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_NavigationState.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_NavigationState.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3404,7 +3404,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_Room.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_Room.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3414,7 +3414,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_RouteRenderingConfig.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_RouteRenderingConfig.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3424,7 +3424,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_RouteSegment.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_RouteSegment.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3434,7 +3434,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_VisitRecord.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_VisitRecord.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3444,7 +3444,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_BuildingPackageLoader.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_BuildingPackageLoader.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3454,7 +3454,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_DefaultBuildingRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_DefaultBuildingRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3464,7 +3464,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_DemoPackageProvider.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_DemoPackageProvider.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3474,7 +3474,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_InMemoryPackageStore.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_InMemoryPackageStore.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3484,7 +3484,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ArrivalDetector.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_ArrivalDetector.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3494,7 +3494,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_CompletionStatus.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_CompletionStatus.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3504,7 +3504,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_DemoMode.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_DemoMode.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3514,7 +3514,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_NavigationSession.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_NavigationSession.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3524,7 +3524,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_NavigationSessionCoordinator.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_NavigationSessionCoordinator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3534,7 +3534,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ProgressEstimator.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_ProgressEstimator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3544,7 +3544,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_BuildingRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_BuildingRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3554,7 +3554,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_HistoryRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_HistoryRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3564,7 +3564,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_InMemoryHistoryRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_InMemoryHistoryRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3574,7 +3574,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_JsonFileHistoryRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_JsonFileHistoryRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3584,7 +3584,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_NavigationRepository.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_NavigationRepository.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3594,7 +3594,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_DijkstraRouteEngine.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_DijkstraRouteEngine.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3604,7 +3604,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_RouteEngine.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_RouteEngine.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3614,7 +3614,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_Vectura AI_core_store_AppStore.kt.md",
+      "path": "codebase-docs\\files\\shared_core_src_commonMain_kotlin_com_VecturAI_core_store_AppStore.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3634,7 +3634,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_LocalCacheDataSource.kt.md",
+      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_LocalCacheDataSource.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3644,7 +3644,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_SqlDelightCacheDataSource.kt.md",
+      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_SqlDelightCacheDataSource.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3654,7 +3654,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_di_DataLocalModule.kt.md",
+      "path": "codebase-docs\\files\\shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_di_DataLocalModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3674,7 +3674,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_KtorBuildingDataSource.kt.md",
+      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_KtorBuildingDataSource.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3684,7 +3684,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_RemoteBuildingDataSource.kt.md",
+      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_RemoteBuildingDataSource.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3694,7 +3694,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_di_DataRemoteModule.kt.md",
+      "path": "codebase-docs\\files\\shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_di_DataRemoteModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3714,7 +3714,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Color.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Color.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3724,7 +3724,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Components.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Components.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3734,7 +3734,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Theme.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Theme.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3744,7 +3744,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Typography.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Typography.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3754,7 +3754,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Vectura AIAppContent.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_VecturAIAppContent.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3764,7 +3764,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_navigation_AppNavigation.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_navigation_AppNavigation.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3774,7 +3774,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_navigation_Screen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_navigation_Screen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3784,7 +3784,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_HistoryScreen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_HistoryScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3794,7 +3794,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_HomeScreen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_HomeScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3804,7 +3804,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_RoutePreviewScreen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_RoutePreviewScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3814,7 +3814,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_SearchScreen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_SearchScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3824,7 +3824,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_SettingsScreen.kt.md",
+      "path": "codebase-docs\\files\\shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_SettingsScreen.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3844,7 +3844,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_HistoryUseCase.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_HistoryUseCase.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3854,7 +3854,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_VisitRecord.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_VisitRecord.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3864,7 +3864,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_di_FeatureHistoryModule.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_di_FeatureHistoryModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3884,7 +3884,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-preview_src_commonMain_kotlin_com_Vectura AI_feature_preview_RoutePreviewUseCase.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-preview_src_commonMain_kotlin_com_VecturAI_feature_preview_RoutePreviewUseCase.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3894,7 +3894,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-preview_src_commonMain_kotlin_com_Vectura AI_feature_preview_di_FeaturePreviewModule.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-preview_src_commonMain_kotlin_com_VecturAI_feature_preview_di_FeaturePreviewModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3914,7 +3914,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-routing_src_commonMain_kotlin_com_Vectura AI_feature_routing_RouteNavigationUseCase.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-routing_src_commonMain_kotlin_com_VecturAI_feature_routing_RouteNavigationUseCase.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3924,7 +3924,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-routing_src_commonMain_kotlin_com_Vectura AI_feature_routing_di_FeatureRoutingModule.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-routing_src_commonMain_kotlin_com_VecturAI_feature_routing_di_FeatureRoutingModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3944,7 +3944,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-search_src_commonMain_kotlin_com_Vectura AI_feature_search_SearchUseCase.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-search_src_commonMain_kotlin_com_VecturAI_feature_search_SearchUseCase.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3954,7 +3954,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\shared_feature-search_src_commonMain_kotlin_com_Vectura AI_feature_search_di_FeatureSearchModule.kt.md",
+      "path": "codebase-docs\\files\\shared_feature-search_src_commonMain_kotlin_com_VecturAI_feature_search_di_FeatureSearchModule.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3974,7 +3974,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_Application.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_Application.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3984,7 +3984,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_DraftJob.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_DraftJob.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -3994,7 +3994,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_DraftSummary.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_DraftSummary.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4004,7 +4004,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_RoomOverride.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_RoomOverride.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4014,7 +4014,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_routes_DraftJobRoutes.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_routes_DraftJobRoutes.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4024,7 +4024,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_DraftJobService.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_DraftJobService.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4034,7 +4034,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_DraftSummaryExtractor.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_DraftSummaryExtractor.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4044,7 +4044,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_ReviewedPackageExporter.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_ReviewedPackageExporter.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4054,7 +4054,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_RoomOverrideService.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_RoomOverrideService.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4064,7 +4064,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_AsyncJobLifecycleTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_AsyncJobLifecycleTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4074,7 +4074,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_DraftJobServiceTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_DraftJobServiceTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4084,7 +4084,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_DraftSummaryExtractorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_DraftSummaryExtractorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4094,7 +4094,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_ReviewedPackageExporterTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_ReviewedPackageExporterTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4104,7 +4104,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoomEditAndExportRoutesTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoomEditAndExportRoutesTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4114,7 +4114,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoomOverrideServiceTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoomOverrideServiceTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4124,7 +4124,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoutesTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoutesTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4134,7 +4134,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_SummaryAndArtifactRoutesTest.kt.md",
+      "path": "codebase-docs\\files\\tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_SummaryAndArtifactRoutesTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4154,7 +4154,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_AssetInspector.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_AssetInspector.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4164,7 +4164,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_AuthoringConfigLoader.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_AuthoringConfigLoader.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4174,7 +4174,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DebugExporter.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DebugExporter.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4184,7 +4184,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DraftPipeline.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DraftPipeline.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4194,7 +4194,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_GraphValidator.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_GraphValidator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4204,7 +4204,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Main.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Main.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4214,7 +4214,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_PackageExporter.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_PackageExporter.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4224,7 +4224,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Pipeline.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Pipeline.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4234,7 +4234,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_ValidationException.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_ValidationException.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4244,7 +4244,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4254,7 +4254,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4264,7 +4264,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_ZoneSuggester.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_ZoneSuggester.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4274,7 +4274,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_draft_DraftConfigGenerator.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_draft_DraftConfigGenerator.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4284,7 +4284,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4294,7 +4294,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbGeometryExtractor.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GlbGeometryExtractor.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4304,7 +4304,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbParser.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GlbParser.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4314,7 +4314,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GltfModels.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GltfModels.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4324,7 +4324,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_model_AuthoringConfig.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_model_AuthoringConfig.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4334,7 +4334,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AlignmentInverseTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AlignmentInverseTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4344,7 +4344,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AlignmentTransformTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AlignmentTransformTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4354,7 +4354,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ArContractSerializationTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ArContractSerializationTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4364,7 +4364,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ArrivalDetectorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ArrivalDetectorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4374,7 +4374,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AuthoringConfigLoaderTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AuthoringConfigLoaderTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4384,7 +4384,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_CheckpointMarkerValidationTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_CheckpointMarkerValidationTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4394,7 +4394,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ContractBackwardCompatTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ContractBackwardCompatTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4404,7 +4404,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ContractSerializationTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ContractSerializationTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4414,7 +4414,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_CorrectionCoordinatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_CorrectionCoordinatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4424,7 +4424,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DemoCriticalRegressionTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DemoCriticalRegressionTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4434,7 +4434,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DemoFlowSmokeTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DemoFlowSmokeTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4444,7 +4444,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DijkstraRouteEngineTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DijkstraRouteEngineTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4454,7 +4454,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DraftConfigGeneratorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DraftConfigGeneratorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4464,7 +4464,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DraftPipelineIntegrationTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DraftPipelineIntegrationTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4474,7 +4474,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_FloorPlaneEstimatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_FloorPlaneEstimatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4484,7 +4484,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_GlbParserTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_GlbParserTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4494,7 +4494,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_GraphValidatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_GraphValidatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4504,7 +4504,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_HistoryRepositoryTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_HistoryRepositoryTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4514,7 +4514,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_JsonFileHistoryPersistenceTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_JsonFileHistoryPersistenceTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4524,7 +4524,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_NavigationGraphDrafterTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_NavigationGraphDrafterTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4534,7 +4534,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_NavigationSessionCoordinatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_NavigationSessionCoordinatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4544,7 +4544,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_OccupancyGridGeneratorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_OccupancyGridGeneratorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4554,7 +4554,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_OffRouteDetectorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_OffRouteDetectorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4564,7 +4564,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_PackageExporterTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_PackageExporterTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4574,7 +4574,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_PipelineIntegrationTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_PipelineIntegrationTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4584,7 +4584,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ProgressContinuityAfterCorrectionTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ProgressContinuityAfterCorrectionTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4594,7 +4594,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ProgressEstimatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ProgressEstimatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4604,7 +4604,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_RouteToArrowMapperTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_RouteToArrowMapperTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4614,7 +4614,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ZoneSuggesterTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ZoneSuggesterTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4624,7 +4624,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_analysis_FloorPlaneEstimatorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_analysis_FloorPlaneEstimatorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4634,7 +4634,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_analysis_OccupancyGridGeneratorTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_analysis_OccupancyGridGeneratorTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4644,7 +4644,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_analysis_ZoneSuggesterTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_analysis_ZoneSuggesterTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -4654,7 +4654,7 @@
       "artifact_link": null
     },
     {
-      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbParserTest.kt.md",
+      "path": "codebase-docs\\files\\tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_glb_GlbParserTest.kt.md",
       "category": "docs/artifact",
       "status": "indexed_minimal",
       "reason": "Documentation artifact for codebase context",
@@ -5642,27 +5642,27 @@
       "artifact_link": "codebase-docs/files/shared_core_build.gradle.kts.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\AlignmentTransform.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\AlignmentTransform.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_AlignmentTransform.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_AlignmentTransform.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\ArNavigationBridge.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\ArNavigationBridge.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArNavigationBridge.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArNavigationBridge.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\ArNavigationCoordinator.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\ArNavigationCoordinator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5670,10 +5670,10 @@
         "ar-alignment",
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArNavigationCoordinator.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArNavigationCoordinator.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\ArSessionState.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\ArSessionState.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5681,80 +5681,80 @@
         "ar-alignment",
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArSessionState.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArSessionState.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\ArrowPlacement.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\ArrowPlacement.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_ArrowPlacement.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_ArrowPlacement.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\CorrectionCoordinator.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\CorrectionCoordinator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_CorrectionCoordinator.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_CorrectionCoordinator.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\CorrectionEvent.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\CorrectionEvent.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_CorrectionEvent.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_CorrectionEvent.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\MarkerAlignmentResult.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\MarkerAlignmentResult.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_MarkerAlignmentResult.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_MarkerAlignmentResult.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\NavigationConfidence.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\NavigationConfidence.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_NavigationConfidence.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_NavigationConfidence.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\OffRouteDetector.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\OffRouteDetector.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_OffRouteDetector.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_OffRouteDetector.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\PoseModels.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\PoseModels.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_PoseModels.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_PoseModels.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\ar\\RouteToArrowMapper.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\ar\\RouteToArrowMapper.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5762,70 +5762,70 @@
         "ar-alignment",
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_ar_RouteToArrowMapper.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_ar_RouteToArrowMapper.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\config\\AppConfig.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\config\\AppConfig.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppConfig.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppConfig.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\config\\AppDiagnostics.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\config\\AppDiagnostics.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppDiagnostics.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppDiagnostics.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\config\\AppVersion.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\config\\AppVersion.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_AppVersion.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_config_AppVersion.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\config\\UserFacingMessages.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\config\\UserFacingMessages.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_config_UserFacingMessages.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_config_UserFacingMessages.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\di\\CoreModule.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\di\\CoreModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_di_CoreModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_di_CoreModule.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\BuildingPackage.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\BuildingPackage.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_BuildingPackage.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_BuildingPackage.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\CheckpointMarker.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\CheckpointMarker.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5833,10 +5833,10 @@
         "navigation-data",
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_CheckpointMarker.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_CheckpointMarker.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\EntranceMarker.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\EntranceMarker.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5844,10 +5844,10 @@
         "navigation-data",
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_EntranceMarker.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_EntranceMarker.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\NavGraph.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\NavGraph.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5855,30 +5855,30 @@
         "navigation-data",
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_NavGraph.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_NavGraph.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\NavigationState.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\NavigationState.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_NavigationState.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_NavigationState.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\Room.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\Room.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_Room.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_Room.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\RouteRenderingConfig.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\RouteRenderingConfig.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -5886,170 +5886,170 @@
         "navigation-data",
         "ar-alignment"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_RouteRenderingConfig.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_RouteRenderingConfig.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\RouteSegment.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\RouteSegment.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_RouteSegment.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_RouteSegment.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\domain\\VisitRecord.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\domain\\VisitRecord.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_domain_VisitRecord.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_domain_VisitRecord.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\loading\\BuildingPackageLoader.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\loading\\BuildingPackageLoader.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_BuildingPackageLoader.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_BuildingPackageLoader.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\loading\\DefaultBuildingRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\loading\\DefaultBuildingRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_DefaultBuildingRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_DefaultBuildingRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\loading\\DemoPackageProvider.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\loading\\DemoPackageProvider.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_DemoPackageProvider.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_DemoPackageProvider.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\loading\\InMemoryPackageStore.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\loading\\InMemoryPackageStore.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_loading_InMemoryPackageStore.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_loading_InMemoryPackageStore.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\ArrivalDetector.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\ArrivalDetector.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ArrivalDetector.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_ArrivalDetector.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\CompletionStatus.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\CompletionStatus.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_CompletionStatus.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_CompletionStatus.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\DemoMode.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\DemoMode.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_DemoMode.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_DemoMode.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\NavigationSession.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\NavigationSession.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_NavigationSession.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_NavigationSession.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\NavigationSessionCoordinator.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\NavigationSessionCoordinator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_NavigationSessionCoordinator.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_NavigationSessionCoordinator.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\navigation\\ProgressEstimator.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\navigation\\ProgressEstimator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_navigation_ProgressEstimator.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_navigation_ProgressEstimator.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository\\BuildingRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository\\BuildingRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-data"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_BuildingRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_BuildingRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository\\HistoryRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository\\HistoryRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_HistoryRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_HistoryRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository\\InMemoryHistoryRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository\\InMemoryHistoryRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_InMemoryHistoryRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_InMemoryHistoryRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository\\JsonFileHistoryRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository\\JsonFileHistoryRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation-session"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_JsonFileHistoryRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_JsonFileHistoryRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\repository\\NavigationRepository.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\repository\\NavigationRepository.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6057,30 +6057,30 @@
         "navigation-session",
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_repository_NavigationRepository.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_repository_NavigationRepository.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\routing\\DijkstraRouteEngine.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\routing\\DijkstraRouteEngine.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_DijkstraRouteEngine.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_DijkstraRouteEngine.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\routing\\RouteEngine.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\routing\\RouteEngine.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "routing"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_routing_RouteEngine.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_routing_RouteEngine.kt.md"
     },
     {
-      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\Vectura AI\\core\\store\\AppStore.kt",
+      "path": "shared\\core\\src\\commonMain\\kotlin\\com\\VecturAI\\core\\store\\AppStore.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6088,7 +6088,7 @@
         "navigation-session",
         "infrastructure"
       ],
-      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_Vectura AI_core_store_AppStore.kt.md"
+      "artifact_link": "codebase-docs/files/shared_core_src_commonMain_kotlin_com_VecturAI_core_store_AppStore.kt.md"
     },
     {
       "path": "shared\\data-local\\build.gradle.kts",
@@ -6102,27 +6102,27 @@
       "artifact_link": "codebase-docs/files/shared_data-local_build.gradle.kts.md"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\local\\LocalCacheDataSource.kt",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\local\\LocalCacheDataSource.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_LocalCacheDataSource.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_LocalCacheDataSource.kt.md"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\local\\SqlDelightCacheDataSource.kt",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\local\\SqlDelightCacheDataSource.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_SqlDelightCacheDataSource.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_SqlDelightCacheDataSource.kt.md"
     },
     {
-      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\local\\di\\DataLocalModule.kt",
+      "path": "shared\\data-local\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\local\\di\\DataLocalModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6130,7 +6130,7 @@
         "infrastructure",
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_Vectura AI_data_local_di_DataLocalModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-local_src_commonMain_kotlin_com_VecturAI_data_local_di_DataLocalModule.kt.md"
     },
     {
       "path": "shared\\data-remote\\build.gradle.kts",
@@ -6144,27 +6144,27 @@
       "artifact_link": "codebase-docs/files/shared_data-remote_build.gradle.kts.md"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\remote\\KtorBuildingDataSource.kt",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\remote\\KtorBuildingDataSource.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_KtorBuildingDataSource.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_KtorBuildingDataSource.kt.md"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\remote\\RemoteBuildingDataSource.kt",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\remote\\RemoteBuildingDataSource.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_RemoteBuildingDataSource.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_RemoteBuildingDataSource.kt.md"
     },
     {
-      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\Vectura AI\\data\\remote\\di\\DataRemoteModule.kt",
+      "path": "shared\\data-remote\\src\\commonMain\\kotlin\\com\\VecturAI\\data\\remote\\di\\DataRemoteModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6172,7 +6172,7 @@
         "infrastructure",
         "offline-caching"
       ],
-      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_Vectura AI_data_remote_di_DataRemoteModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_data-remote_src_commonMain_kotlin_com_VecturAI_data_remote_di_DataRemoteModule.kt.md"
     },
     {
       "path": "shared\\designsystem\\build.gradle.kts",
@@ -6186,124 +6186,124 @@
       "artifact_link": "codebase-docs/files/shared_designsystem_build.gradle.kts.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\Color.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\Color.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Color.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Color.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\Components.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\Components.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Components.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Components.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\Theme.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\Theme.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Theme.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Theme.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\Typography.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\Typography.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Typography.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_Typography.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\Vectura AIAppContent.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\VecturAIAppContent.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_Vectura AIAppContent.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_VecturAIAppContent.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\navigation\\AppNavigation.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\navigation\\AppNavigation.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_navigation_AppNavigation.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_navigation_AppNavigation.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\navigation\\Screen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\navigation\\Screen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_navigation_Screen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_navigation_Screen.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens\\HistoryScreen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens\\HistoryScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_HistoryScreen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_HistoryScreen.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens\\HomeScreen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens\\HomeScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_HomeScreen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_HomeScreen.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens\\RoutePreviewScreen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens\\RoutePreviewScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_RoutePreviewScreen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_RoutePreviewScreen.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens\\SearchScreen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens\\SearchScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_SearchScreen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_SearchScreen.kt.md"
     },
     {
-      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\Vectura AI\\designsystem\\screens\\SettingsScreen.kt",
+      "path": "shared\\designsystem\\src\\commonMain\\kotlin\\com\\VecturAI\\designsystem\\screens\\SettingsScreen.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "design-system"
       ],
-      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_Vectura AI_designsystem_screens_SettingsScreen.kt.md"
+      "artifact_link": "codebase-docs/files/shared_designsystem_src_commonMain_kotlin_com_VecturAI_designsystem_screens_SettingsScreen.kt.md"
     },
     {
       "path": "shared\\feature-history\\build.gradle.kts",
@@ -6317,27 +6317,27 @@
       "artifact_link": "codebase-docs/files/shared_feature-history_build.gradle.kts.md"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\history\\HistoryUseCase.kt",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\history\\HistoryUseCase.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "visit-history"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_HistoryUseCase.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_HistoryUseCase.kt.md"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\history\\VisitRecord.kt",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\history\\VisitRecord.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "visit-history"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_VisitRecord.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_VisitRecord.kt.md"
     },
     {
-      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\history\\di\\FeatureHistoryModule.kt",
+      "path": "shared\\feature-history\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\history\\di\\FeatureHistoryModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6345,7 +6345,7 @@
         "infrastructure",
         "visit-history"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_Vectura AI_feature_history_di_FeatureHistoryModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-history_src_commonMain_kotlin_com_VecturAI_feature_history_di_FeatureHistoryModule.kt.md"
     },
     {
       "path": "shared\\feature-preview\\build.gradle.kts",
@@ -6359,17 +6359,17 @@
       "artifact_link": "codebase-docs/files/shared_feature-preview_build.gradle.kts.md"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\preview\\RoutePreviewUseCase.kt",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\preview\\RoutePreviewUseCase.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "route-preview"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-preview_src_commonMain_kotlin_com_Vectura AI_feature_preview_RoutePreviewUseCase.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-preview_src_commonMain_kotlin_com_VecturAI_feature_preview_RoutePreviewUseCase.kt.md"
     },
     {
-      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\preview\\di\\FeaturePreviewModule.kt",
+      "path": "shared\\feature-preview\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\preview\\di\\FeaturePreviewModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6377,7 +6377,7 @@
         "infrastructure",
         "route-preview"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-preview_src_commonMain_kotlin_com_Vectura AI_feature_preview_di_FeaturePreviewModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-preview_src_commonMain_kotlin_com_VecturAI_feature_preview_di_FeaturePreviewModule.kt.md"
     },
     {
       "path": "shared\\feature-routing\\build.gradle.kts",
@@ -6391,17 +6391,17 @@
       "artifact_link": "codebase-docs/files/shared_feature-routing_build.gradle.kts.md"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\routing\\RouteNavigationUseCase.kt",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\routing\\RouteNavigationUseCase.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "route-finding"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-routing_src_commonMain_kotlin_com_Vectura AI_feature_routing_RouteNavigationUseCase.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-routing_src_commonMain_kotlin_com_VecturAI_feature_routing_RouteNavigationUseCase.kt.md"
     },
     {
-      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\routing\\di\\FeatureRoutingModule.kt",
+      "path": "shared\\feature-routing\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\routing\\di\\FeatureRoutingModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6409,7 +6409,7 @@
         "infrastructure",
         "route-finding"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-routing_src_commonMain_kotlin_com_Vectura AI_feature_routing_di_FeatureRoutingModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-routing_src_commonMain_kotlin_com_VecturAI_feature_routing_di_FeatureRoutingModule.kt.md"
     },
     {
       "path": "shared\\feature-search\\build.gradle.kts",
@@ -6423,17 +6423,17 @@
       "artifact_link": "codebase-docs/files/shared_feature-search_build.gradle.kts.md"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\search\\SearchUseCase.kt",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\search\\SearchUseCase.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "search-discovery"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-search_src_commonMain_kotlin_com_Vectura AI_feature_search_SearchUseCase.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-search_src_commonMain_kotlin_com_VecturAI_feature_search_SearchUseCase.kt.md"
     },
     {
-      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\Vectura AI\\feature\\search\\di\\FeatureSearchModule.kt",
+      "path": "shared\\feature-search\\src\\commonMain\\kotlin\\com\\VecturAI\\feature\\search\\di\\FeatureSearchModule.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6441,7 +6441,7 @@
         "infrastructure",
         "search-discovery"
       ],
-      "artifact_link": "codebase-docs/files/shared_feature-search_src_commonMain_kotlin_com_Vectura AI_feature_search_di_FeatureSearchModule.kt.md"
+      "artifact_link": "codebase-docs/files/shared_feature-search_src_commonMain_kotlin_com_VecturAI_feature_search_di_FeatureSearchModule.kt.md"
     },
     {
       "path": "tools\\admin-api\\build.gradle.kts",
@@ -6455,77 +6455,77 @@
       "artifact_link": "codebase-docs/files/tools_admin-api_build.gradle.kts.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\Application.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\Application.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_Application.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_Application.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\model\\DraftJob.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\model\\DraftJob.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_DraftJob.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_DraftJob.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\model\\DraftSummary.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\model\\DraftSummary.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_DraftSummary.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_DraftSummary.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\model\\RoomOverride.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\model\\RoomOverride.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_model_RoomOverride.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_model_RoomOverride.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\routes\\DraftJobRoutes.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\routes\\DraftJobRoutes.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_routes_DraftJobRoutes.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_routes_DraftJobRoutes.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\service\\DraftJobService.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\service\\DraftJobService.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_DraftJobService.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_DraftJobService.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\service\\DraftSummaryExtractor.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\service\\DraftSummaryExtractor.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_DraftSummaryExtractor.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_DraftSummaryExtractor.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\service\\ReviewedPackageExporter.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\service\\ReviewedPackageExporter.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
@@ -6533,97 +6533,97 @@
         "admin_orchestration",
         "navigation_data_format"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_ReviewedPackageExporter.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_ReviewedPackageExporter.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\Vectura AI\\tools\\admin\\service\\RoomOverrideService.kt",
+      "path": "tools\\admin-api\\src\\main\\kotlin\\com\\VecturAI\\tools\\admin\\service\\RoomOverrideService.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_Vectura AI_tools_admin_service_RoomOverrideService.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_main_kotlin_com_VecturAI_tools_admin_service_RoomOverrideService.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\AsyncJobLifecycleTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\AsyncJobLifecycleTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_AsyncJobLifecycleTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_AsyncJobLifecycleTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\DraftJobServiceTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\DraftJobServiceTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_DraftJobServiceTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_DraftJobServiceTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\DraftSummaryExtractorTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\DraftSummaryExtractorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_DraftSummaryExtractorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_DraftSummaryExtractorTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\ReviewedPackageExporterTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\ReviewedPackageExporterTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_ReviewedPackageExporterTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_ReviewedPackageExporterTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\RoomEditAndExportRoutesTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\RoomEditAndExportRoutesTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoomEditAndExportRoutesTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoomEditAndExportRoutesTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\RoomOverrideServiceTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\RoomOverrideServiceTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoomOverrideServiceTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoomOverrideServiceTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\RoutesTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\RoutesTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_RoutesTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_RoutesTest.kt.md"
     },
     {
-      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\Vectura AI\\tools\\admin\\SummaryAndArtifactRoutesTest.kt",
+      "path": "tools\\admin-api\\src\\test\\kotlin\\com\\VecturAI\\tools\\admin\\SummaryAndArtifactRoutesTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "admin_orchestration"
       ],
-      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_Vectura AI_tools_admin_SummaryAndArtifactRoutesTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_admin-api_src_test_kotlin_com_VecturAI_tools_admin_SummaryAndArtifactRoutesTest.kt.md"
     },
     {
       "path": "tools\\nav-preprocessor\\build.gradle.kts",
@@ -6634,267 +6634,267 @@
       "artifact_link": "codebase-docs/files/tools_nav-preprocessor_build.gradle.kts.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\AssetInspector.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\AssetInspector.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_AssetInspector.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_AssetInspector.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\AuthoringConfigLoader.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\AuthoringConfigLoader.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_AuthoringConfigLoader.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_AuthoringConfigLoader.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DebugExporter.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DebugExporter.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DebugExporter.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DebugExporter.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DraftPipeline.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DraftPipeline.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_DraftPipeline.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_DraftPipeline.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\GraphValidator.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\GraphValidator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_GraphValidator.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_GraphValidator.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\Main.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\Main.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Main.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Main.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\PackageExporter.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\PackageExporter.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_PackageExporter.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_PackageExporter.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\Pipeline.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\Pipeline.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_Pipeline.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_Pipeline.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ValidationException.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ValidationException.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_ValidationException.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_ValidationException.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\analysis\\FloorPlaneEstimator.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\analysis\\FloorPlaneEstimator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_FloorPlaneEstimator.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\analysis\\OccupancyGridGenerator.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\analysis\\OccupancyGridGenerator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_OccupancyGridGenerator.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\analysis\\ZoneSuggester.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\analysis\\ZoneSuggester.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_analysis_ZoneSuggester.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_analysis_ZoneSuggester.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\draft\\DraftConfigGenerator.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\draft\\DraftConfigGenerator.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_draft_DraftConfigGenerator.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_draft_DraftConfigGenerator.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\draft\\NavigationGraphDrafter.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\draft\\NavigationGraphDrafter.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_draft_NavigationGraphDrafter.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\glb\\GlbGeometryExtractor.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\glb\\GlbGeometryExtractor.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbGeometryExtractor.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GlbGeometryExtractor.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\glb\\GlbParser.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\glb\\GlbParser.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GlbParser.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GlbParser.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\glb\\GltfModels.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\glb\\GltfModels.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_glb_GltfModels.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_glb_GltfModels.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\model\\AuthoringConfig.kt",
+      "path": "tools\\nav-preprocessor\\src\\main\\kotlin\\com\\VecturAI\\tools\\preprocessor\\model\\AuthoringConfig.kt",
       "category": "source",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_Vectura AI_tools_preprocessor_model_AuthoringConfig.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_main_kotlin_com_VecturAI_tools_preprocessor_model_AuthoringConfig.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\AlignmentInverseTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\AlignmentInverseTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar_alignment"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AlignmentInverseTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AlignmentInverseTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\AlignmentTransformTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\AlignmentTransformTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar_alignment"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AlignmentTransformTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AlignmentTransformTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ArContractSerializationTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ArContractSerializationTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_data_format"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ArContractSerializationTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ArContractSerializationTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ArrivalDetectorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ArrivalDetectorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ArrivalDetectorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ArrivalDetectorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\AuthoringConfigLoaderTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\AuthoringConfigLoaderTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_AuthoringConfigLoaderTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_AuthoringConfigLoaderTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\CheckpointMarkerValidationTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\CheckpointMarkerValidationTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar_alignment"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_CheckpointMarkerValidationTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_CheckpointMarkerValidationTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ContractBackwardCompatTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ContractBackwardCompatTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_data_format"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ContractBackwardCompatTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ContractBackwardCompatTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ContractSerializationTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ContractSerializationTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_data_format"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ContractSerializationTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ContractSerializationTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\CorrectionCoordinatorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\CorrectionCoordinatorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
@@ -6902,10 +6902,10 @@
         "ar_alignment",
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_CorrectionCoordinatorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_CorrectionCoordinatorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DemoCriticalRegressionTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DemoCriticalRegressionTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
@@ -6914,10 +6914,10 @@
         "route_finding",
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DemoCriticalRegressionTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DemoCriticalRegressionTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DemoFlowSmokeTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DemoFlowSmokeTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
@@ -6925,130 +6925,130 @@
         "preprocessing",
         "route_finding"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DemoFlowSmokeTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DemoFlowSmokeTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DijkstraRouteEngineTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DijkstraRouteEngineTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "route_finding"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DijkstraRouteEngineTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DijkstraRouteEngineTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DraftConfigGeneratorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DraftConfigGeneratorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DraftConfigGeneratorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DraftConfigGeneratorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\DraftPipelineIntegrationTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\DraftPipelineIntegrationTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_DraftPipelineIntegrationTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_DraftPipelineIntegrationTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\FloorPlaneEstimatorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\FloorPlaneEstimatorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_FloorPlaneEstimatorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_FloorPlaneEstimatorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\GlbParserTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\GlbParserTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_GlbParserTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_GlbParserTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\GraphValidatorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\GraphValidatorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_GraphValidatorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_GraphValidatorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\HistoryRepositoryTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\HistoryRepositoryTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "visit_history"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_HistoryRepositoryTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_HistoryRepositoryTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\JsonFileHistoryPersistenceTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\JsonFileHistoryPersistenceTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "visit_history"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_JsonFileHistoryPersistenceTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_JsonFileHistoryPersistenceTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\NavigationGraphDrafterTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\NavigationGraphDrafterTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_NavigationGraphDrafterTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_NavigationGraphDrafterTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\NavigationSessionCoordinatorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\NavigationSessionCoordinatorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_NavigationSessionCoordinatorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_NavigationSessionCoordinatorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\OccupancyGridGeneratorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\OccupancyGridGeneratorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_OccupancyGridGeneratorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_OccupancyGridGeneratorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\OffRouteDetectorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\OffRouteDetectorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_OffRouteDetectorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_OffRouteDetectorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\PackageExporterTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\PackageExporterTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
@@ -7056,20 +7056,20 @@
         "preprocessing",
         "navigation_data_format"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_PackageExporterTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_PackageExporterTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\PipelineIntegrationTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\PipelineIntegrationTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_PipelineIntegrationTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_PipelineIntegrationTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ProgressContinuityAfterCorrectionTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ProgressContinuityAfterCorrectionTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
@@ -7077,40 +7077,40 @@
         "ar_alignment",
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ProgressContinuityAfterCorrectionTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ProgressContinuityAfterCorrectionTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ProgressEstimatorTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ProgressEstimatorTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "navigation_session_management"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ProgressEstimatorTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ProgressEstimatorTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\RouteToArrowMapperTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\RouteToArrowMapperTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "ar_visuals"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_RouteToArrowMapperTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_RouteToArrowMapperTest.kt.md"
     },
     {
-      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\Vectura AI\\tools\\preprocessor\\ZoneSuggesterTest.kt",
+      "path": "tools\\nav-preprocessor\\src\\test\\kotlin\\com\\VecturAI\\tools\\preprocessor\\ZoneSuggesterTest.kt",
       "category": "test",
       "status": "mapped",
       "reason": null,
       "feature_tags": [
         "preprocessing"
       ],
-      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_Vectura AI_tools_preprocessor_ZoneSuggesterTest.kt.md"
+      "artifact_link": "codebase-docs/files/tools_nav-preprocessor_src_test_kotlin_com_VecturAI_tools_preprocessor_ZoneSuggesterTest.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\ArArrow3DRenderer.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\ArArrow3DRenderer.kt",
       "category": "source",
       "status": "mapped",
       "reason": "Rendered 3D arrows",
@@ -7118,10 +7118,10 @@
         "ar",
         "rendering"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_ArArrow3DRenderer.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_ArArrow3DRenderer.kt.md"
     },
     {
-      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\Vectura AI\\android\\ar\\Arrow3DGeometry.kt",
+      "path": "apps\\androidApp\\src\\main\\kotlin\\com\\VecturAI\\android\\ar\\Arrow3DGeometry.kt",
       "category": "source",
       "status": "mapped",
       "reason": "3D Arrow geometry",
@@ -7129,7 +7129,7 @@
         "ar",
         "rendering"
       ],
-      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_Vectura AI_android_ar_Arrow3DGeometry.kt.md"
+      "artifact_link": "codebase-docs/files/apps_androidApp_src_main_kotlin_com_VecturAI_android_ar_Arrow3DGeometry.kt.md"
     }
   ],
   "generated_from_commit": "d43c184651b8efe8bb7e2a3aa358d0f44b63bb96"

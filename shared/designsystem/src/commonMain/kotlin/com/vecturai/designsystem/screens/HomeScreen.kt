@@ -1,4 +1,4 @@
-package com.Vectura AI.designsystem.screens
+package com.VecturAI.designsystem.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -9,12 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.Vectura AI.designsystem.Vectura AIButton
-import com.Vectura AI.designsystem.Vectura AICard
-import com.Vectura AI.designsystem.Vectura AISectionHeader
+import com.VecturAI.designsystem.VecturAIButton
+import com.VecturAI.designsystem.VecturAICard
+import com.VecturAI.designsystem.VecturAISectionHeader
 
 /**
- * Home screen — the main landing screen of Vectura AI.
+ * Home screen — the main landing screen of VecturAI.
  *
  * Displays a welcome message, quick actions, and building information.
  *
@@ -36,7 +36,7 @@ fun HomeScreen(
     ) {
         // Header
         Text(
-            text = "Vectura AI",
+            text = "VecturAI",
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary,
         )
@@ -50,20 +50,20 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         // Quick Actions
-        Vectura AISectionHeader("Quick Actions")
+        VecturAISectionHeader("Quick Actions")
         Spacer(Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Vectura AIButton(
+            VecturAIButton(
                 text = "Find Room",
                 onClick = onNavigateToSearch,
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.Search,
             )
-            Vectura AIButton(
+            VecturAIButton(
                 text = "Start AR",
                 onClick = onNavigateToAr,
                 modifier = Modifier.weight(1f),
@@ -74,10 +74,10 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         // Building Info Card
-        Vectura AISectionHeader("Current Building")
+        VecturAISectionHeader("Current Building")
         Spacer(Modifier.height(8.dp))
 
-        Vectura AICard {
+        VecturAICard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Business,
@@ -104,10 +104,10 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         // Status
-        Vectura AISectionHeader("Status")
+        VecturAISectionHeader("Status")
         Spacer(Modifier.height(8.dp))
 
-        Vectura AICard {
+        VecturAICard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,

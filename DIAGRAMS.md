@@ -1,9 +1,9 @@
-# Vectura AI Project Diagrams
+# VecturAI Project Diagrams
 
-This document contains the Mermaid.js diagram codes that model the architecture and flows of the Vectura AI platform. You can render these diagrams in any markdown viewer that supports Mermaid (like GitHub, GitLab, or the Notion app).
+This document contains the Mermaid.js diagram codes that model the architecture and flows of the VecturAI platform. You can render these diagrams in any markdown viewer that supports Mermaid (like GitHub, GitLab, or the Notion app).
 
 ## 1. Architecture Diagram
-This diagram illustrates the macro-architecture of Vectura AI, showing how the Kotlin Multiplatform shared core interacts with native clients, and how the preprocessing backend feeds navigation data to the system.
+This diagram illustrates the macro-architecture of VecturAI, showing how the Kotlin Multiplatform shared core interacts with native clients, and how the preprocessing backend feeds navigation data to the system.
 
 ```mermaid
 graph TD
@@ -49,7 +49,7 @@ graph TD
 ```
 
 ## 2. Use-Case Diagram
-This diagram shows the primary actors (Visitor and Manager) and the core interactions they have with the Vectura AI platform.
+This diagram shows the primary actors (Visitor and Manager) and the core interactions they have with the VecturAI platform.
 
 ```plantuml
 @startuml
@@ -58,14 +58,14 @@ left to right direction
 actor "Visitor" as Visitor
 actor "Manager" as Manager
 
-package "Vectura AI Mobile App" {
+package "VecturAI Mobile App" {
   usecase "Scan Entrance Poster" as UC1
   usecase "Select Destination" as UC2
   usecase "View Route Preview" as UC3
   usecase "Follow AR Guidance" as UC4
 }
 
-package "Vectura AI Manager Panel" {
+package "VecturAI Manager Panel" {
   usecase "Upload 3D Map (GLB)" as UC5
   usecase "Review Draft Navigation" as UC6
   usecase "Edit Room Details" as UC7
@@ -152,7 +152,7 @@ stateDiagram-v2
 ```
 
 ## 5. UML Class Diagram (Core Domain Models)
-This diagram illustrates the core data structures used in the Vectura AI platform to represent buildings, floors, and the navigation graph (nodes and edges).
+This diagram illustrates the core data structures used in the VecturAI platform to represent buildings, floors, and the navigation graph (nodes and edges).
 
 ```plantuml
 @startuml

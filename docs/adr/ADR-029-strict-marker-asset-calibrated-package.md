@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-03-23
-**Deciders:** Vectura AI iOS team
+**Deciders:** VecturAI iOS team
 **Relates to:** ADR-026, ADR-028
 
 ## Context

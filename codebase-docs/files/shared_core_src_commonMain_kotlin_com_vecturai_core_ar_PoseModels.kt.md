@@ -1,7 +1,7 @@
 # File Dossier: PoseModels.kt
 
 ## Path
-`shared\core\src\commonMain\kotlin\com\Vectura AI\core\ar\PoseModels.kt`
+`shared\core\src\commonMain\kotlin\com\VecturAI\core\ar\PoseModels.kt`
 
 ## Type
 Authored Source
@@ -12,7 +12,7 @@ Authored Source for the shared component.
 ## Logic Overview
 (Inferred from first 50 lines)
 ```kotlin
-package com.Vectura AI.core.ar
+package com.VecturAI.core.ar
 
 import kotlinx.serialization.Serializable
 

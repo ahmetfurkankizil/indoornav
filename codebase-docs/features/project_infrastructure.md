@@ -1,7 +1,7 @@
 # Feature: Project Infrastructure & Build System
 
 - **Feature Name**: Project Infrastructure & Build System
-- **Purpose**: Provides the foundation for building, testing, and developing the Vectura AI multiplatform project.
+- **Purpose**: Provides the foundation for building, testing, and developing the VecturAI multiplatform project.
 - **Implemented In**:
     - `build.gradle.kts`
     - `settings.gradle.kts`

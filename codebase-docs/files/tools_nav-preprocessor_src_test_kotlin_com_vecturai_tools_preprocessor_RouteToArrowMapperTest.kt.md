@@ -1,7 +1,7 @@
 # File Dossier: RouteToArrowMapperTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/RouteToArrowMapperTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/RouteToArrowMapperTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `ar_visuals`
 - **Status**: Mapped

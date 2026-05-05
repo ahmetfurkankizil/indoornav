@@ -13,7 +13,7 @@
     - `libs.plugins.android.library`
     - `libs.plugins.sqldelight`
 - **Exports / Public Surface**:
-    - Project group: `com.Vectura AI`
+    - Project group: `com.VecturAI`
     - Project version: `0.1.0-SNAPSHOT`
 - **Main Symbols**: N/A (Declarative build script)
 - **Important Logic by Line Range**:
@@ -49,7 +49,7 @@
     - `:tools:nav-preprocessor`
     - `:tools:admin-api`
 - **Exports / Public Surface**:
-    - Root project name: `Vectura AI`
+    - Root project name: `VecturAI`
 - **Main Symbols**: N/A
 - **Important Logic by Line Range**:
     - `1-7`: `pluginManagement` (repositories: google, mavenCentral, gradlePluginPortal).

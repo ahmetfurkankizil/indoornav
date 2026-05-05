@@ -14,7 +14,7 @@ Authored Source for the scripts component.
 ```kotlin
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────
-# Vectura AI — Demo Package Verification
+# VecturAI — Demo Package Verification
 # Validates the sample/demo package for integrity.
 # ─────────────────────────────────────────────────
 set -euo pipefail

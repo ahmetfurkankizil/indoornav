@@ -13,7 +13,7 @@ kotlin {
         iosSimulatorArm64(),
     ).forEach { target ->
         target.binaries.framework {
-            baseName = "Vectura AICore"
+            baseName = "VecturAICore"
             isStatic = true
         }
     }
@@ -29,7 +29,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.Vectura AI.core"
+    namespace = "com.VecturAI.core"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

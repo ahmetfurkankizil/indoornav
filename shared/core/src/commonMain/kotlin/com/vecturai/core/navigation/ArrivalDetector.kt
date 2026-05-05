@@ -1,4 +1,4 @@
-package com.Vectura AI.core.navigation
+package com.VecturAI.core.navigation
 
 import kotlinx.serialization.Serializable
 

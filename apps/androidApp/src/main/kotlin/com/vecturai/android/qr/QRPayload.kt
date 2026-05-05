@@ -1,12 +1,12 @@
-package com.Vectura AI.android.qr
+package com.VecturAI.android.qr
 
-import com.Vectura AI.android.data.AndroidReviewedPackageLoader
+import com.VecturAI.android.data.AndroidReviewedPackageLoader
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
 data class QRPayload(
-    val type: String = "Vectura AI-building",
+    val type: String = "VecturAI-building",
     val token: String,
     val entranceId: String? = null,
     val v: Int = 1,
@@ -21,7 +21,7 @@ data class QRPayload(
     sealed class PayloadError(
         override val message: String,
     ) : Exception(message) {
-        data object NotJSON : PayloadError("QR code does not contain a valid Vectura AI payload")
+        data object NotJSON : PayloadError("QR code does not contain a valid VecturAI payload")
         data class WrongType(val actual: String) : PayloadError("Unknown QR type: $actual")
         data class UnsupportedVersion(val version: Int) : PayloadError("Unsupported QR version: $version")
         data class BuildingMismatch(val expected: String, val got: String) :
@@ -31,7 +31,7 @@ data class QRPayload(
     }
 
     companion object {
-        const val EXPECTED_TYPE = "Vectura AI-building"
+        const val EXPECTED_TYPE = "VecturAI-building"
         const val CURRENT_VERSION = 2
 
         private val json = Json {

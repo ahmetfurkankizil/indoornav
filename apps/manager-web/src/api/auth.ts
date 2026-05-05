@@ -20,5 +20,5 @@ export const getMe = async (): Promise<Manager> => {
     const s = localStorage.getItem('manager_user')
     if (s) return JSON.parse(s)
   } catch { /* ignore */ }
-  return makeManager('local@Vectura AI.app', 'Manager')
+  return makeManager('local@VecturAI.app', 'Manager')
 }

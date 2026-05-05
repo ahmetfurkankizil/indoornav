@@ -9,13 +9,13 @@
 
 ## 1. Project context
 
-Vectura AI is an indoor AR navigation app. The Android client (`apps/androidApp`) uses:
-- One `ComponentActivity` ([ArCameraActivity.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt)) that owns the entire QR-to-AR flow.
-- One `GLSurfaceView` set to `RENDERMODE_CONTINUOUSLY` with a single renderer ([UnifiedArRenderer.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt)).
-- One long-lived `ARCore Session` ([UnifiedArSession.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArSession.kt)).
-- One viewmodel for AR navigation state ([AndroidArNavigationViewModel.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt)).
-- Compose UI overlays on top of the GLSurfaceView ([ArNavigationScreen.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt)).
-- Reviewed-package data loaded via [AndroidReviewedPackageLoader.kt](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt), which provides per-arrow `ArrowPlacementData` (position, forward vector, type, cumulative distance).
+VecturAI is an indoor AR navigation app. The Android client (`apps/androidApp`) uses:
+- One `ComponentActivity` ([ArCameraActivity.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt)) that owns the entire QR-to-AR flow.
+- One `GLSurfaceView` set to `RENDERMODE_CONTINUOUSLY` with a single renderer ([UnifiedArRenderer.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArRenderer.kt)).
+- One long-lived `ARCore Session` ([UnifiedArSession.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArSession.kt)).
+- One viewmodel for AR navigation state ([AndroidArNavigationViewModel.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt)).
+- Compose UI overlays on top of the GLSurfaceView ([ArNavigationScreen.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt)).
+- Reviewed-package data loaded via [AndroidReviewedPackageLoader.kt](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt), which provides per-arrow `ArrowPlacementData` (position, forward vector, type, cumulative distance).
 
 Read these before writing code:
 - `AGENTS.md`
@@ -33,7 +33,7 @@ Render navigation arrows as **lit, perspective-correct 3D meshes** anchored in A
 3. Shade with a soft top-light gradient and a rim highlight for depth perception.
 4. Cast a cheap fake "shadow blob" at floor height beneath each arrow.
 5. Pulse the next imminent arrow subtly.
-6. Respect the existing fade-behind, lookahead, alpha, and scale logic from [ArRouteRenderer.updateVisibility](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt).
+6. Respect the existing fade-behind, lookahead, alpha, and scale logic from [ArRouteRenderer.updateVisibility](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt).
 7. Render at 60 fps on the existing supported devices without dropping frames.
 
 All other AR behavior — alignment from entrance poster, route progress, tracking labels, next-action card, ETA HUD, arrival, error overlays, QR scanning, destination select, route preview, lifecycle, ARCore session resume/pause — must remain bit-identical.
@@ -56,9 +56,9 @@ All other AR behavior — alignment from entrance poster, route progress, tracki
 
 - App targets `compileSdk 35` / `targetSdk 35`, `minSdk 28` (per [libs.versions.toml:21-23](../../gradle/libs.versions.toml)).
 - ARCore client lib is `com.google.ar:core:1.46.0` already on the classpath (per [libs.versions.toml:26](../../gradle/libs.versions.toml) and [build.gradle.kts](../../apps/androidApp/build.gradle.kts)).
-- `GLSurfaceView` is created with `setEGLContextClientVersion(2)` and `preserveEGLContextOnPause = true` (per [ArCameraActivity.kt:163-167](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt)). All GL code MUST be ES 2.0 compatible (no GLES30/uniform buffer objects/instancing/VAOs).
+- `GLSurfaceView` is created with `setEGLContextClientVersion(2)` and `preserveEGLContextOnPause = true` (per [ArCameraActivity.kt:163-167](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt)). All GL code MUST be ES 2.0 compatible (no GLES30/uniform buffer objects/instancing/VAOs).
 - `UnifiedArRenderer.onDrawFrame` runs on the GL thread. Its `onFrame(frame, width, height, rotationDegrees)` callback also runs on the GL thread. The viewmodel's `onFrame()` is therefore invoked on the GL thread.
-- `ArrowPlacementData` carries `forwardDx/Dy/Dz` (per [AndroidReviewedPackageLoader.kt:352-363](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt)).
+- `ArrowPlacementData` carries `forwardDx/Dy/Dz` (per [AndroidReviewedPackageLoader.kt:352-363](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt)).
 - `routePackage.config.routeRendering.arrowHeightOffsetMeters` exists and is the floor-to-arrow elevation in meters. Default is small (~0.05 m).
 - `frame.camera.getViewMatrix(out, 0)` and `getProjectionMatrix(out, 0, 0.1f, 100f)` are valid only inside the same `onDrawFrame` call. We must consume them on the GL thread the frame they were produced on.
 - `ArRouteRenderer.updateVisibility(...)` is called from multiple threads (viewmodel main + GL thread via `onFrame`). Arrow snapshots passed to GL must be thread-safely published.
@@ -80,17 +80,17 @@ All other AR behavior — alignment from entrance poster, route progress, tracki
 ## 6. Current state (verified)
 
 ### 6.1 Arrow data path (do NOT change)
-1. Reviewed package loader produces `List<ArrowPlacementData>` at [AndroidReviewedPackageLoader.kt:352](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/data/AndroidReviewedPackageLoader.kt).
-2. Marker detection completes → [AndroidArNavigationViewModel.handleMarkerDetected](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt#L298) calls `routeRenderer.placeAllArrows(pkg.arrows)` and sets the alignment transform.
+1. Reviewed package loader produces `List<ArrowPlacementData>` at [AndroidReviewedPackageLoader.kt:352](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/data/AndroidReviewedPackageLoader.kt).
+2. Marker detection completes → [AndroidArNavigationViewModel.handleMarkerDetected](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt#L298) calls `routeRenderer.placeAllArrows(pkg.arrows)` and sets the alignment transform.
 3. `routeRenderer.updateVisibility(userCumulativeDistance)` is called from `sampleCameraPose`, `advanceProgress`, `handleMarkerDetected`. It computes `List<VisibleArrow>` with world `xyz`, `alpha`, `scale`.
 
 ### 6.2 Current rendering path (TO BE REPLACED)
-1. Per-frame, `AndroidArNavigationViewModel.onFrame` (GL thread) extracts `viewMatrix` and `projectionMatrix` from `frame.camera`, then calls `routeRenderer.projectVisibleArrows(...)` to produce 2D `ProjectedArrow(xPx, yPx, alpha, scale)` (see [ArRouteRenderer.kt:129-165](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt)).
+1. Per-frame, `AndroidArNavigationViewModel.onFrame` (GL thread) extracts `viewMatrix` and `projectionMatrix` from `frame.camera`, then calls `routeRenderer.projectVisibleArrows(...)` to produce 2D `ProjectedArrow(xPx, yPx, alpha, scale)` (see [ArRouteRenderer.kt:129-165](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt)).
 2. The result lands in `uiState.projectedArrows` (StateFlow).
-3. [ArNavigationScreen.ProjectedArrowLayer](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt#L131) renders each as a Compose `Box` (`CircleShape`) with a Material `Icon` inside.
+3. [ArNavigationScreen.ProjectedArrowLayer](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt#L131) renders each as a Compose `Box` (`CircleShape`) with a Material `Icon` inside.
 
 ### 6.3 GL pipeline today (MUST STAY)
-- [UnifiedArRenderer.onDrawFrame](../../apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt#L64) clears, calls `session.update()`, calls `setDisplayGeometry`, draws the AR camera background to a fullscreen quad with `GL_TEXTURE_EXTERNAL_OES`, then dispatches `onFrame` callback.
+- [UnifiedArRenderer.onDrawFrame](../../apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArRenderer.kt#L64) clears, calls `session.update()`, calls `setDisplayGeometry`, draws the AR camera background to a fullscreen quad with `GL_TEXTURE_EXTERNAL_OES`, then dispatches `onFrame` callback.
 - Depth is currently disabled and depth mask is reset to true after the camera background draw. Depth buffer exists.
 
 ---
@@ -205,10 +205,10 @@ After arrow pass, restore the renderer's neutral state (`glDisable(GL_DEPTH_TEST
 
 ## 9. Files to create
 
-### 9.1 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/Arrow3DGeometry.kt`
+### 9.1 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/Arrow3DGeometry.kt`
 Pure data — vertex array, index array, color tables. No GL state.
 
-### 9.2 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArArrow3DRenderer.kt`
+### 9.2 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArArrow3DRenderer.kt`
 Owns:
 - Two GL programs (`arrowProgram`, `shadowProgram`) compiled lazily on first `draw`.
 - Two static `FloatBuffer`s for vertex + normal + gradient data.
@@ -222,7 +222,7 @@ Short notes file for the executing agent to record device-specific findings duri
 
 ## 10. Files to modify
 
-### 10.1 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt`
+### 10.1 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt`
 
 **Add:**
 - A new `data class RenderableArrow3D(val type: ArrowPlacementType, val worldX: Float, val worldY: Float, val worldZ: Float, val headingRad: Float, val alpha: Float, val scale: Float, val isImminent: Boolean, val arrowId: String)`.
@@ -239,7 +239,7 @@ Short notes file for the executing agent to record device-specific findings duri
 - `projectVisibleArrows` — keep it for backward safety / debug HUD; it just goes unused. Deleting it later is a follow-up cleanup.
 - Existing `VisibleArrow` and `ProjectedArrow` types.
 
-### 10.2 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt`
+### 10.2 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArRenderer.kt`
 
 **Add to constructor:**
 ```kotlin
@@ -271,7 +271,7 @@ private val arrow3D = ArArrow3DRenderer()
   ```
 - Restore neutral state (`glDisable(GL_DEPTH_TEST)`, `glDepthMask(true)`).
 
-### 10.3 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+### 10.3 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt`
 
 **Add:**
 - A `val routeRenderer: ArRouteRenderer get() = this.routeRenderer` (already a private constructor field; promote to internal-readable). Use `internal` visibility so `ArCameraActivity` can pass it to the renderer.
@@ -290,7 +290,7 @@ private val arrow3D = ArArrow3DRenderer()
   (Same logic, minus the projection update.)
 - Drop `projectedArrows` from `ArNavigationUiState` initial / update sites if you choose to remove the field. Otherwise leave it as `emptyList()` always.
 
-### 10.4 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt`
+### 10.4 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt`
 
 **Modify the `renderer by lazy { ... }` block:**
 ```kotlin
@@ -307,7 +307,7 @@ private val renderer by lazy {
 ```
 No other change to this file.
 
-### 10.5 `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt`
+### 10.5 `apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt`
 
 **Remove:**
 - The call site `ProjectedArrowLayer(uiState)` at line 94.
@@ -324,7 +324,7 @@ Execute strictly in this order. After each step, run `./gradlew :apps:androidApp
 
 ### Step 1 — Add `RenderableArrow3D` and snapshot publishing
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt`
 
 1. Add import: `import java.util.concurrent.atomic.AtomicReference`.
 2. Add inside the class:
@@ -372,7 +372,7 @@ Build check: `./gradlew :apps:androidApp:assembleDebug`.
 
 ### Step 2 — Promote `routeRenderer` visibility
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt`
 
 1. Change the constructor parameter:
    ```kotlin
@@ -389,14 +389,14 @@ Build check.
 
 ### Step 3 — Create `Arrow3DGeometry`
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/Arrow3DGeometry.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/Arrow3DGeometry.kt`
 
 Define:
 
 ```kotlin
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
-import com.Vectura AI.android.data.ArrowPlacementType
+import com.VecturAI.android.data.ArrowPlacementType
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -587,10 +587,10 @@ Build check.
 
 ### Step 4 — Create `ArArrow3DRenderer`
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArArrow3DRenderer.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArArrow3DRenderer.kt`
 
 ```kotlin
-package com.Vectura AI.android.ar
+package com.VecturAI.android.ar
 
 import android.opengl.GLES20
 import android.opengl.Matrix
@@ -861,7 +861,7 @@ Build check.
 
 ### Step 5 — Wire the renderer into the GL pipeline
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArRenderer.kt`
 
 1. Add constructor parameter:
    ```kotlin
@@ -903,7 +903,7 @@ Build check.
 
 ### Step 6 — Pass `routeRenderer` from the activity
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt`
 
 In `private val renderer by lazy { ... }`, add the new constructor argument:
 ```kotlin
@@ -921,7 +921,7 @@ Build check.
 
 ### Step 7 — Stop computing the 2D projection in the viewmodel
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt`
 
 Replace the body of `onFrame` (currently at line 193-218) with:
 ```kotlin
@@ -947,11 +947,11 @@ Build check.
 
 ### Step 8 — Remove the Compose 2D arrow layer
 
-File: `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt`
+File: `apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt`
 
 1. Delete the call `ProjectedArrowLayer(uiState)` at line 94.
 2. Delete the entire `private fun ProjectedArrowLayer(uiState: ArNavigationUiState) { ... }` definition at lines 131-168.
-3. Run `grep -n "ProjectedArrowLayer\|colorForArrow\|iconForArrow\|projectedArrows" apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt`.
+3. Run `grep -n "ProjectedArrowLayer\|colorForArrow\|iconForArrow\|projectedArrows" apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt`.
    - If `colorForArrow` / `iconForArrow` / `projectedArrows` no longer have callers, delete those helpers and their imports.
 4. Remove now-unused imports (let the IDE / `./gradlew` decide; the build will succeed either way but warnings are noise).
 
@@ -985,7 +985,7 @@ Required device: Android 12+ ARCore-supported phone where Pokémon GO works. (Us
 
 1. Build and install:
    ```
-   adb uninstall com.Vectura AI.android
+   adb uninstall com.VecturAI.android
    ./gradlew :apps:androidApp:installDebug
    ```
 2. Watch logs:
@@ -1013,7 +1013,7 @@ Required device: Android 12+ ARCore-supported phone where Pokémon GO works. (Us
 ### 12.4 Performance sanity
 With the AR session running, run:
 ```
-adb shell dumpsys gfxinfo com.Vectura AI.android | grep -E "Janky|frames rendered|95th percentile"
+adb shell dumpsys gfxinfo com.VecturAI.android | grep -E "Janky|frames rendered|95th percentile"
 ```
 Compare to a pre-change baseline. Janky frame % must not increase by more than 2 percentage points. 95th percentile frame time must stay under 16.7 ms on the Pokémon-GO-capable test device.
 
@@ -1074,11 +1074,11 @@ If "no arrows in emulator" is unacceptable, add a debug-only `Surface` overlay i
 
 If the new visuals regress on real hardware, revert by reverting these files in this order (each step compiles standalone):
 
-1. `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ui/ArNavigationScreen.kt` — restore the `ProjectedArrowLayer` call site and definition.
-2. `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/AndroidArNavigationViewModel.kt` — restore `onFrame` body that updates `projectedArrows`.
-3. `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArCameraActivity.kt` — drop the `routeRenderer = arViewModel.routeRenderer` argument.
-4. `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/UnifiedArRenderer.kt` — drop the constructor param, the `arrow3D` field, the `onSurfaceCreated` call, and the new draw block in `onDrawFrame`.
-5. `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArRouteRenderer.kt` — remove `RenderableArrow3D`, `snapshotRef`, `snapshot()`, and the publication code in `updateVisibility/clearArrows/hideAllArrows/placeAllArrows`. Restore `routeRenderer` to `private val` in the viewmodel.
+1. `apps/androidApp/src/main/kotlin/com/VecturAI/android/ui/ArNavigationScreen.kt` — restore the `ProjectedArrowLayer` call site and definition.
+2. `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/AndroidArNavigationViewModel.kt` — restore `onFrame` body that updates `projectedArrows`.
+3. `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArCameraActivity.kt` — drop the `routeRenderer = arViewModel.routeRenderer` argument.
+4. `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/UnifiedArRenderer.kt` — drop the constructor param, the `arrow3D` field, the `onSurfaceCreated` call, and the new draw block in `onDrawFrame`.
+5. `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArRouteRenderer.kt` — remove `RenderableArrow3D`, `snapshotRef`, `snapshot()`, and the publication code in `updateVisibility/clearArrows/hideAllArrows/placeAllArrows`. Restore `routeRenderer` to `private val` in the viewmodel.
 6. Delete `Arrow3DGeometry.kt` and `ArArrow3DRenderer.kt`.
 
 Use `git revert` on the implementation commits in reverse order. The fix is fully isolated to these files; no shared/iOS/admin/preprocessor changes.

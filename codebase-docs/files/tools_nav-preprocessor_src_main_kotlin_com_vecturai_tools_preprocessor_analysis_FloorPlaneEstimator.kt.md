@@ -1,7 +1,7 @@
 # File Dossier: FloorPlaneEstimator.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/Vectura AI/tools/preprocessor/analysis/FloorPlaneEstimator.kt`
+- **Path**: `tools/nav-preprocessor/src/main/kotlin/com/VecturAI/tools/preprocessor/analysis/FloorPlaneEstimator.kt`
 - **Type**: Kotlin Source (Analysis Logic)
 - **Feature**: `preprocessing`
 - **Status**: Mapped

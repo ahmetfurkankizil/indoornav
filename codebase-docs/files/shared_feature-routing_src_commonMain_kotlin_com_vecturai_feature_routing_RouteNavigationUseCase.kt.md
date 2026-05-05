@@ -1,15 +1,15 @@
-# File Dossier: shared/feature-routing/src/commonMain/kotlin/com/Vectura AI/feature/routing/RouteNavigationUseCase.kt
+# File Dossier: shared/feature-routing/src/commonMain/kotlin/com/VecturAI/feature/routing/RouteNavigationUseCase.kt
 
-- **Path**: `shared/feature-routing/src/commonMain/kotlin/com/Vectura AI/feature/routing/RouteNavigationUseCase.kt`
+- **Path**: `shared/feature-routing/src/commonMain/kotlin/com/VecturAI/feature/routing/RouteNavigationUseCase.kt`
 - **Type**: source
 - **Role**: Orchestrates the transition from building discovery to active navigation, managing the core state machine transitions for the user.
 - **Imports / Includes**:
-    - `com.Vectura AI.core.domain.NavigationState`
-    - `com.Vectura AI.core.domain.Room`
-    - `com.Vectura AI.core.domain.Route`
-    - `com.Vectura AI.core.repository.BuildingRepository`
-    - `com.Vectura AI.core.routing.RouteEngine`
-    - `com.Vectura AI.core.store.AppStore`
+    - `com.VecturAI.core.domain.NavigationState`
+    - `com.VecturAI.core.domain.Room`
+    - `com.VecturAI.core.domain.Route`
+    - `com.VecturAI.core.repository.BuildingRepository`
+    - `com.VecturAI.core.routing.RouteEngine`
+    - `com.VecturAI.core.store.AppStore`
 - **Exports / Public Surface**:
     - `RouteNavigationUseCase` class
     - `startNavigation(buildingId, destination)`

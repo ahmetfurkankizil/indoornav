@@ -1,7 +1,7 @@
 # File Dossier: DraftJob.kt
 
 ## Metadata
-- **Path**: `tools/admin-api/src/main/kotlin/com/Vectura AI/tools/admin/model/DraftJob.kt`
+- **Path**: `tools/admin-api/src/main/kotlin/com/VecturAI/tools/admin/model/DraftJob.kt`
 - **Type**: Kotlin Source (Data Model)
 - **Feature**: `admin_orchestration`
 - **Status**: Mapped

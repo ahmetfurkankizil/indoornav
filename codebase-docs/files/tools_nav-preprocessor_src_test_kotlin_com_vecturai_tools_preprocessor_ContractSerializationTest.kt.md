@@ -1,7 +1,7 @@
 # File Dossier: ContractSerializationTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/ContractSerializationTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/ContractSerializationTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `navigation_data_format`
 - **Status**: Mapped

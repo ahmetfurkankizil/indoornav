@@ -16,7 +16,7 @@ Authored Source for the docs component.
 
 **Status:** Accepted
 **Date:** 2026-03-29
-**Deciders:** Vectura AI team
+**Deciders:** VecturAI team
 **Relates to:** ADR-006 (assisted authoring), ADR-026 (reviewed package runtime truth)
 
 ## Context

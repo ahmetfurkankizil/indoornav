@@ -1,6 +1,6 @@
 # First-Day Setup Guide
 
-Get Vectura AI building and running in ~15 minutes.
+Get VecturAI building and running in ~15 minutes.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ Get Vectura AI building and running in ~15 minutes.
 
 ```bash
 git clone <repo-url>
-cd Vectura AI
+cd VecturAI
 make help           # see all available targets
 ```
 

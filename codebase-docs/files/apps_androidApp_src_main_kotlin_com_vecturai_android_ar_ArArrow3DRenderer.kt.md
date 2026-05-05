@@ -1,4 +1,4 @@
-# `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/ArArrow3DRenderer.kt`
+# `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/ArArrow3DRenderer.kt`
 
 ## Overview
 `ArArrow3DRenderer` is responsible for rendering 3D navigational arrows within the AR session using OpenGL ES. It replaces the previous 2D projected arrows by drawing volumetric shapes (chevrons) directly into the AR world space, allowing for true depth, lighting simulation, and more immersive route guidance. It utilizes geometries and colors defined in `Arrow3DGeometry`.
@@ -20,7 +20,7 @@
 ## Dependencies
 - `Arrow3DGeometry`: Provides vertex data, indices, and color schemes.
 - OpenGL ES APIs (`android.opengl.GLES20`, `android.opengl.Matrix`).
-- Core AR models (`com.Vectura AI.android.data.ArrowPlacementType`, `ArRouteArrow`).
+- Core AR models (`com.VecturAI.android.data.ArrowPlacementType`, `ArRouteArrow`).
 
 ## Used By
 - `UnifiedArRenderer`: Initializes and invokes the `draw` method per frame.

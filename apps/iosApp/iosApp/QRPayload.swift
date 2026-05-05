@@ -8,7 +8,7 @@ import Foundation
 /// Payload format (JSON):
 /// ```json
 /// {
-///   "type": "Vectura AI-entrance",
+///   "type": "VecturAI-entrance",
 ///   "buildingId": "19",
 ///   "entranceId": "marker-main-entrance",
 ///   "v": 1
@@ -21,7 +21,7 @@ struct QRPayload: Codable, Equatable {
     let v: Int
 
     /// Expected `type` field value.
-    static let expectedType = "Vectura AI-entrance"
+    static let expectedType = "VecturAI-entrance"
     /// Current payload version.
     static let currentVersion = 1
 
@@ -37,7 +37,7 @@ struct QRPayload: Codable, Equatable {
         var description: String {
             switch self {
             case .notJSON:
-                return "QR code does not contain a valid Vectura AI payload"
+                return "QR code does not contain a valid VecturAI payload"
             case .wrongType(let t):
                 return "Unknown QR type: \(t)"
             case .unsupportedVersion(let v):

@@ -1,4 +1,4 @@
-package com.Vectura AI.core.config
+package com.VecturAI.core.config
 
 /**
  * App version and build metadata.
@@ -7,7 +7,7 @@ package com.Vectura AI.core.config
  * Update this file when cutting a release or RC.
  */
 object AppVersion {
-    const val NAME = "Vectura AI"
+    const val NAME = "VecturAI"
     const val VERSION = "1.7.0-rc1"
     const val BUILD_PHASE = "Phase 8 — RC"
     const val BUILD_DATE = "2026-03-10"

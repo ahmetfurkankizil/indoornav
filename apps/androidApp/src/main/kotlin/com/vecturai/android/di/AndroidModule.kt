@@ -1,16 +1,16 @@
-package com.Vectura AI.android.di
+package com.VecturAI.android.di
 
-import com.Vectura AI.android.ar.AndroidArNavigationViewModel
-import com.Vectura AI.android.ar.AndroidHapticManager
-import com.Vectura AI.android.ar.ArBridge
-import com.Vectura AI.android.ar.ArMarkerDetector
-import com.Vectura AI.android.ar.ArRouteRenderer
-import com.Vectura AI.android.data.AndroidReviewedPackageLoader
-import com.Vectura AI.android.navigation.ArCameraFlowViewModel
-import com.Vectura AI.android.navigation.AndroidNavigationFlowModel
-import com.Vectura AI.android.Vectura AIConfig
-import com.Vectura AI.data.remote.KtorBuildingDataSource
-import com.Vectura AI.data.remote.RemoteBuildingDataSource
+import com.VecturAI.android.ar.AndroidArNavigationViewModel
+import com.VecturAI.android.ar.AndroidHapticManager
+import com.VecturAI.android.ar.ArBridge
+import com.VecturAI.android.ar.ArMarkerDetector
+import com.VecturAI.android.ar.ArRouteRenderer
+import com.VecturAI.android.data.AndroidReviewedPackageLoader
+import com.VecturAI.android.navigation.ArCameraFlowViewModel
+import com.VecturAI.android.navigation.AndroidNavigationFlowModel
+import com.VecturAI.android.VecturAIConfig
+import com.VecturAI.data.remote.KtorBuildingDataSource
+import com.VecturAI.data.remote.RemoteBuildingDataSource
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
@@ -27,7 +27,7 @@ val androidModule = module {
 
     // Use our PC's IP for the remote data source
     single<RemoteBuildingDataSource> { 
-        KtorBuildingDataSource(Vectura AIConfig.API_BASE_URL)
+        KtorBuildingDataSource(VecturAIConfig.API_BASE_URL)
     }
 
     factory { ArMarkerDetector() }

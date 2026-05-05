@@ -1,4 +1,4 @@
-# `apps/androidApp/src/main/kotlin/com/Vectura AI/android/ar/Arrow3DGeometry.kt`
+# `apps/androidApp/src/main/kotlin/com/VecturAI/android/ar/Arrow3DGeometry.kt`
 
 ## Overview
 `Arrow3DGeometry` is an internal object that provides the static vertex data, indices, normals, and color schemes for the 3D chevron arrows rendered in the AR navigation view. By centralizing the geometry generation, it decouples the mesh definition from the rendering logic in `ArArrow3DRenderer`.

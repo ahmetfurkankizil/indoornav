@@ -1,7 +1,7 @@
 # File Dossier: AlignmentTransformTest.kt
 
 ## Metadata
-- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/Vectura AI/tools/preprocessor/AlignmentTransformTest.kt`
+- **Path**: `tools/nav-preprocessor/src/test/kotlin/com/VecturAI/tools/preprocessor/AlignmentTransformTest.kt`
 - **Type**: Kotlin Source (Unit Test)
 - **Feature**: `ar_alignment`
 - **Status**: Mapped
