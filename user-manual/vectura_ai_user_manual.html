@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vectura AI — User Manual</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0d1117;
+      --paper: #f4f4f8;
+      --surface: #ffffff;
+      --accent: #2563eb;
+      --accent2: #0ea5e9;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --rule: #cccbe0;
+      --tag-bg: #dbeafe;
+      --tag-text: #1e40af;
+      --warn-bg: #fff8e6;
+      --warn-text: #9a6800;
+      --note-bg: #f0f9ff;
+      --note-text: #0369a1;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ───── COVER ───── */
+    .cover {
+      min-height: 100vh;
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 72px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -180px;
+      right: -180px;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -120px;
+      left: -80px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-mark svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .logo-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-name span {
+      color: var(--accent);
+    }
+
+    .cover-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 0 40px;
+    }
+
+    .cover-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .cover-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 800;
+      line-height: 1.0;
+      color: #ffffff;
+      margin-bottom: 28px;
+    }
+
+    .cover-title em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .cover-subtitle {
+      font-size: 16px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.55);
+      max-width: 480px;
+      line-height: 1.65;
+    }
+
+    .cover-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 28px;
+    }
+
+    .cover-meta {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.38);
+      line-height: 1.8;
+    }
+
+    .cover-version {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 0.1em;
+    }
+
+    /* ───── LAYOUT ───── */
+    .page-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ───── TOC ───── */
+    .toc-section {
+      padding: 80px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background 0.15s;
+    }
+
+    .toc-item:hover {
+      background: rgba(124, 58, 237, 0.07);
+    }
+
+    .toc-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 22px;
+    }
+
+    .toc-text {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .toc-dots {
+      flex: 1;
+      border-bottom: 1px dotted var(--rule);
+      margin: 0 6px 3px;
+    }
+
+    .toc-page {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ───── CHAPTER HEADER ───── */
+    .chapter {
+      padding: 72px 0 0;
+    }
+
+    .chapter-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 40px;
+      padding-bottom: 28px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .chapter-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      min-width: 64px;
+    }
+
+    .chapter-meta {}
+
+    .chapter-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
+
+    .chapter-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .chapter-desc {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 560px;
+    }
+
+    /* ───── STEPS ───── */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 32px 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 0 20px;
+      position: relative;
+    }
+
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step:not(:last-child) .step-left::after {
+      content: '';
+      flex: 1;
+      width: 2px;
+      background: var(--border);
+      margin: 4px 0 0;
+    }
+
+    .step-content {
+      padding: 4px 0 36px;
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      margin-top: 6px;
+    }
+
+    .step-body {
+      font-size: 14px;
+      color: #3a3f48;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .sw-instruction-box {
+      background: #f0f9ff;
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13.5px;
+      color: #37335d;
+      line-height: 1.5;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .sw-instruction-box::before {
+      content: "•";
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 18px;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    /* ───── SCREENSHOT PLACEHOLDER ───── */
+    .screenshot-placeholder {
+      width: 100%;
+      aspect-ratio: 9/19;
+      max-width: 200px;
+      background: #efecf8;
+      border: 2px dashed var(--rule);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 20px;
+      flex-shrink: 0;
+    }
+
+    .screenshot-placeholder svg {
+      opacity: 0.35;
+    }
+
+    .screenshot-placeholder .ph-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .screenshot-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .screenshot-wide {
+      aspect-ratio: 16/9;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    /* ───── CALLOUT BOXES ───── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    .callout-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .callout.tip {
+      background: var(--tag-bg);
+      border-left: 3px solid var(--accent);
+      color: #2e1065;
+    }
+
+    .callout.warn {
+      background: var(--warn-bg);
+      border-left: 3px solid #f59e0b;
+      color: var(--warn-text);
+    }
+
+    .callout.note {
+      background: var(--note-bg);
+      border-left: 3px solid var(--accent2);
+      color: var(--note-text);
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    /* ───── FEATURE TABLE ───── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 28px 0;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .feature-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ───── INLINE STEP LAYOUT (text + screenshot side by side) ───── */
+    .step-with-screen {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 28px;
+      align-items: start;
+      margin: 32px 0;
+      padding: 28px;
+      background: #faf9ff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .step-with-screen .step-num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--ink);
+      color: white;
+      border-radius: 50%;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-with-screen .sw-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .step-with-screen .sw-body {
+      font-size: 13.5px;
+      color: #3a3f48;
+      line-height: 1.7;
+    }
+
+    /* ───── SECTION DIVIDER ───── */
+    .section-divider {
+      margin: 56px 0 0;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-divider h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .section-divider .sub-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ───── REQUIREMENTS TABLE ───── */
+    .req-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 20px 0;
+    }
+
+    .req-table th {
+      text-align: left;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 14px;
+      background: #f3f1fb;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .req-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .req-table tr:hover td {
+      background: #f6f4fd;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-green {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .badge-blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-orange {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+
+    /* ───── FAQ ACCORDION STYLE ───── */
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+
+    .faq-q {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .faq-q-icon {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      min-width: 16px;
+    }
+
+    .faq-a {
+      font-size: 13.5px;
+      color: #3a3f48;
+      line-height: 1.7;
+      padding-left: 28px;
+    }
+
+    /* ───── FOOTER ───── */
+    .manual-footer {
+      margin-top: 100px;
+      background: var(--ink);
+      color: rgba(255, 255, 255, 0.45);
+      padding: 48px 72px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .footer-logo span {
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 640px) {
+      .cover {
+        padding: 36px 28px;
+      }
+
+      .page-wrap {
+        padding: 0 22px;
+      }
+
+      .toc-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step-with-screen {
+        grid-template-columns: 1fr;
+      }
+
+      .manual-footer {
+        padding: 40px 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-top">
+      <img src="ss/logo.png" alt="Vectura AI Logo" style="height: 48px; width: auto; border-radius: 12px;">
+      <div class="logo-name">Vectura <span>AI</span></div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-eyebrow">Official Documentation · User Manual</div>
+      <div class="cover-title">Navigate<br><em>Any Space.</em><br>No Hardware.</div>
+      <div class="cover-subtitle">
+        A complete guide to using Vectura AI — the augmented reality indoor navigation app that works entirely from your
+        smartphone, no beacons or infrastructure required.
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div class="cover-meta">
+        Indoor AR Navigation · Android &amp; iOS<br>
+        Bilkent University · CS491/492 Senior Design<br>
+        Team T2523
+      </div>
+      <div class="cover-version">VERSION 1.0</div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+     TABLE OF CONTENTS
+═══════════════════════════════════════ -->
+  <div class="page-wrap">
+    <div class="toc-section">
+      <div class="section-label">Contents</div>
+      <div class="toc-grid">
+
+        <a class="toc-item" href="#ch-overview">
+          <span class="toc-num">01</span>
+          <span class="toc-text">Overview &amp; Key Features</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-requirements">
+          <span class="toc-num">02</span>
+          <span class="toc-text">Device Requirements</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+
+        <a class="toc-item" href="#ch-navigate">
+          <span class="toc-num">03</span>
+          <span class="toc-text">Navigating a Building</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-admin">
+          <span class="toc-num">04</span>
+          <span class="toc-text">Administrator Guide</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-offline">
+          <span class="toc-num">05</span>
+          <span class="toc-text">Offline Mode &amp; Map Updates</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-privacy">
+          <span class="toc-num">06</span>
+          <span class="toc-text">Privacy &amp; Permissions</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-faq">
+          <span class="toc-num">07</span>
+          <span class="toc-text">Troubleshooting &amp; FAQ</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+        <a class="toc-item" href="#ch-glossary">
+          <span class="toc-num">08</span>
+          <span class="toc-text">Glossary</span>
+          <span class="toc-dots"></span>
+          <span class="toc-page">—</span>
+        </a>
+
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 1 — OVERVIEW
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-overview">
+      <div class="chapter-header">
+        <div class="chapter-num">01</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Introduction</span>
+          <div class="chapter-title">Overview &amp; Key Features</div>
+          <div class="chapter-desc">What Vectura AI is, how it works, and what makes it different from other indoor
+            navigation solutions.</div>
+        </div>
+      </div>
+
+      <p style="font-size:14.5px; line-height:1.8; margin-bottom:20px;">
+        Vectura AI is a smartphone application that provides turn-by-turn augmented reality navigation inside large,
+        complex buildings — hospitals, airports, university campuses, and shopping centres — where GPS signals are
+        unreliable or unavailable. Instead of requiring expensive Bluetooth beacons or Wi-Fi infrastructure installed
+        throughout a building, Vectura AI uses a single QR code placed at the building entrance to anchor its AR
+        coordinate system to the physical space.
+      </p>
+
+      <p style="font-size:14.5px; line-height:1.8; margin-bottom:32px;">
+        Once your position is established, three-dimensional directional arrows are rendered directly onto your live
+        camera view, guiding you floor-by-floor to your chosen destination. All routing runs on your device, so the app
+        works even without a network connection once the building map has been downloaded.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📡</div>
+          <h4>Hardware-Free</h4>
+          <p>No beacons, no special Wi-Fi. A QR code at the entrance is all the infrastructure needed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔺</div>
+          <h4>AR Arrow Guidance</h4>
+          <p>3D arrows are projected onto the floor in your camera view, showing exactly where to turn.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h4>Automatic Rerouting</h4>
+          <p>If you stray more than one metre from the route, a new path is calculated within 2 seconds.</p>
+        </div>
+        <div class="feature-card">
+          <span class="badge badge-blue" style="margin-bottom:8px;">New</span>
+          <div class="feature-icon">🤖</div>
+          <h4>AI-Powered Assistant</h4>
+          <p>Multi-modal voice and text assistant that semantically resolves destinations and auto-starts routing.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h4>Privacy by Design</h4>
+          <p>No personal data is collected. Your camera feed is never recorded or transmitted.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 2 — DEVICE REQUIREMENTS
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-requirements">
+      <div class="chapter-header">
+        <div class="chapter-num">02</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Before You Start</span>
+          <div class="chapter-title">Device Requirements</div>
+          <div class="chapter-desc">Minimum hardware and software requirements for running Vectura AI.</div>
+        </div>
+      </div>
+
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Requirement</th>
+            <th>Android</th>
+            <th>iOS</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Operating System</td>
+            <td>Android 7.0 (API 24) or later</td>
+            <td>iOS 14 or later</td>
+            <td><span class="badge badge-green">Required</span></td>
+          </tr>
+          <tr>
+            <td>AR Support</td>
+            <td>ARCore-compatible device</td>
+            <td>ARKit-compatible device (iPhone 6s+)</td>
+            <td><span class="badge badge-green">Required</span></td>
+          </tr>
+          <tr>
+            <td>Camera</td>
+            <td>Rear-facing camera with autofocus</td>
+            <td>Rear-facing camera with autofocus</td>
+            <td><span class="badge badge-green">Required</span></td>
+          </tr>
+          <tr>
+            <td>Storage (map cache)</td>
+            <td>Up to 50 MB per building</td>
+            <td>Up to 50 MB per building</td>
+            <td><span class="badge badge-blue">Recommended</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout note">
+        <span class="callout-icon">ℹ️</span>
+        <div>
+          <strong>Check ARCore compatibility:</strong> To confirm your Android device supports ARCore, visit the
+          official Google ARCore supported devices list, or the app will display a notification at startup if your
+          device is not compatible.
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 3 — NAVIGATING
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-navigate">
+      <div class="chapter-header">
+        <div class="chapter-num">03</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Core Feature</span>
+          <div class="chapter-title">Navigating a Building</div>
+          <div class="chapter-desc">Step-by-step guide to finding your destination using augmented reality guidance.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Step A: Main Screen ── -->
+      <div class="section-divider">
+        <h3>Step A — Main Screen</h3>
+        <div class="sub-desc">The central hub of the app where all navigation starts.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">Welcome to the central hub of the Vectura AI experience.</div>
+            <div class="sw-instruction-box">Displays the current building name, map version, and status.</div>
+            <div class="sw-instruction-box">Quick-access buttons provided for camera and search.</div>
+            <div class="sw-instruction-box">Ensure the displayed building name matches your location.</div>
+            <div class="sw-instruction-box">Access the scanner to synchronize or browse history.</div>
+          </div>
+        </div>
+        <img src="ss/1.jpeg" alt="Main home screen" class="screenshot-img">
+      </div>
+
+      <!-- ── Step B: Scan the Entrance QR Code ── -->
+      <div class="section-divider">
+        <h3>Step B — Scan the Entrance QR Code</h3>
+        <div class="sub-desc">Point your camera at the QR code posted at the building entrance or lobby.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">Locate the official QR anchor near the entrance or lobby.</div>
+            <div class="sw-instruction-box">Align the QR code within the on-screen brackets.</div>
+            <div class="sw-instruction-box">Hold your device steady for approximately 3 seconds.</div>
+            <div class="sw-instruction-box">Establishes the precise coordinate system for your session.</div>
+          </div>
+        </div>
+        <img src="ss/2.jpeg" alt="Entrance QR scanning" class="screenshot-img">
+      </div>
+
+      <!-- ── Step C: Successful Scan Result ── -->
+      <div class="section-divider">
+        <h3>Step C — Successful Scan Result</h3>
+        <div class="sub-desc">Confirmation that your location is synchronized with the building.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">A 'Location Synchronized' confirmation appears on success.</div>
+            <div class="sw-instruction-box">Displays the building's floor plan and metadata status.</div>
+            <div class="sw-instruction-box">Confirms the device is mapped to the physical space.</div>
+            <div class="sw-instruction-box">Follow on-screen tips if the synchronization fails.</div>
+          </div>
+        </div>
+        <img src="ss/3.jpeg" alt="Scan success confirmation" class="screenshot-img">
+      </div>
+
+      <!-- ── Step D: Choose Destination ── -->
+      <div class="section-divider">
+        <h3>Step D — Choose Destination</h3>
+        <div class="sub-desc">Search for the room or department you wish to visit.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">Use the search bar to find your target room or department.</div>
+            <div class="sw-instruction-box">Type in room numbers, offices, or staff names.</div>
+            <div class="sw-instruction-box">The search list filters dynamically as you type.</div>
+            <div class="sw-instruction-box">Alternatively, use the AI Assistant for natural language voice or text
+              commands.</div>
+            <div class="sw-instruction-box">AI semantically resolves queries (e.g., "Take me to the nearest exit") and
+              can auto-start navigation.</div>
+            <div class="sw-instruction-box">Tap your chosen destination or follow the AI's automated prompt to proceed.
+            </div>
+          </div>
+          <div class="callout tip" style="margin-top:14px;">
+            <span class="callout-icon">💡</span>
+            <div>You can search by room number (e.g. <strong>B-204</strong>) or by department name.</div>
+          </div>
+        </div>
+        <img src="ss/4.jpeg" alt="Destination search" class="screenshot-img">
+      </div>
+
+      <!-- ── Step E: Route Preview ── -->
+      <div class="section-divider">
+        <h3>Step E — Route Preview</h3>
+        <div class="sub-desc">A preview of your path is shown before AR navigation begins.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">Review the 2D schematic of the building floors.</div>
+            <div class="sw-instruction-box">Calculated path is clearly highlighted in blue.</div>
+            <div class="sw-instruction-box">Check total distance and estimated arrival time.</div>
+            <div class="sw-instruction-box">Orient yourself before entering the AR navigation mode.</div>
+          </div>
+        </div>
+        <img src="ss/5.jpeg" alt="Route schematic preview" class="screenshot-img">
+      </div>
+
+
+
+      <!-- ── Step F: Navigation Process ── -->
+      <div class="section-divider">
+        <h3>Step F — Navigation Process</h3>
+        <div class="sub-desc">Follow the 3D arrows projected onto the floor in your camera view.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">AR arrows are projected directly onto your camera feed.</div>
+            <div class="sw-instruction-box">HUD displays next turn, distance, and a progress bar.</div>
+            <div class="sw-instruction-box">Advanced motion tracking stays synced as you move.</div>
+            <div class="sw-instruction-box">Use the red <strong>End Route</strong> button to stop early.</div>
+          </div>
+        </div>
+        <img src="ss/6.jpeg" alt="AR navigation view" class="screenshot-img">
+      </div>
+
+      <!-- ── Step G: Turning Points ── -->
+      <div class="section-divider">
+        <h3>Step G — Turning Points</h3>
+        <div class="sub-desc">Clear indicators of when and where to make turns.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">Standard arrows transition into animated turning indicators.</div>
+            <div class="sw-instruction-box">Yellow AR markers highlight exact turning points.</div>
+            <div class="sw-instruction-box">HUD updates with high-visibility turn instructions.</div>
+            <div class="sw-instruction-box">Multi-layered visual cues for complex corridor layouts.</div>
+          </div>
+        </div>
+        <img src="ss/7.jpeg" alt="Animated turn indicator" class="screenshot-img">
+      </div>
+
+      <!-- ── Step H: Arrived Popup ── -->
+      <div class="section-divider">
+        <h3>Step H — Arrived Popup</h3>
+        <div class="sub-desc">The app confirms when you have reached your destination.</div>
+      </div>
+
+      <div class="step-with-screen">
+        <div>
+          <div class="sw-body">
+            <div class="sw-instruction-box">'You Have Arrived' popup appears upon reaching target.</div>
+            <div class="sw-instruction-box">Displays room name, number, and total travel time.</div>
+            <div class="sw-instruction-box">AR session ends automatically to preserve battery life.</div>
+            <div class="sw-instruction-box">Tap <strong>Done</strong> to return to the home screen.</div>
+          </div>
+        </div>
+        <img src="ss/8.jpeg" alt="Arrival confirmation popup" class="screenshot-img">
+      </div>
+
+    </div>
+
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 4 — ADMIN GUIDE
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-admin">
+      <div class="chapter-header">
+        <div class="chapter-num">04</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Building Administrators</span>
+          <div class="chapter-title">Administrator Guide</div>
+          <div class="chapter-desc">How to scan a building and publish a map package for visitors.</div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <div>
+          <strong>Administrator access only.</strong> This chapter is intended for building operators and system
+          administrators. Visitors do not need to perform any of these steps.
+        </div>
+      </div>
+
+
+      <div class="section-divider">
+        <h3>Scanning &amp; Publishing Workflow</h3>
+      </div>
+
+      <div class="step-list">
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">1</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Obtain Building Operator Permission</div>
+            <div class="step-body">Before scanning, obtain explicit written consent from the building operator. Inform
+              them that the scan produces a 3D model of the interior and that the resulting map package will be hosted
+              on a file server accessible to app users.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">2</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Perform a Physical Walkthrough</div>
+            <div class="step-body">Walk the entire floor to be mapped before scanning. Identify and document all
+              hazardous zones, restricted areas, fire exits, and non-walkable regions. These must be marked as
+              non-traversable in the navigation graph before publishing.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Scan the Building with Polycam</div>
+            <div class="step-body">Open Polycam on a LiDAR-equipped iPhone. Walk slowly through all corridors, turning
+              to capture walls, floors, and ceiling. Scan each room that will be a navigable destination. Export the
+              scan as a <strong>GLB, DXF or PNG file</strong> when complete.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">4</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Annotate Points of Interest via Map Editor</div>
+            <div class="step-body">Use the <strong>Vectura AI Map Editor in Manager Panel</strong> to visually add room
+              names, numbers,
+              and department labels to each navigable node. This interface allows you to easily annotate edge types for
+              accessibility-restricted routes.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">5</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Upload the Map Package</div>
+            <div class="step-body">Zip the three output files (building mesh GLB, navigation graph JSON, POI metadata
+              JSON) and upload to the static file server under an incremented version number. Update the version
+              endpoint file. All visitor devices will automatically download the updated package on their next app
+              launch.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-circle">6</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Place the Entrance QR Code</div>
+            <div class="step-body">Print and laminate the signed QR code (generated by the system tools) and affix it at
+              the main entrance of the building, at eye level, on a flat vertical surface with adequate lighting.
+              Confirm QR detection with a test scan before opening to visitors.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 5 — OFFLINE MODE
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-offline">
+      <div class="chapter-header">
+        <div class="chapter-num">05</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Connectivity</span>
+          <div class="chapter-title">Offline Mode &amp; Map Updates</div>
+          <div class="chapter-desc">How Vectura AI behaves without a network connection and how map updates work.</div>
+        </div>
+      </div>
+
+      <p style="font-size:14.5px; line-height:1.8; margin-bottom:24px;">
+        Vectura AI is designed to operate entirely offline once the building map has been downloaded. All navigation
+        calculations — pathfinding, AR rendering, rerouting — run locally on your device. Internet access is only
+        required for the initial map download and for receiving building layout updates.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📶</div>
+          <h4>During Navigation</h4>
+          <p>Network connection is not required. Navigation continues uninterrupted even if you lose signal inside the
+            building.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h4>Map Updates</h4>
+          <p>On each app launch with an internet connection, Vectura AI checks for map updates. If a newer version
+            exists, it downloads automatically in the background before you navigate.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h4>Cached Maps</h4>
+          <p>Downloaded maps are stored on your device. You can navigate without any internet connection after the first
+            download.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h4>Update Speed</h4>
+          <p>Map packages are up to 50 MB and download in under 10 seconds on a 4G connection.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 6 — PRIVACY
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-privacy">
+      <div class="chapter-header">
+        <div class="chapter-num">06</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Privacy &amp; Security</span>
+          <div class="chapter-title">Privacy &amp; Permissions</div>
+          <div class="chapter-desc">What data Vectura AI collects, stores, and transmits — and what it doesn't.</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🔒</span>
+        <div>
+          <strong>Privacy by design.</strong> Vectura AI is built on a data-minimization principle. No personal data is
+          ever collected, stored, or transmitted.
+        </div>
+      </div>
+
+      <table class="req-table" style="margin-top:28px;">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Collected?</th>
+            <th>Stored Where?</th>
+            <th>Transmitted?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Camera feed</td>
+            <td>Processed in memory only</td>
+            <td>Never stored</td>
+            <td><span class="badge badge-green">Never</span></td>
+          </tr>
+          <tr>
+            <td>Location / GPS</td>
+            <td>Not used</td>
+            <td>Never stored</td>
+            <td><span class="badge badge-green">Never</span></td>
+          </tr>
+
+          <tr>
+            <td>Personal identity</td>
+            <td>Not collected</td>
+            <td>Never stored</td>
+            <td><span class="badge badge-green">Never</span></td>
+          </tr>
+          <tr>
+            <td>Analytics / usage data</td>
+            <td>Not collected</td>
+            <td>Never stored</td>
+            <td><span class="badge badge-green">Never</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:13.5px; color: var(--muted); margin-top:20px; line-height:1.7;">
+        Vectura AI complies with <strong>GDPR</strong> (General Data Protection Regulation) and <strong>KVKK</strong>
+        (Kişisel Verilerin Korunması Kanunu) through data minimization by design. The only outbound network requests the
+        application makes are: (1) a version check on launch and (2) a map package download when an update is available.
+      </p>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 7 — FAQ / TROUBLESHOOTING
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-faq">
+      <div class="chapter-header">
+        <div class="chapter-num">07</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Support</span>
+          <div class="chapter-title">Troubleshooting &amp; FAQ</div>
+          <div class="chapter-desc">Common issues and how to resolve them.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> The QR code isn't being detected. What should I do?</div>
+        <div class="faq-a">Ensure the QR code is fully visible and centred in your camera frame. Make sure the area is
+          adequately lit — low light reduces detection reliability. Avoid scanning at extreme angles; try to hold your
+          phone roughly parallel to the surface the code is printed on. If the code is damaged or obscured, contact the
+          building administrator.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> The AR arrows appear offset from the floor. Why?</div>
+        <div class="faq-a">This can happen if the QR code was scanned at an unusual angle, causing a slight misalignment
+          in the AR coordinate frame. Exit the navigation session, return to the entrance QR code, and re-scan it.
+          Ensure you hold the phone horizontally when scanning the code for best results.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> The app says my device is not ARCore compatible. What does
+          that mean?</div>
+        <div class="faq-a">Vectura AI requires a device that supports Google ARCore (Android) or Apple ARKit (iOS).
+          Older devices or some budget Android models may not be supported. Check the official ARCore supported devices
+          list on Google's website to confirm your device's status.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> The app went to the background and now asks me to re-scan.
+          Is that normal?</div>
+        <div class="faq-a">Yes. If the AR session is released by the operating system while the app is in the
+          background, Vectura AI will ask you to re-scan the entrance QR code. Your selected destination is preserved,
+          so you will not need to search again — just re-scan and continue.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> The map download is taking very long. What can I do?</div>
+        <div class="faq-a">The map package is up to 50 MB and should download in under 10 seconds on a 4G connection. If
+          the download is slow, try switching to Wi-Fi. If the download consistently fails, check that you have at least
+          100 MB of free storage on your device and a stable internet connection.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span> My destination is not appearing in the search results.
+        </div>
+        <div class="faq-a">The search list is drawn from the building's published map package. If a room or department
+          is missing, the building administrator may need to update the map's Points of Interest list. Try searching by
+          room number as an alternative to the room name.</div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+       CHAPTER 8 — GLOSSARY
+  ═══════════════════════════════════════ -->
+    <div class="chapter" id="ch-glossary">
+      <div class="chapter-header">
+        <div class="chapter-num">08</div>
+        <div class="chapter-meta">
+          <span class="chapter-tag">Reference</span>
+          <div class="chapter-title">Glossary</div>
+          <div class="chapter-desc">Definitions of technical terms used in this manual.</div>
+        </div>
+      </div>
+
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>Definition</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AR (Augmented Reality)</strong></td>
+            <td>Technology that overlays digital content, such as directional arrows, onto a live camera view of the
+              physical world.</td>
+          </tr>
+          <tr>
+            <td><strong>ARCore</strong></td>
+            <td>Google's augmented reality SDK for Android, providing motion tracking and plane detection on compatible
+              devices.</td>
+          </tr>
+          <tr>
+            <td><strong>ARKit</strong></td>
+            <td>Apple's equivalent augmented reality SDK for iOS devices.</td>
+          </tr>
+          <tr>
+            <td><strong>QR Code</strong></td>
+            <td>A two-dimensional barcode placed at building entrances; scanning it establishes the AR coordinate frame
+              used for navigation.</td>
+          </tr>
+          <tr>
+            <td><strong>AR Anchor</strong></td>
+            <td>A fixed reference point in the real world from which the app's AR coordinate system is oriented.
+              Established by scanning the entrance QR code.</td>
+          </tr>
+          <tr>
+            <td><strong>Map Package</strong></td>
+            <td>A ZIP file containing the building mesh, navigation graph, and point-of-interest data; downloaded once
+              and cached on your device.</td>
+          </tr>
+          <tr>
+            <td><strong>POI (Point of Interest)</strong></td>
+            <td>Any named, navigable destination in the building, such as a room, office, or department.</td>
+          </tr>
+          <tr>
+            <td><strong>NavMesh</strong></td>
+            <td>A two-dimensional surface baked in the app representing all walkable floor areas, used to determine
+              where AR arrows are placed.</td>
+          </tr>
+          <tr>
+            <td><strong>Rerouting</strong></td>
+            <td>Automatic recalculation of a new path when you deviate more than one metre from your original route.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>HUD (Heads-Up Display)</strong></td>
+            <td>The on-screen overlay shown during navigation, displaying turn instructions, remaining distance, and a
+              minimap thumbnail.</td>
+          </tr>
+          <tr>
+            <td><strong>LiDAR</strong></td>
+            <td>A depth-sensing technology available on select iPhone Pro models, used by administrators to scan
+              building interiors for map creation.</td>
+          </tr>
+          <tr>
+            <td><strong>VIO (Visual-Inertial Odometry)</strong></td>
+            <td>The technique ARCore uses to track your device's position and orientation by combining camera imagery
+              and motion sensor data.</td>
+          </tr>
+          <tr>
+            <td><strong>AI Assistant</strong></td>
+            <td>An integrated natural language processing tool that allows users to find destinations and start
+              navigation using voice or text commands semantically.</td>
+          </tr>
+          <tr>
+            <td><strong>GDPR</strong></td>
+            <td>General Data Protection Regulation — European Union privacy law. Vectura AI complies by design through
+              data minimization.</td>
+          </tr>
+          <tr>
+            <td><strong>KVKK</strong></td>
+            <td>Kişisel Verilerin Korunması Kanunu — Turkish personal data protection law. Vectura AI complies by
+              design.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="height: 60px;"></div>
+
+    </div>
+
+  </div><!-- end .page-wrap -->
+
+
+  <!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+  <div class="manual-footer">
+    <div>
+      <div class="footer-logo">Vectura <span>AI</span></div>
+      <div>Hardware-free AR indoor navigation<br>Bilkent University · CS491/492 Senior Design · Team T2523</div>
+    </div>
+    <div class="footer-links">
+      <div>User Manual · Version 1.0</div>
+      <div>Android &amp; iOS</div>
+      <div style="margin-top:8px; font-size:10.5px; opacity:0.6;">
+        © 2025 Team T2523. All rights reserved.<br>
+        No personal data is collected by this application.
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
