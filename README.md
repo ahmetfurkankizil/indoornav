@@ -2,6 +2,8 @@
 
 > Kotlin Multiplatform indoor AR navigation for Android & iOS.
 
+**View the website:** [ahmetfurkankizil.github.io/vecturai](https://ahmetfurkankizil.github.io/vecturai/)
+
 **v1.7.0-rc1** | [First-Day Setup](docs/setup/first-day-setup.md) | [Architecture](docs/handoff/architecture-summary.md)
 
 ---
